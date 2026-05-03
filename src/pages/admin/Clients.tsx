@@ -1,0 +1,89 @@
+import { Building2, Globe2, Lock, Plus, Search } from "lucide-react";
+import { Card, CardHeader } from "@/components/ui/Card";
+import Badge from "@/components/ui/Badge";
+import AdminShell from "./AdminShell";
+
+const CLIENTS = [
+  { id: "c-001", name: "Hotel Optimizer Demo",       brand: "Hotel Optimizer",  type: "Direct SaaS",     properties: 8,  region: "Global",     status: "Active",     billing: "USD"  },
+  { id: "c-002", name: "Aurora Hospitality Group",   brand: "Aurora Hotels",     type: "White-label",     properties: 24, region: "EMEA",        status: "Active",     billing: "EUR"  },
+  { id: "c-003", name: "Pacifica Resorts",            brand: "Pacifica",           type: "White-label",     properties: 12, region: "APAC",        status: "Active",     billing: "SGD"  },
+  { id: "c-004", name: "Alpine Lodges Holdings",      brand: "AlpineLodge",        type: "Sovereign hosting",properties: 6,  region: "Americas",   status: "Active",     billing: "CAD"  },
+  { id: "c-005", name: "MENA Sustainable Hotels",     brand: "MENA-Sustain",       type: "White-label",     properties: 9,  region: "MENA",        status: "Onboarding", billing: "AED"  },
+];
+
+export default function AdminClients() {
+  return (
+    <AdminShell
+      eyebrow="Tenancy"
+      title="Clients & deployments"
+      subtitle="Each client gets full data isolation. Deployment type controls branding, hosting, and module toggles."
+      actions={<button className="btn-primary"><Plus size={14} /> New client</button>}
+    >
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <Tile label="Total clients"           value="5"  hint="across 4 deployment types" />
+        <Tile label="White-label"             value="3"  />
+        <Tile label="Sovereign hosting"       value="1"  />
+        <Tile label="Properties under licence" value="59" />
+      </div>
+
+      <div className="flex items-center gap-2">
+        <div className="relative w-72">
+          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-400" />
+          <input className="input pl-9" placeholder="Search by client, brand, region…" />
+        </div>
+        <select className="input max-w-[180px]"><option>All deployment types</option></select>
+        <select className="input max-w-[150px]"><option>All regions</option></select>
+      </div>
+
+      <Card>
+        <CardHeader title="Clients" hint={`${CLIENTS.length} on platform`} />
+        <div className="overflow-x-auto">
+          <table className="min-w-full">
+            <thead>
+              <tr className="bg-ink-50">
+                <th className="table-th">Client</th>
+                <th className="table-th">Brand</th>
+                <th className="table-th">Deployment</th>
+                <th className="table-th">Properties</th>
+                <th className="table-th">Region</th>
+                <th className="table-th">Billing currency</th>
+                <th className="table-th">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {CLIENTS.map((c) => (
+                <tr key={c.id} className="hover:bg-ink-50/60 cursor-pointer">
+                  <td className="table-td font-medium text-ink-900">
+                    <div className="flex items-center gap-2"><Building2 size={14} className="text-brand-700" /> {c.name}</div>
+                  </td>
+                  <td className="table-td">{c.brand}</td>
+                  <td className="table-td">
+                    <Badge tone={c.type === "Direct SaaS" ? "info" : c.type === "Sovereign hosting" ? "warn" : "brand"}>
+                      {c.type === "Sovereign hosting" && <Lock size={10} className="mr-0.5" />}
+                      {c.type === "White-label" && <Globe2 size={10} className="mr-0.5" />}
+                      {c.type}
+                    </Badge>
+                  </td>
+                  <td className="table-td tabular-nums">{c.properties}</td>
+                  <td className="table-td">{c.region}</td>
+                  <td className="table-td">{c.billing}</td>
+                  <td className="table-td"><Badge tone={c.status === "Active" ? "good" : "warn"}>{c.status}</Badge></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </Card>
+    </AdminShell>
+  );
+}
+
+function Tile({ label, value, hint }: { label: string; value: string; hint?: string }) {
+  return (
+    <div className="rounded-xl border border-ink-200 bg-white p-4">
+      <div className="text-[11px] uppercase tracking-wide font-semibold text-ink-500">{label}</div>
+      <div className="text-2xl font-bold text-ink-900 mt-0.5">{value}</div>
+      {hint && <div className="text-[11px] text-ink-500">{hint}</div>}
+    </div>
+  );
+}

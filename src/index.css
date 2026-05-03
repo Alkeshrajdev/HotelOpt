@@ -1,0 +1,242 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ---------------------------------------------------------------
+ * DESIGN TOKENS — runtime variables.
+ * Brand colors are RGB triplets so Tailwind opacity utilities work
+ * (`bg-brand-700/40`). White-label override path: write to these
+ * variables on :root or a parent container.
+ * --------------------------------------------------------------- */
+:root {
+  /* Brand — overridable for white-label. */
+  --brand-50:  236 248 241;
+  --brand-100: 210 239 221;
+  --brand-200: 166 224 189;
+  --brand-300: 113 203 151;
+  --brand-400:  63 179 116;
+  --brand-500:  31 155  91;
+  --brand-600:  19 128  73;
+  --brand-700:  15 106  60;
+  --brand-800:  12  85  48;
+  --brand-900:  10  69  40;
+  --brand-950:   7  42  26;
+
+  /* Neutral ink scale — RGB triplets for dark-mode CSS-var flipping. */
+  --ink-900: 15 23 42;
+  --ink-700: 51 65 85;
+  --ink-600: 71 85 105;
+  --ink-500: 100 116 139;
+  --ink-400: 148 163 184;
+  --ink-300: 203 213 225;
+  --ink-200: 226 232 240;
+  --ink-100: 241 245 249;
+  --ink-50:  247 249 252;
+
+  /* Surface token — white in light mode, overridden in dark. */
+  --surface: 255 255 255;
+
+  /* Resolved hex mirrors for chart code that wants a hex string. */
+  --brand-700-hex:    #0F6A3C;
+  --brand-500-hex:    #1F9B5B;
+  --pillar-energy-hex:#16A34A;
+  --pillar-water-hex: #0EA5E9;
+  --pillar-waste-hex: #14B8A6;
+  --pillar-carbon-hex:#0F766E;
+  --pillar-social-hex:#7C3AED;
+  --pillar-governance-hex:#EA580C;
+  --status-good-hex:  #16A34A;
+  --status-warn-hex:  #F59E0B;
+  --status-bad-hex:   #DC2626;
+  --status-info-hex:  #0EA5E9;
+
+  /* Status — RGB triplets for Tailwind opacity utilities (bg-good/10 etc.) */
+  --good: 22 163 74;
+  --warn: 245 158 11;
+  --bad:  220 38 38;
+  --info: 14 165 233;
+
+  /* Pillar — RGB triplets for opacity utilities (bg-pillar-energy/10 etc.)
+   * Energy=green · Water=blue · Waste=teal · Carbon=deep-teal · Social=purple · Gov=orange */
+  --pillar-energy: 22 163 74;    /* #16A34A */
+  --pillar-water:  14 165 233;   /* #0EA5E9 */
+  --pillar-waste:  20 184 166;   /* #14B8A6 */
+  --pillar-carbon: 15 118 110;   /* #0F766E */
+  --pillar-social: 124 58 237;   /* #7C3AED */
+  --pillar-gov:    234 88 12;    /* #EA580C */
+}
+
+@layer base {
+  html, body, #root { height: 100%; }
+  body {
+    background: #F6F8F7;
+    @apply text-ink-900 font-sans antialiased;
+    font-feature-settings: "cv11", "ss01";
+  }
+  * { -webkit-font-smoothing: antialiased; }
+
+  h1.page-title {
+    @apply text-page-title text-ink-900;
+  }
+}
+
+@layer components {
+  /* ----- Cards (base) ----- */
+  .card {
+    @apply bg-white border border-ink-200 rounded-xl2 shadow-card;
+  }
+  .card-lg {
+    @apply bg-white border border-ink-200 rounded-xl3 shadow-card-lg;
+  }
+  .card-pad {
+    @apply p-6;
+  }
+  .card-pad-lg {
+    @apply p-7;
+  }
+
+  /* ----- Card hierarchy (BRD §1.2) ----- */
+  /* Level 1 — Primary KPIs and urgent insights. Stronger shadow, 1.5rem padding. */
+  .card-level-1 {
+    @apply bg-white border border-ink-200 rounded-xl2 p-6;
+    box-shadow: 0 2px 4px rgba(15, 23, 42, 0.06), 0 8px 24px rgba(15, 23, 42, 0.08);
+  }
+  /* Level 1 with a pillar-coloured left accent bar (border-l colour set inline). */
+  .card-level-1-accent {
+    @apply bg-white border border-ink-200 rounded-xl2 p-6 border-l-4;
+    box-shadow: 0 2px 4px rgba(15, 23, 42, 0.06), 0 8px 24px rgba(15, 23, 42, 0.08);
+  }
+  /* Level 2 — Standard: trend charts, comparison tables, six-pillar grids. */
+  .card-level-2 {
+    @apply bg-white rounded-xl2 shadow-card border border-ink-200/60;
+  }
+  /* Level 3 — Supporting: notes, evidence metadata, contextual warnings. */
+  .card-level-3 {
+    @apply bg-ink-50 border border-ink-100 rounded-xl p-4;
+  }
+
+  /* ----- Typography helpers (BRD §1.3) ----- */
+  /* Use Tailwind utilities directly where possible; these helpers combine size + colour. */
+  .page-subtitle {
+    @apply text-[13px] leading-snug text-ink-500;
+  }
+  .section-heading {
+    @apply text-[17px] font-semibold leading-snug text-ink-700;
+  }
+  .helper-text {
+    @apply text-[12px] leading-relaxed text-ink-500;
+  }
+  .kpi-label {
+    @apply text-[11px] uppercase tracking-[0.06em] font-semibold text-ink-500;
+  }
+
+  /* ----- Chips & badges ----- */
+  .chip {
+    @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium;
+  }
+  .kbd {
+    @apply px-1.5 py-0.5 text-[10px] font-medium rounded border border-ink-200 bg-ink-50 text-ink-500;
+  }
+
+  /* ----- Sidebar (dark emerald) ----- */
+  .sidebar-shell {
+    @apply flex flex-col shrink-0 transition-[width] duration-200 ease-out;
+    background: var(--sidebar-bg, #062A1C);
+    color: var(--sidebar-text, #A7D5BC);
+    border-right: 1px solid var(--sidebar-border, #0E3D28);
+  }
+  .sidebar-divider {
+    border-color: var(--sidebar-border, #0F4528);
+  }
+  .nav-item {
+    @apply flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors;
+    color: var(--sidebar-text, #A7D5BC);
+  }
+  .nav-item:hover {
+    background: var(--sidebar-bg-hover, #0E3A26);
+    color: #FFFFFF;
+  }
+  .nav-item-active {
+    @apply shadow-sm;
+    background: var(--sidebar-bg-active, #0F6A3C);
+    color: #FFFFFF;
+  }
+  .nav-item-active:hover {
+    background: var(--sidebar-bg-active, #0F6A3C);
+    color: #FFFFFF;
+  }
+  .nav-group-heading {
+    color: var(--sidebar-heading, #5C8E73);
+  }
+
+  /* ----- Inputs ----- */
+  .input {
+    @apply w-full h-9 px-3 rounded-lg border border-ink-200 bg-white text-sm
+           placeholder:text-ink-400 focus:outline-none focus:ring-2 focus:ring-brand-500/30 focus:border-brand-500;
+  }
+
+  /* ----- Buttons ----- */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 h-9 px-3.5 rounded-lg text-sm font-medium
+           transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .btn-primary {
+    @apply btn bg-brand-700 text-white hover:bg-brand-800;
+  }
+  .btn-secondary {
+    @apply btn bg-white border border-ink-200 text-ink-700 hover:bg-ink-100;
+  }
+  .btn-ghost {
+    @apply btn text-ink-600 hover:bg-ink-100;
+  }
+
+  /* ----- Tabs ----- */
+  .tab {
+    @apply inline-flex items-center gap-2 px-3.5 py-2 rounded-lg text-sm font-medium
+           text-ink-500 hover:text-ink-900 transition-colors;
+  }
+  .tab-active {
+    @apply bg-white text-ink-900 shadow-card border border-ink-200;
+  }
+
+  /* ----- Progress ----- */
+  .progress {
+    @apply h-1.5 rounded-full bg-ink-100 overflow-hidden;
+  }
+  .progress > span {
+    @apply block h-full bg-brand-500 rounded-full;
+  }
+
+  /* ----- Tables ----- */
+  .table-th {
+    @apply text-left text-[11px] uppercase tracking-wide font-semibold text-ink-500 px-4 py-2.5;
+  }
+  .table-td {
+    @apply px-4 py-3.5 text-sm text-ink-700 border-t border-ink-200;
+  }
+}
+
+
+/* Scrollbar polish */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 8px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-track { background: transparent; }
+
+/* Sidebar gets a darker scrollbar to match the dark theme. */
+.sidebar-shell ::-webkit-scrollbar-thumb {
+  background: #18472D;
+  background-clip: padding-box;
+}
+.sidebar-shell ::-webkit-scrollbar-thumb:hover {
+  background: #235C3C;
+  background-clip: padding-box;
+}
