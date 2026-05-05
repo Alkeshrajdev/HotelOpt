@@ -3,6 +3,7 @@
 // Fold 2: Hotel operating context, performance detail, data quality, framework readiness.
 
 import { useState } from "react";
+import { useTopbar } from "@/lib/topbarContext";
 import { Link } from "react-router-dom";
 import {
   LineChart,
@@ -109,6 +110,9 @@ const anyPillarCritical  = PILLARS.some((p) => p.score < 60);
 const portfolioStatus    = anyPillarCritical ? "Critical" : pillarsAboveTarget >= 4 ? "On Track" : "Attention";
 
 export default function Dashboard() {
+  const { property, period, dataBasis } = useTopbar();
+  const isPortfolioView = property === "All Properties (72)";
+
   const [trendMetric, setTrendMetric] = useState<(typeof TREND_METRICS)[number]["key"]>("energyIntensity");
   const activeTrend = TREND_METRICS.find((m) => m.key === trendMetric)!;
 
@@ -138,9 +142,13 @@ export default function Dashboard() {
 
       {/* ── Page Header + Workflow ── */}
       <PageHeader
-        eyebrow="Portfolio overview"
+        eyebrow={isPortfolioView ? "Portfolio overview" : "Property overview"}
         title="Executive Dashboard"
-        subtitle="Cross-pillar performance, data quality, and actions across the entire portfolio."
+        subtitle={
+          isPortfolioView
+            ? `Cross-pillar performance, data quality, and actions across the entire portfolio · ${period} · ${dataBasis === "approved" ? "Approved data" : dataBasis === "approved+provisional" ? "Approved + provisional" : dataBasis}`
+            : `Performance, data quality, and actions for ${property} · ${period}`
+        }
         actions={
           <button className="btn-primary">
             <Download size={14} /> Export

@@ -27,6 +27,7 @@ import {
   Zap,
 } from "lucide-react";
 import PageHeader from "@/components/ui/PageHeader";
+import DemoNotice from "@/components/ui/DemoNotice";
 import { Card, CardHeader } from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import { KNOWLEDGE_TOPICS } from "@/lib/mock";
@@ -226,6 +227,7 @@ export default function AIAssistant() {
           </button>
         }
       />
+      <DemoNotice message="Responses shown are illustrative examples. In a live environment, answers are grounded in your verified sustainability records." />
 
       <div className="grid grid-cols-12 gap-4 items-start">
         {/* ---- History sidebar ---- */}

@@ -49,6 +49,7 @@ import {
   X,
 } from "lucide-react";
 import PageHeader from "@/components/ui/PageHeader";
+import DemoNotice from "@/components/ui/DemoNotice";
 import { Card, CardHeader } from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import EmptyState from "@/components/ui/EmptyState";
@@ -249,6 +250,7 @@ export default function ReviewApproval() {
 
   return (
     <div className="space-y-5">
+      <DemoNotice message="Records shown are sample data. In a live environment, submitted records from makers flow here for checker review, approval, and audit logging." />
       <PageHeader
         eyebrow="Approval queue"
         title="Review & Approval"

@@ -1,7 +1,8 @@
 import { FormEvent, useState } from "react";
 import { Navigate, useLocation } from "react-router-dom";
-import { Leaf, Loader2 } from "lucide-react";
+import { FlaskConical, Leaf, Loader2 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
+import { SUPABASE_CONFIGURED } from "@/lib/supabase";
 
 export default function Login() {
   const { session, signIn, loading } = useAuth();
@@ -100,9 +101,17 @@ export default function Login() {
             Sign in
           </button>
 
-          <p className="text-[12px] text-ink-500 mt-4">
-            Demo accounts (after seeding) — <code className="kbd">maker@demo.test</code> / <code className="kbd">checker@demo.test</code>, password <code className="kbd">demo123!</code>.
-          </p>
+          {!SUPABASE_CONFIGURED && (
+            <div className="mt-5 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-[12px] text-amber-800">
+              <div className="flex items-center gap-1.5 font-semibold mb-1">
+                <FlaskConical size={13} className="text-amber-500" />
+                Demo environment
+              </div>
+              <p className="text-amber-700 leading-relaxed">
+                Sample data only — not connected to live client records. Click <strong>Enter Demo</strong> to explore without credentials.
+              </p>
+            </div>
+          )}
         </form>
       </div>
     </div>
