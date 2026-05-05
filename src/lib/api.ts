@@ -2,6 +2,8 @@
 // or throws. Call from React Query / SWR / useEffect — your choice.
 
 import { supabase } from "./supabase";
+
+// These functions are only called when Supabase is configured (SUPABASE_CONFIGURED === true).
 import type { Inserts, Tables } from "./database.types";
 
 export type Property = Tables<"properties">;
@@ -11,7 +13,7 @@ export type EmissionFactor = Tables<"ef_library">;
 /* ---------------- Properties ---------------- */
 
 export async function listProperties(): Promise<Property[]> {
-  const { data, error } = await supabase
+  const { data, error } = await supabase!
     .from("properties")
     .select("*")
     .order("name");
@@ -22,7 +24,7 @@ export async function listProperties(): Promise<Property[]> {
 /* ---------------- EF Library ---------------- */
 
 export async function listEnergyEFs(): Promise<EmissionFactor[]> {
-  const { data, error } = await supabase
+  const { data, error } = await supabase!
     .from("ef_library")
     .select("*")
     .eq("is_active", true)
@@ -41,7 +43,7 @@ export async function listRecords(opts?: {
   status?: ConsumptionRecord["status"];
   propertyId?: string;
 }): Promise<RecordWithProperty[]> {
-  let q = supabase
+  let q = supabase!
     .from("consumption_records")
     .select("*, property:properties(id,name,region)")
     .order("created_at", { ascending: false })
@@ -67,7 +69,7 @@ export async function createRecord(payload: {
   notes?: string | null;
   submit?: boolean;
 }): Promise<ConsumptionRecord> {
-  const { data: userResp } = await supabase.auth.getUser();
+  const { data: userResp } = await supabase!.auth.getUser();
   const uid = userResp.user?.id;
   if (!uid) throw new Error("Not signed in");
 
@@ -91,7 +93,7 @@ export async function createRecord(payload: {
     input_method: "manual",
   };
 
-  const { data, error } = await supabase
+  const { data, error } = await supabase!
     .from("consumption_records")
     .insert(insert)
     .select()
@@ -105,7 +107,7 @@ export async function transitionRecord(
   next: ConsumptionRecord["status"],
   comment?: string
 ): Promise<ConsumptionRecord> {
-  const { data: userResp } = await supabase.auth.getUser();
+  const { data: userResp } = await supabase!.auth.getUser();
   const uid = userResp.user?.id;
   if (!uid) throw new Error("Not signed in");
 
@@ -115,7 +117,7 @@ export async function transitionRecord(
     reviewed_at: new Date().toISOString(),
   };
 
-  const { data, error } = await supabase
+  const { data, error } = await supabase!
     .from("consumption_records")
     .update(patch)
     .eq("id", id)
@@ -124,7 +126,7 @@ export async function transitionRecord(
   if (error) throw error;
 
   if (comment) {
-    const { error: cErr } = await supabase.from("record_comments").insert({
+    const { error: cErr } = await supabase!.from("record_comments").insert({
       record_id: id,
       author_id: uid,
       body: comment,
@@ -141,7 +143,7 @@ export type Comment = Tables<"record_comments"> & {
 };
 
 export async function listComments(recordId: string): Promise<Comment[]> {
-  const { data, error } = await supabase
+  const { data, error } = await supabase!
     .from("record_comments")
     .select("*, author:user_profiles(id,full_name,role)")
     .eq("record_id", recordId)

@@ -1,4 +1,4 @@
-// Data Capture — BRD §6 (FR-1) compliant.
+// Data Capture — BRD §6 compliant.
 //
 // 5-step flow per BRD revision:
 //   Step 1: Pick a data type
@@ -177,9 +177,9 @@ export default function DataCapture() {
   return (
     <div className="space-y-5">
       <PageHeader
-        eyebrow="Foundation of the platform · FR-1"
+        eyebrow="Enter and submit sustainability data"
         title="Data Capture"
-        subtitle="Choose what to enter, then how to enter it. Every input method routes through Maker–Checker (FR-2) — nothing is used in dashboards or reports until approved."
+        subtitle="Choose what to capture and how to enter it. All submissions are reviewed by a checker before they appear in dashboards or reports."
       />
 
       <Stepper
@@ -302,7 +302,7 @@ function PickDataType({ onPick }: { onPick: (k: DataTypeKey) => void }) {
           <h2 className="text-lg font-bold text-ink-900">What do you want to capture?</h2>
         </div>
         <p className="text-sm text-ink-500 max-w-md">
-          Every BRD-listed data type has its own dedicated form. Manual entry is always available; additional automated methods appear on the next step.
+          Every data type has its own dedicated form. Manual entry is always available; additional automated methods appear on the next step.
         </p>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -320,9 +320,6 @@ function PickDataType({ onPick }: { onPick: (k: DataTypeKey) => void }) {
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="text-sm font-bold text-ink-900">{dt.label}</div>
-                  {dt.brdRef && (
-                    <div className="text-[10px] font-mono text-ink-400 mt-0.5">{dt.brdRef}</div>
-                  )}
                 </div>
                 <ChevronRight size={14} className="text-ink-300 mt-2.5" />
               </div>
@@ -367,7 +364,7 @@ function PickMethod({
           <h2 className="text-lg font-bold text-ink-900">How would you like to enter it?</h2>
         </div>
         <p className="text-sm text-ink-500 max-w-md">
-          Methods follow BRD §6.1. Manual entry is always available. Methods marked <em>Requires setup</em> need a one-time configuration in Admin.
+          Manual entry is always available. Methods marked <em>Requires setup</em> need a one-time configuration in Admin.
         </p>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -393,7 +390,6 @@ function PickMethod({
               <div className="min-w-0 flex-1">
                 <div className="flex items-center justify-between gap-2">
                   <div className="text-sm font-bold text-ink-900">{meta.label}</div>
-                  <span className="text-[10px] font-mono text-ink-400">{meta.brdRef}</span>
                 </div>
                 <p className="text-[12px] text-ink-500 mt-1 leading-snug">{meta.description}</p>
                 <div className="mt-2">
@@ -460,13 +456,13 @@ function MethodWorkflow({
 
       <div className="col-span-12 lg:col-span-4 space-y-4">
         <Card>
-          <CardHeader title="Submission flow" hint="DP-03 · DP-11" />
+          <CardHeader title="Submission flow" hint="review before commit" />
           <ol className="px-5 pb-5 space-y-3 text-sm">
             <FlowStep n={1} title="Capture" body="Manual, OCR, bulk, QR, API, or supplier portal." />
             <FlowStep n={2} title="Preview" body="Read-only summary. Anomaly flags surfaced before submission." />
-            <FlowStep n={3} title="Submit" body="Maker explicitly submits — record locks until checker acts (FR-2.1)." />
-            <FlowStep n={4} title="Checker" body="Anomaly-flagged records surface first (FR-2.3). Approve / Query / Reject." />
-            <FlowStep n={5} title="Audit trail" body="Immutable log; original value preserved (FR-2.5)." done />
+            <FlowStep n={3} title="Submit" body="Maker explicitly submits — record locks until checker acts." />
+            <FlowStep n={4} title="Checker" body="Anomaly-flagged records surface first. Approve / Query / Reject." />
+            <FlowStep n={5} title="Audit trail" body="Immutable log; original value preserved." done />
           </ol>
         </Card>
         <Card>
@@ -474,7 +470,7 @@ function MethodWorkflow({
           <ul className="p-5 space-y-2 text-sm text-ink-700">
             <li className="flex items-start gap-2">
               <Sparkles size={14} className="text-brand-700 mt-1" />
-              <span>AI is assistive, never authoritative — every field can be edited before submission (DP-11).</span>
+              <span>AI is assistive, never authoritative — every field can be edited before submission.</span>
             </li>
             <li className="flex items-start gap-2">
               <ShieldCheck size={14} className="text-good mt-1" />
@@ -539,7 +535,7 @@ function PreviewScreen({
         <Card>
           <CardHeader
             title="Submission preview"
-            hint={`${cfg.label} · ${METHOD_META[method].label} · DP-03`}
+            hint={`${cfg.label} · ${METHOD_META[method].label}`}
           />
           <div className="px-5 pb-5 space-y-4">
             {/* Property + method summary */}
@@ -606,7 +602,7 @@ function PreviewScreen({
             {/* DP-03 notice */}
             <div className="rounded-xl bg-brand-50 border border-brand-100 p-3 flex items-start gap-2 text-[12px] text-brand-900">
               <Sparkles size={14} className="text-brand-700 mt-0.5 shrink-0" />
-              Submitting routes through Maker–Checker (FR-2). Nothing commits to dashboards or reports until a checker approves.
+              Submitting routes through Maker–Checker. Nothing commits to dashboards or reports until a checker approves.
             </div>
 
             {submitError && (
@@ -634,7 +630,7 @@ function PreviewScreen({
 
       <div className="col-span-12 lg:col-span-4">
         <Card>
-          <CardHeader title="What happens next" hint="FR-2" />
+          <CardHeader title="What happens next" hint="review workflow" />
           <ol className="px-5 pb-5 space-y-3 text-sm">
             <FlowStep n={1} title="Record locked" body="Once submitted, the record is locked for editing until checker acts." />
             <FlowStep n={2} title="Anomaly triage" body="Flagged records surface first in the checker queue." />
@@ -806,7 +802,7 @@ function ManualWorkflow({
     <Card>
       <CardHeader
         title={`Manual entry — ${cfg.label}`}
-        hint={`DP-02 · DP-05 · BRD ${cfg.brdRef}`}
+        hint={cfg.label}
       />
       <div className="px-5 pt-4">
         <Field label="Property" required error={errors["propertyId"]}>
@@ -880,7 +876,7 @@ function ManualWorkflow({
 
         <div className="col-span-2 rounded-xl bg-brand-50 border border-brand-100 p-3 text-[12px] text-brand-800 flex items-center gap-2">
           <Sparkles size={14} />
-          Submitting routes through Maker–Checker (FR-2). No data commits without checker approval.
+          Submitting routes through Maker–Checker. No data commits without checker approval.
         </div>
 
         {Object.keys(errors).length > 0 && attempted && (
@@ -1052,7 +1048,7 @@ function GovernanceWorkflow({
 
   return (
     <Card>
-      <CardHeader title="Governance attestation" hint="FR-1.2.13 · GRI 102/205/414 · annual" />
+      <CardHeader title="Governance attestation" hint="GRI 102/205/414 · annual" />
       <div className="px-5 pt-4 pb-5 space-y-5">
         <Field label="Property" required error={attempted ? errors["propertyId"] : undefined}>
           <select
@@ -1406,7 +1402,7 @@ function OcrWorkflow({ cfg, onPreview }: { cfg: DataTypeConfig; onPreview: (r: C
 
   return (
     <Card>
-      <CardHeader title={`OCR — ${cfg.label}`} hint={`BRD ${cfg.brdRef ?? ""} · FR-1.3`} />
+      <CardHeader title={`OCR — ${cfg.label}`} hint="text recognition from documents" />
       <div className="grid grid-cols-2 gap-4 p-5">
         {/* Upload + document preview */}
         <div className="rounded-xl border-2 border-dashed border-ink-200 bg-ink-50 grid place-items-center text-center p-6 min-h-[300px]">
@@ -1596,7 +1592,7 @@ function BulkWorkflow({ cfg, onPreview }: { cfg: DataTypeConfig; onPreview: (r: 
 
   return (
     <Card>
-      <CardHeader title={`Bulk upload — ${cfg.label}`} hint="FR-1.4 · all rows pass or none commit" />
+      <CardHeader title={`Bulk upload — ${cfg.label}`} hint="all rows pass or none commit" />
       <div className="p-5 space-y-3">
         <div className="flex flex-wrap gap-3">
           <Field label="Property" required>
@@ -1756,7 +1752,7 @@ function QrWorkflow({ cfg, onPreview }: { cfg: DataTypeConfig; onPreview: (r: Ca
     <Card>
       <CardHeader
         title={`QR scan — ${cfg.label}`}
-        hint="FR-1.5 · DP-06 · sub-30s mobile flow"
+        hint="sub-30s mobile flow"
         right={
           <div className="flex items-center gap-2 text-[11px]">
             <button
@@ -1891,7 +1887,7 @@ function QrWorkflow({ cfg, onPreview }: { cfg: DataTypeConfig; onPreview: (r: Ca
         <div>
           <div className="text-sm font-semibold text-ink-900 mb-2">Mobile flow</div>
           <ol className="space-y-2 text-sm text-ink-700">
-            <li className="flex items-center gap-2"><Smartphone size={14} className="text-brand-700" /> Scan QR on phone — no app install (DP-06).</li>
+            <li className="flex items-center gap-2"><Smartphone size={14} className="text-brand-700" /> Scan QR on phone — no app install.</li>
             <li className="flex items-center gap-2"><ClipboardEdit size={14} className="text-brand-700" /> Tap the stream — large gloved-hand-friendly buttons.</li>
             <li className="flex items-center gap-2"><Camera size={14} className="text-brand-700" /> Optional photo attachment per scan.</li>
             <li className="flex items-center gap-2"><AlertTriangle size={14} className="text-warn" /> Flag contamination — surfaces to checker automatically.</li>
@@ -1960,7 +1956,7 @@ function ApiWorkflow({ cfg }: { cfg: DataTypeConfig }) {
 
   return (
     <Card>
-      <CardHeader title={`API integrations — ${cfg.label}`} hint="FR-1.7 · last sync · field mapping" />
+      <CardHeader title={`API integrations — ${cfg.label}`} hint="last sync · field mapping" />
       <div className="p-5 space-y-3">
         {relevant.map((i) => {
           const tone = STATUS_TONE[i.status];
@@ -2031,7 +2027,7 @@ function ApiWorkflow({ cfg }: { cfg: DataTypeConfig }) {
       <div className="px-5 pb-5 space-y-3">
         <div className="rounded-xl bg-brand-50 border border-brand-100 p-3 flex items-start gap-2 text-[12px] text-brand-900">
           <Info size={14} className="text-brand-700 mt-0.5" />
-          <span>All API responses are pre-populated into the standard manual form for the maker to review (DP-03). Nothing commits without explicit submission.</span>
+          <span>All API responses are pre-populated into the standard form for the maker to review. Nothing commits without explicit submission.</span>
         </div>
 
         <div>
@@ -2071,7 +2067,7 @@ function SurveyWorkflow({ cfg }: { cfg: DataTypeConfig }) {
     <Card>
       <CardHeader
         title={`Surveys — ${cfg.label}`}
-        hint="FR-1.6 · supplier · employee · guest · manager"
+        hint="supplier · employee · guest · manager"
         right={
           <button onClick={() => setCreateMode((v) => !v)} className="btn-primary">
             <Plus size={14} /> {createMode ? "Cancel" : "New campaign"}
@@ -2105,7 +2101,7 @@ function SurveyWorkflow({ cfg }: { cfg: DataTypeConfig }) {
             <textarea className="input min-h-[80px] py-2" placeholder="emails, one per line" />
           </label>
           <div className="col-span-2 rounded-xl bg-brand-50 border border-brand-100 p-3 text-[12px] text-brand-800">
-            Responses pre-populate the relevant entry form for Checker review before commit (DP-03).
+            Responses pre-populate the relevant entry form for Checker review before they commit.
           </div>
           <div className="col-span-2 flex justify-end gap-2">
             <button onClick={() => setCreateMode(false)} className="btn-secondary">Cancel</button>

@@ -24,6 +24,7 @@
 
   /* Neutral ink scale — RGB triplets for dark-mode CSS-var flipping. */
   --ink-900: 15 23 42;
+  --ink-800: 30 41 59;
   --ink-700: 51 65 85;
   --ink-600: 71 85 105;
   --ink-500: 100 116 139;

@@ -53,6 +53,7 @@ export default {
         // Neutral scale — CSS-var-backed so dark mode flips automatically.
         ink: {
           900: "rgb(var(--ink-900) / <alpha-value>)",
+          800: "rgb(var(--ink-800) / <alpha-value>)",
           700: "rgb(var(--ink-700) / <alpha-value>)",
           600: "rgb(var(--ink-600) / <alpha-value>)",
           500: "rgb(var(--ink-500) / <alpha-value>)",

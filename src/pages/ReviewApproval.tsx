@@ -1,4 +1,4 @@
-// Review & Approval — BRD-aligned Maker–Checker queue (FR-2).
+// Review & Approval — BRD-aligned Maker–Checker queue.
 //
 // Compared with the previous version this rewrite adds:
 //   • Priority-sorted queue (overdue → bad-flag → spike/drop → low-confidence
@@ -250,9 +250,9 @@ export default function ReviewApproval() {
   return (
     <div className="space-y-5">
       <PageHeader
-        eyebrow="Maker–Checker workflow · FR-2"
+        eyebrow="Approval queue"
         title="Review & Approval"
-        subtitle="Anomaly-flagged records surface first. Comments are mandatory for Reject, Query, and any approval of a flagged record. Audit trail is immutable."
+        subtitle="24 records are waiting for your decision — 6 are overdue. Anomaly-flagged records surface first. Approve, query, or reject with a mandatory comment. Nothing appears in reports until you approve it."
         actions={
           <RolePicker
             role={role}
@@ -761,7 +761,7 @@ function DetailsTab({
               Supplier submission — {record.supplierName}
             </div>
             <div className="text-[12px] text-pillar-social">
-              Data submitted via the Supplier Portal (FR-15). Supplier corrections to previously approved records re-trigger Maker–Checker review.
+              Data submitted via the Supplier Portal. Supplier corrections to previously approved records re-trigger Maker–Checker review.
             </div>
             <button onClick={onOpenSupplier} className="text-[12px] font-semibold text-pillar-social underline mt-1">
               Open supplier profile
@@ -920,7 +920,7 @@ function SlaPanel({ record }: { record: ReviewRecord }) {
           {overdue ? `${record.overdueDays} days overdue` : "Within SLA"}
         </div>
         <div className="text-[12px] text-ink-600">
-          Due {record.dueAt}. SLA escalation: Day 1 → Maker · Day 3 → SM · Day 7 → GM (FR-2.6).
+          Due {record.dueAt}. SLA escalation: Day 1 → Submitter · Day 3 → Sustainability Manager · Day 7 → General Manager.
         </div>
       </div>
     </div>
@@ -1199,7 +1199,7 @@ function AiOcrTab({ record }: { record: ReviewRecord }) {
       <div className="rounded-xl bg-brand-50 border border-brand-100 p-3 text-[12px] text-brand-900 flex items-start gap-2">
         <ShieldCheck size={14} className="text-brand-700 mt-0.5" />
         <span>
-          AI is assistive, never authoritative (DP-11). The maker reviews all AI/OCR suggestions before submission, and the audit trail records both the original AI suggestion and the human decision.
+          AI is assistive, never authoritative. The maker reviews all AI/OCR suggestions before submission, and the audit trail records both the original AI suggestion and the human decision.
         </span>
       </div>
     </div>
@@ -1342,7 +1342,7 @@ function RevisionRequestModal({
         </div>
         <div className="p-6 space-y-4">
           <div className="rounded-xl bg-warn/5 border border-warn/25 p-3 text-[12px] text-warn">
-            Approved records cannot be silently edited. This revision goes through Maker–Checker (FR-2). The original value is preserved.
+            Approved records cannot be silently edited. This revision goes through Maker–Checker. The original value is preserved.
           </div>
 
           <div className="grid grid-cols-2 gap-4">
@@ -1444,7 +1444,7 @@ function SupplierProfileDrawer({
           </ul>
 
           <div className="rounded-xl bg-pillar-social/5 border border-pillar-social/20 p-3 text-[12px] text-pillar-social">
-            Supplier data submitted via the Supplier Portal (FR-15). Corrections to approved records re-trigger the full Maker–Checker review.
+            Supplier data submitted via the Supplier Portal. Corrections to approved records re-trigger the full Maker–Checker review.
           </div>
 
           <div className="flex gap-2">

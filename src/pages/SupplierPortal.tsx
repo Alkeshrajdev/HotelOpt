@@ -102,9 +102,9 @@ export default function SupplierPortal() {
   return (
     <div className="space-y-5">
       <PageHeader
-        eyebrow="Suppliers · FR-15 · DP-14"
+        eyebrow="Supplier management"
         title="Supplier Portal"
-        subtitle="Suppliers are first-class users. Supplier-specific EFs, certifications, and attestations are entered once and reused across the clients they serve — under a strict confidentiality boundary."
+        subtitle="9 supplier records need re-review after recent corrections — unresolved supplier data affects your Scope 3 calculations. Supplier emission factors are entered once and reused across all clients they serve."
         actions={
           <div className="flex items-center gap-2">
             <span className="text-[11px] text-ink-500">Viewing as</span>
@@ -315,7 +315,7 @@ function ClientView() {
 
       {/* Re-review queue */}
       <Card>
-        <CardHeader title="Re-review queue" hint="Triggered when suppliers correct previously approved data (FR-2.9)" />
+        <CardHeader title="Re-review queue" hint="Triggered when suppliers correct previously approved data" />
         <ul className="p-5 space-y-2 text-sm">
           <ReReviewRow
             supplier="FreshLeaf Produce"
@@ -847,7 +847,7 @@ function ReReviewRow({ supplier, field, change, reason, tone }: { supplier: stri
 
 function Request({ from, ask, due, clients, status }: { from: string; ask: string; due: string; clients: number; status: "open" | "submitted" }) {
   return (
-    <li className={cn("flex items-start gap-3 rounded-xl border p-3", status === "open" ? "border-warn/25 bg-warn/10/40" : "border-ink-200")}>
+    <li className={cn("flex items-start gap-3 rounded-xl border p-3", status === "open" ? "border-warn/25 bg-warn/10" : "border-ink-200")}>
       <span className={cn("w-9 h-9 rounded-lg grid place-items-center shrink-0", status === "open" ? "bg-warn/15 text-warn" : "bg-good/10 text-good")}>
         {status === "open" ? <Bell size={15} /> : <CheckCircle2 size={15} />}
       </span>
@@ -953,7 +953,7 @@ function ConfidentialityCallout() {
     <div className="rounded-xl border border-brand-200 bg-brand-50/40 p-4 flex items-start gap-3">
       <ShieldAlert size={18} className="text-brand-700 mt-0.5" />
       <div className="text-[13px] text-brand-900">
-        <strong>Confidentiality boundary.</strong> Supplier generic profile and product sustainability data may be reused only where the supplier approves reuse. Client-specific pricing, contract terms, purchase values, volumes, and relationship data remain tenant-specific and are <strong>never visible to other clients</strong> on the platform (BRD §2.3, FR-15).
+        <strong>Confidentiality boundary.</strong> Supplier generic profile and product sustainability data may be reused only where the supplier approves reuse. Client-specific pricing, contract terms, purchase values, volumes, and relationship data remain tenant-specific and are <strong>never visible to other clients</strong> on the platform ().
         <div className="mt-1 text-[12px] inline-flex items-center gap-2">
           <Building2 size={12} /> Supplier serves 12 clients · No cross-client data leakage.
           <button className="underline font-semibold inline-flex items-center gap-1"><History size={11} /> Reuse history</button>

@@ -9,7 +9,7 @@ import {
   type ReactNode,
 } from "react";
 import type { Session } from "@supabase/supabase-js";
-import { supabase } from "./supabase";
+import { supabase, SUPABASE_CONFIGURED } from "./supabase";
 import type { Tables } from "./database.types";
 
 export type Profile = Tables<"user_profiles">;
@@ -25,6 +25,21 @@ type AuthContextValue = {
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
+// Minimal demo session used when Supabase is not configured.
+const DEMO_SESSION = {
+  user: { id: "demo", email: "maker@demo.test" },
+} as unknown as Session;
+
+const DEMO_PROFILE = {
+  id: "demo",
+  client_id: "demo",
+  full_name: "Demo User",
+  email: "demo@demo.test",
+  role: "super_admin",
+  created_at: new Date().toISOString(),
+  updated_at: new Date().toISOString(),
+} as unknown as Profile;
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -32,7 +47,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const initialised = useRef(false);
 
   const loadProfile = useCallback(async (uid: string | undefined) => {
-    if (!uid) {
+    if (!uid || !supabase) {
       setProfile(null);
       return;
     }
@@ -45,9 +60,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    // Subscribing to onAuthStateChange — Supabase fires INITIAL_SESSION
-    // synchronously on subscribe with the persisted session (or null).
-    // This avoids the getSession() lock contention under StrictMode.
+    // Demo mode: no Supabase credentials — skip auth entirely.
+    if (!SUPABASE_CONFIGURED || !supabase) {
+      setSession(DEMO_SESSION);
+      setProfile(DEMO_PROFILE);
+      setLoading(false);
+      return;
+    }
+
     const { data: sub } = supabase.auth.onAuthStateChange(
       async (_event, s) => {
         setSession(s);
@@ -59,8 +79,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     );
 
-    // Safety net: if for any reason no event fires within 1.5s, end loading
-    // so the route can decide (likely → /login).
     const t = setTimeout(() => {
       if (!initialised.current) {
         initialised.current = true;
@@ -80,13 +98,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       profile,
       loading,
       signIn: async (email, password) => {
-        const { error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
+        if (!supabase) return { error: null };
+        const { error } = await supabase.auth.signInWithPassword({ email, password });
         return { error: error?.message ?? null };
       },
       signOut: async () => {
+        if (!supabase) return;
         await supabase.auth.signOut();
       },
       refreshProfile: () => loadProfile(session?.user.id),

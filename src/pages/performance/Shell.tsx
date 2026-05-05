@@ -73,17 +73,17 @@ const PILLAR_VIEWS: Record<PillarKey, ViewKey[]> = {
 
 const PILLAR_DESCRIPTIONS: Record<PillarKey, string> = {
   energy:
-    "Energy intensity, performance index, renewable share — across the four-layer performance story.",
+    "Are your hotels using less energy per room night than last year, adjusted for occupancy? Track genuine improvement, renewable share, and how you compare to similar hotels.",
   water:
-    "Water consumption, recycled share, leak detection, and pool comparisons.",
+    "Is water use per room night falling? See recycled water share, leak alerts, and how your properties compare to the benchmark pool.",
   waste:
-    "Waste generation, diversion rate, food-waste programmes, and stream-level data.",
+    "Is your diversion rate rising and food waste falling? Track performance by waste stream and property, and see where action will have the most impact.",
   carbon:
-    "GHG inventory across Scope 1, 2 (location & market), and Scope 3 — plus the four-layer story.",
+    "Are your total emissions falling in real terms? Review direct, indirect, and supplier emissions, and track progress against your net-zero pathway.",
   social:
-    "Headcount, diversity, training, and health & safety. GRI 401 / 403 / 404 / 405 aligned.",
+    "Are your people practices improving year-on-year? Track headcount, diversity, training hours, and health & safety metrics aligned to GRI 401 / 403 / 404 / 405.",
   governance:
-    "Annual attestations, anti-corruption, whistleblowing, and supplier code adoption.",
+    "Are your governance commitments up to date? Review annual attestations, anti-corruption, whistleblowing, and supplier code of conduct adoption.",
 };
 
 /** Per-pillar workflow strip — pillar-scoped numbers from BRD §5 sufficiency rules. */
@@ -238,7 +238,7 @@ export default function PerformanceShell() {
 
       {/* Trace meta — useful for stakeholders reviewing IA */}
       <div className="text-[11px] text-ink-400 mt-6">
-        Pillar = <code>{pillar}</code> · View = <code>{view}</code> · GP &amp; External Comparison hidden for Social/Governance per BRD §9.1.
+        Pillar = <code>{pillar}</code> · View = <code>{view}</code> · GP &amp; External Comparison hidden for Social/Governance .
       </div>
     </div>
   );

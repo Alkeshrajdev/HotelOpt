@@ -510,7 +510,7 @@ function GPSetupTab({ property }: { property: RichProperty }) {
   return (
     <div className="grid grid-cols-12 gap-4">
       <Card className="col-span-12 md:col-span-7">
-        <CardHeader title="GP readiness checklist" hint="BRD §9 — GP requires a complete baseline year of approved data" />
+        <CardHeader title="GP readiness checklist" hint="Genuine Performance requires a complete baseline year of approved data" />
         <div className="p-6">
           <ReadinessChecklist
             items={[
@@ -525,7 +525,7 @@ function GPSetupTab({ property }: { property: RichProperty }) {
       </Card>
 
       <Card className="col-span-12 md:col-span-5">
-        <CardHeader title="Comparison readiness" hint="BRD §2.3 — drives External Comparison pool eligibility" />
+        <CardHeader title="Comparison readiness" hint="Drives external benchmark pool eligibility" />
         <div className="p-6">
           <ReadinessChecklist
             items={[
@@ -631,7 +631,7 @@ function QrPointsTab({ property }: { property: RichProperty }) {
       <Card>
         <CardHeader
           title="Waste QR points"
-          hint="Printable QR codes for waste collection points — mobile-first scan flow (BRD FR-1.5)"
+          hint="Printable QR codes for waste collection points — mobile-first scan flow"
           right={
             <>
               <button className="btn-secondary"><QrCode size={14} /> Print sheet</button>
@@ -1008,7 +1008,7 @@ function HeroStat({
 }) {
   const ring = {
     good: "border-good/25 bg-good/10/40",
-    warn: "border-warn/25 bg-warn/10/40",
+    warn: "border-warn/25 bg-warn/10",
     bad:  "border-bad/25 bg-bad/10/40",
     info: "border-info/25 bg-info/10/40",
   }[tone];

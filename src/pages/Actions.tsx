@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import {
   AlertTriangle,
   ArrowRight,
@@ -14,6 +15,7 @@ import {
   Plus,
   ShieldCheck,
   Sparkles,
+  Sun,
   Target,
   TrendingDown,
   UserCheck,
@@ -226,9 +228,9 @@ export default function Actions() {
   return (
     <div className="space-y-5">
       <PageHeader
-        eyebrow="Capex measure library · FR-18"
+        eyebrow="Improvement measures"
         title="Actions & Measures"
-        subtitle="Recommended interventions, capex measures, payback, and verified GP uplift."
+        subtitle="3 critical actions need your decision this week. Review AI-suggested measures, approve what's ready, and track in-progress work toward your net-zero target."
         actions={
           <>
             <button className="btn-secondary"><Sparkles size={14} /> AI recommendations</button>
@@ -236,6 +238,9 @@ export default function Actions() {
           </>
         }
       />
+
+      {/* Platform-detected gaps — RE&O recommendations */}
+      <GapRecommendations />
 
       {/* Impact KPI tiles */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -475,7 +480,7 @@ export default function Actions() {
       <div className="rounded-xl bg-brand-50 border border-brand-100 p-3 flex items-start gap-2.5">
         <ShieldCheck size={16} className="text-brand-700 mt-0.5" />
         <div className="text-[13px] text-brand-900">
-          Measures need <strong>GM approval</strong> before moving Proposed → Approved. Once <strong>Completed</strong>, the platform auto-creates an <strong>operational event</strong> on the GP timeline so before/after performance is measurable (FR-1.2.7).
+          Measures need <strong>GM approval</strong> before moving Proposed → Approved. Once <strong>Completed</strong>, the platform auto-creates an <strong>operational event</strong> on the GP timeline so before/after performance is measurable.
         </div>
       </div>
 
@@ -776,6 +781,114 @@ function Row({ label, value }: { label: string; value: string }) {
       <span className="text-[12px] text-ink-500">{label}</span>
       <span className="text-ink-900 font-medium capitalize">{value}</span>
     </li>
+  );
+}
+
+/* ---------- Gap-based RE&O recommendation cards ---------- */
+
+type GapCard = {
+  id: string;
+  icon: React.ReactNode;
+  label: string;
+  title: string;
+  gap: string;
+  recommendation: string;
+  ctaLabel: string;
+  ctaHref: string;
+  tone: "bad" | "warn" | "info";
+};
+
+const GAP_CARDS: GapCard[] = [
+  {
+    id: "irec",
+    icon: <Sun size={18} />,
+    label: "Scope 2 shortfall detected",
+    title: "Purchase I-RECs to cover residual market-based Scope 2",
+    gap: "Greenview Resort has a Scope 2 shortfall of ~142 tCO₂e after all committed physical efficiency measures. The SBTi pathway requires market-based coverage before the 2026 reporting period closes.",
+    recommendation: "Request I-RECs (Renewable Energy Certificates) in the Solutions Hub to achieve a market-based Scope 2 of zero for the shortfall period.",
+    ctaLabel: "Request I-RECs in Solutions Hub",
+    ctaHref: "/marketplace",
+    tone: "bad",
+  },
+  {
+    id: "carbon",
+    icon: <Leaf size={18} />,
+    label: "Residual Scope 1 emissions remain",
+    title: "Consider verified carbon credits for residual Scope 1 / 2 emissions",
+    gap: "After all in-pipeline physical measures are verified, an estimated 38 tCO₂e of Scope 1 emissions remain unaddressed across the portfolio — primarily from refrigerants and backup generators.",
+    recommendation: "High-quality, verified carbon credits (VCS / Gold Standard) can offset residual emissions as a last-resort measure once all reduction actions are in progress.",
+    ctaLabel: "Explore carbon credits in Solutions Hub",
+    ctaHref: "/marketplace",
+    tone: "warn",
+  },
+];
+
+function GapRecommendations() {
+  const [dismissed, setDismissed] = useState<Set<string>>(new Set());
+  const visible = GAP_CARDS.filter((c) => !dismissed.has(c.id));
+  if (visible.length === 0) return null;
+
+  const borderColor: Record<GapCard["tone"], string> = {
+    bad:  "border-bad/25 bg-bad/5",
+    warn: "border-warn/25 bg-warn/5",
+    info: "border-ink-200 bg-ink-50",
+  };
+  const labelColor: Record<GapCard["tone"], string> = {
+    bad:  "text-bad",
+    warn: "text-warn",
+    info: "text-ink-500",
+  };
+  const iconBg: Record<GapCard["tone"], string> = {
+    bad:  "bg-bad/10 text-bad",
+    warn: "bg-warn/10 text-warn",
+    info: "bg-ink-100 text-ink-500",
+  };
+
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center gap-2 text-[11px] font-semibold text-ink-500 uppercase tracking-wide">
+        <Sparkles size={12} className="text-brand-700" />
+        Platform-detected gaps — recommended instruments
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        {visible.map((card) => (
+          <div
+            key={card.id}
+            className={cn("rounded-xl border p-4 flex flex-col gap-3", borderColor[card.tone])}
+          >
+            <div className="flex items-start gap-3">
+              <div className={cn("w-9 h-9 rounded-lg grid place-items-center shrink-0", iconBg[card.tone])}>
+                {card.icon}
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className={cn("text-[11px] font-semibold uppercase tracking-wide mb-0.5", labelColor[card.tone])}>
+                  {card.label}
+                </div>
+                <div className="text-sm font-bold text-ink-900 leading-tight">{card.title}</div>
+              </div>
+              <button
+                className="text-ink-400 hover:text-ink-600 shrink-0"
+                onClick={() => setDismissed((s) => new Set([...s, card.id]))}
+                title="Dismiss"
+              >
+                <X size={14} />
+              </button>
+            </div>
+            <div className="text-[12px] text-ink-600 leading-relaxed">{card.gap}</div>
+            <div className="rounded-lg bg-white/70 border border-ink-200 p-2.5 text-[12px] text-ink-700 flex items-start gap-1.5">
+              <Lightbulb size={12} className="text-brand-700 mt-0.5 shrink-0" />
+              {card.recommendation}
+            </div>
+            <Link
+              to={card.ctaHref}
+              className="btn-primary self-start text-[12px] flex items-center gap-1.5 h-8 px-3"
+            >
+              {card.ctaLabel} <ArrowRight size={12} />
+            </Link>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }
 

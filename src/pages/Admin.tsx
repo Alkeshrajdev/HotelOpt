@@ -86,9 +86,9 @@ export default function Admin() {
   return (
     <div className="space-y-5">
       <PageHeader
-        eyebrow="Platform management · FR-11"
+        eyebrow="Platform management"
         title="Admin"
-        subtitle="Client config, EF library, pool management, white-label, billing, audit log, knowledge base content, measure library."
+        subtitle="Client config, Emission factor library, pool management, white-label, billing, audit log, knowledge base content, measure library."
       />
 
       {ADMIN.map((g) => (
@@ -156,7 +156,7 @@ type AuditEvent = {
 };
 
 const ALL_EVENTS: AuditEvent[] = [
-  { ts: "2026-05-02 09:14", actor: "james.wilson@",    action: "Updated EF — UAE grid 2026 Q2",          target: "EF library",          ip: "185.22.14.7",   result: "success" },
+  { ts: "2026-05-02 09:14", actor: "james.wilson@",    action: "Updated EF — UAE grid 2026 Q2",          target: "Emission factor library",          ip: "185.22.14.7",   result: "success" },
   { ts: "2026-05-02 08:50", actor: "priya.sharma@",    action: "Data submission approved",                target: "Greenview Resort",    ip: "203.0.113.42",  result: "success" },
   { ts: "2026-05-02 08:41", actor: "felix.andersen@",  action: "Login",                                   target: "Session",             ip: "198.51.100.9",  result: "success" },
   { ts: "2026-05-01 16:02", actor: "platform-admin@",  action: "Activated white-label theme",             target: "Client: Aurora Hotels", ip: "10.0.0.1",    result: "success" },
@@ -197,7 +197,7 @@ function AuditLog() {
 
   return (
     <Card>
-      <CardHeader title="Platform audit log" hint="Immutable · tamper-evident · FR-11" />
+      <CardHeader title="Platform audit log" hint="Immutable · tamper-evident" />
 
       {/* Filters */}
       <div className="px-5 pb-3 flex items-center gap-3 flex-wrap">

@@ -97,7 +97,7 @@ export default function Billing() {
   return (
     <div className="space-y-5">
       <PageHeader
-        eyebrow="Subscription · FR-10"
+        eyebrow="Subscription & billing"
         title="Billing"
         subtitle="Plan management, seat administration, API keys, and invoice history."
         actions={

@@ -30,7 +30,7 @@ export default function AdminPools() {
         <Tile label="Onboarding pools"     value={String(POOLS.filter((p) => p.level === "Reference").length)} hint="< 4 properties" />
       </div>
 
-      <div className="rounded-xl border border-warn/25 bg-warn/10/40 p-3 flex items-start gap-2 text-[13px] text-warn">
+      <div className="rounded-xl border border-warn/25 bg-warn/10 p-3 flex items-start gap-2 text-[13px] text-warn">
         <ShieldAlert size={14} className="text-warn mt-0.5" />
         <span>
           <strong>Pool isolation rule:</strong> Direct SaaS forms one global pool; each white-label client has its own isolated pool; Sovereign Hosting clients run their pool entirely inside their own infrastructure. No cross-pool data sharing — ever.

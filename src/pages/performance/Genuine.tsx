@@ -78,9 +78,9 @@ export default function Genuine({ pillar }: { pillar: PillarKey }) {
   if (pillar === "social" || pillar === "governance") {
     return (
       <InsufficientData
-        title="Genuine Performance does not apply to this pillar"
-        body="GP normalises out occupancy and weather noise — concepts that don't apply to Social and Governance metrics. Per BRD §9.1, GP is only computed for Energy, Water, Waste, and Carbon."
-        hint="Switch to Energy, Water, Waste, or Carbon to see GP."
+        title="Genuine Performance is not available for this pillar"
+        body="Genuine Performance measures efficiency adjusted for occupancy and weather — concepts that don't apply to Social or Governance metrics. It is calculated for Energy, Water, Waste, and Carbon only."
+        hint="Switch to Energy, Water, Waste, or Carbon in the sidebar to see GP."
       />
     );
   }
@@ -148,7 +148,7 @@ export default function Genuine({ pillar }: { pillar: PillarKey }) {
       <Card>
         <CardHeader
           title="Operational events log"
-          hint="FR-1.2.7 · GP segments timeline before/after each event"
+          hint="GP recalculates before and after each event to isolate its impact"
           right={
             <button className="btn-primary">
               <Plus size={14} /> Log event
@@ -293,7 +293,7 @@ function CompositeBody() {
         </div>
       </Card>
       <Card className="col-span-12 lg:col-span-5">
-        <CardHeader title="Pillar weights" hint="Configurable per client (FR-4.3.2)" />
+        <CardHeader title="Pillar weights" hint="Configurable per portfolio" />
         <div className="p-6">
           <HBar
             data={[

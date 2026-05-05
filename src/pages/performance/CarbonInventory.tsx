@@ -114,7 +114,7 @@ export default function CarbonInventory() {
         open={drill === 3}
         onClose={() => setDrill(null)}
         title="Scope 3 — value chain emissions"
-        subtitle="Categories 1–7 · spend-based & supplier-specific (FR-7)"
+        subtitle="Categories 1–7 · spend-based and supplier-specific emission factors"
         size="xl"
         hero={<HeroValue value="22,640" unit="tCO₂e" delta={-2.2} context="Last 12 months" />}
       >

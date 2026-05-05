@@ -259,7 +259,7 @@ export const DATA_TYPES: DataTypeConfig[] = [
     fields: [
       COMMON_PERIOD,
       { key: "availableRooms",  label: "Available rooms",        type: "number", required: true },
-      { key: "occupiedRoomNights", label: "Occupied Room Nights", type: "number", required: true },
+      { key: "occupiedRoomNights", label: "Occupied Room Nights (room nights)", type: "number", required: true },
       { key: "occupancyPct",   label: "Occupancy %",             type: "number", help: "Auto-calculated if blank." },
       { key: "totalGuests",    label: "Total guests",            type: "number" },
       { key: "conferenceGuests", label: "Conference / banqueting (day)", type: "number" },
@@ -270,7 +270,7 @@ export const DATA_TYPES: DataTypeConfig[] = [
 
   {
     key: "procurement",
-    label: "Procurement (Scope 3 Cat 1/2/4)",
+    label: "Purchases & Supplier Invoices",
     description: "Purchased goods, capital goods, upstream transport — spend or supplier-specific.",
     icon: Truck,
     iconBg: "bg-pillar-social/10 text-pillar-social",
@@ -310,7 +310,7 @@ export const DATA_TYPES: DataTypeConfig[] = [
 
   {
     key: "travel-commute",
-    label: "Business travel & commute (Cat 6/7)",
+    label: "Business travel & commute",
     description: "Air, rail, road, hotel stays, employee commute mode share.",
     icon: Plane,
     iconBg: "bg-indigo-50 text-indigo-700",
@@ -361,7 +361,7 @@ export const DATA_TYPES: DataTypeConfig[] = [
 
   {
     key: "refrigerants",
-    label: "Refrigerants (Scope 1)",
+    label: "Refrigerants & Fugitive Emissions",
     description: "HVAC and chiller leak rates — manual only per BRD.",
     icon: FlaskConical,
     iconBg: "bg-info/10 text-info",
@@ -445,7 +445,7 @@ export const DATA_TYPES: DataTypeConfig[] = [
 
   {
     key: "social",
-    label: "Social — HR, training, H&S, community",
+    label: "Social — HR, training & community",
     description: "Headcount, diversity, training hours, H&S incidents, community engagement, local sourcing.",
     icon: Users,
     iconBg: "bg-pillar-social/10 text-pillar-social",

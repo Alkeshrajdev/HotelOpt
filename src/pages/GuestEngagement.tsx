@@ -1,5 +1,7 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import {
+  AlertTriangle,
   ArrowDown,
   ArrowUp,
   Award,
@@ -26,6 +28,7 @@ import {
   Smartphone,
   Sparkles,
   Star,
+  Sun,
   Trash2,
   X,
 } from "lucide-react";
@@ -76,14 +79,14 @@ type PointsEntry = { guest: string; action: string; points: number; date: string
 /* ------------------------------------------------------------------ */
 
 const METRIC_REGISTRY: PublicMetric[] = [
-  { name: "Energy use per stay",   value: "12.4 kWh",     delta: -8,  source: "FR-3.1", lastApproved: "2026-04-29", isPublic: true,  brdSafe: true },
-  { name: "Water per stay",        value: "184 L",          delta: -5,  source: "FR-3.2", lastApproved: "2026-04-28", isPublic: true,  brdSafe: true },
-  { name: "Waste per stay",        value: "0.42 kg",        delta: -12, source: "FR-3.3", lastApproved: "2026-04-26", isPublic: true,  brdSafe: true },
-  { name: "Carbon per stay (HCMI)",value: "8.2 kgCO₂e",    delta: -9,  source: "HCMI v1.2", lastApproved: "2026-04-25", isPublic: true, brdSafe: true },
-  { name: "Renewable share",       value: "78%",            delta: 3,   source: "FR-3.1", lastApproved: "2026-04-29", isPublic: false, brdSafe: true },
-  { name: "Diversion rate",        value: "64%",            delta: 5,   source: "FR-3.3", lastApproved: "2026-04-26", isPublic: false, brdSafe: true },
-  { name: "Total Scope 3",         value: "22,640 tCO₂e",   delta: -2,  source: "FR-7",   lastApproved: "2026-04-12", isPublic: false, brdSafe: false },
-  { name: "Supplier EFs",          value: "54 active",      delta: 12,  source: "FR-15",  lastApproved: "2026-04-22", isPublic: false, brdSafe: false },
+  { name: "Energy use per stay",   value: "12.4 kWh",     delta: -8,  source: "Energy data", lastApproved: "2026-04-29", isPublic: true,  brdSafe: true },
+  { name: "Water per stay",        value: "184 L",          delta: -5,  source: "Water data",  lastApproved: "2026-04-28", isPublic: true,  brdSafe: true },
+  { name: "Waste per stay",        value: "0.42 kg",        delta: -12, source: "Waste data",  lastApproved: "2026-04-26", isPublic: true,  brdSafe: true },
+  { name: "Carbon per stay",       value: "8.2 kgCO₂e",    delta: -9,  source: "HCMI v1.2",  lastApproved: "2026-04-25", isPublic: true,  brdSafe: true },
+  { name: "Renewable share",       value: "78%",            delta: 3,   source: "Energy data", lastApproved: "2026-04-29", isPublic: false, brdSafe: true },
+  { name: "Diversion rate",        value: "64%",            delta: 5,   source: "Waste data",  lastApproved: "2026-04-26", isPublic: false, brdSafe: true },
+  { name: "Total Scope 3",         value: "22,640 tCO₂e",   delta: -2,  source: "Supplier data", lastApproved: "2026-04-12", isPublic: false, brdSafe: false },
+  { name: "Supplier EFs",          value: "54 active",      delta: 12,  source: "Supplier portal", lastApproved: "2026-04-22", isPublic: false, brdSafe: false },
 ];
 
 const CAMPAIGNS: Campaign[] = [
@@ -146,9 +149,9 @@ export default function GuestEngagement() {
   return (
     <div className="space-y-5">
       <PageHeader
-        eyebrow="Public surfaces · FR-17"
+        eyebrow="Guest experience"
         title="Guest Engagement"
-        subtitle="Public sustainability page, campaigns, guest surveys, eco-points, and per-stay carbon footprints (HCMI)."
+        subtitle="Public sustainability page, guest campaigns, eco-points, and per-stay carbon footprints visible to guests."
         actions={
           <>
             <button className="btn-secondary"><QrCode size={14} /> Print lobby QR</button>
@@ -298,7 +301,205 @@ function PublicPageTab() {
           ))}
         </div>
       </Card>
+
+      <RenewableClaimsPanel />
     </div>
+  );
+}
+
+/* ================================================================== */
+/* Renewable Energy & Carbon claims panel                              */
+/* ================================================================== */
+
+type ClaimStep = "certificate" | "wording" | "visibility";
+type ClaimStatus = "awaiting-wording" | "awaiting-visibility" | "live" | "rejected";
+
+type RenewableClaim = {
+  id: string;
+  certType: "I-REC" | "EAC" | "VCS";
+  period: string;
+  claimWording: string;
+  status: ClaimStatus;
+};
+
+const INITIAL_CLAIMS: RenewableClaim[] = [
+  {
+    id: "rc1",
+    certType: "I-REC",
+    period: "Jan–Dec 2025",
+    claimWording: "Powered by 100% renewable electricity (I-REC certified, serial I-REC-AP-2025-001–012)",
+    status: "awaiting-visibility",
+  },
+  {
+    id: "rc2",
+    certType: "EAC",
+    period: "Q1 2026",
+    claimWording: "Renewable electricity from European grid (EAC verified, Q1 2026)",
+    status: "awaiting-wording",
+  },
+  {
+    id: "rc3",
+    certType: "VCS",
+    period: "FY 2025",
+    claimWording: "Residual Scope 1 emissions fully offset with Gold Standard certified credits",
+    status: "live",
+  },
+];
+
+const CLAIM_STEPS: { key: ClaimStep; label: string }[] = [
+  { key: "certificate", label: "Certificate issued" },
+  { key: "wording",     label: "Claim wording approved" },
+  { key: "visibility",  label: "Public visibility approved" },
+];
+
+const CLAIM_STATUS_ACTIVE: Record<ClaimStatus, number> = {
+  "awaiting-wording":     0,
+  "awaiting-visibility":  1,
+  "live":                 2,
+  "rejected":             0,
+};
+
+const CLAIM_STATUS_TONE: Record<ClaimStatus, "good" | "warn" | "info" | "bad"> = {
+  "awaiting-wording":    "warn",
+  "awaiting-visibility": "warn",
+  "live":                "good",
+  "rejected":            "bad",
+};
+const CLAIM_STATUS_LABEL: Record<ClaimStatus, string> = {
+  "awaiting-wording":    "Awaiting wording approval",
+  "awaiting-visibility": "Awaiting visibility approval",
+  "live":                "Live on public page",
+  "rejected":            "Rejected",
+};
+
+function RenewableClaimsPanel() {
+  const [claims, setClaims] = useState<RenewableClaim[]>(INITIAL_CLAIMS);
+
+  function approve(id: string) {
+    setClaims((cs) => cs.map((c) => {
+      if (c.id !== id) return c;
+      if (c.status === "awaiting-wording") return { ...c, status: "awaiting-visibility" };
+      if (c.status === "awaiting-visibility") return { ...c, status: "live" };
+      return c;
+    }));
+  }
+
+  function reject(id: string) {
+    setClaims((cs) => cs.map((c) => c.id === id ? { ...c, status: "rejected" } : c));
+  }
+
+  const liveCount = claims.filter((c) => c.status === "live").length;
+  const pendingCount = claims.filter((c) => c.status.startsWith("awaiting")).length;
+
+  return (
+    <Card>
+      <CardHeader
+        title="Renewable Energy & Carbon claims"
+        hint="Claims only appear on the public page and in campaign materials after all three approvals are complete."
+        right={
+          <Link to="/marketplace" className="btn-ghost h-7 px-2 text-[11px] text-brand-700 flex items-center gap-1">
+            Manage certificates <ExternalLink size={11} />
+          </Link>
+        }
+      />
+      <div className="grid grid-cols-3 gap-px bg-ink-100 border-t border-ink-100">
+        <div className="bg-white p-4">
+          <div className="flex items-center gap-2 mb-1">
+            <Sun size={14} className="text-warn" />
+            <span className="text-[11px] font-semibold text-ink-500 uppercase tracking-wide">Total claims</span>
+          </div>
+          <div className="text-2xl font-bold text-ink-900">{claims.length}</div>
+        </div>
+        <div className="bg-white p-4">
+          <div className="flex items-center gap-2 mb-1">
+            <CheckCircle2 size={14} className="text-good" />
+            <span className="text-[11px] font-semibold text-ink-500 uppercase tracking-wide">Live on public page</span>
+          </div>
+          <div className="text-2xl font-bold text-good">{liveCount}</div>
+        </div>
+        <div className="bg-white p-4">
+          <div className="flex items-center gap-2 mb-1">
+            <AlertTriangle size={14} className="text-warn" />
+            <span className="text-[11px] font-semibold text-ink-500 uppercase tracking-wide">Awaiting approval</span>
+          </div>
+          <div className="text-2xl font-bold text-warn">{pendingCount}</div>
+        </div>
+      </div>
+      <div className="p-4 space-y-4">
+        {claims.map((claim) => (
+          <div
+            key={claim.id}
+            className={cn(
+              "rounded-xl border p-4 space-y-3",
+              claim.status === "live" ? "border-good/30 bg-good/5"
+              : claim.status === "rejected" ? "border-bad/30 bg-bad/5"
+              : "border-warn/30 bg-warn/5"
+            )}
+          >
+            <div className="flex items-start gap-3">
+              <div className={cn(
+                "w-9 h-9 rounded-lg grid place-items-center shrink-0",
+                claim.certType === "I-REC" || claim.certType === "EAC" ? "bg-warn/10 text-warn" : "bg-good/10 text-good"
+              )}>
+                {claim.certType === "VCS" ? <Leaf size={16} /> : <Sun size={16} />}
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 flex-wrap mb-1">
+                  <Badge tone={claim.certType === "I-REC" || claim.certType === "EAC" ? "warn" : "good"}>{claim.certType}</Badge>
+                  <Badge tone={CLAIM_STATUS_TONE[claim.status]}>{CLAIM_STATUS_LABEL[claim.status]}</Badge>
+                  <span className="text-[11px] text-ink-500">{claim.period}</span>
+                </div>
+                <div className="text-sm font-medium text-ink-900 italic">"{claim.claimWording}"</div>
+              </div>
+            </div>
+
+            <StatusPipeline
+              steps={CLAIM_STEPS}
+              active={CLAIM_STATUS_ACTIVE[claim.status]}
+              size="sm"
+            />
+
+            {claim.status.startsWith("awaiting") && (
+              <div className="flex items-center gap-2 pt-1">
+                <div className="flex-1 text-[11px] text-ink-600 bg-white rounded-lg border border-ink-200 px-3 py-2">
+                  {claim.status === "awaiting-wording"
+                    ? "Sustainability Manager — please review and approve the claim wording above before it can be set live."
+                    : "Sustainability Manager — please approve public visibility. Once approved, this claim will appear on the guest page and in campaign templates."}
+                </div>
+                <button
+                  className="btn bg-bad text-white hover:bg-red-700 h-8 px-3 text-[12px] shrink-0"
+                  onClick={() => reject(claim.id)}
+                >
+                  Reject
+                </button>
+                <button
+                  className="btn-primary h-8 px-3 text-[12px] shrink-0"
+                  onClick={() => approve(claim.id)}
+                >
+                  <CheckCircle2 size={13} />
+                  {claim.status === "awaiting-wording" ? "Approve wording" : "Approve & publish"}
+                </button>
+              </div>
+            )}
+            {claim.status === "live" && (
+              <div className="flex items-center gap-1.5 text-[12px] text-good">
+                <CheckCircle2 size={13} /> All three approvals complete — visible on public page and available in campaign templates.
+              </div>
+            )}
+            {claim.status === "rejected" && (
+              <div className="flex items-center gap-1.5 text-[12px] text-bad">
+                <AlertTriangle size={13} /> Claim rejected — revise wording in Solutions Hub and resubmit.
+                <Link to="/marketplace" className="ml-1 underline font-semibold">Solutions Hub</Link>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+      <div className="px-5 pb-4 border-t border-ink-100 pt-3 text-[11px] text-ink-500 flex items-start gap-1.5">
+        <Lock size={11} className="mt-0.5 shrink-0 text-brand-700" />
+        Claims never appear publicly until: (1) the underlying certificate is active in Solutions Hub, (2) the claim wording is approved by a Sustainability Manager, and (3) public visibility is explicitly approved. All approvals are logged in the audit trail.
+      </div>
+    </Card>
   );
 }
 

@@ -1,16 +1,20 @@
 import { useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import {
   AlertTriangle,
   Award,
   CheckCircle2,
   ChevronRight,
   Download,
+  ExternalLink,
   Eye,
   FileText,
   Folder,
   History,
+  Leaf,
   Link2,
   ShieldCheck,
+  Sun,
   Upload,
   UserCheck,
   X,
@@ -190,9 +194,9 @@ const CRITERIA_BY_PROGRAMME: Record<string, Criterion[]> = {
     { code: "E5", title: "Emissions evidence",                  requirement: "EF library + supplier-specific EFs",             status: "partial",   evidenceRequired: 5, evidenceUploaded: 3, owner: "Sustainability Manager", dueDate: "2026-07-15" },
   ],
   HSB: [
-    { code: "1.1", title: "Energy benchmarking",   requirement: "kWh/ORN tracked monthly",  status: "ready",   evidenceRequired: 1, evidenceUploaded: 1, owner: "Property SM" },
+    { code: "1.1", title: "Energy benchmarking",   requirement: "kWh per room night, tracked monthly",  status: "ready",   evidenceRequired: 1, evidenceUploaded: 1, owner: "Property SM" },
     { code: "1.2", title: "Energy reduction plan", requirement: "Documented plan",           status: "ready",   evidenceRequired: 1, evidenceUploaded: 1, owner: "Property SM" },
-    { code: "2.1", title: "Water benchmarking",    requirement: "m³/ORN tracked monthly",   status: "ready",   evidenceRequired: 1, evidenceUploaded: 1, owner: "Property SM" },
+    { code: "2.1", title: "Water benchmarking",    requirement: "m³ per room night, tracked monthly",   status: "ready",   evidenceRequired: 1, evidenceUploaded: 1, owner: "Property SM" },
     { code: "3.1", title: "Waste streams",         requirement: "All streams tracked",       status: "partial", evidenceRequired: 1, evidenceUploaded: 0, owner: "Operations", dueDate: "2026-06-01" },
     { code: "4.1", title: "Single-use plastics",   requirement: "Reduction policy",          status: "ready",   evidenceRequired: 1, evidenceUploaded: 1, owner: "F&B Manager" },
   ],
@@ -236,9 +240,9 @@ export default function Certifications() {
   return (
     <div className="space-y-5">
       <PageHeader
-        eyebrow="Certification readiness · FR-12"
+        eyebrow="Certification readiness"
         title="Certifications & Compliance"
-        subtitle="Per-property readiness for Green Globe, LEED, ISO 14001, EarthCheck, BREEAM, GreenKey and more."
+        subtitle="Your next audit is in 45 days. Upload missing evidence and close criteria gaps across active programmes before the deadline. Green Globe evidence pack is 12% short."
         actions={
           <>
             <button className="btn-secondary"><Upload size={14} /> Upload evidence</button>
@@ -310,6 +314,9 @@ export default function Certifications() {
           ))}
         </div>
       </Card>
+
+      {/* ── RE&O certificate evidence for certification criteria ── */}
+      <CertCertificatePanel />
 
       {/* ── Evidence checklist + Gap analysis (shown when a card is selected) ── */}
       {checklistOpen && selectedCard && activeCert && (
@@ -614,13 +621,131 @@ export default function Certifications() {
       <div className="rounded-xl bg-brand-50 border border-brand-100 p-3 flex items-start gap-2.5">
         <Award size={16} className="text-brand-700 mt-0.5" />
         <div className="text-[13px] text-brand-900">
-          <strong>Auditor view:</strong> third-party verifiers see this workspace as read-only, including the criterion table, evidence library, dossier version history, and the maker–checker audit trail behind every uploaded file (FR-2.8).
+          <strong>Auditor view:</strong> third-party verifiers see this workspace as read-only, including the criterion table, evidence library, dossier version history, and the maker–checker audit trail behind every uploaded file.
           <button className="ml-2 underline font-semibold inline-flex items-center gap-1">
             Open auditor view <ChevronRight size={12} />
           </button>
         </div>
       </div>
     </div>
+  );
+}
+
+/* ---------- RE&O certificate evidence for certification criteria ---------- */
+
+type CertEvidenceRow = {
+  certType: "I-REC" | "EAC" | "VCS" | "Gold Standard";
+  period: string;
+  volume: string;
+  programmes: string[];
+  criteria: string[];
+  status: "Available" | "Used" | "Pending";
+};
+
+const CERT_EVIDENCE_ROWS: CertEvidenceRow[] = [
+  {
+    certType: "I-REC", period: "Jan–Dec 2025", volume: "1,240 MWh",
+    programmes: ["GSTC", "LEED O+M", "Green Globe"],
+    criteria: ["GSTC E1 — GHG inventory (Scope 2 MB)", "LEED EA — renewable energy credit"],
+    status: "Available",
+  },
+  {
+    certType: "EAC", period: "Q1 2026", volume: "320 MWh",
+    programmes: ["GSTC", "Green Globe"],
+    criteria: ["GSTC E1 — GHG inventory (Scope 2 MB partial)"],
+    status: "Available",
+  },
+  {
+    certType: "VCS", period: "FY 2025", volume: "38 tCO₂e",
+    programmes: ["GSTC", "EarthCheck"],
+    criteria: ["GSTC E5 — emissions evidence (residual Scope 1 offset)"],
+    status: "Used",
+  },
+];
+
+const STATUS_TONE_CE: Record<CertEvidenceRow["status"], "good" | "info" | "warn"> = {
+  Available: "good",
+  Used: "info",
+  Pending: "warn",
+};
+
+function CertCertificatePanel() {
+  return (
+    <Card>
+      <CardHeader
+        title="Renewable Energy & Carbon Credit certificates available as evidence"
+        hint="I-REC / EAC and carbon credit retirements can satisfy energy and emissions criteria across GSTC, LEED, Green Globe, and EarthCheck."
+        right={
+          <Link to="/marketplace" className="btn-ghost h-7 px-2 text-[11px] text-brand-700 flex items-center gap-1">
+            Get more in Solutions Hub <ExternalLink size={11} />
+          </Link>
+        }
+      />
+      <div className="grid grid-cols-2 gap-px bg-ink-100 border-t border-ink-100">
+        <div className="bg-white p-4">
+          <div className="flex items-center gap-2 mb-1">
+            <Sun size={14} className="text-warn" />
+            <span className="text-[11px] font-semibold text-ink-500 uppercase tracking-wide">I-REC / EAC certificates</span>
+          </div>
+          <div className="text-2xl font-bold text-ink-900">2</div>
+          <div className="text-[12px] text-ink-500">1,560 MWh · available as Scope 2 MB evidence</div>
+        </div>
+        <div className="bg-white p-4">
+          <div className="flex items-center gap-2 mb-1">
+            <Leaf size={14} className="text-good" />
+            <span className="text-[11px] font-semibold text-ink-500 uppercase tracking-wide">Carbon credit retirements</span>
+          </div>
+          <div className="text-2xl font-bold text-ink-900">1</div>
+          <div className="text-[12px] text-ink-500">38 tCO₂e · used for GSTC E5 & EarthCheck</div>
+        </div>
+      </div>
+      <div className="overflow-x-auto border-t border-ink-100">
+        <table className="min-w-full">
+          <thead>
+            <tr className="bg-ink-50">
+              <th className="table-th">Type</th>
+              <th className="table-th">Period</th>
+              <th className="table-th">Volume</th>
+              <th className="table-th">Applicable programmes</th>
+              <th className="table-th">Criteria satisfied</th>
+              <th className="table-th">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {CERT_EVIDENCE_ROWS.map((row, i) => (
+              <tr key={i} className="hover:bg-ink-50/60">
+                <td className="table-td">
+                  <Badge tone={row.certType === "I-REC" || row.certType === "EAC" ? "warn" : "good"}>{row.certType}</Badge>
+                </td>
+                <td className="table-td text-ink-600">{row.period}</td>
+                <td className="table-td font-semibold text-ink-900 tabular-nums">{row.volume}</td>
+                <td className="table-td">
+                  <div className="flex flex-wrap gap-1">
+                    {row.programmes.map((p) => (
+                      <Badge key={p} tone="neutral" className="text-[10px]">{p}</Badge>
+                    ))}
+                  </div>
+                </td>
+                <td className="table-td max-w-xs">
+                  <ul className="space-y-0.5">
+                    {row.criteria.map((c) => (
+                      <li key={c} className="text-[11px] text-ink-600">{c}</li>
+                    ))}
+                  </ul>
+                </td>
+                <td className="table-td">
+                  <Badge tone={STATUS_TONE_CE[row.status]}>{row.status}</Badge>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <div className="px-5 py-3 border-t border-ink-100 bg-ink-50 rounded-b-xl text-[11px] text-ink-500 flex items-start gap-1.5">
+          <ShieldCheck size={12} className="text-brand-700 mt-0.5 shrink-0" />
+          Certificates are automatically attached to the relevant evidence library when uploading a certification dossier. Auditors can verify serial numbers and registry records directly.
+        </div>
+      </div>
+    </Card>
   );
 }
 

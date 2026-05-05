@@ -192,9 +192,9 @@ export default function AIAssistant() {
     const refuse = /stock|invest|price/i.test(draft);
     const aiMsg: Message = refuse
       ? { id: "a-" + Date.now(), role: "assistant", ts: now, refusal: true, confidence: 0,
-          text: "I can't answer that — it isn't covered by the curated Hotel Optimizer knowledge base. The assistant is grounded on internal sustainability content only (DP-12). Please consult a human expert or financial system." }
+          text: "I can't answer that — it is outside the hotel sustainability knowledge base. The assistant only answers questions it is trained on. Please consult a human expert or financial system." }
       : { id: "a-" + Date.now(), role: "assistant", ts: now, confidence: 78,
-          text: "Based on the knowledge base, here's a draft response. This is assistive guidance only — please review before applying it to your data (DP-11).",
+          text: "Based on the knowledge base, here's a draft response. This is assistive guidance only — please review before applying it to your data.",
           sources: [
             { title: KNOWLEDGE_TOPICS[0].topic, version: "v2.1", date: "2026-02-14" },
             { title: "Setting an SBTi-aligned target", version: "v1.8", date: "2026-01-22" },
@@ -217,7 +217,7 @@ export default function AIAssistant() {
   return (
     <div className="space-y-5">
       <PageHeader
-        eyebrow="Knowledge layer · FR-16 · DP-11 · DP-12"
+        eyebrow="AI-assisted sustainability guidance"
         title="AI Assistant"
         subtitle="Conversational guidance grounded in a curated knowledge base. AI is assistive, never authoritative — every answer cites sources and never commits data without explicit human approval."
         actions={
@@ -325,7 +325,7 @@ export default function AIAssistant() {
       <div className="rounded-xl bg-warn/10 border border-warn/25 p-3 flex items-start gap-2.5">
         <Bot size={16} className="text-warn mt-0.5 shrink-0" />
         <div className="text-[13px] text-warn">
-          <strong>Refusal state.</strong> If your question isn't covered by the curated knowledge base, the assistant will refuse to answer and offer to escalate to a human expert (DP-12). Try asking <em>"What's our stock price?"</em> to see how that looks.
+          <strong>Refusal state.</strong> If your question isn't covered by the curated knowledge base, the assistant will refuse to answer and offer to escalate to a human expert  to see how that looks. Try asking <em>"What's our stock price?"</em> to see how that looks.
         </div>
       </div>
 
@@ -472,8 +472,8 @@ function ChatPane({
           </button>
         </div>
         <div className="mt-2 flex items-center gap-3 text-[10px] text-ink-400 flex-wrap">
-          <span className="inline-flex items-center gap-1"><ShieldCheck size={10} /> Assistive only (DP-11)</span>
-          <span className="inline-flex items-center gap-1"><Database size={10} /> KB-grounded (DP-12)</span>
+          <span className="inline-flex items-center gap-1"><ShieldCheck size={10} /> Assistive only</span>
+          <span className="inline-flex items-center gap-1"><Database size={10} /> Knowledge base grounded</span>
           <span className="inline-flex items-center gap-1"><UserCheck size={10} /> Human approval required</span>
         </div>
 

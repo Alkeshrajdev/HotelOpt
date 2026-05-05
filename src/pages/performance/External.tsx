@@ -23,9 +23,9 @@ export default function External({ pillar }: { pillar: PillarKey }) {
   if (pillar === "social" || pillar === "governance") {
     return (
       <InsufficientData
-        title="External Comparison does not apply to this pillar"
-        body="Social and Governance pillars are excluded from External Comparison per BRD §2.3 — these metrics aren't comparable across deployment pools the same way intensity-based metrics are."
-        hint="Switch to Energy, Water, Waste, or Carbon to compare against the pool."
+        title="External Comparison is not available for this pillar"
+        body="Social and Governance metrics cannot be meaningfully compared across hotels in a benchmark pool — the conditions vary too much. External Comparison is available for Energy, Water, Waste, and Carbon only."
+        hint="Switch to Energy, Water, Waste, or Carbon in the sidebar to compare against the pool."
       />
     );
   }
@@ -75,7 +75,7 @@ export default function External({ pillar }: { pillar: PillarKey }) {
 
       <div className="grid grid-cols-12 gap-4">
         <Card className="col-span-12 md:col-span-4">
-          <CardHeader title="Comparable pool" hint="BRD §2.3" />
+          <CardHeader title="Comparable pool" hint="Drives benchmark pool eligibility" />
           <div className="p-5 space-y-2 text-sm">
             <PoolRow label="Pool size" value={`${poolSize} properties`} />
             <PoolRow label="Display level" value={
@@ -135,7 +135,7 @@ export default function External({ pillar }: { pillar: PillarKey }) {
       <div className="rounded-xl bg-warn/10 border border-warn/25 p-3 flex items-start gap-2.5">
         <Info size={16} className="text-warn mt-0.5" />
         <div className="text-[13px] text-warn">
-          External Comparison is directional market context — not a rated score. Pool isolation per BRD §2.3 (no cross-pool leakage).
+          External Comparison is directional market context — not a rated score. Pool isolation  (no cross-pool leakage).
         </div>
       </div>
 
@@ -158,7 +158,7 @@ function drillContent(d: Drill) {
   if (d === "pool") {
     return {
       title: "Comparable pool composition",
-      subtitle: "Pool isolation per client (BRD §2.3) — properties anonymised in distribution views",
+      subtitle: "Each client's pool is isolated — properties are anonymised in distribution views",
       hero: <HeroValue value="23" context="properties match all filters" />,
       body: (
         <div className="grid grid-cols-12 gap-4">

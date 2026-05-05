@@ -1,6 +1,8 @@
 import { NavLink, useLocation } from "react-router-dom";
 import { Building2, ChevronLeft, Leaf } from "lucide-react";
 import { NAV, NAV_GROUPS } from "@/lib/nav";
+import type { Role } from "@/lib/nav";
+import { useAuth } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 
 type Props = {
@@ -10,6 +12,12 @@ type Props = {
 
 export default function Sidebar({ collapsed, onToggle }: Props) {
   const location = useLocation();
+  const { profile } = useAuth();
+  // "maker" is the most restrictive role — safe fallback when profile not yet loaded.
+  const role: Role = profile?.role ?? "maker";
+
+  const visibleNav = NAV.filter((item) => !item.roles || item.roles.includes(role));
+
   return (
     <aside className={cn("sidebar-shell", collapsed ? "w-[72px]" : "w-[252px]")}>
 
@@ -52,7 +60,7 @@ export default function Sidebar({ collapsed, onToggle }: Props) {
       {/* ── Nav ── */}
       <nav className="flex-1 overflow-y-auto py-3 px-2.5">
         {NAV_GROUPS.map((group) => {
-          const items = NAV.filter((n) => n.group === group);
+          const items = visibleNav.filter((n) => n.group === group);
           if (items.length === 0) return null;
           return (
             <div key={group} className="mb-3">

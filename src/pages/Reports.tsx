@@ -1,12 +1,15 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import {
   Archive,
+  Award,
   Bell,
   BarChart2,
   Calendar,
   ChevronDown,
   ChevronRight,
   Download,
+  ExternalLink,
   FileText,
   Filter,
   Globe,
@@ -16,6 +19,7 @@ import {
   Plus,
   Share2,
   Sparkles,
+  Sun,
   ToggleLeft,
   ToggleRight,
   Zap,
@@ -147,9 +151,9 @@ export default function Reports() {
   return (
     <div className="space-y-5">
       <PageHeader
-        eyebrow="Disclosure & assurance · FR-8"
+        eyebrow="Disclosure & assurance"
         title="Reports & Disclosure"
-        subtitle="Framework-aligned exports. Sustainability managers review and finalise — AI drafts, never commits without approval (DP-11)."
+        subtitle="5 of 7 frameworks are ready to export. 2 have blocking issues — resolve data gaps before your next disclosure deadline. AI drafts reports; sustainability managers review and finalise before any export."
         actions={
           <>
             <button className="btn-secondary"><Filter size={14} /> Filters</button>
@@ -191,6 +195,9 @@ export default function Reports() {
           ))}
         </div>
       </Card>
+
+      {/* RE&O Certificate evidence panel */}
+      <CertificateEvidencePanel />
 
       {/* Main 2-column: frameworks + GRI/TCFD sidebar */}
       <div className="grid grid-cols-12 gap-4">
@@ -451,11 +458,170 @@ export default function Reports() {
       <div className="rounded-xl bg-brand-50 border border-brand-100 p-3 flex items-start gap-2.5">
         <Sparkles size={16} className="text-brand-700 mt-0.5" />
         <div className="text-[13px] text-brand-900">
-          <strong>Framework outputs:</strong> the platform maps verified data to the relevant disclosure points and produces a draft response. Sustainability managers review and finalise — AI never commits without approval (DP-11).
+          <strong>Framework outputs:</strong> the platform maps verified data to the relevant disclosure points and produces a draft response. Sustainability managers review and finalise — AI never commits without approval.
         </div>
       </div>
 
       <GenerateReportModal open={genOpen} onClose={() => setGenOpen(false)} />
     </div>
+  );
+}
+
+/* ---------- RE&O Certificate Evidence Panel ---------- */
+
+type CertRow = {
+  id: string;
+  type: "I-REC" | "EAC" | "VCS" | "Gold Standard";
+  period: string;
+  mwhOrTco2e: number;
+  unit: "MWh" | "tCO₂e";
+  coverage: string;
+  status: "Active" | "Retired" | "Pending";
+  serialRange: string;
+  claimText: string;
+  evidenceRef: string;
+};
+
+const CERT_ROWS: CertRow[] = [
+  {
+    id: "c1", type: "I-REC", period: "Jan–Dec 2025",
+    mwhOrTco2e: 1_240, unit: "MWh",
+    coverage: "142 tCO₂e market-based Scope 2 offset",
+    status: "Active",
+    serialRange: "I-REC-AP-2025-001 — 012",
+    claimText: "Greenview Resort: 100% renewable electricity (market-based), Jan–Dec 2025",
+    evidenceRef: "GHG Inventory FY 2025 · Scope 2 MB",
+  },
+  {
+    id: "c2", type: "EAC", period: "Q1 2026",
+    mwhOrTco2e: 320, unit: "MWh",
+    coverage: "37 tCO₂e market-based Scope 2 offset",
+    status: "Active",
+    serialRange: "EAC-EU-2026-Q1-001 — 004",
+    claimText: "City Centre Hotel: renewable electricity (EAC), Q1 2026",
+    evidenceRef: "GHG Inventory FY 2026 · Scope 2 MB (partial)",
+  },
+  {
+    id: "c3", type: "VCS", period: "FY 2025",
+    mwhOrTco2e: 38, unit: "tCO₂e",
+    coverage: "Residual Scope 1 — refrigerant & generator offsets",
+    status: "Retired",
+    serialRange: "VCS-2025-VCU-00482 — 00519",
+    claimText: "Portfolio residual Scope 1 offset · FY 2025",
+    evidenceRef: "Carbon Reduction Plan 2025",
+  },
+];
+
+const STATUS_TONE_CERT: Record<CertRow["status"], "good" | "info" | "warn"> = {
+  Active: "good",
+  Retired: "info",
+  Pending: "warn",
+};
+
+function CertificateEvidencePanel() {
+  const [expanded, setExpanded] = useState(false);
+
+  const scope2MWh = CERT_ROWS.filter((c) => ["I-REC","EAC"].includes(c.type) && c.status !== "Pending")
+    .reduce((s, c) => s + c.mwhOrTco2e, 0);
+  const scope2Tco2e = CERT_ROWS.filter((c) => ["I-REC","EAC"].includes(c.type) && c.status !== "Pending")
+    .reduce((s, c) => s + (c.unit === "MWh" ? Math.round(c.mwhOrTco2e * 0.1145) : c.mwhOrTco2e), 0);
+  const creditsTco2e = CERT_ROWS.filter((c) => ["VCS","Gold Standard"].includes(c.type) && c.status !== "Pending")
+    .reduce((s, c) => s + (c.unit === "tCO₂e" ? c.mwhOrTco2e : 0), 0);
+
+  return (
+    <Card>
+      <CardHeader
+        title="Renewable Energy & Carbon Credit certificates"
+        hint="I-REC / EAC certificates feed market-based Scope 2. Carbon credits cover residual Scope 1 offsets. Both are automatically included in GHG Inventory exports."
+        right={
+          <div className="flex items-center gap-2">
+            <Link to="/marketplace" className="btn-ghost h-7 px-2 text-[11px] text-brand-700 flex items-center gap-1">
+              Manage in Solutions Hub <ExternalLink size={11} />
+            </Link>
+            <button
+              onClick={() => setExpanded((e) => !e)}
+              className="btn-ghost h-7 px-2 text-[11px]"
+            >
+              {expanded ? "Collapse" : "Expand"} <ChevronDown size={12} className={cn("transition-transform", expanded && "rotate-180")} />
+            </button>
+          </div>
+        }
+      />
+
+      {/* Summary tiles */}
+      <div className="grid grid-cols-3 gap-px bg-ink-100 border-t border-ink-100">
+        <div className="bg-white p-4">
+          <div className="flex items-center gap-2 mb-1">
+            <Sun size={14} className="text-warn" />
+            <span className="text-[11px] font-semibold text-ink-500 uppercase tracking-wide">Market-based Scope 2</span>
+          </div>
+          <div className="text-2xl font-bold text-ink-900">{scope2MWh.toLocaleString()} MWh</div>
+          <div className="text-[12px] text-ink-500">≈ {scope2Tco2e} tCO₂e offset via I-REC / EAC</div>
+        </div>
+        <div className="bg-white p-4">
+          <div className="flex items-center gap-2 mb-1">
+            <Leaf size={14} className="text-good" />
+            <span className="text-[11px] font-semibold text-ink-500 uppercase tracking-wide">Carbon credits retired</span>
+          </div>
+          <div className="text-2xl font-bold text-ink-900">{creditsTco2e} tCO₂e</div>
+          <div className="text-[12px] text-ink-500">Residual Scope 1 · VCS retired FY 2025</div>
+        </div>
+        <div className="bg-white p-4">
+          <div className="flex items-center gap-2 mb-1">
+            <Award size={14} className="text-brand-700" />
+            <span className="text-[11px] font-semibold text-ink-500 uppercase tracking-wide">Certificates on file</span>
+          </div>
+          <div className="text-2xl font-bold text-ink-900">{CERT_ROWS.length}</div>
+          <div className="text-[12px] text-ink-500">{CERT_ROWS.filter((c) => c.status === "Active").length} active · {CERT_ROWS.filter((c) => c.status === "Retired").length} retired</div>
+        </div>
+      </div>
+
+      {/* Detail table (expandable) */}
+      {expanded && (
+        <div className="overflow-x-auto border-t border-ink-100">
+          <table className="min-w-full">
+            <thead>
+              <tr className="bg-ink-50">
+                <th className="table-th">Type</th>
+                <th className="table-th">Period</th>
+                <th className="table-th">Volume</th>
+                <th className="table-th">Disclosure coverage</th>
+                <th className="table-th">Serial range</th>
+                <th className="table-th">Status</th>
+                <th className="table-th text-right pr-6">Evidence</th>
+              </tr>
+            </thead>
+            <tbody>
+              {CERT_ROWS.map((c) => (
+                <tr key={c.id} className="hover:bg-ink-50/60">
+                  <td className="table-td">
+                    <Badge tone={c.type === "I-REC" || c.type === "EAC" ? "warn" : "good"}>{c.type}</Badge>
+                  </td>
+                  <td className="table-td text-ink-600">{c.period}</td>
+                  <td className="table-td font-semibold text-ink-900 tabular-nums">
+                    {c.mwhOrTco2e.toLocaleString()} {c.unit}
+                  </td>
+                  <td className="table-td text-[12px] text-ink-600">{c.coverage}</td>
+                  <td className="table-td font-mono text-[10px] text-ink-500">{c.serialRange}</td>
+                  <td className="table-td">
+                    <Badge tone={STATUS_TONE_CERT[c.status]}>{c.status}</Badge>
+                  </td>
+                  <td className="table-td text-right pr-6">
+                    <div className="flex items-center justify-end gap-1">
+                      <span className="text-[11px] text-ink-500">{c.evidenceRef}</span>
+                      <button className="btn-ghost h-6 px-1" title="Download certificate"><Download size={12} /></button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <div className="px-5 py-3 border-t border-ink-100 rounded-b-xl bg-ink-50 text-[11px] text-ink-500 flex items-start gap-2">
+            <Zap size={12} className="text-brand-700 mt-0.5 shrink-0" />
+            I-REC / EAC certificates automatically populate the <strong>market-based (MB) Scope 2</strong> row in all GHG Inventory and CSRD E1 exports. Retired carbon credits appear in the <strong>residual emissions offset</strong> section of the Carbon Reduction Plan.
+          </div>
+        </div>
+      )}
+    </Card>
   );
 }
