@@ -13,7 +13,7 @@ import {
   Users,
   Settings as SettingsIcon,
   CreditCard,
-  Store,
+  ShoppingBag,
 } from "lucide-react";
 
 // Must match database.types.ts Enums["user_role"] exactly.
@@ -116,7 +116,7 @@ export const NAV: NavItem[] = [
   },
 
   // Admin
-  { to: "/marketplace", label: "Solutions Hub", icon: Store, group: "Admin", roles: ["super_admin"] },
+  { to: "/marketplace", label: "Marketplace", icon: ShoppingBag, group: "Engagement", roles: ["property_sm", "super_admin"] },
   { to: "/billing", label: "Billing", icon: CreditCard, group: "Admin", roles: ["super_admin"] },
   { to: "/admin", label: "Admin", icon: SettingsIcon, group: "Admin", roles: ["super_admin"] },
 ];
