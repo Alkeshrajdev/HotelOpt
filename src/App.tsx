@@ -24,6 +24,15 @@ import AdminStub from "./pages/admin/Stub";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 
+// Smart Operations
+import SmartOpsOverview from "./pages/smart-ops/SmartOpsOverview";
+import EnergyManagement from "./pages/smart-ops/EnergyManagement";
+import WaterManagement from "./pages/smart-ops/WaterManagement";
+import IAQComfort from "./pages/smart-ops/IAQComfort";
+import AssetPerformance from "./pages/smart-ops/AssetPerformance";
+import AlertsCentre from "./pages/smart-ops/AlertsCentre";
+import SavingsVerification from "./pages/smart-ops/SavingsVerification";
+
 export default function App() {
   return (
     <Routes>
@@ -41,6 +50,15 @@ export default function App() {
         <Route path="/properties" element={<Properties />} />
         <Route path="/properties/:propertyId" element={<PropertyDetail />} />
 
+        {/* Smart Operations */}
+        <Route path="/smart-ops" element={<SmartOpsOverview />} />
+        <Route path="/smart-ops/energy" element={<EnergyManagement />} />
+        <Route path="/smart-ops/water" element={<WaterManagement />} />
+        <Route path="/smart-ops/iaq" element={<IAQComfort />} />
+        <Route path="/smart-ops/assets" element={<AssetPerformance />} />
+        <Route path="/smart-ops/alerts" element={<AlertsCentre />} />
+        <Route path="/smart-ops/savings" element={<SavingsVerification />} />
+
         {/* Performance — pillar-first hub */}
         <Route
           path="/performance"
@@ -55,31 +73,15 @@ export default function App() {
           element={<PerformanceShell />}
         />
 
-        {/* Backwards-compatible redirects from old top-level routes */}
-        <Route
-          path="/own-performance"
-          element={<Navigate to="/performance/energy/overview" replace />}
-        />
-        <Route
-          path="/genuine-performance"
-          element={<Navigate to="/performance/energy/genuine-performance" replace />}
-        />
-        <Route
-          path="/internal-comparison"
-          element={<Navigate to="/performance/energy/internal-comparison" replace />}
-        />
-        <Route
-          path="/external-comparison"
-          element={<Navigate to="/performance/energy/external-comparison" replace />}
-        />
-        <Route
-          path="/carbon-inventory"
-          element={<Navigate to="/performance/carbon/carbon-inventory" replace />}
-        />
+        {/* Backwards-compatible redirects */}
+        <Route path="/own-performance" element={<Navigate to="/performance/energy/overview" replace />} />
+        <Route path="/genuine-performance" element={<Navigate to="/performance/energy/genuine-performance" replace />} />
+        <Route path="/internal-comparison" element={<Navigate to="/performance/energy/internal-comparison" replace />} />
+        <Route path="/external-comparison" element={<Navigate to="/performance/energy/external-comparison" replace />} />
+        <Route path="/carbon-inventory" element={<Navigate to="/performance/carbon/carbon-inventory" replace />} />
 
         <Route path="/reports" element={<Reports />} />
         <Route path="/certifications" element={<Certifications />} />
-
         <Route path="/actions" element={<Actions />} />
         <Route path="/supplier-portal" element={<SupplierPortal />} />
         <Route path="/ai-assistant" element={<AIAssistant />} />
@@ -88,7 +90,7 @@ export default function App() {
         <Route path="/marketplace" element={<Marketplace />} />
         <Route path="/billing" element={<Billing />} />
         <Route path="/admin" element={<Admin />} />
-        <Route path="/admin/clients"   element={<AdminClients />} />
+        <Route path="/admin/clients"    element={<AdminClients />} />
         <Route path="/admin/ef-library" element={<AdminEFLibrary />} />
         <Route path="/admin/users"      element={<AdminUsers />} />
         <Route path="/admin/pools"      element={<AdminPools />} />
@@ -100,10 +102,6 @@ export default function App() {
   );
 }
 
-// Default a bare /performance/:pillar to its overview view.
 function PerformanceShellRedirect() {
-  // We can't useParams() here without typing — react-router gives us the params
-  // via the Navigate's URL composition. Easiest: render PerformanceShell which
-  // already redirects to /:pillar/overview when view is missing/invalid.
   return <PerformanceShell />;
 }

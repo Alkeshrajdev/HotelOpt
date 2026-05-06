@@ -14,25 +14,41 @@ import {
   Settings as SettingsIcon,
   CreditCard,
   ShoppingBag,
+  Zap,
+  Droplets,
+  Wind,
+  Cpu,
+  Bell,
+  TrendingDown,
+  Activity,
 } from "lucide-react";
 
 // Must match database.types.ts Enums["user_role"] exactly.
 export type Role = "maker" | "checker" | "property_sm" | "super_admin";
 
+export type NavGroup =
+  | "Workspace"
+  | "Smart Operations"
+  | "Sustainability Performance"
+  | "Action & Improvement"
+  | "Reporting"
+  | "Engagement"
+  | "Admin";
+
 export type NavItem = {
   to: string;
   label: string;
   icon: LucideIcon;
-  group: "Workspace" | "Insights" | "Reporting" | "Engagement" | "Admin";
+  group: NavGroup;
   badge?: string;
-  /** Match this prefix for active state (e.g. /performance covers all pillar/view sub-routes). */
+  /** Match this prefix for active state. */
   matchPrefix?: string;
   /** Roles that can see this item. Omit to show to everyone. */
   roles?: Role[];
 };
 
 export const NAV: NavItem[] = [
-  // Workspace
+  // ── Workspace ────────────────────────────────────────────────────────
   { to: "/", label: "Dashboard", icon: LayoutDashboard, group: "Workspace" },
   {
     to: "/data-capture",
@@ -57,17 +73,87 @@ export const NAV: NavItem[] = [
     roles: ["property_sm", "super_admin"],
   },
 
-  // Insights
+  // ── Smart Operations ─────────────────────────────────────────────────
+  {
+    to: "/smart-ops",
+    label: "Smart Ops Overview",
+    icon: Activity,
+    group: "Smart Operations",
+    matchPrefix: "/smart-ops",
+    roles: ["property_sm", "super_admin"],
+  },
+  {
+    to: "/smart-ops/energy",
+    label: "Energy Management",
+    icon: Zap,
+    group: "Smart Operations",
+    roles: ["property_sm", "super_admin"],
+  },
+  {
+    to: "/smart-ops/water",
+    label: "Water Management",
+    icon: Droplets,
+    group: "Smart Operations",
+    roles: ["property_sm", "super_admin"],
+  },
+  {
+    to: "/smart-ops/iaq",
+    label: "IAQ & Comfort",
+    icon: Wind,
+    group: "Smart Operations",
+    roles: ["property_sm", "super_admin"],
+  },
+  {
+    to: "/smart-ops/assets",
+    label: "Asset Performance",
+    icon: Cpu,
+    group: "Smart Operations",
+    roles: ["property_sm", "super_admin"],
+  },
+  {
+    to: "/smart-ops/alerts",
+    label: "Alerts Centre",
+    icon: Bell,
+    group: "Smart Operations",
+    badge: "7",
+    roles: ["property_sm", "super_admin"],
+  },
+  {
+    to: "/smart-ops/savings",
+    label: "Savings Verification",
+    icon: TrendingDown,
+    group: "Smart Operations",
+    roles: ["property_sm", "super_admin"],
+  },
+
+  // ── Sustainability Performance ────────────────────────────────────────
   {
     to: "/performance/energy/overview",
     label: "Performance",
     icon: BarChart3,
-    group: "Insights",
+    group: "Sustainability Performance",
     matchPrefix: "/performance",
     roles: ["property_sm", "super_admin"],
   },
 
-  // Reporting
+  // ── Action & Improvement ─────────────────────────────────────────────
+  {
+    to: "/actions",
+    label: "Actions",
+    icon: Lightbulb,
+    group: "Action & Improvement",
+    badge: "3",
+    roles: ["property_sm", "super_admin"],
+  },
+  {
+    to: "/marketplace",
+    label: "Marketplace",
+    icon: ShoppingBag,
+    group: "Action & Improvement",
+    roles: ["property_sm", "super_admin"],
+  },
+
+  // ── Reporting ─────────────────────────────────────────────────────────
   {
     to: "/reports",
     label: "Reports & Disclosure",
@@ -83,15 +169,7 @@ export const NAV: NavItem[] = [
     roles: ["checker", "property_sm", "super_admin"],
   },
 
-  // Engagement & Action
-  {
-    to: "/actions",
-    label: "Actions",
-    icon: Lightbulb,
-    group: "Engagement",
-    badge: "3",
-    roles: ["property_sm", "super_admin"],
-  },
+  // ── Engagement ────────────────────────────────────────────────────────
   {
     to: "/supplier-portal",
     label: "Supplier Portal",
@@ -115,15 +193,16 @@ export const NAV: NavItem[] = [
     roles: ["property_sm", "super_admin"],
   },
 
-  // Admin
-  { to: "/marketplace", label: "Marketplace", icon: ShoppingBag, group: "Engagement", roles: ["property_sm", "super_admin"] },
+  // ── Admin ─────────────────────────────────────────────────────────────
   { to: "/billing", label: "Billing", icon: CreditCard, group: "Admin", roles: ["super_admin"] },
   { to: "/admin", label: "Admin", icon: SettingsIcon, group: "Admin", roles: ["super_admin"] },
 ];
 
-export const NAV_GROUPS: NavItem["group"][] = [
+export const NAV_GROUPS: NavGroup[] = [
   "Workspace",
-  "Insights",
+  "Smart Operations",
+  "Sustainability Performance",
+  "Action & Improvement",
   "Reporting",
   "Engagement",
   "Admin",
