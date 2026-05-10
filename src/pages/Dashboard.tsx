@@ -43,6 +43,7 @@ import InsufficientData from "@/components/ui/InsufficientData";
 import {
   ACTION_CENTRE,
   NEEDS_ATTENTION,
+  TOP_PROPERTIES,
   OPERATING_METRICS,
   PORTFOLIO_TRENDS,
   CERTIFICATIONS_OVERVIEW,
@@ -787,6 +788,93 @@ export default function Dashboard() {
               </tbody>
             </table>
           </div>
+        </Card>
+      </div>
+
+      {/* ── Zone 8: Hotel Performance Snapshot ── */}
+      <div className="mt-5 grid grid-cols-12 gap-5">
+
+        {/* Best Performing Hotels */}
+        <Card className="col-span-12 lg:col-span-6">
+          <CardHeader
+            title="Best Performing Hotels"
+            hint="hotels above portfolio median across all areas"
+            right={
+              <Link to="/properties" className="text-[12px] font-semibold text-brand-700 hover:text-brand-800 inline-flex items-center gap-1">
+                View all <ArrowRight size={12} />
+              </Link>
+            }
+          />
+          <ul className="px-3 pb-4 mt-2 space-y-1">
+            {TOP_PROPERTIES.slice(0, 4).map((p) => (
+              <li key={p.property}>
+                <Link
+                  to="/performance/energy/overview"
+                  className="flex items-center gap-3 rounded-lg px-3 py-3 hover:bg-ink-50 group transition-colors"
+                >
+                  <div className="w-8 h-8 rounded-full bg-good/10 grid place-items-center shrink-0">
+                    <CheckCircle2 size={14} className="text-good" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-[13px] font-semibold text-ink-900 truncate">{p.property}</div>
+                    <div className="text-[11px] text-ink-500 truncate">{p.location}</div>
+                    <div className="text-[11px] text-ink-500 mt-0.5 line-clamp-1 leading-relaxed">{p.reason}</div>
+                  </div>
+                  <div className="shrink-0 flex items-center gap-2">
+                    <div className="text-right">
+                      <div className="text-[13px] font-bold text-good tabular-nums">{p.score}%</div>
+                      <div className="text-[10px] text-ink-400">data ready</div>
+                    </div>
+                    <ChevronRight size={14} className="text-ink-300 group-hover:text-brand-700 transition-colors" />
+                  </div>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </Card>
+
+        {/* Hotels to Review */}
+        <Card className="col-span-12 lg:col-span-6">
+          <CardHeader
+            title="Hotels to Review"
+            hint="performance below threshold or data incomplete"
+            right={
+              <Link to="/properties" className="text-[12px] font-semibold text-brand-700 hover:text-brand-800 inline-flex items-center gap-1">
+                View all <ArrowRight size={12} />
+              </Link>
+            }
+          />
+          <ul className="px-3 pb-4 mt-2 space-y-1">
+            {NEEDS_ATTENTION.map((p) => (
+              <li key={p.property}>
+                <Link
+                  to="/performance/energy/overview"
+                  className="flex items-center gap-3 rounded-lg px-3 py-3 hover:bg-ink-50 group transition-colors"
+                >
+                  <div className={cn(
+                    "w-8 h-8 rounded-full grid place-items-center shrink-0",
+                    p.score < 45 ? "bg-bad/10" : "bg-warn/10"
+                  )}>
+                    <AlertTriangle size={14} className={p.score < 45 ? "text-bad" : "text-warn"} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-[13px] font-semibold text-ink-900 truncate">{p.property}</div>
+                    <div className="text-[11px] text-ink-500 truncate">{p.location}</div>
+                    <div className="text-[11px] text-ink-500 mt-0.5 line-clamp-1 leading-relaxed">{p.reason}</div>
+                  </div>
+                  <div className="shrink-0 flex items-center gap-2">
+                    <span className={cn(
+                      "chip text-[10px]",
+                      p.score < 45 ? "bg-bad/10 text-bad" : "bg-warn/10 text-warn"
+                    )}>
+                      {p.score < 45 ? "Critical" : "Moderate"}
+                    </span>
+                    <ChevronRight size={14} className="text-ink-300 group-hover:text-brand-700 transition-colors" />
+                  </div>
+                </Link>
+              </li>
+            ))}
+          </ul>
         </Card>
       </div>
 
