@@ -2,10 +2,9 @@ import { FormEvent, useState } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { FlaskConical, Leaf, Loader2 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
-import { SUPABASE_CONFIGURED } from "@/lib/supabase";
 
 export default function Login() {
-  const { session, signIn, loading } = useAuth();
+  const { session, signIn, signInDemo, loading } = useAuth();
   const location = useLocation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -56,63 +55,72 @@ export default function Login() {
 
       {/* Right form */}
       <div className="flex items-center justify-center p-6">
-        <form onSubmit={onSubmit} className="w-full max-w-sm">
-          <h1 className="text-2xl font-extrabold text-ink-900">Sign in</h1>
-          <p className="text-sm text-ink-500 mt-1">
-            Use your Hotel Optimizer credentials.
-          </p>
+        <div className="w-full max-w-sm">
 
-          {error && (
-            <div className="mt-4 text-sm rounded-lg border border-bad/25 bg-bad/10 text-bad px-3 py-2">
-              {error}
+          {/* Demo banner — always visible */}
+          <div className="mb-6 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-[12px] text-amber-800">
+            <div className="flex items-center gap-1.5 font-semibold mb-1">
+              <FlaskConical size={13} className="text-amber-500" />
+              Demo environment
             </div>
-          )}
+            <p className="text-amber-700 leading-relaxed mb-2">
+              Sample data only — not connected to live client records.
+            </p>
+            <button
+              type="button"
+              onClick={signInDemo}
+              className="w-full rounded-lg bg-amber-500 hover:bg-amber-600 text-white font-semibold py-2 text-[13px] transition-colors"
+            >
+              Enter Demo — no login required
+            </button>
+          </div>
 
-          <label className="block mt-5">
-            <span className="text-[12px] font-medium text-ink-600">Email</span>
-            <input
-              className="input mt-1"
-              type="email"
-              autoComplete="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@hotel.com"
-            />
-          </label>
-          <label className="block mt-3">
-            <span className="text-[12px] font-medium text-ink-600">Password</span>
-            <input
-              className="input mt-1"
-              type="password"
-              autoComplete="current-password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-            />
-          </label>
-          <button
-            type="submit"
-            disabled={submitting}
-            className="btn-primary w-full mt-5"
-          >
-            {submitting ? <Loader2 size={14} className="animate-spin" /> : null}
-            Sign in
-          </button>
+          <form onSubmit={onSubmit}>
+            <h1 className="text-2xl font-extrabold text-ink-900">Sign in</h1>
+            <p className="text-sm text-ink-500 mt-1">
+              Use your Hotel Optimizer credentials.
+            </p>
 
-          {!SUPABASE_CONFIGURED && (
-            <div className="mt-5 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-[12px] text-amber-800">
-              <div className="flex items-center gap-1.5 font-semibold mb-1">
-                <FlaskConical size={13} className="text-amber-500" />
-                Demo environment
+            {error && (
+              <div className="mt-4 text-sm rounded-lg border border-bad/25 bg-bad/10 text-bad px-3 py-2">
+                {error}
               </div>
-              <p className="text-amber-700 leading-relaxed">
-                Sample data only — not connected to live client records. Click <strong>Enter Demo</strong> to explore without credentials.
-              </p>
-            </div>
-          )}
-        </form>
+            )}
+
+            <label className="block mt-5">
+              <span className="text-[12px] font-medium text-ink-600">Email</span>
+              <input
+                className="input mt-1"
+                type="email"
+                autoComplete="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@hotel.com"
+              />
+            </label>
+            <label className="block mt-3">
+              <span className="text-[12px] font-medium text-ink-600">Password</span>
+              <input
+                className="input mt-1"
+                type="password"
+                autoComplete="current-password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+              />
+            </label>
+            <button
+              type="submit"
+              disabled={submitting}
+              className="btn-primary w-full mt-5"
+            >
+              {submitting ? <Loader2 size={14} className="animate-spin" /> : null}
+              Sign in
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   );

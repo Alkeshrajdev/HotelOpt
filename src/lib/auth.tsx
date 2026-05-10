@@ -19,6 +19,7 @@ type AuthContextValue = {
   profile: Profile | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ error: string | null }>;
+  signInDemo: () => void;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
 };
@@ -101,6 +102,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (!supabase) return { error: null };
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         return { error: error?.message ?? null };
+      },
+      signInDemo: () => {
+        setSession(DEMO_SESSION);
+        setProfile(DEMO_PROFILE);
       },
       signOut: async () => {
         if (!supabase) return;
