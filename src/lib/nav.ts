@@ -27,6 +27,7 @@ import {
 export type Role = "maker" | "checker" | "property_sm" | "super_admin";
 
 export type NavGroup =
+  | "Portfolio"
   | "Workspace"
   | "Smart Operations"
   | "Sustainability Performance"
@@ -48,8 +49,33 @@ export type NavItem = {
 };
 
 export const NAV: NavItem[] = [
+  // ── Portfolio ────────────────────────────────────────────────────────
+  {
+    to: "/portfolio/dashboard",
+    label: "Portfolio Dashboard",
+    icon: LayoutDashboard,
+    group: "Portfolio",
+    matchPrefix: "/portfolio/dashboard",
+    roles: ["super_admin"],
+  },
+  {
+    to: "/portfolio/setup",
+    label: "Portfolio Setup",
+    icon: SettingsIcon,
+    group: "Portfolio",
+    matchPrefix: "/portfolio/setup",
+    roles: ["super_admin"],
+  },
+  {
+    to: "/portfolio/reports-certifications",
+    label: "Reports & Certifications",
+    icon: FileText,
+    group: "Portfolio",
+    matchPrefix: "/portfolio/reports-certifications",
+    roles: ["super_admin"],
+  },
+
   // ── Workspace ────────────────────────────────────────────────────────
-  { to: "/", label: "Dashboard", icon: LayoutDashboard, group: "Workspace" },
   {
     to: "/data-capture",
     label: "Data Capture",
@@ -199,6 +225,7 @@ export const NAV: NavItem[] = [
 ];
 
 export const NAV_GROUPS: NavGroup[] = [
+  "Portfolio",
   "Workspace",
   "Smart Operations",
   "Sustainability Performance",

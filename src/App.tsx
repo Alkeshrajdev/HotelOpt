@@ -2,6 +2,8 @@ import { Navigate, Routes, Route } from "react-router-dom";
 import AppShell from "./components/layout/AppShell";
 import RequireAuth from "./components/RequireAuth";
 import Dashboard from "./pages/Dashboard";
+import PortfolioSetup from "./pages/portfolio/PortfolioSetup";
+import PortfolioReports from "./pages/portfolio/PortfolioReports";
 import DataCapture from "./pages/DataCapture";
 import ReviewApproval from "./pages/ReviewApproval";
 import PerformanceShell from "./pages/performance/Shell";
@@ -44,7 +46,10 @@ export default function App() {
           </RequireAuth>
         }
       >
-        <Route index element={<Dashboard />} />
+        <Route index element={<Navigate to="/portfolio/dashboard" replace />} />
+        <Route path="/portfolio/dashboard" element={<Dashboard />} />
+        <Route path="/portfolio/setup" element={<PortfolioSetup />} />
+        <Route path="/portfolio/reports-certifications" element={<PortfolioReports />} />
         <Route path="/data-capture" element={<DataCapture />} />
         <Route path="/review-approval" element={<ReviewApproval />} />
         <Route path="/properties" element={<Properties />} />
