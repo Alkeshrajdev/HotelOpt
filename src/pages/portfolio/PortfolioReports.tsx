@@ -182,8 +182,9 @@ function ReportingStatusTab() {
                 <td className="py-3 px-2 text-ink-400 whitespace-nowrap">{r.lastGen}</td>
                 <td className="py-3 px-2 pr-0">
                   <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <Link to="/portfolio/reports-certifications" className="chip bg-brand-100 text-brand-700 hover:bg-brand-200 text-[10px] font-semibold cursor-pointer">Open</Link>
-                    {r.blocker && <span className="chip bg-bad/10 text-bad text-[10px] font-semibold cursor-pointer">Resolve</span>}
+                    <Link to="/portfolio/reports-certifications" className="chip bg-brand-100 text-brand-700 hover:bg-brand-200 text-[10px] font-semibold cursor-pointer">
+                      {r.status === "Ready" ? "Generate" : r.status === "Mapped" ? "Review" : r.status === "Draft" ? "Continue" : "Resolve"}
+                    </Link>
                   </div>
                 </td>
               </tr>
@@ -765,23 +766,25 @@ export default function PortfolioReports() {
       {/* Alert strip */}
       <div className="flex flex-wrap gap-3">
         {reportBlocked > 0 && (
-          <div className="flex items-center gap-2 rounded-xl border border-bad/30 bg-bad/5 px-4 py-2.5 text-[12px] text-bad">
+          <button onClick={() => setTab("status")} className="flex items-center gap-2 rounded-xl border border-bad/30 bg-bad/5 px-4 py-2.5 text-[12px] text-bad text-left hover:bg-bad/10 transition-colors">
             <AlertTriangle size={13} className="shrink-0" />
             <span><strong>{reportBlocked} report{reportBlocked > 1 ? "s" : ""} blocked</strong> — resolve evidence gaps to unblock.</span>
-            <button onClick={() => {}} className="underline font-medium">View</button>
-          </div>
+            <span className="underline font-medium ml-1">View</span>
+          </button>
         )}
         {blocking > 0 && (
-          <div className="flex items-center gap-2 rounded-xl border border-bad/30 bg-bad/5 px-4 py-2.5 text-[12px] text-bad">
+          <button onClick={() => setTab("evidence")} className="flex items-center gap-2 rounded-xl border border-bad/30 bg-bad/5 px-4 py-2.5 text-[12px] text-bad text-left hover:bg-bad/10 transition-colors">
             <AlertTriangle size={13} className="shrink-0" />
             <span><strong>{blocking} critical evidence gaps</strong> are blocking submissions.</span>
-          </div>
+            <span className="underline font-medium ml-1">View</span>
+          </button>
         )}
         {renewSoon > 0 && (
-          <div className="flex items-center gap-2 rounded-xl border border-warn/30 bg-warn/5 px-4 py-2.5 text-[12px] text-warn">
+          <button onClick={() => setTab("certification")} className="flex items-center gap-2 rounded-xl border border-warn/30 bg-warn/5 px-4 py-2.5 text-[12px] text-warn text-left hover:bg-warn/10 transition-colors">
             <Clock size={13} className="shrink-0" />
             <span><strong>{renewSoon} certifications</strong> need renewal action.</span>
-          </div>
+            <span className="underline font-medium ml-1">View</span>
+          </button>
         )}
       </div>
 

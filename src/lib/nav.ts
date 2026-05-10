@@ -68,7 +68,7 @@ export const NAV: NavItem[] = [
   },
   {
     to: "/portfolio/reports-certifications",
-    label: "Reports & Certifications",
+    label: "Portfolio Reports & Certifications",
     icon: FileText,
     group: "Portfolio",
     matchPrefix: "/portfolio/reports-certifications",
@@ -182,14 +182,14 @@ export const NAV: NavItem[] = [
   // ── Reporting ─────────────────────────────────────────────────────────
   {
     to: "/reports",
-    label: "Reports & Disclosure",
+    label: "Hotel Reports",
     icon: FileText,
     group: "Reporting",
     roles: ["checker", "property_sm", "super_admin"],
   },
   {
     to: "/certifications",
-    label: "Certifications",
+    label: "Hotel Certifications",
     icon: Award,
     group: "Reporting",
     roles: ["checker", "property_sm", "super_admin"],

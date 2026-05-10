@@ -56,10 +56,10 @@ export default function WorkflowStrip({
       <div className="flex items-center justify-between gap-2 mb-4">
         <div>
           <div className="text-[12px] font-semibold uppercase tracking-[0.08em] text-ink-500">
-            Operational workflow
+            Data & Reporting Progress
           </div>
           <div className="text-[12px] text-ink-500">
-            From data capture through to assurance-ready reports
+            From data capture to approved reports
           </div>
         </div>
         <button className="text-[12px] font-semibold text-brand-700 hover:text-brand-800">

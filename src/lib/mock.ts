@@ -62,7 +62,7 @@ export const ACTION_CENTRE = [
   { label: "Supplier reminders",         count: 12, severity: "info" as const, href: "/supplier-portal?status=pending" },
   { label: "Certification evidence due", count: 6,  severity: "warn" as const, href: "/certifications?status=evidence-due" },
   { label: "Targets off-track",          count: 4,  severity: "bad"  as const, href: "/performance/energy/overview" },
-  { label: "GP worsening alert",         count: 3,  severity: "bad"  as const, href: "/performance/energy/overview" },
+  { label: "Adjusted performance worsening", count: 3,  severity: "bad"  as const, href: "/performance/energy/overview" },
 ];
 
 export const RECOMMENDED_MEASURES = [
@@ -249,13 +249,13 @@ export const GP_COMPOSITE = {
 };
 
 export const OPERATING_METRICS = [
-  { key: "orn",          label: "Occ Room Nights",    value: 412_585, unit: "",        delta: null,  goodDirection: null },
+  { key: "orn",          label: "Occupied Room Nights", value: 412_585, unit: "",        delta: null,  goodDirection: null },
   { key: "guestNights",  label: "Guest Nights",       value: 876_241, unit: "",        delta: null,  goodDirection: null },
   { key: "occupancy",    label: "Occupancy",          value: 67.4,    unit: "%",       delta: null,  goodDirection: null },
   { key: "fbCovers",     label: "F&B Covers",         value: 248_420, unit: "",        delta: null,  goodDirection: null },
-  { key: "laundry",      label: "Laundry Intensity",  value: 3.9,     unit: "kg/ORN",  delta: -1.2, goodDirection: "down" as const },
+  { key: "laundry",      label: "Laundry kg / Room Night", value: 3.9,  unit: "kg/ORN",  delta: -1.2, goodDirection: "down" as const },
   { key: "foodWaste",    label: "Food Waste / Cover", value: 82,      unit: "g/cover", delta: -8.6, goodDirection: "down" as const },
-  { key: "energyPerOr",  label: "Energy / Occ Room",  value: 20.6,    unit: "kWh/OR",  delta: -3.3, goodDirection: "down" as const },
+  { key: "energyPerOr",  label: "Energy / Room Night", value: 20.6,    unit: "kWh/OR",  delta: -3.3, goodDirection: "down" as const },
 ];
 
 export const PORTFOLIO_TRENDS = [
@@ -281,3 +281,64 @@ export const CERTIFICATIONS_OVERVIEW = {
   nextAuditDays:     45,
   nextAuditName:     "Green Globe",
 };
+
+// ── Dashboard tab data ────────────────────────────────────────────────────────
+
+export const ESG_TOTALS = {
+  carbon:     { total: 42850,   displayTotal: "42,850",  unit: "tCO₂e",    delta: -4.2,  scope1: 12400, scope2: 18200, scope3: 12250, intensity: 2.9,  intensityUnit: "kgCO₂e / room night" },
+  energy:     { total: 84200,   displayTotal: "84.2",    unit: "GWh",      delta: -6.1,  intensity: 20.6, intensityUnit: "kWh / room night",   renewablePct: 28 },
+  water:      { total: 1250000, displayTotal: "1.25M",   unit: "m³",       delta: -3.8,  intensity: 342,  intensityUnit: "L / guest night",     recycledPct: 12 },
+  waste:      { total: 8420,    displayTotal: "8,420",   unit: "tonnes",   delta:  1.4,  diversionPct: 42, foodWastePerCover: 82 },
+  social:     { trainingHoursPerFTE: 24, ltifr: 0.82, turnoverPct: 18, localSourcingPct: 34 },
+  governance: { attestationsPct: 81, supplierCodeAdoption: 74, openGaps: 4 },
+};
+
+export const PORTFOLIO_TARGETS = [
+  { key: "carbon", label: "Carbon Target",       area: "Carbon",     icon: "cloud",  currentLabel: "22% reduction", currentVal: 22, targetVal: 40, unit: "%",      baseYear: 2019, targetYear: 2030, gap: "18% remaining", status: "bad"  as const, hotelCount: 6,  hotelsNote: "6 hotels driving 70% of emissions", owner: "Sarah Chen"      },
+  { key: "energy", label: "Energy Target",       area: "Energy",     icon: "zap",    currentLabel: "18.4 kWh/RN",  currentVal: 18.4, targetVal: 16.5, unit: "kWh/RN", baseYear: 2022, targetYear: 2025, gap: "1.9 kWh above target", status: "warn" as const, hotelCount: 5,  hotelsNote: "5 hotels above intensity target",   owner: "Sarah Chen"      },
+  { key: "water",  label: "Water Target",        area: "Water",      icon: "droplet",currentLabel: "342 L/GN",      currentVal: 342, targetVal: 310, unit: "L/GN", baseYear: 2022, targetYear: 2025, gap: "32 L above target",  status: "warn" as const, hotelCount: 7,  hotelsNote: "7 hotels above intensity target",   owner: "Jin Park"        },
+  { key: "waste",  label: "Waste Diversion",     area: "Waste",      icon: "recycle",currentLabel: "42% diversion", currentVal: 42, targetVal: 60,  unit: "%",      baseYear: 2022, targetYear: 2025, gap: "18% below target",   status: "bad"  as const, hotelCount: 9,  hotelsNote: "9 hotels below diversion target",   owner: "Marco Rossi"     },
+  { key: "cert",   label: "Certification Target",area: "Governance", icon: "award",  currentLabel: "6 of 8 active", currentVal: 75, targetVal: 100, unit: "%",      baseYear: 2023, targetYear: 2025, gap: "2 hotels uncertified",status: "warn" as const, hotelCount: 2,  hotelsNote: "2 hotels without current cert",     owner: "Layla Al-Hassan" },
+  { key: "data",   label: "Data Approval Target",area: "Data",       icon: "shield", currentLabel: "86% approved",  currentVal: 86, targetVal: 95,  unit: "%",      baseYear: 2024, targetYear: 2025, gap: "9% below target",    status: "warn" as const, hotelCount: 4,  hotelsNote: "4 hotels with approval <80%",       owner: "Sarah Chen"      },
+];
+
+export const HOTEL_HEATMAP = [
+  { id:"h1",  name:"The Pavilion London",           region:"EMEA",   brand:"Flagship",  type:"City Hotel",   data:"ok",   carbon:"ok",   energy:"ok",   water:"warn", waste:"ok",   cert:"ok",   actions:"warn", overall:"ok"   },
+  { id:"h2",  name:"Grand Harbour Lisbon",           region:"EMEA",   brand:"Grand",     type:"City Hotel",   data:"warn", carbon:"warn", energy:"ok",   water:"ok",   waste:"warn", cert:"warn", actions:"ok",   overall:"warn" },
+  { id:"h3",  name:"Skyline Dubai",                  region:"EMEA",   brand:"Skyline",   type:"Resort",       data:"ok",   carbon:"ok",   energy:"ok",   water:"ok",   waste:"ok",   cert:"ok",   actions:"ok",   overall:"ok"   },
+  { id:"h4",  name:"Bay View Singapore",             region:"APAC",   brand:"Bay",       type:"City Hotel",   data:"warn", carbon:"ok",   energy:"warn", water:"ok",   waste:"ok",   cert:"ok",   actions:"warn", overall:"warn" },
+  { id:"h5",  name:"The Montrose Paris",             region:"EMEA",   brand:"Flagship",  type:"Boutique",     data:"ok",   carbon:"ok",   energy:"ok",   water:"ok",   waste:"ok",   cert:"warn", actions:"ok",   overall:"ok"   },
+  { id:"h6",  name:"Marina Residences Barcelona",    region:"EMEA",   brand:"Marina",    type:"Resort",       data:"bad",  carbon:"warn", energy:"warn", water:"ok",   waste:"bad",  cert:"warn", actions:"bad",  overall:"bad"  },
+  { id:"h7",  name:"Peaks Resort Zermatt",           region:"EMEA",   brand:"Mountain",  type:"Ski Resort",   data:"bad",  carbon:"bad",  energy:"bad",  water:"bad",  waste:"bad",  cert:"bad",  actions:"bad",  overall:"bad"  },
+  { id:"h8",  name:"Oceanfront Cape Town",           region:"Africa", brand:"Ocean",     type:"Resort",       data:"ok",   carbon:"ok",   energy:"ok",   water:"warn", waste:"ok",   cert:"ok",   actions:"ok",   overall:"ok"   },
+  { id:"h9",  name:"Airport Hotel Dubai",            region:"EMEA",   brand:"Skyline",   type:"Airport",      data:"bad",  carbon:"bad",  energy:"bad",  water:"ok",   waste:"warn", cert:"bad",  actions:"bad",  overall:"bad"  },
+  { id:"h10", name:"Riverside Bangkok",              region:"APAC",   brand:"River",     type:"City Hotel",   data:"bad",  carbon:"ok",   energy:"ok",   water:"ok",   waste:"ok",   cert:"bad",  actions:"ok",   overall:"bad"  },
+];
+
+export const PORTFOLIO_ACTIONS = [
+  { id:"A-001", action:"LED retrofit — back-of-house",     hotel:"Airport Hotel Dubai",         area:"Energy",     status:"overdue",     owner:"Layla Al-Hassan", due:"2025-03-31", capex:"AED 85k",  expected:"AED 22k/yr",  verified:"—"        },
+  { id:"A-002", action:"BMS optimisation",                  hotel:"Marina Residences Barcelona", area:"Energy",     status:"in-progress", owner:"Marco Rossi",    due:"2025-06-30", capex:"AED 60k",  expected:"AED 18k/yr",  verified:"—"        },
+  { id:"A-003", action:"Water sub-metering rollout",        hotel:"Grand Harbour Lisbon",        area:"Water",      status:"overdue",     owner:"Marco Rossi",    due:"2025-04-15", capex:"AED 35k",  expected:"AED 8k/yr",   verified:"—"        },
+  { id:"A-004", action:"Greywater reuse system",            hotel:"Skyline Dubai",               area:"Water",      status:"approved",    owner:"Layla Al-Hassan", due:"2025-09-30", capex:"AED 120k", expected:"AED 30k/yr",  verified:"—"        },
+  { id:"A-005", action:"Food waste segregation",            hotel:"The Pavilion London",         area:"Waste",      status:"in-progress", owner:"Sarah Chen",     due:"2025-06-01", capex:"AED 12k",  expected:"AED 6k/yr",   verified:"AED 4k/yr"},
+  { id:"A-006", action:"On-site solar PV — phase 2",        hotel:"Oceanfront Cape Town",        area:"Carbon",     status:"proposed",    owner:"Thabo Nkosi",    due:"2025-12-31", capex:"AED 480k", expected:"AED 95k/yr",  verified:"—"        },
+  { id:"A-007", action:"Supplier EF alignment — Scope 3",   hotel:"Portfolio",                   area:"Carbon",     status:"overdue",     owner:"Sarah Chen",     due:"2025-04-30", capex:"—",        expected:"—",           verified:"—"        },
+  { id:"A-008", action:"Certification evidence upload",     hotel:"Airport Hotel Dubai",         area:"Governance", status:"overdue",     owner:"Layla Al-Hassan", due:"2025-05-01", capex:"—",        expected:"—",           verified:"—"        },
+  { id:"A-009", action:"Heat recovery on chillers",         hotel:"Bay View Singapore",          area:"Energy",     status:"proposed",    owner:"Jin Park",       due:"2025-10-31", capex:"AED 250k", expected:"AED 58k/yr",  verified:"—"        },
+  { id:"A-010", action:"Staff sustainability training",     hotel:"Riverside Bangkok",           area:"Social",     status:"in-progress", owner:"Sarah Chen",     due:"2025-06-30", capex:"AED 8k",   expected:"—",           verified:"—"        },
+  { id:"A-011", action:"Scope 3 travel data collection",    hotel:"Portfolio",                   area:"Carbon",     status:"overdue",     owner:"Sophie Müller",  due:"2025-05-15", capex:"—",        expected:"—",           verified:"—"        },
+  { id:"A-012", action:"Green Key renewal documentation",   hotel:"The Pavilion London",         area:"Governance", status:"in-progress", owner:"Sarah Chen",     due:"2025-06-15", capex:"—",        expected:"—",           verified:"—"        },
+];
+
+export const DATA_ASSURANCE_BY_HOTEL = [
+  { hotel:"The Pavilion London",          approved:91, estimated:4,  missing:2,  pending:2,  evidenceGaps:2,  lowConfidence:1  },
+  { hotel:"Grand Harbour Lisbon",          approved:87, estimated:6,  missing:5,  pending:5,  evidenceGaps:5,  lowConfidence:2  },
+  { hotel:"Skyline Dubai",                 approved:94, estimated:3,  missing:1,  pending:1,  evidenceGaps:7,  lowConfidence:1  },
+  { hotel:"Bay View Singapore",            approved:82, estimated:9,  missing:8,  pending:8,  evidenceGaps:8,  lowConfidence:3  },
+  { hotel:"The Montrose Paris",            approved:96, estimated:2,  missing:0,  pending:0,  evidenceGaps:3,  lowConfidence:0  },
+  { hotel:"Marina Residences Barcelona",   approved:74, estimated:14, missing:12, pending:12, evidenceGaps:7,  lowConfidence:6  },
+  { hotel:"Peaks Resort Zermatt",          approved:41, estimated:42, missing:0,  pending:0,  evidenceGaps:19, lowConfidence:0  },
+  { hotel:"Oceanfront Cape Town",          approved:88, estimated:5,  missing:3,  pending:3,  evidenceGaps:5,  lowConfidence:1  },
+  { hotel:"Airport Hotel Dubai",           approved:45, estimated:22, missing:18, pending:18, evidenceGaps:22, lowConfidence:8  },
+  { hotel:"Riverside Bangkok",             approved:12, estimated:71, missing:0,  pending:0,  evidenceGaps:0,  lowConfidence:0  },
+];

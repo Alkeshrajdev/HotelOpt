@@ -52,7 +52,7 @@ export default function KpiTile({
       <div className="flex items-center justify-between gap-3">
         <div
           className={cn(
-            "w-11 h-11 rounded-xl grid place-items-center shrink-0",
+            "w-12 h-12 rounded-xl grid place-items-center shrink-0",
             iconBg
           )}
         >
@@ -64,11 +64,11 @@ export default function KpiTile({
           </span>
         )}
       </div>
-      <div className="mt-4 text-[11px] uppercase tracking-[0.06em] font-semibold text-ink-500 truncate">
+      <div className="mt-4 text-[11px] uppercase tracking-[0.06em] font-semibold text-ink-500 leading-snug">
         {label}
       </div>
-      <div className="mt-1.5 flex items-baseline gap-1.5">
-        <div className="text-kpi text-ink-900 tabular-nums">{value}</div>
+      <div className="mt-1.5 flex items-baseline gap-1.5 flex-wrap">
+        <div className="text-kpi text-ink-900 tabular-nums whitespace-nowrap">{value}</div>
         {unit && (
           <span className="text-[12px] font-medium text-ink-500">{unit}</span>
         )}

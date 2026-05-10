@@ -128,7 +128,7 @@ function HotelsTab() {
 
       <div className="flex items-center justify-between">
         <p className="text-sm text-ink-500">{HOTELS.length} hotels · {included} included in portfolio</p>
-        <button className="btn-primary flex items-center gap-1.5 text-[13px]"><Plus size={14} /> Add Hotel</button>
+        <button className="btn-primary flex items-center gap-1.5 text-[13px]"><Plus size={14} /> Add Hotels to Portfolio</button>
       </div>
 
       <div className="overflow-x-auto">
