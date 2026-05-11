@@ -413,6 +413,63 @@ export const PORTFOLIO_GOVERNANCE_BY_HOTEL = [
   { hotel:"Riverside Bangkok",           attestationsPct:22, supplierCodePct:15, openGaps:8, certifications:[]                         },
 ];
 
+// ── Carbon sub-category breakdowns ───────────────────────────────────────────
+
+export const SCOPE1_BREAKDOWN = [
+  { source: "Natural gas (boilers & heating)", tco2e: 1440, pct: 42.0, note: "Space & water heating", color: "#F59E0B" },
+  { source: "Refrigerants (HVAC / chillers)",  tco2e: 960,  pct: 28.0, note: "Fugitive leaks — R-410A, R-32", color: "#8B5CF6" },
+  { source: "Diesel (backup generators)",      tco2e: 720,  pct: 21.0, note: "Peak demand & outages",         color: "#EF4444" },
+  { source: "Company vehicles & fleet",        tco2e: 205,  pct: 6.0,  note: "Shuttles, service vehicles",    color: "#6B7280" },
+  { source: "Other direct combustion",         tco2e: 103,  pct: 3.0,  note: "Biomass, LPG, cooking gas",     color: "#D1D5DB" },
+];
+// Total: 3,428 tCO₂e = Scope 1
+
+export const SCOPE2_METHODS = {
+  locationBased: { tco2e: 14569, label: "Location-based",  note: "Uses average grid emission factor — mandatory disclosure" },
+  marketBased:   { tco2e: 12400, label: "Market-based",    note: "After RECs & green tariffs — 15% lower" },
+  recCoverage:   { mwh: 6984,    pct: 12, label: "Renewable electricity coverage (RECs + on-site)" },
+  gridEF:        { value: 0.251, unit: "kgCO₂/kWh", label: "Avg. grid emission factor" },
+  saving:        { tco2e: 2169,  pct: 15, label: "Abatement from RECs vs location-based" },
+};
+
+// ── Energy end-use breakdown ──────────────────────────────────────────────────
+
+export const ENERGY_END_USE = [
+  { system: "HVAC & Cooling",     mwh: 36800, pct: 43.7, note: "Chillers, AHUs, cooling towers",        color: "#0EA5E9" },
+  { system: "Kitchen & F&B",      mwh: 16800, pct: 19.9, note: "Ovens, refrigeration, dishwashers",     color: "#F59E0B" },
+  { system: "Guest Rooms",        mwh: 13500, pct: 16.0, note: "In-room AC, lighting, mini-bars",       color: "#6366F1" },
+  { system: "Laundry",            mwh: 7500,  pct: 8.9,  note: "Washers, dryers, ironing",              color: "#22C55E" },
+  { system: "Lighting (common)",  mwh: 5900,  pct: 7.0,  note: "Corridors, lobby, exterior",            color: "#FCD34D" },
+  { system: "Other / Plant",      mwh: 3700,  pct: 4.4,  note: "Pumps, lifts, IT, AV",                  color: "#D1D5DB" },
+];
+// Total: 84,200 MWh ✓
+
+// ── Water end-use breakdown ───────────────────────────────────────────────────
+
+export const WATER_END_USE = [
+  { use: "Guest rooms & bathrooms",  m3: 193200, pct: 35.0, litresPerGN: 186, note: "Showers, baths, taps, toilets",  color: "#0EA5E9" },
+  { use: "Laundry",                  m3: 132480, pct: 24.0, litresPerGN: 128, note: "Linen, uniforms, towels",         color: "#38BDF8" },
+  { use: "Kitchen & F&B",            m3: 99360,  pct: 18.0, litresPerGN: 96,  note: "Prep, dishwashing, ice",          color: "#7DD3FC" },
+  { use: "Pool, Spa & Recreation",   m3: 66240,  pct: 12.0, litresPerGN: 64,  note: "Top-up, backwash, splash zones",  color: "#BAE6FD" },
+  { use: "Cooling towers & HVAC",    m3: 38640,  pct: 7.0,  litresPerGN: 37,  note: "Evaporative cooling, makeup",     color: "#6366F1" },
+  { use: "Landscaping & irrigation", m3: 22080,  pct: 4.0,  litresPerGN: 21,  note: "Gardens, greens, outdoor areas",  color: "#22C55E" },
+];
+// Total: 552,000 m³ ✓
+
+// ── Waste by source ───────────────────────────────────────────────────────────
+
+export const WASTE_BY_SOURCE = [
+  { source: "F&B & Kitchen",            tonnes: 3621, pct: 43.0, diversionPct: 58, color: "#F59E0B",
+    streams: { recycled: 1200, composted: 900, energyRec: 1000, landfill: 521 } },
+  { source: "Rooms & Housekeeping",     tonnes: 2190, pct: 26.0, diversionPct: 34, color: "#6366F1",
+    streams: { recycled: 620, composted: 125, energyRec: 0, landfill: 1445 } },
+  { source: "Maintenance & Operations", tonnes: 1516, pct: 18.0, diversionPct: 28, color: "#6B7280",
+    streams: { recycled: 350, composted: 0, energyRec: 75, landfill: 1091 } },
+  { source: "Events & Conferences",     tonnes: 1093, pct: 13.0, diversionPct: 20, color: "#EC4899",
+    streams: { recycled: 0, composted: 335, energyRec: 0, landfill: 758 } },
+];
+// Total: 8,420 t | Weighted diversion ≈ 42% ✓
+
 export const PORTFOLIO_MONTHLY_TREND = [
   { month:"May",   carbon:3850, energy:7200, waterM3:48000, diversion:40 },
   { month:"Jun",   carbon:3720, energy:7050, waterM3:46800, diversion:40 },
