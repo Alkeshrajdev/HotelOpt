@@ -1,6 +1,6 @@
 import { FormEvent, useState } from "react";
 import { Navigate, useLocation } from "react-router-dom";
-import { FlaskConical, Leaf, Loader2 } from "lucide-react";
+import { Leaf, Loader2 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 
 export default function Login() {
@@ -56,24 +56,6 @@ export default function Login() {
       {/* Right form */}
       <div className="flex items-center justify-center p-6">
         <div className="w-full max-w-sm">
-
-          {/* Demo banner — always visible */}
-          <div className="mb-6 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-[12px] text-amber-800">
-            <div className="flex items-center gap-1.5 font-semibold mb-1">
-              <FlaskConical size={13} className="text-amber-500" />
-              Demo environment
-            </div>
-            <p className="text-amber-700 leading-relaxed mb-2">
-              Sample data only — not connected to live client records.
-            </p>
-            <button
-              type="button"
-              onClick={signInDemo}
-              className="w-full rounded-lg bg-amber-500 hover:bg-amber-600 text-white font-semibold py-2 text-[13px] transition-colors"
-            >
-              Enter Demo — no login required
-            </button>
-          </div>
 
           <form onSubmit={onSubmit}>
             <h1 className="text-2xl font-extrabold text-ink-900">Sign in</h1>

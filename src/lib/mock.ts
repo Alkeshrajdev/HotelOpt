@@ -1,6 +1,3 @@
-// Dummy data — replace with real API calls when backend is wired in.
-// Numbers are illustrative only and intentionally rounded.
-
 export const KPIS = {
   energyScore: { value: 82, label: "% compliant" },
   energyPerformanceIndex: { value: 91, delta: -4.2 },

@@ -27,11 +27,7 @@ export default function Dashboard() {
 
   return (
     <div>
-      <div className="mb-3 px-4 py-2 rounded-lg bg-ink-100 border border-ink-200 text-[11px] text-ink-500 text-center">
-        Demo environment — sample data only. Not connected to live client records.
-      </div>
-
-      <div className="flex items-center gap-2 mb-5 px-4 py-2.5 rounded-xl bg-brand-50 border border-brand-100 text-[12px] text-brand-700">
+<div className="flex items-center gap-2 mb-5 px-4 py-2.5 rounded-xl bg-brand-50 border border-brand-100 text-[12px] text-brand-700">
         <TrustIcon size={13} className="shrink-0" />
         <span>
           All figures are based on <strong>approved records</strong>. Draft and unapproved submissions are excluded from KPIs and reports.

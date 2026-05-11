@@ -1,5 +1,3 @@
-// Per-pillar dummy data. Replace with real API calls per pillar later.
-
 export type TrendPoint = { x: string; v: number };
 
 export type PillarKpiSpec = {
