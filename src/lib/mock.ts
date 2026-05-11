@@ -342,3 +342,88 @@ export const DATA_ASSURANCE_BY_HOTEL = [
   { hotel:"Airport Hotel Dubai",           approved:45, estimated:22, missing:18, pending:18, evidenceGaps:22, lowConfidence:8  },
   { hotel:"Riverside Bangkok",             approved:12, estimated:71, missing:0,  pending:0,  evidenceGaps:0,  lowConfidence:0  },
 ];
+
+// ── Portfolio v2 data — consistent 10-hotel dataset ───────────────────────────
+
+export const PORTFOLIO_HOTELS = [
+  { id:"h1",  name:"Skyline Dubai",               shortName:"Skyline Dubai",    region:"EMEA",   type:"Resort",     rooms:420, orn:105000, gn:151200, carbon_t:9100,  energy_mwh:17200, water_m3:120000, waste_t:1800, diversion_pct:52, waste_kg_per_cover:74, carbonIntensity:86.7, energyIntensity:163.8, waterIntensity:794, dataConfidence:94, status:"active"    },
+  { id:"h2",  name:"Airport Hotel Dubai",         shortName:"Airport Dubai",    region:"EMEA",   type:"Airport",    rooms:380, orn:86000,  gn:107500, carbon_t:7200,  energy_mwh:14800, water_m3:90000,  waste_t:1500, diversion_pct:24, waste_kg_per_cover:118,carbonIntensity:83.7, energyIntensity:172.1, waterIntensity:837, dataConfidence:45, status:"active"    },
+  { id:"h3",  name:"Bay View Singapore",          shortName:"Bay View SG",      region:"APAC",   type:"City Hotel", rooms:350, orn:96000,  gn:134400, carbon_t:6200,  energy_mwh:12400, water_m3:85000,  waste_t:1200, diversion_pct:48, waste_kg_per_cover:82, carbonIntensity:64.6, energyIntensity:129.2, waterIntensity:633, dataConfidence:82, status:"active"    },
+  { id:"h4",  name:"The Pavilion London",         shortName:"Pavilion London",  region:"EMEA",   type:"City Hotel", rooms:312, orn:88000,  gn:123200, carbon_t:5700,  energy_mwh:11200, water_m3:72000,  waste_t:1010, diversion_pct:54, waste_kg_per_cover:68, carbonIntensity:64.8, energyIntensity:127.3, waterIntensity:584, dataConfidence:91, status:"active"    },
+  { id:"h5",  name:"Grand Harbour Lisbon",        shortName:"Grand Lisbon",     region:"EMEA",   type:"City Hotel", rooms:280, orn:88000,  gn:123200, carbon_t:4600,  energy_mwh:8900,  water_m3:70000,  waste_t:900,  diversion_pct:45, waste_kg_per_cover:88, carbonIntensity:52.3, energyIntensity:101.1, waterIntensity:568, dataConfidence:87, status:"active"    },
+  { id:"h6",  name:"Marina Residences Barcelona", shortName:"Marina Barcelona", region:"EMEA",   type:"Resort",     rooms:260, orn:80000,  gn:112000, carbon_t:4100,  energy_mwh:7800,  water_m3:65000,  waste_t:850,  diversion_pct:28, waste_kg_per_cover:102,carbonIntensity:51.3, energyIntensity:97.5,  waterIntensity:580, dataConfidence:74, status:"active"    },
+  { id:"h7",  name:"Oceanfront Cape Town",        shortName:"Cape Town",        region:"Africa", type:"Resort",     rooms:210, orn:72000,  gn:100800, carbon_t:2900,  energy_mwh:5900,  water_m3:28000,  waste_t:620,  diversion_pct:55, waste_kg_per_cover:61, carbonIntensity:40.3, energyIntensity:81.9,  waterIntensity:278, dataConfidence:88, status:"active"    },
+  { id:"h8",  name:"The Montrose Paris",          shortName:"Montrose Paris",   region:"EMEA",   type:"Boutique",   rooms:165, orn:64000,  gn:89600,  carbon_t:1850,  energy_mwh:3700,  water_m3:14000,  waste_t:380,  diversion_pct:62, waste_kg_per_cover:55, carbonIntensity:28.9, energyIntensity:57.8,  waterIntensity:156, dataConfidence:96, status:"active"    },
+  { id:"h9",  name:"Peaks Resort Zermatt",        shortName:"Zermatt",          region:"EMEA",   type:"Ski Resort", rooms:95,  orn:16000,  gn:22400,  carbon_t:850,   energy_mwh:1600,  water_m3:5000,   waste_t:100,  diversion_pct:18, waste_kg_per_cover:91, carbonIntensity:53.1, energyIntensity:100.0, waterIntensity:223, dataConfidence:41, status:"seasonal"  },
+  { id:"h10", name:"Riverside Bangkok",           shortName:"Bangkok",          region:"APAC",   type:"City Hotel", rooms:180, orn:20000,  gn:28000,  carbon_t:350,   energy_mwh:700,   water_m3:3000,   waste_t:60,   diversion_pct:38, waste_kg_per_cover:70, carbonIntensity:17.5, energyIntensity:35.0,  waterIntensity:107, dataConfidence:12, status:"onboarding"},
+];
+
+export const PORTFOLIO_SCOPE3_CATEGORIES = [
+  { category: "Purchased goods & services", tco2e: 12400, pct: 49.9 },
+  { category: "Business travel",            tco2e: 4200,  pct: 16.9 },
+  { category: "Employee commuting",         tco2e: 3100,  pct: 12.5 },
+  { category: "Upstream transport",         tco2e: 2600,  pct: 10.5 },
+  { category: "Waste disposal",             tco2e: 1553,  pct: 6.2  },
+  { category: "Other",                      tco2e: 1000,  pct: 4.0  },
+];
+
+export const PORTFOLIO_ENERGY_SOURCES = [
+  { source: "Grid electricity", mwh: 58200, pct: 69.1, color: "#0EA5E9" },
+  { source: "Natural gas",      mwh: 16800, pct: 19.9, color: "#F59E0B" },
+  { source: "Diesel",           mwh: 5300,  pct: 6.3,  color: "#EF4444" },
+  { source: "Renewables",       mwh: 3900,  pct: 4.6,  color: "#22C55E" },
+];
+
+export const PORTFOLIO_WATER_SOURCES = [
+  { source: "Municipal supply", m3: 498000, pct: 90.2, color: "#0EA5E9" },
+  { source: "Borehole/well",    m3: 21000,  pct: 3.8,  color: "#6366F1" },
+  { source: "Recycled/reused",  m3: 33000,  pct: 6.0,  color: "#22C55E" },
+];
+
+export const PORTFOLIO_WASTE_STREAMS = [
+  { stream: "Recycled",   tonnes: 2170, pct: 25.8, color: "#22C55E" },
+  { stream: "Composted",  tonnes: 1360, pct: 16.2, color: "#84CC16" },
+  { stream: "Energy rec.",tonnes: 1007, pct: 12.0, color: "#F59E0B" },
+  { stream: "Landfill",   tonnes: 3883, pct: 46.1, color: "#EF4444" },
+];
+
+export const PORTFOLIO_SOCIAL_BY_HOTEL = [
+  { hotel:"Skyline Dubai",               trainingHrs:28, ltifr:0.62, turnoverPct:14, localSourcingPct:38, fte:320 },
+  { hotel:"Airport Hotel Dubai",         trainingHrs:12, ltifr:1.84, turnoverPct:32, localSourcingPct:18, fte:280 },
+  { hotel:"Bay View Singapore",          trainingHrs:31, ltifr:0.41, turnoverPct:18, localSourcingPct:45, fte:260 },
+  { hotel:"The Pavilion London",         trainingHrs:38, ltifr:0.28, turnoverPct:21, localSourcingPct:54, fte:240 },
+  { hotel:"Grand Harbour Lisbon",        trainingHrs:24, ltifr:0.55, turnoverPct:24, localSourcingPct:42, fte:210 },
+  { hotel:"Marina Residences Barcelona", trainingHrs:16, ltifr:1.10, turnoverPct:28, localSourcingPct:28, fte:195 },
+  { hotel:"Oceanfront Cape Town",        trainingHrs:22, ltifr:0.72, turnoverPct:19, localSourcingPct:61, fte:155 },
+  { hotel:"The Montrose Paris",          trainingHrs:42, ltifr:0.18, turnoverPct:12, localSourcingPct:68, fte:120 },
+  { hotel:"Peaks Resort Zermatt",        trainingHrs:18, ltifr:0.90, turnoverPct:38, localSourcingPct:72, fte:65  },
+  { hotel:"Riverside Bangkok",           trainingHrs:8,  ltifr:0.00, turnoverPct:15, localSourcingPct:35, fte:140 },
+];
+
+export const PORTFOLIO_GOVERNANCE_BY_HOTEL = [
+  { hotel:"Skyline Dubai",               attestationsPct:88, supplierCodePct:82, openGaps:1, certifications:["Green Globe","Travelife"] },
+  { hotel:"Airport Hotel Dubai",         attestationsPct:52, supplierCodePct:44, openGaps:6, certifications:[]                         },
+  { hotel:"Bay View Singapore",          attestationsPct:76, supplierCodePct:68, openGaps:3, certifications:["Green Key"]              },
+  { hotel:"The Pavilion London",         attestationsPct:95, supplierCodePct:91, openGaps:0, certifications:["Green Globe","Green Key"] },
+  { hotel:"Grand Harbour Lisbon",        attestationsPct:82, supplierCodePct:74, openGaps:2, certifications:["Travelife"]              },
+  { hotel:"Marina Residences Barcelona", attestationsPct:61, supplierCodePct:52, openGaps:5, certifications:[]                         },
+  { hotel:"Oceanfront Cape Town",        attestationsPct:84, supplierCodePct:78, openGaps:1, certifications:["Green Globe"]            },
+  { hotel:"The Montrose Paris",          attestationsPct:97, supplierCodePct:94, openGaps:0, certifications:["Green Key","EU Ecolabel"] },
+  { hotel:"Peaks Resort Zermatt",        attestationsPct:44, supplierCodePct:38, openGaps:4, certifications:[]                         },
+  { hotel:"Riverside Bangkok",           attestationsPct:22, supplierCodePct:15, openGaps:8, certifications:[]                         },
+];
+
+export const PORTFOLIO_MONTHLY_TREND = [
+  { month:"May",   carbon:3850, energy:7200, waterM3:48000, diversion:40 },
+  { month:"Jun",   carbon:3720, energy:7050, waterM3:46800, diversion:40 },
+  { month:"Jul",   carbon:3940, energy:7400, waterM3:49200, diversion:41 },
+  { month:"Aug",   carbon:4010, energy:7500, waterM3:50100, diversion:41 },
+  { month:"Sep",   carbon:3680, energy:6900, waterM3:46200, diversion:42 },
+  { month:"Oct",   carbon:3420, energy:6600, waterM3:44400, diversion:42 },
+  { month:"Nov",   carbon:3280, energy:6400, waterM3:43200, diversion:43 },
+  { month:"Dec",   carbon:3350, energy:6500, waterM3:44100, diversion:43 },
+  { month:"Jan",   carbon:3150, energy:6200, waterM3:41400, diversion:43 },
+  { month:"Feb",   carbon:3010, energy:6000, waterM3:39600, diversion:44 },
+  { month:"Mar",   carbon:3220, energy:6300, waterM3:42300, diversion:44 },
+  { month:"Apr",   carbon:3220, energy:6150, waterM3:46500, diversion:44 },
+];

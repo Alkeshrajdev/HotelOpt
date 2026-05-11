@@ -4,22 +4,18 @@ import { Link } from "react-router-dom";
 import { Download, ShieldCheck as TrustIcon, ChevronRight } from "lucide-react";
 import PageHeader from "@/components/ui/PageHeader";
 import OverviewTab from "./dashboard/OverviewTab";
-import EsgTab from "./dashboard/EsgTab";
+import EnvironmentTab from "./dashboard/EnvironmentTab";
 import TargetsTab from "./dashboard/TargetsTab";
 import HotelsTab from "./dashboard/HotelsTab";
-import ActionsTab from "./dashboard/ActionsTab";
-import AssuranceTab from "./dashboard/AssuranceTab";
-import ReportingTab from "./dashboard/ReportingTab";
+import SocialGovernanceTab from "./dashboard/SocialGovernanceTab";
 import { cn } from "@/lib/utils";
 
 const TABS = [
-  { key: "overview",   label: "Overview" },
-  { key: "esg",        label: "ESG Performance" },
-  { key: "targets",    label: "Targets" },
-  { key: "hotels",     label: "Hotels" },
-  { key: "actions",    label: "Actions & Investment" },
-  { key: "assurance",  label: "Data & Assurance" },
-  { key: "reporting",  label: "Reporting & Certifications" },
+  { key: "overview",     label: "Overview" },
+  { key: "environment",  label: "Environment" },
+  { key: "targets",      label: "Targets" },
+  { key: "hotels",       label: "Hotels" },
+  { key: "social",       label: "Social & Governance" },
 ] as const;
 
 type TabKey = (typeof TABS)[number]["key"];
@@ -53,8 +49,8 @@ export default function Dashboard() {
         title="Portfolio Dashboard"
         subtitle={
           isPortfolioView
-            ? `Cross-property ESG performance, targets, reporting, and actions across selected hotels · ${period} · ${dataBasis === "approved" ? "Approved data" : dataBasis === "approved+provisional" ? "Approved + provisional" : dataBasis}`
-            : `Performance, data approval, and actions for ${property} · ${period}`
+            ? `ESG performance, targets, and actions across 10 hotels · ${period} · ${dataBasis === "approved" ? "Approved data" : dataBasis === "approved+provisional" ? "Approved + provisional" : dataBasis}`
+            : `Performance and actions for ${property} · ${period}`
         }
         actions={
           <button className="btn-primary">
@@ -81,13 +77,11 @@ export default function Dashboard() {
       </div>
 
       <div className="mt-6">
-        {tab === "overview"   && <OverviewTab onNavigate={(t) => setTab(t as TabKey)} />}
-        {tab === "esg"        && <EsgTab />}
-        {tab === "targets"    && <TargetsTab />}
-        {tab === "hotels"     && <HotelsTab />}
-        {tab === "actions"    && <ActionsTab />}
-        {tab === "assurance"  && <AssuranceTab />}
-        {tab === "reporting"  && <ReportingTab />}
+        {tab === "overview"    && <OverviewTab onNavigate={(t) => setTab(t as TabKey)} />}
+        {tab === "environment" && <EnvironmentTab />}
+        {tab === "targets"     && <TargetsTab />}
+        {tab === "hotels"      && <HotelsTab />}
+        {tab === "social"      && <SocialGovernanceTab />}
       </div>
     </div>
   );

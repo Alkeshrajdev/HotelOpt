@@ -1,339 +1,283 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import {
-  AlertTriangle,
-  ArrowRight,
-  Award,
-  CheckCircle2,
-  ChevronRight,
   Cloud,
-  Droplet,
-  FileText,
-  Recycle,
-  ShieldCheck,
-  TrendingUp,
   Zap,
+  Droplet,
+  Recycle,
+  Users,
+  ShieldCheck,
+  AlertTriangle,
+  ChevronRight,
+  ArrowRight,
 } from "lucide-react";
-import KpiTile from "@/components/ui/KpiTile";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  Cell,
+} from "recharts";
 import { Card, CardHeader } from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
-import { ACTION_CENTRE, NEEDS_ATTENTION, ESG_TOTALS } from "@/lib/mock";
+import { ESG_TOTALS, PORTFOLIO_HOTELS, PORTFOLIO_TARGETS } from "@/lib/mock";
 import { cn } from "@/lib/utils";
 
 type Props = { onNavigate: (tab: string) => void };
 
-const SEVERITY_COLOR: Record<string, string> = { bad: "#DC2626", warn: "#F59E0B", info: "#0EA5E9" };
-const SEVERITY_ORDER: Record<string, number> = { bad: 0, warn: 1, info: 2 };
+type Metric = "carbon" | "energy" | "water" | "waste";
 
-const REPORTS_BLOCKED = [
-  {
-    name: "SBTi Net-Zero",
-    issue: "Scope 3 travel data incomplete",
-    coverage: 71,
-  },
-  {
-    name: "CSRD / ESRS Draft",
-    issue: "Social indicators gap — 3 KPIs missing",
-    coverage: 61,
-  },
-  {
-    name: "Certification Evidence Pack",
-    issue: "Green Globe evidence 12% short",
-    coverage: 74,
-  },
+const METRIC_OPTIONS: { key: Metric; label: string; field: keyof typeof PORTFOLIO_HOTELS[0]; unit: string; color: string }[] = [
+  { key: "carbon", label: "Carbon (tCO₂e)",  field: "carbon_t",    unit: "tCO₂e", color: "#0F766E" },
+  { key: "energy", label: "Energy (MWh)",    field: "energy_mwh",  unit: "MWh",   color: "#CA8A04" },
+  { key: "water",  label: "Water (m³)",      field: "water_m3",    unit: "m³",    color: "#0EA5E9" },
+  { key: "waste",  label: "Waste (tonnes)",  field: "waste_t",     unit: "t",     color: "#9333EA" },
 ];
 
-const sortedActions = [...ACTION_CENTRE].sort(
-  (a, b) => (SEVERITY_ORDER[a.severity] ?? 9) - (SEVERITY_ORDER[b.severity] ?? 9)
-);
+const CERT_ALERTS = [
+  { text: "Green Globe renewal — evidence 12% short", href: "/portfolio/reports-certifications", tone: "warn" as const },
+  { text: "2 hotels have no active certification",    href: "/portfolio/reports-certifications", tone: "bad"  as const },
+  { text: "Travelife audit scheduled in 45 days",     href: "/portfolio/reports-certifications", tone: "neutral" as const },
+];
 
 export default function OverviewTab({ onNavigate }: Props) {
+  const [metric, setMetric] = useState<Metric>("carbon");
+  const active = METRIC_OPTIONS.find((m) => m.key === metric)!;
+
+  const chartData = [...PORTFOLIO_HOTELS]
+    .sort((a, b) => (b[active.field] as number) - (a[active.field] as number))
+    .map((h) => ({
+      name: h.shortName,
+      value: h[active.field] as number,
+    }));
+
+  const totalValue = PORTFOLIO_HOTELS.reduce((s, h) => s + (h[active.field] as number), 0);
+
   return (
     <div className="space-y-6">
+      {/* 6 ESG Snapshot KPI tiles */}
       <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-4">
-        <KpiTile
-          prominent
-          icon={<TrendingUp size={18} />}
-          iconBg="bg-good/10 text-good"
-          label="Hotels On Track"
-          value="58 / 72"
-          caption="14 to review · 9 critical"
-        />
-        <KpiTile
-          prominent
-          icon={<AlertTriangle size={18} />}
-          iconBg="bg-warn/10 text-warn"
-          label="Hotels to Review"
-          value="14"
-          caption="click to open hotel matrix"
-          onClick={() => onNavigate("hotels")}
-        />
-        <KpiTile
-          prominent
-          icon={<AlertTriangle size={18} />}
-          iconBg="bg-bad/10 text-bad"
-          label="Critical Issues"
-          value="9"
-          caption="3 cert · 4 data · 2 carbon"
-          onClick={() => onNavigate("assurance")}
-        />
-        <KpiTile
-          prominent
-          icon={<FileText size={18} />}
-          iconBg="bg-bad/10 text-bad"
-          label="Reports Blocked"
-          value="3"
-          caption="evidence pack, SBTi, CSRD"
-          onClick={() => onNavigate("reporting")}
-        />
-        <KpiTile
-          prominent
-          icon={<AlertTriangle size={18} />}
-          iconBg="bg-warn/10 text-warn"
-          label="Overdue Actions"
-          value="12"
-          caption="4 critical · 8 moderate"
-          onClick={() => onNavigate("actions")}
-        />
-        <KpiTile
-          prominent
-          icon={<Award size={18} />}
-          iconBg="bg-warn/10 text-warn"
-          label="Next Audit"
-          value="45 days"
-          caption="Green Globe · evidence 12% short"
-        />
+        <button
+          onClick={() => onNavigate("environment")}
+          className="card p-5 text-left hover:shadow-pop hover:-translate-y-0.5 transition-all"
+        >
+          <div className="w-10 h-10 rounded-xl bg-pillar-carbon/10 grid place-items-center mb-3">
+            <Cloud size={18} className="text-pillar-carbon" />
+          </div>
+          <div className="text-[10px] uppercase tracking-[0.06em] font-semibold text-ink-500">Total Emissions</div>
+          <div className="text-2xl font-bold text-ink-900 tabular-nums mt-1">{ESG_TOTALS.carbon.displayTotal}</div>
+          <div className="text-[11px] text-ink-400">{ESG_TOTALS.carbon.unit}</div>
+          <div className="mt-2 text-[11px] font-semibold text-good">{ESG_TOTALS.carbon.delta}% YoY</div>
+        </button>
+
+        <button
+          onClick={() => onNavigate("environment")}
+          className="card p-5 text-left hover:shadow-pop hover:-translate-y-0.5 transition-all"
+        >
+          <div className="w-10 h-10 rounded-xl bg-pillar-energy/10 grid place-items-center mb-3">
+            <Zap size={18} className="text-pillar-energy" />
+          </div>
+          <div className="text-[10px] uppercase tracking-[0.06em] font-semibold text-ink-500">Energy Use</div>
+          <div className="text-2xl font-bold text-ink-900 tabular-nums mt-1">{ESG_TOTALS.energy.displayTotal}</div>
+          <div className="text-[11px] text-ink-400">{ESG_TOTALS.energy.unit}</div>
+          <div className="mt-2 text-[11px] font-semibold text-good">{ESG_TOTALS.energy.delta}% YoY</div>
+        </button>
+
+        <button
+          onClick={() => onNavigate("environment")}
+          className="card p-5 text-left hover:shadow-pop hover:-translate-y-0.5 transition-all"
+        >
+          <div className="w-10 h-10 rounded-xl bg-pillar-water/10 grid place-items-center mb-3">
+            <Droplet size={18} className="text-pillar-water" />
+          </div>
+          <div className="text-[10px] uppercase tracking-[0.06em] font-semibold text-ink-500">Water Use</div>
+          <div className="text-2xl font-bold text-ink-900 tabular-nums mt-1">{ESG_TOTALS.water.displayTotal}</div>
+          <div className="text-[11px] text-ink-400">{ESG_TOTALS.water.unit}</div>
+          <div className="mt-2 text-[11px] font-semibold text-good">{ESG_TOTALS.water.delta}% YoY</div>
+        </button>
+
+        <button
+          onClick={() => onNavigate("environment")}
+          className="card p-5 text-left hover:shadow-pop hover:-translate-y-0.5 transition-all"
+        >
+          <div className="w-10 h-10 rounded-xl bg-pillar-waste/10 grid place-items-center mb-3">
+            <Recycle size={18} className="text-pillar-waste" />
+          </div>
+          <div className="text-[10px] uppercase tracking-[0.06em] font-semibold text-ink-500">Waste Diversion</div>
+          <div className="text-2xl font-bold text-ink-900 tabular-nums mt-1">{ESG_TOTALS.waste.diversionPct}%</div>
+          <div className="text-[11px] text-ink-400">vs 60% target</div>
+          <div className="mt-2 text-[11px] font-semibold text-warn">18% below target</div>
+        </button>
+
+        <button
+          onClick={() => onNavigate("social")}
+          className="card p-5 text-left hover:shadow-pop hover:-translate-y-0.5 transition-all"
+        >
+          <div className="w-10 h-10 rounded-xl bg-pillar-social/10 grid place-items-center mb-3">
+            <Users size={18} className="text-pillar-social" />
+          </div>
+          <div className="text-[10px] uppercase tracking-[0.06em] font-semibold text-ink-500">LTIFR</div>
+          <div className="text-2xl font-bold text-ink-900 tabular-nums mt-1">{ESG_TOTALS.social.ltifr}</div>
+          <div className="text-[11px] text-ink-400">per 200k hrs worked</div>
+          <div className="mt-2 text-[11px] font-semibold text-good">-0.12 YoY</div>
+        </button>
+
+        <button
+          onClick={() => onNavigate("social")}
+          className="card p-5 text-left hover:shadow-pop hover:-translate-y-0.5 transition-all"
+        >
+          <div className="w-10 h-10 rounded-xl bg-pillar-gov/10 grid place-items-center mb-3">
+            <ShieldCheck size={18} className="text-pillar-gov" />
+          </div>
+          <div className="text-[10px] uppercase tracking-[0.06em] font-semibold text-ink-500">Attestations</div>
+          <div className="text-2xl font-bold text-ink-900 tabular-nums mt-1">{ESG_TOTALS.governance.attestationsPct}%</div>
+          <div className="text-[11px] text-ink-400">complete</div>
+          <div className="mt-2 text-[11px] font-semibold text-warn">4 gaps open</div>
+        </button>
       </div>
 
+      {/* Portfolio Contribution by Hotel chart */}
+      <Card>
+        <CardHeader
+          title="Portfolio Contribution by Hotel"
+          hint="ranked by selected metric — click bars to drill down"
+          right={
+            <div className="flex gap-1 flex-wrap justify-end">
+              {METRIC_OPTIONS.map((m) => (
+                <button
+                  key={m.key}
+                  onClick={() => setMetric(m.key)}
+                  className={cn(
+                    "px-3 py-1 rounded-md text-[11px] font-semibold transition-colors",
+                    metric === m.key ? "bg-brand-700 text-white" : "bg-ink-100 text-ink-600 hover:bg-ink-200"
+                  )}
+                >
+                  {m.label}
+                </button>
+              ))}
+            </div>
+          }
+        />
+        <div className="px-6 pb-6 pt-2">
+          <div className="mb-3 flex items-center gap-3 text-[12px] text-ink-500">
+            <span>Portfolio total: <span className="font-bold text-ink-900">{totalValue.toLocaleString()} {active.unit}</span></span>
+          </div>
+          <ResponsiveContainer width="100%" height={280}>
+            <BarChart
+              data={chartData}
+              layout="vertical"
+              margin={{ top: 0, right: 60, bottom: 0, left: 120 }}
+            >
+              <XAxis
+                type="number"
+                tick={{ fontSize: 10, fill: "#64748B" }}
+                axisLine={false}
+                tickLine={false}
+                tickFormatter={(v) => v >= 1000 ? `${(v / 1000).toFixed(0)}k` : String(v)}
+              />
+              <YAxis
+                type="category"
+                dataKey="name"
+                width={116}
+                tick={{ fontSize: 11, fill: "#334155" }}
+                axisLine={false}
+                tickLine={false}
+              />
+              <Tooltip
+                contentStyle={{ fontSize: 12, borderRadius: 8, border: "1px solid #E2E8F0" }}
+                formatter={(val: number) => [`${val.toLocaleString()} ${active.unit}`, active.label]}
+              />
+              <Bar dataKey="value" radius={[0, 4, 4, 0]} maxBarSize={20}>
+                {chartData.map((entry, i) => {
+                  const pct = entry.value / totalValue;
+                  const opacity = 1 - i * 0.07;
+                  return <Cell key={entry.name} fill={active.color} fillOpacity={Math.max(opacity, 0.3)} />;
+                })}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </Card>
+
+      {/* Target Status Summary + Cert Alerts */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+        <div className="lg:col-span-2">
+          <Card>
+            <CardHeader
+              title="Target Status"
+              hint="2025–2030 reduction targets"
+              right={
+                <button
+                  onClick={() => onNavigate("targets")}
+                  className="text-[12px] font-semibold text-brand-700 hover:text-brand-800 inline-flex items-center gap-1"
+                >
+                  View all <ArrowRight size={12} />
+                </button>
+              }
+            />
+            <div className="px-4 pb-4 pt-2 grid grid-cols-2 sm:grid-cols-3 gap-3">
+              {PORTFOLIO_TARGETS.map((t) => {
+                const pct = Math.min(100, (t.currentVal / t.targetVal) * 100);
+                return (
+                  <button
+                    key={t.key}
+                    onClick={() => onNavigate("targets")}
+                    className="card-level-3 p-3 text-left hover:bg-ink-100 transition-colors rounded-lg"
+                  >
+                    <div className="flex items-center justify-between gap-1 mb-2">
+                      <span className="text-[11px] font-semibold text-ink-700 truncate">{t.label}</span>
+                      <Badge tone={t.status}>{t.status === "bad" ? "Off Track" : "At Risk"}</Badge>
+                    </div>
+                    <div className="h-1.5 bg-ink-200 rounded-full overflow-hidden mb-1.5">
+                      <div
+                        className={cn("h-full rounded-full", t.status === "bad" ? "bg-bad" : "bg-warn")}
+                        style={{ width: `${pct}%` }}
+                      />
+                    </div>
+                    <div className="text-[10px] text-ink-500 truncate">{t.gap}</div>
+                  </button>
+                );
+              })}
+            </div>
+          </Card>
+        </div>
+
         <Card>
           <CardHeader
-            title="Urgent Issues"
-            hint="sorted by severity — click to resolve"
-            right={
-              <Badge tone="bad">
-                {ACTION_CENTRE.filter((a) => a.severity === "bad").length} critical
-              </Badge>
-            }
+            title="Certification & Reporting Alerts"
+            hint="items needing attention"
           />
-          <ul className="px-3 pb-4 mt-3 space-y-0.5">
-            {sortedActions.map((a) => (
-              <li key={a.label}>
+          <ul className="px-3 pb-4 mt-2 space-y-1.5">
+            {CERT_ALERTS.map((a) => (
+              <li key={a.text}>
                 <Link
                   to={a.href}
-                  className="flex items-center justify-between rounded-lg px-3 py-3 hover:bg-ink-50 group border-l-2 transition-all"
-                  style={{ borderLeftColor: SEVERITY_COLOR[a.severity] ?? "#0EA5E9" }}
+                  className="flex items-start gap-2.5 rounded-lg px-3 py-2.5 hover:bg-ink-50 transition-colors group"
                 >
-                  <div className="flex items-center gap-2.5 text-[13px] font-medium text-ink-700 group-hover:text-ink-900 transition-colors">
-                    <AlertTriangle
-                      size={14}
-                      className="shrink-0"
-                      style={{ color: SEVERITY_COLOR[a.severity] ?? "#0EA5E9" }}
-                    />
-                    {a.label}
-                  </div>
-                  <div className="flex items-center gap-1 shrink-0">
-                    <span className="font-bold text-[15px] text-ink-900 tabular-nums">{a.count}</span>
-                    <ChevronRight size={14} className="text-ink-400 group-hover:text-brand-700 transition-colors" />
-                  </div>
+                  <AlertTriangle
+                    size={13}
+                    className={cn(
+                      "shrink-0 mt-0.5",
+                      a.tone === "bad" ? "text-bad" : a.tone === "warn" ? "text-warn" : "text-ink-400"
+                    )}
+                  />
+                  <span className="text-[12px] text-ink-700 group-hover:text-ink-900 leading-snug">{a.text}</span>
+                  <ChevronRight size={12} className="shrink-0 mt-0.5 text-ink-300 group-hover:text-brand-700 ml-auto" />
                 </Link>
               </li>
             ))}
             <li>
               <Link
-                to="/actions"
-                className="flex items-center gap-1.5 px-3 py-2.5 text-[12px] font-semibold text-brand-700 hover:text-brand-800"
+                to="/portfolio/reports-certifications"
+                className="flex items-center gap-1.5 px-3 py-2 text-[12px] font-semibold text-brand-700 hover:text-brand-800"
               >
-                View all actions <ArrowRight size={12} />
+                View all certifications <ArrowRight size={12} />
               </Link>
             </li>
           </ul>
         </Card>
-
-        <Card>
-          <CardHeader
-            title="Hotels to Review"
-            hint="performance below threshold or data incomplete"
-            right={
-              <button
-                onClick={() => onNavigate("hotels")}
-                className="text-[12px] font-semibold text-brand-700 hover:text-brand-800 inline-flex items-center gap-1"
-              >
-                View matrix <ArrowRight size={12} />
-              </button>
-            }
-          />
-          <ul className="px-2 pb-4 mt-2">
-            {NEEDS_ATTENTION.map((p) => (
-              <li
-                key={p.property}
-                className="flex items-start gap-3 px-3 py-3 hover:bg-ink-50 rounded-lg transition-colors"
-              >
-                <div className="w-7 h-7 rounded-full bg-warn/10 grid place-items-center shrink-0 mt-0.5">
-                  <AlertTriangle size={13} className="text-warn" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="text-[13px] font-semibold text-ink-900 truncate">{p.property}</div>
-                  <div className="text-[11px] text-ink-500 truncate">{p.location}</div>
-                  <div className="text-[11px] text-ink-500 mt-0.5 line-clamp-1 leading-relaxed">
-                    {p.reason}
-                  </div>
-                </div>
-                <span
-                  className={cn(
-                    "chip text-[10px] shrink-0 mt-0.5",
-                    p.score < 45 ? "bg-bad/10 text-bad" : "bg-warn/10 text-warn"
-                  )}
-                >
-                  {p.score < 45 ? "Critical" : "Moderate"}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </Card>
-
-        <Card>
-          <CardHeader
-            title="Reports Blocked"
-            hint="issues that will delay framework submissions"
-            right={
-              <button
-                onClick={() => onNavigate("reporting")}
-                className="text-[12px] font-semibold text-brand-700 hover:text-brand-800 inline-flex items-center gap-1"
-              >
-                Open Reports <ArrowRight size={12} />
-              </button>
-            }
-          />
-          <ul className="px-3 pb-4 mt-3 space-y-2">
-            {REPORTS_BLOCKED.map((r) => (
-              <li key={r.name} className="rounded-lg border border-warn/25 bg-warn/10 p-3">
-                <div className="flex items-center justify-between gap-2 mb-1.5">
-                  <span className="text-[12px] font-bold text-ink-900">{r.name}</span>
-                  <div className="flex items-center gap-1.5 shrink-0">
-                    <div className="w-14 h-1.5 bg-ink-100 rounded-full overflow-hidden">
-                      <div className="h-full rounded-full bg-warn" style={{ width: `${r.coverage}%` }} />
-                    </div>
-                    <span className="text-[10px] font-semibold text-warn tabular-nums">{r.coverage}%</span>
-                  </div>
-                </div>
-                <div className="flex items-start gap-1.5 text-[11px] text-warn">
-                  <AlertTriangle size={11} className="shrink-0 mt-0.5" />
-                  <span className="leading-relaxed">{r.issue}</span>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </Card>
-      </div>
-
-      <div className="overflow-x-auto rounded-xl border border-ink-100 bg-white">
-        <div className="flex items-center gap-2 px-5 py-2.5 border-b border-ink-100">
-          <span className="text-[10px] uppercase font-semibold tracking-wider text-ink-500">
-            ESG Snapshot
-          </span>
-          <Badge tone="neutral">Click any metric to drill down</Badge>
-        </div>
-        <div className="flex divide-x divide-ink-100 min-w-max">
-          <button
-            onClick={() => onNavigate("esg")}
-            className="px-5 py-4 flex flex-col cursor-pointer hover:bg-ink-50 transition-colors text-left"
-          >
-            <div className="flex items-center gap-1.5 mb-1">
-              <Cloud size={12} className="text-pillar-carbon" />
-              <span className="text-[10px] uppercase font-semibold tracking-wider text-ink-400">Carbon</span>
-            </div>
-            <span className="text-xl font-bold text-ink-900 tabular-nums mt-0.5">
-              {ESG_TOTALS.carbon.displayTotal}
-            </span>
-            <span className="text-[10px] text-ink-400">{ESG_TOTALS.carbon.unit}</span>
-            <span className="text-[10px] font-semibold text-good mt-0.5">
-              {ESG_TOTALS.carbon.delta}% YoY
-            </span>
-          </button>
-
-          <button
-            onClick={() => onNavigate("esg")}
-            className="px-5 py-4 flex flex-col cursor-pointer hover:bg-ink-50 transition-colors text-left"
-          >
-            <div className="flex items-center gap-1.5 mb-1">
-              <Zap size={12} className="text-pillar-energy" />
-              <span className="text-[10px] uppercase font-semibold tracking-wider text-ink-400">Energy</span>
-            </div>
-            <span className="text-xl font-bold text-ink-900 tabular-nums mt-0.5">
-              {ESG_TOTALS.energy.displayTotal}
-            </span>
-            <span className="text-[10px] text-ink-400">{ESG_TOTALS.energy.unit}</span>
-            <span className="text-[10px] font-semibold text-good mt-0.5">
-              {ESG_TOTALS.energy.delta}% YoY
-            </span>
-          </button>
-
-          <button
-            onClick={() => onNavigate("esg")}
-            className="px-5 py-4 flex flex-col cursor-pointer hover:bg-ink-50 transition-colors text-left"
-          >
-            <div className="flex items-center gap-1.5 mb-1">
-              <Droplet size={12} className="text-pillar-water" />
-              <span className="text-[10px] uppercase font-semibold tracking-wider text-ink-400">Water</span>
-            </div>
-            <span className="text-xl font-bold text-ink-900 tabular-nums mt-0.5">
-              {ESG_TOTALS.water.displayTotal}
-            </span>
-            <span className="text-[10px] text-ink-400">{ESG_TOTALS.water.unit}</span>
-            <span className="text-[10px] font-semibold text-good mt-0.5">
-              {ESG_TOTALS.water.delta}% YoY
-            </span>
-          </button>
-
-          <button
-            onClick={() => onNavigate("esg")}
-            className="px-5 py-4 flex flex-col cursor-pointer hover:bg-ink-50 transition-colors text-left"
-          >
-            <div className="flex items-center gap-1.5 mb-1">
-              <Recycle size={12} className="text-pillar-waste" />
-              <span className="text-[10px] uppercase font-semibold tracking-wider text-ink-400">Waste</span>
-            </div>
-            <span className="text-xl font-bold text-ink-900 tabular-nums mt-0.5">
-              {ESG_TOTALS.waste.displayTotal}
-            </span>
-            <span className="text-[10px] text-ink-400">{ESG_TOTALS.waste.unit}</span>
-            <span className="text-[10px] font-semibold text-bad mt-0.5">
-              +{ESG_TOTALS.waste.delta}% YoY
-            </span>
-          </button>
-
-          <button
-            onClick={() => onNavigate("targets")}
-            className="px-5 py-4 flex flex-col cursor-pointer hover:bg-ink-50 transition-colors text-left"
-          >
-            <div className="flex items-center gap-1.5 mb-1">
-              <Recycle size={12} className="text-pillar-waste" />
-              <span className="text-[10px] uppercase font-semibold tracking-wider text-ink-400">
-                Waste Diversion
-              </span>
-            </div>
-            <span className="text-xl font-bold text-ink-900 tabular-nums mt-0.5">
-              {ESG_TOTALS.waste.diversionPct}%
-            </span>
-            <span className="text-[10px] text-ink-400">vs 60% target</span>
-            <span className="text-[10px] font-semibold text-warn mt-0.5">18% below target</span>
-          </button>
-
-          <button
-            onClick={() => onNavigate("assurance")}
-            className="px-5 py-4 flex flex-col cursor-pointer hover:bg-ink-50 transition-colors text-left"
-          >
-            <div className="flex items-center gap-1.5 mb-1">
-              <CheckCircle2 size={12} className="text-good" />
-              <span className="text-[10px] uppercase font-semibold tracking-wider text-ink-400">
-                Approved Data
-              </span>
-            </div>
-            <span className="text-xl font-bold text-ink-900 tabular-nums mt-0.5">86%</span>
-            <span className="text-[10px] text-ink-400">portfolio-wide</span>
-            <span className="text-[10px] font-semibold text-warn mt-0.5">4 hotels below 80%</span>
-          </button>
-        </div>
       </div>
     </div>
   );
