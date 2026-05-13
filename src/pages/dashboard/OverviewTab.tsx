@@ -29,6 +29,11 @@ type Props = { onNavigate: (tab: string) => void };
 
 type Metric = "carbon" | "energy" | "water" | "waste";
 
+const HOTEL_COLORS = [
+  "#0F766E", "#7C3AED", "#0369A1", "#B45309", "#047857",
+  "#C026D3", "#D97706", "#0E7490", "#9F1239", "#4338CA",
+];
+
 const METRIC_OPTIONS: { key: Metric; label: string; field: keyof typeof PORTFOLIO_HOTELS[0]; unit: string; color: string }[] = [
   { key: "carbon", label: "Carbon (tCO₂e)",  field: "carbon_t",    unit: "tCO₂e", color: "#0F766E" },
   { key: "energy", label: "Energy (MWh)",    field: "energy_mwh",  unit: "MWh",   color: "#CA8A04" },
@@ -121,7 +126,7 @@ export default function OverviewTab({ onNavigate }: Props) {
           <div className="text-[10px] uppercase tracking-[0.06em] font-semibold text-ink-500">LTIFR</div>
           <div className="text-2xl font-bold text-ink-900 tabular-nums mt-1">{ESG_TOTALS.social.ltifr}</div>
           <div className="text-[11px] text-ink-400">per 200k hrs worked</div>
-          <div className="mt-2 text-[11px] font-semibold text-good">-0.12 YoY</div>
+          <div className="mt-2 text-[11px] font-semibold text-good">−0.30 YoY</div>
         </button>
 
         <button
@@ -134,7 +139,7 @@ export default function OverviewTab({ onNavigate }: Props) {
           <div className="text-[10px] uppercase tracking-[0.06em] font-semibold text-ink-500">Attestations</div>
           <div className="text-2xl font-bold text-ink-900 tabular-nums mt-1">{ESG_TOTALS.governance.attestationsPct}%</div>
           <div className="text-[11px] text-ink-400">complete</div>
-          <div className="mt-2 text-[11px] font-semibold text-warn">4 gaps open</div>
+          <div className="mt-2 text-[11px] font-semibold text-bad">{ESG_TOTALS.governance.openGaps} evidence gaps</div>
         </button>
       </div>
 
@@ -190,11 +195,9 @@ export default function OverviewTab({ onNavigate }: Props) {
                 formatter={(val: number) => [`${val.toLocaleString()} ${active.unit}`, active.label]}
               />
               <Bar dataKey="value" radius={[0, 4, 4, 0]} maxBarSize={20}>
-                {chartData.map((entry, i) => {
-                  const pct = entry.value / totalValue;
-                  const opacity = 1 - i * 0.07;
-                  return <Cell key={entry.name} fill={active.color} fillOpacity={Math.max(opacity, 0.3)} />;
-                })}
+                {chartData.map((entry, i) => (
+                  <Cell key={entry.name} fill={HOTEL_COLORS[i % HOTEL_COLORS.length]} />
+                ))}
               </Bar>
             </BarChart>
           </ResponsiveContainer>
@@ -210,10 +213,10 @@ export default function OverviewTab({ onNavigate }: Props) {
               hint="2025–2030 reduction targets"
               right={
                 <button
-                  onClick={() => onNavigate("targets")}
+                  onClick={() => onNavigate("environment")}
                   className="text-[12px] font-semibold text-brand-700 hover:text-brand-800 inline-flex items-center gap-1"
                 >
-                  View all <ArrowRight size={12} />
+                  View in Environment <ArrowRight size={12} />
                 </button>
               }
             />
@@ -223,7 +226,7 @@ export default function OverviewTab({ onNavigate }: Props) {
                 return (
                   <button
                     key={t.key}
-                    onClick={() => onNavigate("targets")}
+                    onClick={() => onNavigate("environment")}
                     className="card-level-3 p-3 text-left hover:bg-ink-100 transition-colors rounded-lg"
                   >
                     <div className="flex items-center justify-between gap-1 mb-2">

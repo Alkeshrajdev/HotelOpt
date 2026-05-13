@@ -236,10 +236,6 @@ export default function PerformanceShell() {
       {view === "data-quality" && <DataQualityView pillar={pillar} />}
       {view === "evidence" && <EvidenceView pillar={pillar} />}
 
-      {/* Trace meta — useful for stakeholders reviewing IA */}
-      <div className="text-[11px] text-ink-400 mt-6">
-        Pillar = <code>{pillar}</code> · View = <code>{view}</code> · GP &amp; External Comparison hidden for Social/Governance .
-      </div>
     </div>
   );
 }

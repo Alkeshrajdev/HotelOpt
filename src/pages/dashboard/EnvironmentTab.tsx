@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useLayoutEffect, useRef } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, ShieldCheck, Info } from "lucide-react";
+import { ArrowRight, ShieldCheck, Info, X, ChevronRight } from "lucide-react";
 import {
   BarChart,
   Bar,
@@ -11,6 +11,7 @@ import {
   LineChart,
   Line,
   CartesianGrid,
+  ReferenceLine,
   PieChart,
   Pie,
   Cell,
@@ -31,6 +32,7 @@ import {
   WATER_END_USE,
   WASTE_BY_SOURCE,
 } from "@/lib/mock";
+import { DRILLDOWN_DATA } from "@/lib/drilldownData";
 import { cn } from "@/lib/utils";
 
 type Section = "carbon" | "energy" | "water" | "waste";
@@ -99,9 +101,221 @@ function SectionHeader({ confidence, hubTo, hubLabel }: { confidence: number; hu
   );
 }
 
+type TargetStatus = "bad" | "warn";
+function TargetBanner({
+  baseline, baseYear, current, target, targetYear, gap, status, owner,
+}: {
+  baseline: string; baseYear: number; current: string; target: string;
+  targetYear: number; gap: string; status: TargetStatus; owner: string;
+}) {
+  return (
+    <div className={cn(
+      "flex items-center gap-0 rounded-xl border overflow-hidden text-[11px] mb-1",
+      status === "bad" ? "border-bad/20 bg-bad/5" : "border-warn/20 bg-warn/5"
+    )}>
+      <div className="px-3 py-2 border-r border-ink-100 text-center shrink-0">
+        <div className="text-[9px] text-ink-400 uppercase tracking-wide font-semibold">Baseline {baseYear}</div>
+        <div className="font-bold text-ink-600 tabular-nums">{baseline}</div>
+      </div>
+      <div className="flex-1 px-3 py-2 flex items-center gap-2">
+        <div className="flex-1">
+          <span className="text-ink-500">Current: </span>
+          <span className={cn("font-bold tabular-nums", status === "bad" ? "text-bad" : "text-warn")}>{current}</span>
+          <span className="mx-2 text-ink-300">·</span>
+          <span className="text-ink-500">Gap: </span>
+          <span className={cn("font-semibold", status === "bad" ? "text-bad" : "text-warn")}>{gap}</span>
+        </div>
+        <span className={cn(
+          "shrink-0 px-2 py-0.5 rounded-full text-[10px] font-bold",
+          status === "bad" ? "bg-bad/15 text-bad" : "bg-warn/15 text-warn"
+        )}>
+          {status === "bad" ? "Off Track" : "At Risk"}
+        </span>
+      </div>
+      <div className="px-3 py-2 border-l border-ink-100 text-center shrink-0">
+        <div className="text-[9px] text-ink-400 uppercase tracking-wide font-semibold">Target {targetYear}</div>
+        <div className="font-bold text-good tabular-nums">{target}</div>
+      </div>
+      <div className="px-3 py-2 border-l border-ink-100 shrink-0 hidden lg:block">
+        <div className="text-[9px] text-ink-400 uppercase tracking-wide font-semibold">Owner</div>
+        <div className="font-semibold text-ink-700">{owner}</div>
+      </div>
+    </div>
+  );
+}
+
+// ─── DRILL-DOWN PANEL ────────────────────────────────────────────────────────
+
+type DrilldownState = { key: string; label: string } | null;
+
+function DrilldownPanel({
+  drilldownKey,
+  label,
+  onClose,
+}: {
+  drilldownKey: string;
+  label: string;
+  onClose: () => void;
+}) {
+  const data = DRILLDOWN_DATA[drilldownKey];
+  const panelRef = useRef<HTMLDivElement>(null);
+
+  useLayoutEffect(() => {
+    const panel = panelRef.current;
+    if (!panel) return;
+    requestAnimationFrame(() => {
+      const scrollContainer = document.querySelector("main");
+      if (!scrollContainer) return;
+      const containerRect = scrollContainer.getBoundingClientRect();
+      const panelRect = panel.getBoundingClientRect();
+      const offset = panelRect.top - containerRect.top + scrollContainer.scrollTop - 16;
+      scrollContainer.scrollTo({ top: offset, behavior: "smooth" });
+    });
+  }, [drilldownKey]);
+
+  if (!data) return null;
+
+  const sorted = [...data.hotels].sort((a, b) => b.value - a.value);
+  const total = sorted.reduce((s, h) => s + h.value, 0);
+
+  const barColor = (flag?: "bad" | "warn" | "good") =>
+    flag === "bad" ? "#EF4444" : flag === "warn" ? "#F59E0B" : flag === "good" ? "#22C55E" : data.color;
+
+  return (
+    <div ref={panelRef} className="rounded-2xl border-2 border-brand-200 bg-white shadow-sm overflow-hidden">
+      {/* Header */}
+      <div className="px-5 pt-4 pb-3 border-b border-ink-100 flex items-center justify-between gap-4">
+        <div className="min-w-0">
+          <div className="flex items-center gap-1.5 text-[10px] text-ink-400 uppercase tracking-wider mb-0.5">
+            {data.parentLabel.split(" → ").map((seg, i, arr) => (
+              <span key={seg} className="flex items-center gap-1">
+                {seg}
+                {i < arr.length - 1 && <ChevronRight size={9} />}
+              </span>
+            ))}
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="w-3 h-3 rounded-full shrink-0" style={{ background: data.color }} />
+            <span className="text-[15px] font-bold text-ink-900 leading-tight">{label}</span>
+            <span className="text-[12px] text-ink-400 font-medium">
+              {total.toLocaleString()} {data.unit} total · all 10 properties
+            </span>
+          </div>
+        </div>
+        <button
+          onClick={onClose}
+          className="shrink-0 p-1.5 rounded-lg hover:bg-ink-100 text-ink-400 transition-colors"
+          title="Close"
+        >
+          <X size={15} />
+        </button>
+      </div>
+
+      {/* Content */}
+      <div className="p-5 grid grid-cols-1 lg:grid-cols-2 gap-5">
+        {/* Chart */}
+        <div>
+          <div className="text-[11px] font-semibold text-ink-500 mb-3 uppercase tracking-wide">
+            Contribution by property — {data.unit}
+          </div>
+          <ResponsiveContainer width="100%" height={290}>
+            <BarChart
+              data={sorted}
+              layout="vertical"
+              margin={{ top: 0, right: 60, bottom: 0, left: 110 }}
+            >
+              <XAxis
+                type="number"
+                tick={{ fontSize: 10, fill: "#64748B" }}
+                axisLine={false}
+                tickLine={false}
+                tickFormatter={(v) =>
+                  v >= 1000 ? `${(v / 1000).toFixed(1)}k` : String(v)
+                }
+              />
+              <YAxis
+                type="category"
+                dataKey="name"
+                width={106}
+                tick={{ fontSize: 11, fill: "#334155" }}
+                axisLine={false}
+                tickLine={false}
+              />
+              <Tooltip
+                contentStyle={{ fontSize: 12, borderRadius: 8, border: "1px solid #E2E8F0" }}
+                formatter={(v: number) => [`${v.toLocaleString()} ${data.unit}`, ""]}
+              />
+              <Bar dataKey="value" radius={[0, 4, 4, 0]} maxBarSize={20}>
+                {sorted.map((h) => (
+                  <Cell key={h.name} fill={barColor(h.flag)} />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+          {/* Legend */}
+          <div className="flex items-center gap-4 mt-2 text-[10px] text-ink-400">
+            <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-bad inline-block" />Action required</span>
+            <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-warn inline-block" />Monitor</span>
+            <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-good inline-block" />On track</span>
+          </div>
+        </div>
+
+        {/* Hotel list */}
+        <div>
+          <div className="text-[11px] font-semibold text-ink-500 mb-3 uppercase tracking-wide">
+            Property detail
+          </div>
+          <div className="space-y-1.5 max-h-[340px] overflow-y-auto pr-1">
+            {sorted.map((h) => {
+              const pct = total > 0 ? ((h.value / total) * 100).toFixed(1) : "0.0";
+              return (
+                <div
+                  key={h.name}
+                  className="flex items-start gap-2.5 rounded-lg px-3 py-2.5 bg-ink-50 border border-transparent hover:border-ink-100"
+                >
+                  <span
+                    className="w-2.5 h-2.5 rounded-full shrink-0 mt-1"
+                    style={{ background: barColor(h.flag) }}
+                  />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between gap-2">
+                      <span className="text-[12px] font-semibold text-ink-800 leading-snug">
+                        {h.name}
+                      </span>
+                      <div className="flex items-center gap-2 shrink-0 tabular-nums">
+                        <span className="text-[10px] text-ink-400">{pct}%</span>
+                        <span className="text-[12px] font-bold text-ink-900">
+                          {h.value.toLocaleString()}
+                        </span>
+                      </div>
+                    </div>
+                    {h.secondary && (
+                      <div className="text-[10px] text-ink-500 mt-0.5">{h.secondary}</div>
+                    )}
+                    <div className="text-[10px] text-ink-400 mt-0.5 leading-snug">
+                      {h.context}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      {/* Insight */}
+      <div className="mx-5 mb-5 flex items-start gap-2 rounded-xl bg-brand-50 border border-brand-100 px-4 py-3 text-[12px] text-brand-800">
+        <Info size={13} className="shrink-0 mt-0.5 text-brand-600" />
+        <span>{data.insight}</span>
+      </div>
+    </div>
+  );
+}
+
 // ─── CARBON ──────────────────────────────────────────────────────────────────
 
 function CarbonSection() {
+  const [drilldown, setDrilldown] = useState<DrilldownState>(null);
   const hotelScopeData = [...PORTFOLIO_HOTELS]
     .sort((a, b) => b.carbon_t - a.carbon_t)
     .map((h) => ({
@@ -147,14 +361,30 @@ function CarbonSection() {
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
-            <ul className="space-y-2">
+            <ul className="space-y-1">
               {SCOPE1_BREAKDOWN.map((s) => (
-                <li key={s.source} className="flex items-start gap-2">
+                <li
+                  key={s.source}
+                  className={cn(
+                    "flex items-start gap-2 rounded-lg px-2 py-1.5 -mx-2 transition-colors",
+                    s.drilldownKey
+                      ? "cursor-pointer hover:bg-ink-50 group"
+                      : ""
+                  )}
+                  onClick={() => s.drilldownKey && setDrilldown({ key: s.drilldownKey, label: s.source })}
+                >
                   <span className="w-2 h-2 rounded-full shrink-0 mt-1.5" style={{ background: s.color }} />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-2">
-                      <span className="text-[11px] font-semibold text-ink-800 leading-snug">{s.source}</span>
-                      <span className="text-[11px] tabular-nums font-bold text-ink-900 shrink-0">{s.pct}%</span>
+                      <span className={cn("text-[11px] font-semibold leading-snug",
+                        s.drilldownKey ? "text-brand-700 group-hover:underline" : "text-ink-800"
+                      )}>
+                        {s.source}
+                      </span>
+                      <div className="flex items-center gap-1 shrink-0">
+                        <span className="text-[11px] tabular-nums font-bold text-ink-900">{s.pct}%</span>
+                        {s.drilldownKey && <ChevronRight size={10} className="text-ink-300 group-hover:text-brand-600" />}
+                      </div>
                     </div>
                     <div className="text-[10px] text-ink-400">{s.note} · {s.tco2e.toLocaleString()} tCO₂e</div>
                   </div>
@@ -246,15 +476,25 @@ function CarbonSection() {
                 <Bar dataKey="tco2e" fill="#6EE7B7" radius={[0, 4, 4, 0]} maxBarSize={14} />
               </BarChart>
             </ResponsiveContainer>
-            <ul className="space-y-2">
+            <ul className="space-y-1">
               {PORTFOLIO_SCOPE3_CATEGORIES.map((c) => (
-                <li key={c.category} className="flex items-center justify-between text-[11px] gap-2">
-                  <span className="text-ink-700 truncate">{c.category}</span>
+                <li
+                  key={c.category}
+                  className={cn(
+                    "flex items-center justify-between text-[11px] gap-2 rounded-lg px-2 py-1.5 -mx-2 transition-colors",
+                    c.drilldownKey ? "cursor-pointer hover:bg-ink-50 group" : ""
+                  )}
+                  onClick={() => c.drilldownKey && setDrilldown({ key: c.drilldownKey, label: c.category })}
+                >
+                  <span className={cn("truncate", c.drilldownKey ? "text-brand-700 group-hover:underline font-medium" : "text-ink-700")}>
+                    {c.category}
+                  </span>
                   <div className="flex items-center gap-2 shrink-0">
                     <div className="w-12 h-1 bg-ink-100 rounded-full overflow-hidden">
                       <div className="h-full bg-pillar-carbon rounded-full" style={{ width: `${c.pct}%` }} />
                     </div>
                     <span className="font-semibold text-ink-900 w-8 text-right">{c.pct}%</span>
+                    {c.drilldownKey && <ChevronRight size={10} className="text-ink-300 group-hover:text-brand-600" />}
                   </div>
                 </li>
               ))}
@@ -266,6 +506,14 @@ function CarbonSection() {
           </div>
         </Card>
       </div>
+
+      {drilldown && (
+        <DrilldownPanel
+          drilldownKey={drilldown.key}
+          label={drilldown.label}
+          onClose={() => setDrilldown(null)}
+        />
+      )}
 
       {/* Emissions by hotel — stacked scope split */}
       <Card>
@@ -287,10 +535,17 @@ function CarbonSection() {
         </div>
       </Card>
 
-      {/* Monthly trend */}
+      {/* Monthly trend + target */}
       <Card>
-        <CardHeader title="Monthly Emissions Trend" hint="tCO₂e total, 12 months" />
-        <div className="px-6 pb-6 pt-2">
+        <CardHeader title="Monthly Emissions Trend" hint="tCO₂e · solid = actual · dashed = 2030 target trajectory" />
+        <div className="px-4 pb-2 pt-1">
+          <TargetBanner
+            baseline="54,900 tCO₂e" baseYear={2019}
+            current="42,850 tCO₂e (−22%)" target="−40% reduction" targetYear={2030}
+            gap="18% remaining" status="bad" owner="Sarah Chen"
+          />
+        </div>
+        <div className="px-6 pb-6 pt-1">
           <ResponsiveContainer width="100%" height={200}>
             <LineChart data={PORTFOLIO_MONTHLY_TREND} margin={{ top: 4, right: 8, bottom: 0, left: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" vertical={false} />
@@ -298,10 +553,18 @@ function CarbonSection() {
               <YAxis tick={{ fontSize: 11, fill: "#64748B" }} axisLine={false} tickLine={false} width={45}
                 tickFormatter={(v) => `${(v / 1000).toFixed(1)}k`} />
               <Tooltip contentStyle={{ fontSize: 12, borderRadius: 8, border: "1px solid #E2E8F0" }}
-                formatter={(v: number) => [`${v.toLocaleString()} tCO₂e`, "Emissions"]} />
-              <Line type="monotone" dataKey="carbon" stroke="#0F766E" strokeWidth={2.5} dot={false} activeDot={{ r: 5, strokeWidth: 0 }} />
+                formatter={(v: number, name: string) => [
+                  `${v.toLocaleString()} tCO₂e`,
+                  name === "carbonTarget" ? "2030 target" : "Actual"
+                ]} />
+              <Line type="monotone" dataKey="carbon" name="carbon" stroke="#0F766E" strokeWidth={2.5} dot={false} activeDot={{ r: 5, strokeWidth: 0 }} />
+              <Line type="monotone" dataKey="carbonTarget" name="carbonTarget" stroke="#0F766E" strokeWidth={1.5} strokeDasharray="5 4" dot={false} activeDot={{ r: 4, strokeWidth: 0 }} opacity={0.5} />
             </LineChart>
           </ResponsiveContainer>
+          <div className="flex items-center gap-5 mt-1 text-[10px] text-ink-400 justify-center">
+            <span className="flex items-center gap-1.5"><span className="inline-block w-6 h-0.5 bg-[#0F766E] rounded" />Actual</span>
+            <span className="flex items-center gap-1.5"><span className="inline-block w-6 h-0.5 bg-[#0F766E] rounded opacity-50" style={{ backgroundImage: "repeating-linear-gradient(90deg,#0F766E 0,#0F766E 4px,transparent 4px,transparent 8px)" }} />Target trajectory</span>
+          </div>
         </div>
       </Card>
     </div>
@@ -311,6 +574,7 @@ function CarbonSection() {
 // ─── ENERGY ──────────────────────────────────────────────────────────────────
 
 function EnergySection() {
+  const [drilldown, setDrilldown] = useState<DrilldownState>(null);
   const intensityData = [...PORTFOLIO_HOTELS]
     .sort((a, b) => b.energyIntensity - a.energyIntensity)
     .map((h) => ({ name: h.shortName, intensity: h.energyIntensity, total: h.energy_mwh }));
@@ -349,14 +613,28 @@ function EnergySection() {
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
-            <ul className="space-y-2">
+            <ul className="space-y-1">
               {ENERGY_END_USE.map((s) => (
-                <li key={s.system} className="flex items-start gap-2">
+                <li
+                  key={s.system}
+                  className={cn(
+                    "flex items-start gap-2 rounded-lg px-2 py-1.5 -mx-2 transition-colors",
+                    s.drilldownKey ? "cursor-pointer hover:bg-ink-50 group" : ""
+                  )}
+                  onClick={() => s.drilldownKey && setDrilldown({ key: s.drilldownKey, label: s.system })}
+                >
                   <span className="w-2 h-2 rounded-full shrink-0 mt-1.5" style={{ background: s.color }} />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-2">
-                      <span className="text-[11px] font-semibold text-ink-800">{s.system}</span>
-                      <span className="text-[11px] font-bold text-ink-900 tabular-nums shrink-0">{s.pct}%</span>
+                      <span className={cn("text-[11px] font-semibold leading-snug",
+                        s.drilldownKey ? "text-brand-700 group-hover:underline" : "text-ink-800"
+                      )}>
+                        {s.system}
+                      </span>
+                      <div className="flex items-center gap-1 shrink-0">
+                        <span className="text-[11px] font-bold text-ink-900 tabular-nums">{s.pct}%</span>
+                        {s.drilldownKey && <ChevronRight size={10} className="text-ink-300 group-hover:text-brand-600" />}
+                      </div>
                     </div>
                     <div className="text-[10px] text-ink-400">{s.note} · {s.mwh.toLocaleString()} MWh</div>
                   </div>
@@ -406,6 +684,14 @@ function EnergySection() {
         </Card>
       </div>
 
+      {drilldown && (
+        <DrilldownPanel
+          drilldownKey={drilldown.key}
+          label={drilldown.label}
+          onClose={() => setDrilldown(null)}
+        />
+      )}
+
       {/* Intensity by hotel */}
       <Card>
         <CardHeader title="Energy Intensity by Hotel" hint="kWh per room night — portfolio average 116.9" />
@@ -426,10 +712,17 @@ function EnergySection() {
         </div>
       </Card>
 
-      {/* Trend */}
+      {/* Trend + target */}
       <Card>
-        <CardHeader title="Monthly Energy Trend" hint="total MWh, 12 months" />
-        <div className="px-6 pb-6 pt-2">
+        <CardHeader title="Monthly Energy Trend" hint="MWh · solid = actual · dashed = 2026 target trajectory" />
+        <div className="px-4 pb-2 pt-1">
+          <TargetBanner
+            baseline="22.5 kWh/RN" baseYear={2022}
+            current="116.9 kWh/RN total" target="16.5 kWh/RN" targetYear={2025}
+            gap="1.9 kWh/RN above target" status="warn" owner="Sarah Chen"
+          />
+        </div>
+        <div className="px-6 pb-6 pt-1">
           <ResponsiveContainer width="100%" height={200}>
             <LineChart data={PORTFOLIO_MONTHLY_TREND} margin={{ top: 4, right: 8, bottom: 0, left: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" vertical={false} />
@@ -437,10 +730,18 @@ function EnergySection() {
               <YAxis tick={{ fontSize: 11, fill: "#64748B" }} axisLine={false} tickLine={false} width={50}
                 tickFormatter={(v) => `${(v / 1000).toFixed(1)}k`} />
               <Tooltip contentStyle={{ fontSize: 12, borderRadius: 8, border: "1px solid #E2E8F0" }}
-                formatter={(v: number) => [`${v.toLocaleString()} MWh`, "Energy"]} />
-              <Line type="monotone" dataKey="energy" stroke="#CA8A04" strokeWidth={2.5} dot={false} activeDot={{ r: 5, strokeWidth: 0 }} />
+                formatter={(v: number, name: string) => [
+                  `${v.toLocaleString()} MWh`,
+                  name === "energyTarget" ? "Target" : "Actual"
+                ]} />
+              <Line type="monotone" dataKey="energy" name="energy" stroke="#CA8A04" strokeWidth={2.5} dot={false} activeDot={{ r: 5, strokeWidth: 0 }} />
+              <Line type="monotone" dataKey="energyTarget" name="energyTarget" stroke="#CA8A04" strokeWidth={1.5} strokeDasharray="5 4" dot={false} activeDot={{ r: 4, strokeWidth: 0 }} opacity={0.5} />
             </LineChart>
           </ResponsiveContainer>
+          <div className="flex items-center gap-5 mt-1 text-[10px] text-ink-400 justify-center">
+            <span className="flex items-center gap-1.5"><span className="inline-block w-6 h-0.5 bg-[#CA8A04] rounded" />Actual</span>
+            <span className="flex items-center gap-1.5"><span className="inline-block w-6 h-0.5 bg-[#CA8A04] rounded opacity-50" style={{ backgroundImage: "repeating-linear-gradient(90deg,#CA8A04 0,#CA8A04 4px,transparent 4px,transparent 8px)" }} />Target</span>
+          </div>
         </div>
       </Card>
     </div>
@@ -450,6 +751,7 @@ function EnergySection() {
 // ─── WATER ───────────────────────────────────────────────────────────────────
 
 function WaterSection() {
+  const [drilldown, setDrilldown] = useState<DrilldownState>(null);
   const intensityData = [...PORTFOLIO_HOTELS]
     .sort((a, b) => b.waterIntensity - a.waterIntensity)
     .map((h) => ({ name: h.shortName, intensity: h.waterIntensity, total: h.water_m3 }));
@@ -488,14 +790,28 @@ function WaterSection() {
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
-            <ul className="space-y-2">
+            <ul className="space-y-1">
               {WATER_END_USE.map((u) => (
-                <li key={u.use} className="flex items-start gap-2">
+                <li
+                  key={u.use}
+                  className={cn(
+                    "flex items-start gap-2 rounded-lg px-2 py-1.5 -mx-2 transition-colors",
+                    u.drilldownKey ? "cursor-pointer hover:bg-ink-50 group" : ""
+                  )}
+                  onClick={() => u.drilldownKey && setDrilldown({ key: u.drilldownKey, label: u.use })}
+                >
                   <span className="w-2 h-2 rounded-full shrink-0 mt-1.5" style={{ background: u.color }} />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-2">
-                      <span className="text-[11px] font-semibold text-ink-800 leading-snug">{u.use}</span>
-                      <span className="text-[11px] font-bold text-ink-900 tabular-nums shrink-0">{u.pct}%</span>
+                      <span className={cn("text-[11px] font-semibold leading-snug",
+                        u.drilldownKey ? "text-brand-700 group-hover:underline" : "text-ink-800"
+                      )}>
+                        {u.use}
+                      </span>
+                      <div className="flex items-center gap-1 shrink-0">
+                        <span className="text-[11px] font-bold text-ink-900 tabular-nums">{u.pct}%</span>
+                        {u.drilldownKey && <ChevronRight size={10} className="text-ink-300 group-hover:text-brand-600" />}
+                      </div>
                     </div>
                     <div className="text-[10px] text-ink-400">
                       {u.note} · {u.litresPerGN} L/GN
@@ -553,6 +869,14 @@ function WaterSection() {
         </Card>
       </div>
 
+      {drilldown && (
+        <DrilldownPanel
+          drilldownKey={drilldown.key}
+          label={drilldown.label}
+          onClose={() => setDrilldown(null)}
+        />
+      )}
+
       {/* Intensity by hotel */}
       <Card>
         <CardHeader title="Water Intensity by Hotel" hint="litres per guest night — portfolio average 532" />
@@ -573,10 +897,17 @@ function WaterSection() {
         </div>
       </Card>
 
-      {/* Trend */}
+      {/* Trend + target */}
       <Card>
-        <CardHeader title="Monthly Water Trend" hint="total m³, 12 months" />
-        <div className="px-6 pb-6 pt-2">
+        <CardHeader title="Monthly Water Trend" hint="m³ · solid = actual · dashed = target trajectory" />
+        <div className="px-4 pb-2 pt-1">
+          <TargetBanner
+            baseline="374 L/GN" baseYear={2022}
+            current="532 L/GN" target="310 L/GN" targetYear={2025}
+            gap="32 L/GN above target" status="warn" owner="Jin Park"
+          />
+        </div>
+        <div className="px-6 pb-6 pt-1">
           <ResponsiveContainer width="100%" height={200}>
             <LineChart data={PORTFOLIO_MONTHLY_TREND} margin={{ top: 4, right: 8, bottom: 0, left: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" vertical={false} />
@@ -584,10 +915,18 @@ function WaterSection() {
               <YAxis tick={{ fontSize: 11, fill: "#64748B" }} axisLine={false} tickLine={false} width={50}
                 tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`} />
               <Tooltip contentStyle={{ fontSize: 12, borderRadius: 8, border: "1px solid #E2E8F0" }}
-                formatter={(v: number) => [`${v.toLocaleString()} m³`, "Water"]} />
-              <Line type="monotone" dataKey="waterM3" stroke="#0EA5E9" strokeWidth={2.5} dot={false} activeDot={{ r: 5, strokeWidth: 0 }} />
+                formatter={(v: number, name: string) => [
+                  `${v.toLocaleString()} m³`,
+                  name === "waterTarget" ? "Target" : "Actual"
+                ]} />
+              <Line type="monotone" dataKey="waterM3" name="waterM3" stroke="#0EA5E9" strokeWidth={2.5} dot={false} activeDot={{ r: 5, strokeWidth: 0 }} />
+              <Line type="monotone" dataKey="waterTarget" name="waterTarget" stroke="#0EA5E9" strokeWidth={1.5} strokeDasharray="5 4" dot={false} activeDot={{ r: 4, strokeWidth: 0 }} opacity={0.5} />
             </LineChart>
           </ResponsiveContainer>
+          <div className="flex items-center gap-5 mt-1 text-[10px] text-ink-400 justify-center">
+            <span className="flex items-center gap-1.5"><span className="inline-block w-6 h-0.5 bg-[#0EA5E9] rounded" />Actual</span>
+            <span className="flex items-center gap-1.5"><span className="inline-block w-6 h-0.5 bg-[#0EA5E9] rounded opacity-50" style={{ backgroundImage: "repeating-linear-gradient(90deg,#0EA5E9 0,#0EA5E9 4px,transparent 4px,transparent 8px)" }} />Target</span>
+          </div>
         </div>
       </Card>
     </div>
@@ -597,6 +936,7 @@ function WaterSection() {
 // ─── WASTE ───────────────────────────────────────────────────────────────────
 
 function WasteSection() {
+  const [drilldown, setDrilldown] = useState<DrilldownState>(null);
   const diversionData = [...PORTFOLIO_HOTELS]
     .sort((a, b) => a.diversion_pct - b.diversion_pct)
     .map((h) => ({ name: h.shortName, diversion: h.diversion_pct, total: h.waste_t }));
@@ -646,16 +986,30 @@ function WasteSection() {
                 <Bar dataKey="landfill"  name="Landfill"     stackId="a" fill="#EF4444" radius={[4, 4, 0, 0]} maxBarSize={48} />
               </BarChart>
             </ResponsiveContainer>
-            <ul className="space-y-2">
+            <ul className="space-y-1">
               {WASTE_BY_SOURCE.map((s) => (
-                <li key={s.source} className="flex items-start gap-2">
+                <li
+                  key={s.source}
+                  className={cn(
+                    "flex items-start gap-2 rounded-lg px-2 py-1.5 -mx-2 transition-colors",
+                    s.drilldownKey ? "cursor-pointer hover:bg-ink-50 group" : ""
+                  )}
+                  onClick={() => s.drilldownKey && setDrilldown({ key: s.drilldownKey, label: s.source })}
+                >
                   <span className="w-2 h-2 rounded-full shrink-0 mt-1.5" style={{ background: s.color }} />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-2">
-                      <span className="text-[11px] font-semibold text-ink-800">{s.source}</span>
-                      <Badge tone={s.diversionPct >= 55 ? "good" : s.diversionPct >= 35 ? "warn" : "bad"}>
-                        {s.diversionPct}% diverted
-                      </Badge>
+                      <span className={cn("text-[11px] font-semibold leading-snug",
+                        s.drilldownKey ? "text-brand-700 group-hover:underline" : "text-ink-800"
+                      )}>
+                        {s.source}
+                      </span>
+                      <div className="flex items-center gap-1 shrink-0">
+                        <Badge tone={s.diversionPct >= 55 ? "good" : s.diversionPct >= 35 ? "warn" : "bad"}>
+                          {s.diversionPct}% diverted
+                        </Badge>
+                        {s.drilldownKey && <ChevronRight size={10} className="text-ink-300 group-hover:text-brand-600" />}
+                      </div>
                     </div>
                     <div className="text-[10px] text-ink-400">
                       {s.tonnes.toLocaleString()} t · {s.pct}% of portfolio
@@ -713,6 +1067,14 @@ function WasteSection() {
         </Card>
       </div>
 
+      {drilldown && (
+        <DrilldownPanel
+          drilldownKey={drilldown.key}
+          label={drilldown.label}
+          onClose={() => setDrilldown(null)}
+        />
+      )}
+
       {/* Diversion by hotel */}
       <Card>
         <CardHeader title="Diversion Rate by Hotel" hint="% diverted from landfill — worst first" />
@@ -734,21 +1096,36 @@ function WasteSection() {
         </div>
       </Card>
 
-      {/* Trend */}
+      {/* Trend + target */}
       <Card>
-        <CardHeader title="Monthly Diversion Rate Trend" hint="% diverted from landfill, 12 months" />
-        <div className="px-6 pb-6 pt-2">
+        <CardHeader title="Monthly Diversion Rate Trend" hint="% · solid = actual · dashed = 60% target" />
+        <div className="px-4 pb-2 pt-1">
+          <TargetBanner
+            baseline="24% diversion" baseYear={2022}
+            current="42% diversion" target="60% diversion" targetYear={2025}
+            gap="18% below target" status="bad" owner="Marco Rossi"
+          />
+        </div>
+        <div className="px-6 pb-6 pt-1">
           <ResponsiveContainer width="100%" height={200}>
             <LineChart data={PORTFOLIO_MONTHLY_TREND} margin={{ top: 4, right: 8, bottom: 0, left: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" vertical={false} />
               <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#64748B" }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fontSize: 11, fill: "#64748B" }} axisLine={false} tickLine={false} width={35}
-                tickFormatter={(v) => `${v}%`} domain={[38, 46]} />
+                tickFormatter={(v) => `${v}%`} domain={[35, 65]} />
               <Tooltip contentStyle={{ fontSize: 12, borderRadius: 8, border: "1px solid #E2E8F0" }}
-                formatter={(v: number) => [`${v}%`, "Diversion"]} />
-              <Line type="monotone" dataKey="diversion" stroke="#9333EA" strokeWidth={2.5} dot={false} activeDot={{ r: 5, strokeWidth: 0 }} />
+                formatter={(v: number, name: string) => [
+                  `${v}%`,
+                  name === "diversionTarget" ? "Target" : "Actual"
+                ]} />
+              <Line type="monotone" dataKey="diversion" name="diversion" stroke="#9333EA" strokeWidth={2.5} dot={false} activeDot={{ r: 5, strokeWidth: 0 }} />
+              <Line type="monotone" dataKey="diversionTarget" name="diversionTarget" stroke="#9333EA" strokeWidth={1.5} strokeDasharray="5 4" dot={false} activeDot={{ r: 4, strokeWidth: 0 }} opacity={0.5} />
             </LineChart>
           </ResponsiveContainer>
+          <div className="flex items-center gap-5 mt-1 text-[10px] text-ink-400 justify-center">
+            <span className="flex items-center gap-1.5"><span className="inline-block w-6 h-0.5 bg-[#9333EA] rounded" />Actual</span>
+            <span className="flex items-center gap-1.5"><span className="inline-block w-6 h-0.5 bg-[#9333EA] rounded opacity-50" style={{ backgroundImage: "repeating-linear-gradient(90deg,#9333EA 0,#9333EA 4px,transparent 4px,transparent 8px)" }} />Target (60%)</span>
+          </div>
         </div>
       </Card>
     </div>

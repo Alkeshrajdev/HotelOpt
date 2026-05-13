@@ -31,6 +31,39 @@ import { useAuth } from "@/lib/auth";
 import { useTopbar, DATA_BASIS_LABEL, type DataBasis } from "@/lib/topbarContext";
 import { cn } from "@/lib/utils";
 
+/* ── Filter options ────────────────────────────────────────────────────────── */
+const PROPERTY_OPTIONS = [
+  "All Properties (72)",
+  "Skyline Dubai",
+  "Airport Hotel Dubai",
+  "Bay View Singapore",
+  "The Pavilion London",
+  "Grand Harbour Lisbon",
+  "Marina Residences Barcelona",
+  "Oceanfront Cape Town",
+  "The Montrose Paris",
+  "Peaks Resort Zermatt",
+  "Riverside Bangkok",
+];
+
+const REGION_OPTIONS = [
+  "All Regions",
+  "EMEA",
+  "APAC",
+  "Africa",
+  "Americas",
+];
+
+const PERIOD_OPTIONS = [
+  "May 2025 – Apr 2026",
+  "May 2024 – Apr 2025",
+  "Jan 2025 – Dec 2025",
+  "Jan 2024 – Dec 2024",
+  "Q1 2026 (Jan–Mar)",
+  "Q4 2025 (Oct–Dec)",
+  "Q3 2025 (Jul–Sep)",
+];
+
 const ROLE_LABEL: Record<string, string> = {
   maker:       "Maker — Data Entry",
   checker:     "Checker — Reviewer",
@@ -39,40 +72,40 @@ const ROLE_LABEL: Record<string, string> = {
 };
 
 /* ── Notification types & data ─────────────────────────────────────────── */
-type NotifItem = { id: string; title: string; detail: string; priority: "high" | "medium" | "low" };
-type NotifCategory = { key: string; label: string; icon: React.ElementType; items: NotifItem[] };
+type NotifItem = { id: string; title: string; detail: string; priority: "high" | "medium" | "low"; href: string };
+type NotifCategory = { key: string; label: string; icon: React.ElementType; items: NotifItem[]; href: string };
 
 const NOTIF_CATEGORIES: NotifCategory[] = [
   {
-    key: "review", label: "Review & Approval", icon: CheckCircle2,
+    key: "review", label: "Review & Approval", icon: CheckCircle2, href: "/review-approval",
     items: [
-      { id: "r1", title: "24 records pending review",         detail: "6 overdue · SLA breach risk",          priority: "high"   },
-      { id: "r2", title: "3 queries awaiting maker response", detail: "Water · Waste · Carbon",               priority: "medium" },
+      { id: "r1", title: "24 records pending review",         detail: "6 overdue · SLA breach risk",          priority: "high",   href: "/review-approval?status=submitted" },
+      { id: "r2", title: "3 queries awaiting maker response", detail: "Water · Waste · Carbon",               priority: "medium", href: "/review-approval?status=queried" },
     ],
   },
   {
-    key: "data", label: "Data Capture", icon: Database,
+    key: "data", label: "Data Capture", icon: Database, href: "/data-capture",
     items: [
-      { id: "d1", title: "Missing meter data — 4 properties", detail: "Energy Feb 2026 · Due 7 May",          priority: "high"   },
+      { id: "d1", title: "Missing meter data — 4 properties", detail: "Energy Feb 2026 · Due 7 May",          priority: "high",   href: "/data-capture?flag=missing" },
     ],
   },
   {
-    key: "certifications", label: "Certifications", icon: ShieldCheck,
+    key: "certifications", label: "Certifications", icon: ShieldCheck, href: "/certifications",
     items: [
-      { id: "c1", title: "Green Key evidence due in 12 days", detail: "Criterion 3.4 — Energy policy",        priority: "medium" },
-      { id: "c2", title: "GSTC certificate expires in 45 days", detail: "Grand Hyatt Dubai",                  priority: "medium" },
+      { id: "c1", title: "Green Key evidence due in 12 days", detail: "Criterion 3.4 — Energy policy",        priority: "medium", href: "/certifications?status=evidence-due" },
+      { id: "c2", title: "GSTC certificate expires in 45 days", detail: "Grand Hyatt Dubai",                  priority: "medium", href: "/certifications" },
     ],
   },
   {
-    key: "reports", label: "Reports", icon: FileText,
+    key: "reports", label: "Reports", icon: FileText, href: "/reports",
     items: [
-      { id: "rp1", title: "CSRD report generation blocked",   detail: "Missing S1/Supplier data for Scope 3", priority: "high"   },
+      { id: "rp1", title: "CSRD report generation blocked",   detail: "Missing S1/Supplier data for Scope 3", priority: "high",   href: "/reports" },
     ],
   },
   {
-    key: "ai", label: "AI / OCR", icon: Bot,
+    key: "ai", label: "AI / OCR", icon: Bot, href: "/review-approval?flag=low-confidence",
     items: [
-      { id: "ai1", title: "9 OCR extractions below confidence threshold", detail: "Manual review required",   priority: "medium" },
+      { id: "ai1", title: "9 OCR extractions below confidence threshold", detail: "Manual review required",   priority: "medium", href: "/review-approval?flag=low-confidence" },
     ],
   },
 ];
@@ -129,15 +162,18 @@ const DATA_BASIS_OPTIONS: DataBasis[] = ["approved", "approved+provisional", "dr
 /* ── Topbar ──────────────────────────────────────────────────────────────── */
 export default function Topbar() {
   const { profile, session, signOut } = useAuth();
-  const { property, region, period, dataBasis, setDataBasis } = useTopbar();
+  const { property, region, period, dataBasis, setProperty, setRegion, setPeriod, setDataBasis } = useTopbar();
   const navigate = useNavigate();
 
-  const [menuOpen,    setMenuOpen]    = useState(false);
-  const [notifOpen,   setNotifOpen]   = useState(false);
-  const [basisOpen,   setBasisOpen]   = useState(false);
-  const [filtersOpen, setFiltersOpen] = useState(false);
+  const [menuOpen,       setMenuOpen]       = useState(false);
+  const [notifOpen,      setNotifOpen]      = useState(false);
+  const [basisOpen,      setBasisOpen]      = useState(false);
+  const [filtersOpen,    setFiltersOpen]    = useState(false);
+  const [propertyOpen,   setPropertyOpen]   = useState(false);
+  const [regionOpen,     setRegionOpen]     = useState(false);
+  const [periodOpen,     setPeriodOpen]     = useState(false);
   const [activeNotifCategory, setActiveNotifCategory] = useState("review");
-  const [readIds,     setReadIds]     = useState<Set<string>>(new Set());
+  const [readIds,        setReadIds]        = useState<Set<string>>(new Set());
 
   const [searchOpen,  setSearchOpen]  = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -148,17 +184,23 @@ export default function Topbar() {
   const [contactForm, setContactForm] = useState({ subject: "", message: "" });
   const [contactSent, setContactSent] = useState(false);
 
-  const menuRef   = useRef<HTMLDivElement>(null);
-  const notifRef  = useRef<HTMLDivElement>(null);
-  const basisRef  = useRef<HTMLDivElement>(null);
-  const filterRef = useRef<HTMLDivElement>(null);
+  const menuRef       = useRef<HTMLDivElement>(null);
+  const notifRef      = useRef<HTMLDivElement>(null);
+  const basisRef      = useRef<HTMLDivElement>(null);
+  const filterRef     = useRef<HTMLDivElement>(null);
+  const propertyRef   = useRef<HTMLDivElement>(null);
+  const regionRef     = useRef<HTMLDivElement>(null);
+  const periodRef     = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const onClick = (e: MouseEvent) => {
-      if (menuRef.current   && !menuRef.current.contains(e.target as Node))   setMenuOpen(false);
-      if (notifRef.current  && !notifRef.current.contains(e.target as Node))  setNotifOpen(false);
-      if (basisRef.current  && !basisRef.current.contains(e.target as Node))  setBasisOpen(false);
-      if (filterRef.current && !filterRef.current.contains(e.target as Node)) setFiltersOpen(false);
+      if (menuRef.current     && !menuRef.current.contains(e.target as Node))     setMenuOpen(false);
+      if (notifRef.current    && !notifRef.current.contains(e.target as Node))    setNotifOpen(false);
+      if (basisRef.current    && !basisRef.current.contains(e.target as Node))    setBasisOpen(false);
+      if (filterRef.current   && !filterRef.current.contains(e.target as Node))   setFiltersOpen(false);
+      if (propertyRef.current && !propertyRef.current.contains(e.target as Node)) setPropertyOpen(false);
+      if (regionRef.current   && !regionRef.current.contains(e.target as Node))   setRegionOpen(false);
+      if (periodRef.current   && !periodRef.current.contains(e.target as Node))   setPeriodOpen(false);
     };
     document.addEventListener("mousedown", onClick);
     return () => document.removeEventListener("mousedown", onClick);
@@ -216,9 +258,77 @@ export default function Topbar() {
 
         {/* ── Context filters (xl+) ── */}
         <div className="hidden xl:flex items-center gap-2">
-          <FilterPill icon={<Building2 size={13} />}    label="Property" value={property} />
-          <FilterPill icon={<Map size={13} />}           label="Region"   value={region}   />
-          <FilterPill icon={<CalendarRange size={13} />} label="Period"   value={period}   />
+          <div className="relative" ref={propertyRef}>
+            <FilterPill
+              icon={<Building2 size={13} />}
+              label="Property"
+              value={property}
+              onClick={() => { setPropertyOpen((v) => !v); setRegionOpen(false); setPeriodOpen(false); }}
+            />
+            {propertyOpen && (
+              <div className="absolute left-0 top-12 w-56 card shadow-pop z-40 py-1 overflow-hidden max-h-72 overflow-y-auto">
+                {PROPERTY_OPTIONS.map((opt) => (
+                  <button
+                    key={opt}
+                    onClick={() => { setProperty(opt); setPropertyOpen(false); }}
+                    className={cn("w-full text-left px-3 py-2 text-[12px] hover:bg-ink-50 flex items-center gap-2", opt === property && "font-semibold text-brand-700")}
+                  >
+                    {opt === property && <CheckCircle2 size={12} className="text-good shrink-0" />}
+                    {opt !== property && <span className="w-[12px] shrink-0" />}
+                    {opt}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="relative" ref={regionRef}>
+            <FilterPill
+              icon={<Map size={13} />}
+              label="Region"
+              value={region}
+              onClick={() => { setRegionOpen((v) => !v); setPropertyOpen(false); setPeriodOpen(false); }}
+            />
+            {regionOpen && (
+              <div className="absolute left-0 top-12 w-44 card shadow-pop z-40 py-1 overflow-hidden">
+                {REGION_OPTIONS.map((opt) => (
+                  <button
+                    key={opt}
+                    onClick={() => { setRegion(opt); setRegionOpen(false); }}
+                    className={cn("w-full text-left px-3 py-2 text-[12px] hover:bg-ink-50 flex items-center gap-2", opt === region && "font-semibold text-brand-700")}
+                  >
+                    {opt === region && <CheckCircle2 size={12} className="text-good shrink-0" />}
+                    {opt !== region && <span className="w-[12px] shrink-0" />}
+                    {opt}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="relative" ref={periodRef}>
+            <FilterPill
+              icon={<CalendarRange size={13} />}
+              label="Period"
+              value={period}
+              onClick={() => { setPeriodOpen((v) => !v); setPropertyOpen(false); setRegionOpen(false); }}
+            />
+            {periodOpen && (
+              <div className="absolute left-0 top-12 w-52 card shadow-pop z-40 py-1 overflow-hidden">
+                {PERIOD_OPTIONS.map((opt) => (
+                  <button
+                    key={opt}
+                    onClick={() => { setPeriod(opt); setPeriodOpen(false); }}
+                    className={cn("w-full text-left px-3 py-2 text-[12px] hover:bg-ink-50 flex items-center gap-2", opt === period && "font-semibold text-brand-700")}
+                  >
+                    {opt === period && <CheckCircle2 size={12} className="text-good shrink-0" />}
+                    {opt !== period && <span className="w-[12px] shrink-0" />}
+                    {opt}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
 
           <div className="relative" ref={basisRef}>
             <button
@@ -274,19 +384,36 @@ export default function Topbar() {
                 <button onClick={() => setFiltersOpen(false)} className="btn-ghost w-7 h-7 p-0"><X size={13} /></button>
               </div>
               <div className="p-3 space-y-2">
-                {[
-                  { label: "Property", icon: Building2,    value: property },
-                  { label: "Region",   icon: Map,          value: region   },
-                  { label: "Period",   icon: CalendarRange, value: period  },
-                ].map((f) => (
-                  <label key={f.label} className="block">
-                    <span className="text-[11px] font-medium text-ink-500">{f.label}</span>
-                    <button className="mt-1 w-full flex items-center justify-between gap-2 h-9 px-3 rounded-lg border border-ink-200 bg-white text-sm font-medium text-ink-700 hover:bg-ink-50">
-                      <span className="flex items-center gap-2"><f.icon size={13} className="text-ink-400" />{f.value}</span>
-                      <ChevronDown size={13} className="text-ink-400" />
-                    </button>
-                  </label>
-                ))}
+                <div>
+                  <span className="text-[11px] font-medium text-ink-500">Property</span>
+                  <select
+                    value={property}
+                    onChange={(e) => setProperty(e.target.value)}
+                    className="mt-1 w-full h-9 px-3 rounded-lg border border-ink-200 bg-white text-sm text-ink-700 focus:outline-none focus:ring-2 focus:ring-brand-500"
+                  >
+                    {PROPERTY_OPTIONS.map((o) => <option key={o}>{o}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <span className="text-[11px] font-medium text-ink-500">Region</span>
+                  <select
+                    value={region}
+                    onChange={(e) => setRegion(e.target.value)}
+                    className="mt-1 w-full h-9 px-3 rounded-lg border border-ink-200 bg-white text-sm text-ink-700 focus:outline-none focus:ring-2 focus:ring-brand-500"
+                  >
+                    {REGION_OPTIONS.map((o) => <option key={o}>{o}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <span className="text-[11px] font-medium text-ink-500">Period</span>
+                  <select
+                    value={period}
+                    onChange={(e) => setPeriod(e.target.value)}
+                    className="mt-1 w-full h-9 px-3 rounded-lg border border-ink-200 bg-white text-sm text-ink-700 focus:outline-none focus:ring-2 focus:ring-brand-500"
+                  >
+                    {PERIOD_OPTIONS.map((o) => <option key={o}>{o}</option>)}
+                  </select>
+                </div>
                 <label className="block">
                   <span className="text-[11px] font-medium text-ink-500">Data Basis</span>
                   <div className="mt-1 space-y-1">
@@ -308,7 +435,12 @@ export default function Topbar() {
                 </label>
               </div>
               <div className="px-4 py-3 border-t border-ink-200 flex justify-end gap-2">
-                <button className="btn-ghost h-8 px-2 text-[12px]">Reset</button>
+                <button
+                  onClick={() => { setProperty(PROPERTY_OPTIONS[0]); setRegion(REGION_OPTIONS[0]); setPeriod(PERIOD_OPTIONS[0]); }}
+                  className="btn-ghost h-8 px-2 text-[12px]"
+                >
+                  Reset
+                </button>
                 <button onClick={() => setFiltersOpen(false)} className="btn-primary h-8 px-3 text-[12px]">Apply</button>
               </div>
             </div>
@@ -416,7 +548,12 @@ export default function Topbar() {
                                 Mark read
                               </button>
                             )}
-                            <button className="text-[11px] font-semibold text-brand-700 hover:text-brand-900">View →</button>
+                            <button
+                              onClick={() => { markRead(item.id); navigate(item.href); setNotifOpen(false); }}
+                              className="text-[11px] font-semibold text-brand-700 hover:text-brand-900"
+                            >
+                              View →
+                            </button>
                           </div>
                         </div>
                       </div>
@@ -428,7 +565,12 @@ export default function Topbar() {
                 </div>
 
                 <div className="px-4 py-2.5 border-t border-ink-100 shrink-0">
-                  <button className="text-[12px] text-brand-700 font-semibold hover:text-brand-900">View all notifications</button>
+                  <button
+                    onClick={() => { navigate(activeCategory.href); setNotifOpen(false); }}
+                    className="text-[12px] text-brand-700 font-semibold hover:text-brand-900"
+                  >
+                    View all in {activeCategory.label} →
+                  </button>
                 </div>
               </div>
             )}
@@ -683,11 +825,14 @@ export default function Topbar() {
 }
 
 /* ── Sub-components ─────────────────────────────────────────────────────── */
-function FilterPill({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
+function FilterPill({ icon, label, value, onClick }: { icon: React.ReactNode; label: string; value: string; onClick?: () => void }) {
   return (
     <div className="flex flex-col">
       <span className="text-[10px] font-medium text-ink-400 uppercase tracking-wide">{label}</span>
-      <button className="mt-0.5 inline-flex items-center gap-1.5 h-8 px-2.5 rounded-lg border border-ink-200 bg-white text-[12px] font-medium text-ink-700 hover:bg-ink-50 transition-colors">
+      <button
+        onClick={onClick}
+        className="mt-0.5 inline-flex items-center gap-1.5 h-8 px-2.5 rounded-lg border border-ink-200 bg-white text-[12px] font-medium text-ink-700 hover:bg-ink-50 transition-colors"
+      >
         <span className="text-ink-400">{icon}</span>
         {value}
         <ChevronDown size={11} className="text-ink-400" />

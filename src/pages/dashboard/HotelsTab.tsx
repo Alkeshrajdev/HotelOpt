@@ -1,39 +1,42 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowUpDown } from "lucide-react";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  Cell,
-  ReferenceLine,
-} from "recharts";
-import { Card, CardHeader } from "@/components/ui/Card";
+import { TrendingDown, TrendingUp, ExternalLink, ArrowUpDown } from "lucide-react";
 import Badge from "@/components/ui/Badge";
-import { PORTFOLIO_HOTELS } from "@/lib/mock";
+import { PORTFOLIO_HOTELS, PORTFOLIO_GOVERNANCE_BY_HOTEL } from "@/lib/mock";
 import { cn } from "@/lib/utils";
 
 type Region = "All" | "EMEA" | "APAC" | "Africa";
-type SortField = "carbon_t" | "energyIntensity" | "waterIntensity" | "diversion_pct" | "dataConfidence";
+type SortField = "name" | "carbonIntensity" | "energyIntensity" | "waterIntensity" | "diversion_pct" | "renewablePct" | "dataConfidence";
 
 const REGIONS: Region[] = ["All", "EMEA", "APAC", "Africa"];
 
-function confidenceTone(pct: number): "good" | "warn" | "bad" {
-  return pct >= 85 ? "good" : pct >= 70 ? "warn" : "bad";
+const SORT_OPTIONS: { field: SortField; label: string }[] = [
+  { field: "carbonIntensity", label: "Carbon" },
+  { field: "energyIntensity", label: "Energy" },
+  { field: "waterIntensity",  label: "Water" },
+  { field: "diversion_pct",  label: "Diversion" },
+  { field: "renewablePct",   label: "Renewable" },
+  { field: "dataConfidence", label: "Data" },
+  { field: "name",           label: "Name" },
+];
+
+const CERT_MAP = Object.fromEntries(
+  PORTFOLIO_GOVERNANCE_BY_HOTEL.map((g) => {
+    const status: "certified" | "in-progress" | "gap" =
+      g.certifications.length > 0 ? "certified" :
+      g.attestationsPct >= 60 ? "in-progress" : "gap";
+    return [g.hotel, status];
+  })
+);
+
+function certTone(s: "certified" | "in-progress" | "gap"): "good" | "warn" | "bad" {
+  return s === "certified" ? "good" : s === "in-progress" ? "warn" : "bad";
+}
+function certLabel(s: "certified" | "in-progress" | "gap") {
+  return s === "certified" ? "Certified" : s === "in-progress" ? "In progress" : "Gap";
 }
 
-function diversionTone(pct: number): "good" | "warn" | "bad" {
-  return pct >= 55 ? "good" : pct >= 40 ? "warn" : "bad";
-}
-
-function carbonTone(val: number): "good" | "warn" | "bad" {
-  return val < 50 ? "good" : val < 70 ? "warn" : "bad";
-}
-
-function statusDot(tone: "good" | "warn" | "bad") {
+function RagDot({ tone }: { tone: "good" | "warn" | "bad" }) {
   return (
     <span className={cn(
       "inline-block w-2 h-2 rounded-full shrink-0",
@@ -42,13 +45,204 @@ function statusDot(tone: "good" | "warn" | "bad") {
   );
 }
 
+function YoY({ val }: { val: number }) {
+  const good = val < 0;
+  return (
+    <span className={cn(
+      "inline-flex items-center gap-0.5 text-[10px] font-semibold tabular-nums",
+      good ? "text-good" : "text-bad"
+    )}>
+      {val < 0 ? <TrendingDown size={9} /> : <TrendingUp size={9} />}
+      {val > 0 ? "+" : ""}{val.toFixed(1)}%
+    </span>
+  );
+}
+
+function biggestGap(h: typeof PORTFOLIO_HOTELS[0]): { text: string; tone: "bad" | "warn" } {
+  const AVG_CARBON = 54.3;
+  const AVG_ENERGY = 106.6;
+  const AVG_WATER  = 476;
+  const TARGET_DIV = 60;
+  const issues: { text: string; severity: number; tone: "bad" | "warn" }[] = [];
+  if (h.dataConfidence < 50)
+    issues.push({ text: `Data ${Math.round(h.dataConfidence / 100 * 12)}/12 months — incomplete`, severity: 10, tone: "bad" });
+  if (h.carbonIntensity > AVG_CARBON * 1.3)
+    issues.push({ text: `Carbon ${h.carbonIntensity.toFixed(0)} kgCO₂/RN — ${Math.round((h.carbonIntensity / AVG_CARBON - 1) * 100)}% above avg`, severity: h.carbonIntensity / AVG_CARBON, tone: "bad" });
+  if (h.energyIntensity > AVG_ENERGY * 1.25)
+    issues.push({ text: `Energy ${h.energyIntensity.toFixed(0)} kWh/RN — ${Math.round((h.energyIntensity / AVG_ENERGY - 1) * 100)}% above avg`, severity: h.energyIntensity / AVG_ENERGY, tone: "warn" });
+  if (h.waterIntensity > AVG_WATER * 1.3)
+    issues.push({ text: `Water ${h.waterIntensity.toFixed(0)} L/GN — ${Math.round((h.waterIntensity / AVG_WATER - 1) * 100)}% above avg`, severity: h.waterIntensity / AVG_WATER, tone: "warn" });
+  if (h.diversion_pct < TARGET_DIV - 25)
+    issues.push({ text: `Waste diversion ${h.diversion_pct}% — ${TARGET_DIV - h.diversion_pct}% below target`, severity: (TARGET_DIV - h.diversion_pct) / TARGET_DIV + 1, tone: "bad" });
+  if (issues.length === 0) return { text: "All metrics on track", tone: "warn" };
+  issues.sort((a, b) => b.severity - a.severity);
+  return { text: issues[0].text, tone: issues[0].tone };
+}
+
+function MetricBar({ value, max, tone }: { value: number; max: number; tone: "good" | "warn" | "bad" }) {
+  const pct = Math.min(100, (value / max) * 100);
+  const avg = pct * 0.55; // rough avg marker position
+  return (
+    <div className="relative h-2 bg-ink-100 rounded-full overflow-hidden">
+      <div
+        className={cn("h-full rounded-full transition-all",
+          tone === "good" ? "bg-good" : tone === "warn" ? "bg-warn" : "bg-bad"
+        )}
+        style={{ width: `${pct}%` }}
+      />
+    </div>
+  );
+}
+
+function HotelCard({ h }: { h: typeof PORTFOLIO_HOTELS[0] }) {
+  const certStatus = CERT_MAP[h.name] ?? "gap";
+  const coverage = Math.round(h.dataConfidence / 100 * 12);
+  const gap = biggestGap(h);
+
+  const carbonTone: "good" | "warn" | "bad" = h.carbonIntensity < 55 ? "good" : h.carbonIntensity < 75 ? "warn" : "bad";
+  const energyTone: "good" | "warn" | "bad" = h.energyIntensity < 100 ? "good" : h.energyIntensity < 140 ? "warn" : "bad";
+  const waterTone:  "good" | "warn" | "bad" = h.waterIntensity  < 450 ? "good" : h.waterIntensity  < 700 ? "warn" : "bad";
+  const divTone:    "good" | "warn" | "bad" = h.diversion_pct   >= 55  ? "good" : h.diversion_pct  >= 35  ? "warn" : "bad";
+  const dataTone:   "good" | "warn" | "bad" = coverage >= 11 ? "good" : coverage >= 8 ? "warn" : "bad";
+  const renewTone:  "good" | "warn" | "bad" = h.renewablePct >= 30 ? "good" : h.renewablePct >= 10 ? "warn" : "bad";
+
+  const borderCls = carbonTone === "good" ? "border-good/40" : carbonTone === "warn" ? "border-warn/40" : "border-bad/40";
+  const headerBg  = carbonTone === "good" ? "bg-good/5" : carbonTone === "warn" ? "bg-warn/5" : "bg-bad/5";
+  const stripeCls = carbonTone === "good" ? "bg-good" : carbonTone === "warn" ? "bg-warn" : "bg-bad";
+
+  return (
+    <div className={cn("rounded-xl border-2 bg-white overflow-hidden hover:shadow-md transition-all flex flex-col", borderCls)}>
+      {/* Top colour stripe */}
+      <div className={cn("h-1", stripeCls)} />
+
+      {/* Header */}
+      <div className={cn("px-4 py-3 flex items-start justify-between gap-2", headerBg)}>
+        <div className="min-w-0">
+          <div className="flex items-center gap-2">
+            <RagDot tone={carbonTone} />
+            <span className="text-[14px] font-bold text-ink-900 leading-tight truncate">{h.name}</span>
+          </div>
+          <div className="text-[10px] text-ink-400 mt-0.5 pl-4">{h.region} · {h.type}</div>
+        </div>
+        <Badge tone={certTone(certStatus)} className="shrink-0">{certLabel(certStatus)}</Badge>
+      </div>
+
+      {/* Metric bars */}
+      <div className="px-4 pt-3 pb-2 space-y-3 flex-1">
+
+        {/* Carbon */}
+        <div>
+          <div className="flex justify-between items-baseline mb-1 gap-2">
+            <span className="text-[10px] text-ink-500 font-medium">Carbon</span>
+            <div className="flex items-center gap-1.5 shrink-0">
+              <span className={cn("text-[13px] font-bold tabular-nums", `text-${carbonTone}`)}>
+                {h.carbonIntensity.toFixed(1)}
+              </span>
+              <span className="text-[9px] text-ink-400">kgCO₂/RN</span>
+              <YoY val={h.yoyCarbon} />
+            </div>
+          </div>
+          <MetricBar value={h.carbonIntensity} max={120} tone={carbonTone} />
+          <div className="flex justify-between text-[8px] text-ink-300 mt-0.5">
+            <span>0</span><span className="text-ink-400 font-medium">avg 54</span><span>120</span>
+          </div>
+        </div>
+
+        {/* Energy */}
+        <div>
+          <div className="flex justify-between items-baseline mb-1 gap-2">
+            <span className="text-[10px] text-ink-500 font-medium">Energy</span>
+            <div className="flex items-center gap-1.5 shrink-0">
+              <span className={cn("text-[13px] font-bold tabular-nums", `text-${energyTone}`)}>
+                {h.energyIntensity.toFixed(1)}
+              </span>
+              <span className="text-[9px] text-ink-400">kWh/RN</span>
+              <YoY val={h.yoyEnergy} />
+            </div>
+          </div>
+          <MetricBar value={h.energyIntensity} max={250} tone={energyTone} />
+          <div className="flex justify-between text-[8px] text-ink-300 mt-0.5">
+            <span>0</span><span className="text-ink-400 font-medium">avg 107</span><span>250</span>
+          </div>
+        </div>
+
+        {/* Water */}
+        <div>
+          <div className="flex justify-between items-baseline mb-1 gap-2">
+            <span className="text-[10px] text-ink-500 font-medium">Water</span>
+            <div className="flex items-center gap-1.5 shrink-0">
+              <span className={cn("text-[13px] font-bold tabular-nums", `text-${waterTone}`)}>
+                {h.waterIntensity.toFixed(0)}
+              </span>
+              <span className="text-[9px] text-ink-400">L/GN</span>
+            </div>
+          </div>
+          <MetricBar value={h.waterIntensity} max={1200} tone={waterTone} />
+          <div className="flex justify-between text-[8px] text-ink-300 mt-0.5">
+            <span>0</span><span className="text-ink-400 font-medium">avg 476</span><span>1200</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Stats row */}
+      <div className="mx-4 mb-3 grid grid-cols-4 gap-1 rounded-lg bg-ink-50 px-2 py-2.5 text-center">
+        <div>
+          <div className={cn("text-[13px] font-bold tabular-nums leading-none", `text-${divTone}`)}>
+            {h.diversion_pct}%
+          </div>
+          <div className="text-[8px] text-ink-400 mt-0.5">Diversion</div>
+        </div>
+        <div>
+          <div className={cn("text-[13px] font-bold tabular-nums leading-none", `text-${renewTone}`)}>
+            {h.renewablePct}%
+          </div>
+          <div className="text-[8px] text-ink-400 mt-0.5">Renewable</div>
+        </div>
+        <div>
+          <div className={cn("text-[13px] font-bold tabular-nums leading-none", `text-${dataTone}`)}>
+            {coverage}/12
+          </div>
+          <div className="text-[8px] text-ink-400 mt-0.5">Data</div>
+        </div>
+        <div>
+          <div className="flex justify-center">
+            <Badge tone={certTone(certStatus)} className="text-[8px] px-1 py-0">
+              {certStatus === "certified" ? "✓ Cert" : certStatus === "in-progress" ? "~ Prog" : "✗ Gap"}
+            </Badge>
+          </div>
+          <div className="text-[8px] text-ink-400 mt-0.5">Cert</div>
+        </div>
+      </div>
+
+      {/* Biggest gap callout */}
+      <div className={cn(
+        "mx-4 mb-3 rounded-lg px-3 py-2 text-[11px] leading-snug",
+        gap.tone === "bad" ? "bg-bad/8 text-bad" : gap.text === "All metrics on track" ? "bg-good/8 text-good" : "bg-warn/8 text-warn"
+      )}>
+        {gap.text}
+      </div>
+
+      {/* Footer */}
+      <div className="px-4 pb-4">
+        <Link
+          to="/properties"
+          className="btn-secondary h-8 text-[11px] text-brand-700 border-brand-200 hover:bg-brand-50 inline-flex items-center justify-center gap-1.5 w-full rounded-lg"
+        >
+          Open property <ExternalLink size={10} />
+        </Link>
+      </div>
+    </div>
+  );
+}
+
 export default function HotelsTab() {
   const [region, setRegion] = useState<Region>("All");
-  const [sortField, setSortField] = useState<SortField>("carbon_t");
+  const [sortField, setSortField] = useState<SortField>("carbonIntensity");
   const [sortAsc, setSortAsc] = useState(false);
 
   const filtered = PORTFOLIO_HOTELS.filter((h) => region === "All" || h.region === region);
   const sorted = [...filtered].sort((a, b) => {
+    if (sortField === "name") return sortAsc ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name);
     const diff = (a[sortField] as number) - (b[sortField] as number);
     return sortAsc ? diff : -diff;
   });
@@ -58,273 +252,75 @@ export default function HotelsTab() {
     else { setSortField(field); setSortAsc(false); }
   }
 
-  const totalCarbon = PORTFOLIO_HOTELS.reduce((s, h) => s + h.carbon_t, 0);
-
-  // Pareto data — sorted descending by carbon
-  const paretoData = [...PORTFOLIO_HOTELS]
-    .sort((a, b) => b.carbon_t - a.carbon_t)
-    .map((h, i, arr) => {
-      const cumulative = arr.slice(0, i + 1).reduce((s, x) => s + x.carbon_t, 0);
-      return { name: h.shortName, carbon: h.carbon_t, cumPct: Math.round((cumulative / totalCarbon) * 100) };
-    });
-
-  // Intensity comparison
-  const intensityData = [...PORTFOLIO_HOTELS]
-    .sort((a, b) => b.energyIntensity - a.energyIntensity)
-    .map((h) => ({ name: h.shortName, intensity: h.energyIntensity }));
-
-  const avgIntensity = Math.round(PORTFOLIO_HOTELS.reduce((s, h) => s + h.energyIntensity, 0) / PORTFOLIO_HOTELS.length);
-
   return (
-    <div className="space-y-6">
-      {/* Region filter */}
-      <div className="flex gap-1">
-        {REGIONS.map((r) => (
-          <button
-            key={r}
-            onClick={() => setRegion(r)}
-            className={cn(
-              "px-3 py-1.5 rounded-md text-[12px] font-medium transition-colors",
-              region === r ? "bg-brand-700 text-white" : "bg-ink-100 text-ink-600 hover:bg-ink-200"
-            )}
-          >
-            {r}
-          </button>
-        ))}
-      </div>
+    <div className="space-y-5">
 
-      {/* Full metric table */}
-      <div className="overflow-x-auto rounded-xl border border-ink-100 bg-white">
-        <table className="min-w-full">
-          <thead>
-            <tr className="bg-ink-50">
-              <th className="table-th">Hotel</th>
-              <th className="table-th">Region</th>
-              <th className="table-th">Type</th>
-              <th className="table-th text-right">
-                <button onClick={() => toggleSort("carbon_t")} className="inline-flex items-center gap-1 hover:text-ink-900">
-                  tCO₂e <ArrowUpDown size={10} />
-                </button>
-              </th>
-              <th className="table-th text-right">% Portfolio</th>
-              <th className="table-th text-right">
-                <button onClick={() => toggleSort("energyIntensity")} className="inline-flex items-center gap-1 hover:text-ink-900">
-                  kWh/RN <ArrowUpDown size={10} />
-                </button>
-              </th>
-              <th className="table-th text-right">
-                <button onClick={() => toggleSort("waterIntensity")} className="inline-flex items-center gap-1 hover:text-ink-900">
-                  L/GN <ArrowUpDown size={10} />
-                </button>
-              </th>
-              <th className="table-th text-right">
-                <button onClick={() => toggleSort("diversion_pct")} className="inline-flex items-center gap-1 hover:text-ink-900">
-                  Diversion <ArrowUpDown size={10} />
-                </button>
-              </th>
-              <th className="table-th text-right">
-                <button onClick={() => toggleSort("dataConfidence")} className="inline-flex items-center gap-1 hover:text-ink-900">
-                  Data <ArrowUpDown size={10} />
-                </button>
-              </th>
-              <th className="table-th text-right pr-6">Open</th>
-            </tr>
-          </thead>
-          <tbody>
-            {sorted.map((h) => {
-              const pct = Math.round((h.carbon_t / totalCarbon) * 100);
-              return (
-                <tr key={h.id} className="hover:bg-ink-50/60">
-                  <td className="table-td font-semibold text-ink-900 whitespace-nowrap">
-                    <div className="flex items-center gap-2">
-                      {statusDot(carbonTone(h.carbonIntensity))}
-                      {h.name}
-                    </div>
-                  </td>
-                  <td className="table-td text-[12px] text-ink-500">{h.region}</td>
-                  <td className="table-td text-[12px] text-ink-500 whitespace-nowrap">{h.type}</td>
-                  <td className="table-td text-right tabular-nums text-[13px] font-semibold text-ink-900 whitespace-nowrap">
-                    {h.carbon_t.toLocaleString()}
-                  </td>
-                  <td className="table-td text-right">
-                    <div className="flex items-center justify-end gap-2">
-                      <div className="w-14 h-1.5 bg-ink-100 rounded-full overflow-hidden">
-                        <div className="h-full bg-pillar-carbon rounded-full" style={{ width: `${Math.min(100, pct * 2.5)}%` }} />
-                      </div>
-                      <span className="text-[11px] font-semibold text-ink-700 tabular-nums w-6 text-right">{pct}%</span>
-                    </div>
-                  </td>
-                  <td className="table-td text-right">
-                    <span className={cn(
-                      "text-[12px] font-semibold tabular-nums",
-                      h.energyIntensity > 150 ? "text-bad" : h.energyIntensity > 100 ? "text-warn" : "text-good"
-                    )}>
-                      {h.energyIntensity.toFixed(1)}
-                    </span>
-                  </td>
-                  <td className="table-td text-right">
-                    <span className={cn(
-                      "text-[12px] font-semibold tabular-nums",
-                      h.waterIntensity > 700 ? "text-bad" : h.waterIntensity > 500 ? "text-warn" : "text-good"
-                    )}>
-                      {h.waterIntensity.toFixed(0)}
-                    </span>
-                  </td>
-                  <td className="table-td text-right">
-                    <Badge tone={diversionTone(h.diversion_pct)}>{h.diversion_pct}%</Badge>
-                  </td>
-                  <td className="table-td text-right">
-                    <Badge tone={confidenceTone(h.dataConfidence)}>{h.dataConfidence}%</Badge>
-                  </td>
-                  <td className="table-td text-right pr-6">
-                    <Link
-                      to="/properties"
-                      className="btn-secondary h-7 px-3 text-[11px] text-brand-700 border-brand-200 hover:bg-brand-50 inline-flex items-center gap-1"
-                    >
-                      Open
-                    </Link>
-                  </td>
-                </tr>
-              );
-            })}
-            {sorted.length === 0 && (
-              <tr>
-                <td colSpan={10} className="table-td text-center text-ink-400 py-8">
-                  No hotels match the selected filter.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-        <Card>
-          <CardHeader
-            title="Carbon Contribution — Pareto"
-            hint="cumulative % shown on bars"
-          />
-          <div className="px-4 pb-4 pt-2">
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={paretoData} margin={{ top: 0, right: 50, bottom: 40, left: 0 }}>
-                <XAxis
-                  dataKey="name"
-                  tick={{ fontSize: 10, fill: "#64748B" }}
-                  axisLine={false}
-                  tickLine={false}
-                  angle={-40}
-                  textAnchor="end"
-                />
-                <YAxis
-                  tick={{ fontSize: 10, fill: "#64748B" }}
-                  axisLine={false}
-                  tickLine={false}
-                  tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`}
-                  width={40}
-                />
-                <Tooltip
-                  contentStyle={{ fontSize: 12, borderRadius: 8, border: "1px solid #E2E8F0" }}
-                  formatter={(val: number, name: string) => [
-                    name === "carbon"
-                      ? `${val.toLocaleString()} tCO₂e`
-                      : `${val}% cumulative`,
-                    name === "carbon" ? "Emissions" : "Cumulative %",
-                  ]}
-                />
-                <Bar dataKey="carbon" maxBarSize={32} radius={[4, 4, 0, 0]}>
-                  {paretoData.map((d, i) => (
-                    <Cell key={d.name} fill={i < 3 ? "#0F766E" : "#99F6E4"} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-            <p className="text-[11px] text-ink-400 mt-1 text-center">
-              Top 3 hotels contribute {paretoData[2]?.cumPct ?? 0}% of portfolio emissions
-            </p>
-          </div>
-        </Card>
-
-        <Card>
-          <CardHeader
-            title="Energy Intensity Ranking"
-            hint="kWh per room night — portfolio avg shown"
-          />
-          <div className="px-4 pb-4 pt-2">
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={intensityData} layout="vertical" margin={{ top: 0, right: 40, bottom: 0, left: 110 }}>
-                <XAxis type="number" tick={{ fontSize: 10, fill: "#64748B" }} axisLine={false} tickLine={false} />
-                <YAxis
-                  type="category"
-                  dataKey="name"
-                  width={106}
-                  tick={{ fontSize: 11, fill: "#334155" }}
-                  axisLine={false}
-                  tickLine={false}
-                />
-                <Tooltip
-                  contentStyle={{ fontSize: 12, borderRadius: 8, border: "1px solid #E2E8F0" }}
-                  formatter={(v: number) => [`${v.toFixed(1)} kWh/RN`, "Intensity"]}
-                />
-                <ReferenceLine
-                  x={avgIntensity}
-                  stroke="#94A3B8"
-                  strokeDasharray="4 3"
-                  label={{ value: `Avg ${avgIntensity}`, position: "top", fontSize: 10, fill: "#64748B" }}
-                />
-                <Bar dataKey="intensity" radius={[0, 4, 4, 0]} maxBarSize={18}>
-                  {intensityData.map((d) => (
-                    <Cell
-                      key={d.name}
-                      fill={d.intensity > 150 ? "#EF4444" : d.intensity > 100 ? "#F59E0B" : "#22C55E"}
-                    />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </Card>
-      </div>
-
-      {/* Hotspot heatmap */}
-      <Card>
-        <CardHeader
-          title="Portfolio Hotspot Summary"
-          hint="hotels with the most risk across pillars"
-        />
-        <div className="p-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            {PORTFOLIO_HOTELS.filter((h) =>
-              h.dataConfidence < 70 || h.diversion_pct < 30 || h.energyIntensity > 140 || h.carbonIntensity > 70
-            ).map((h) => {
-              const risks: string[] = [];
-              if (h.dataConfidence < 70) risks.push(`Data ${h.dataConfidence}%`);
-              if (h.diversion_pct < 30) risks.push(`Diversion ${h.diversion_pct}%`);
-              if (h.energyIntensity > 140) risks.push(`Energy ${h.energyIntensity.toFixed(0)} kWh/RN`);
-              if (h.carbonIntensity > 70) risks.push(`Carbon ${h.carbonIntensity.toFixed(0)} kgCO₂/RN`);
-
-              return (
-                <Link
-                  key={h.id}
-                  to="/properties"
-                  className="card-level-3 p-3 rounded-lg hover:bg-ink-100 transition-colors"
-                >
-                  <div className="flex items-center justify-between gap-2 mb-2">
-                    <span className="text-[12px] font-semibold text-ink-900">{h.name}</span>
-                    <Badge tone="bad">{risks.length} risk{risks.length > 1 ? "s" : ""}</Badge>
-                  </div>
-                  <div className="flex flex-wrap gap-1">
-                    {risks.map((r) => (
-                      <span key={r} className="chip bg-bad/10 text-bad text-[10px]">{r}</span>
-                    ))}
-                  </div>
-                  <div className="mt-2 text-[10px] text-ink-400">{h.region} · {h.type}</div>
-                </Link>
-              );
-            })}
-          </div>
+      {/* Controls row */}
+      <div className="flex flex-wrap items-center gap-3">
+        {/* Region filter */}
+        <div className="flex gap-1">
+          {REGIONS.map((r) => (
+            <button
+              key={r}
+              onClick={() => setRegion(r)}
+              className={cn(
+                "px-3 py-1.5 rounded-md text-[12px] font-medium transition-colors",
+                region === r ? "bg-brand-700 text-white" : "bg-ink-100 text-ink-600 hover:bg-ink-200"
+              )}
+            >
+              {r}
+            </button>
+          ))}
         </div>
-      </Card>
+
+        {/* Sort pills */}
+        <div className="flex items-center gap-1 ml-auto flex-wrap">
+          <span className="text-[10px] text-ink-400 font-medium mr-1">Sort:</span>
+          {SORT_OPTIONS.map((o) => (
+            <button
+              key={o.field}
+              onClick={() => toggleSort(o.field)}
+              className={cn(
+                "inline-flex items-center gap-0.5 px-2.5 py-1 rounded-full text-[10px] font-medium transition-colors",
+                sortField === o.field
+                  ? "bg-brand-700 text-white"
+                  : "bg-ink-100 text-ink-500 hover:bg-ink-200"
+              )}
+            >
+              {o.label}
+              {sortField === o.field && <ArrowUpDown size={8} />}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Legend */}
+      <div className="flex items-center gap-5 text-[11px] text-ink-500">
+        <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-good inline-block" />On track</span>
+        <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-warn inline-block" />Monitor</span>
+        <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-bad inline-block" />Action needed</span>
+        <span className="text-ink-400 ml-auto">{sorted.length} hotel{sorted.length !== 1 ? "s" : ""} · sorted by {SORT_OPTIONS.find(o => o.field === sortField)?.label}</span>
+      </div>
+
+      {/* Hotel cards */}
+      {sorted.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+          {sorted.map((h) => <HotelCard key={h.id} h={h} />)}
+        </div>
+      ) : (
+        <div className="rounded-xl border border-ink-100 bg-white py-12 text-center text-ink-400 text-[13px]">
+          No hotels match the selected filter.
+        </div>
+      )}
+
+      {/* Thresholds footnote */}
+      <div className="text-[11px] text-ink-400 flex flex-wrap gap-x-6 gap-y-1 px-1 pt-1 border-t border-ink-100">
+        <span>Carbon: <span className="text-good">&#60;55</span> / <span className="text-warn">55–75</span> / <span className="text-bad">&#62;75</span> kgCO₂/RN</span>
+        <span>Energy: <span className="text-good">&#60;100</span> / <span className="text-warn">100–140</span> / <span className="text-bad">&#62;140</span> kWh/RN</span>
+        <span>Water: <span className="text-good">&#60;450</span> / <span className="text-warn">450–700</span> / <span className="text-bad">&#62;700</span> L/GN</span>
+        <span>Diversion: <span className="text-good">≥55%</span> / <span className="text-warn">35–54%</span> / <span className="text-bad">&#60;35%</span></span>
+        <span>Data: <span className="text-good">≥11/12</span> / <span className="text-warn">8–10/12</span> / <span className="text-bad">&#60;8/12</span> months</span>
+      </div>
     </div>
   );
 }
