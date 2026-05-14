@@ -1,7 +1,8 @@
+import React, { useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
-import { Building2, ChevronLeft, Leaf } from "lucide-react";
-import { NAV, NAV_GROUPS } from "@/lib/nav";
-import type { Role } from "@/lib/nav";
+import { Building2, ChevronLeft, ChevronRight, Leaf } from "lucide-react";
+import { NAV } from "@/lib/nav";
+import type { NavGroup, NavItem, Role } from "@/lib/nav";
 import { useAuth } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 
@@ -10,20 +11,132 @@ type Props = {
   onToggle: () => void;
 };
 
-export default function Sidebar({ collapsed, onToggle }: Props) {
-  const location = useLocation();
-  const { profile } = useAuth();
-  // "maker" is the most restrictive role — safe fallback when profile not yet loaded.
-  const role: Role = profile?.role ?? "maker";
+function hasRole(roles: Role[] | undefined, role: Role) {
+  return !roles || roles.includes(role);
+}
 
-  const visibleNav = NAV.filter((item) => !item.roles || item.roles.includes(role));
+function NavItemLink({
+  item,
+  collapsed,
+  indent = false,
+}: {
+  item: NavItem;
+  collapsed: boolean;
+  indent?: boolean;
+}) {
+  const location = useLocation();
+  const prefixActive =
+    !!item.matchPrefix && location.pathname.startsWith(item.matchPrefix);
+  const Icon = item.icon;
+
+  return (
+    <NavLink
+      to={item.to}
+      end={!item.matchPrefix}
+      className={({ isActive }) =>
+        cn(
+          "nav-item",
+          indent && !collapsed && "pl-9",
+          (isActive || prefixActive) && "nav-item-active"
+        )
+      }
+      title={collapsed ? item.label : undefined}
+    >
+      <Icon size={18} className="shrink-0" />
+      {!collapsed && (
+        <>
+          <span className="truncate">{item.label}</span>
+          {item.badge && (
+            <span
+              className={cn(
+                "ml-auto chip rounded-full text-[10px] font-bold",
+                item.badge === "BETA"
+                  ? "bg-white/12 text-white/60"
+                  : "bg-warn/25 text-warn"
+              )}
+            >
+              {item.badge}
+            </span>
+          )}
+        </>
+      )}
+    </NavLink>
+  );
+}
+
+function NavGroupSection({
+  group,
+  collapsed,
+}: {
+  group: NavGroup;
+  collapsed: boolean;
+}) {
+  const location = useLocation();
+  const isCurrentSection =
+    !!group.matchPrefix
+      ? location.pathname.startsWith(group.matchPrefix)
+      : group.items.some((i) => location.pathname.startsWith(i.to));
+
+  const [open, setOpen] = useState(isCurrentSection);
+  const Icon = group.icon;
+
+  // In collapsed mode show a simple icon-only button (tooltip only)
+  if (collapsed) {
+    return (
+      <div className="relative group/g">
+        <button
+          onClick={() => setOpen((v) => !v)}
+          className={cn("nav-item w-full", isCurrentSection && "nav-item-active")}
+          title={group.label}
+        >
+          <Icon size={18} className="shrink-0" />
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className={cn(
+          "nav-item w-full",
+          isCurrentSection && !open && "nav-item-active"
+        )}
+      >
+        <Icon size={18} className="shrink-0" />
+        <span className="truncate flex-1 text-left">{group.label}</span>
+        <ChevronRight
+          size={14}
+          className={cn(
+            "ml-auto shrink-0 text-white/40 transition-transform duration-200",
+            open && "rotate-90"
+          )}
+        />
+      </button>
+
+      {open && (
+        <ul className="mt-0.5 space-y-0.5">
+          {group.items.map((item) => (
+            <li key={item.to}>
+              <NavItemLink item={item} collapsed={false} indent />
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
+export default function Sidebar({ collapsed, onToggle }: Props) {
+  const { profile } = useAuth();
+  const role: Role = profile?.role ?? "maker";
 
   return (
     <aside className={cn("sidebar-shell", collapsed ? "w-[72px]" : "w-[252px]")}>
 
       {/* ── Brand + client context ── */}
       <div className="shrink-0 border-b sidebar-divider">
-        {/* Logo row */}
         <div className="h-16 flex items-center px-4 gap-2.5">
           <div className="w-9 h-9 rounded-xl bg-white/10 ring-1 ring-white/10 grid place-items-center text-white shadow-sm shrink-0">
             <Leaf size={18} />
@@ -36,7 +149,6 @@ export default function Sidebar({ collapsed, onToggle }: Props) {
           )}
         </div>
 
-        {/* Client context — collapsed shows just building icon */}
         {collapsed ? (
           <div className="flex justify-center pb-3">
             <div className="w-8 h-8 rounded-lg bg-white/8 grid place-items-center text-white/50">
@@ -58,59 +170,46 @@ export default function Sidebar({ collapsed, onToggle }: Props) {
       </div>
 
       {/* ── Nav ── */}
-      <nav className="flex-1 overflow-y-auto py-3 px-2.5">
-        {NAV_GROUPS.map((group) => {
-          const items = visibleNav.filter((n) => n.group === group);
-          if (items.length === 0) return null;
-          return (
-            <div key={group} className="mb-3">
-              {!collapsed && (
-                <div className="px-3 pt-2 pb-1 text-[10px] uppercase tracking-wider font-semibold nav-group-heading">
-                  {group}
-                </div>
-              )}
-              <ul className="space-y-0.5">
-                {items.map((item) => {
-                  const Icon = item.icon;
-                  const prefixActive =
-                    !!item.matchPrefix &&
-                    location.pathname.startsWith(item.matchPrefix);
-                  return (
-                    <li key={item.to}>
-                      <NavLink
-                        to={item.to}
-                        end={item.to === "/"}
-                        className={({ isActive }) =>
-                          cn("nav-item", (isActive || prefixActive) && "nav-item-active")
-                        }
-                        title={collapsed ? item.label : undefined}
-                      >
-                        <Icon size={18} className="shrink-0" />
-                        {!collapsed && (
-                          <>
-                            <span className="truncate">{item.label}</span>
-                            {item.badge && (
-                              <span
-                                className={cn(
-                                  "ml-auto chip rounded-full text-[10px] font-bold",
-                                  item.badge === "BETA"
-                                    ? "bg-white/12 text-white/60"
-                                    : "bg-warn/25 text-warn"
-                                )}
-                              >
-                                {item.badge}
-                              </span>
-                            )}
-                          </>
-                        )}
-                      </NavLink>
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
+      <nav className="flex-1 overflow-y-auto py-3 px-2.5 space-y-0.5">
+        {(() => {
+          // Build visible sections first so we can strip orphan dividers
+          type Rendered = { type: "divider"; idx: number } | { type: "node"; key: string; el: React.ReactNode };
+          const visible: Rendered[] = [];
+
+          NAV.forEach((section, i) => {
+            if (section.type === "divider") {
+              visible.push({ type: "divider", idx: i });
+              return;
+            }
+            if (section.type === "group") {
+              if (!hasRole(section.roles, role)) return;
+              visible.push({ type: "node", key: section.label, el: <NavGroupSection key={section.label} group={section} collapsed={collapsed} /> });
+              return;
+            }
+            if (!hasRole(section.roles, role)) return;
+            visible.push({ type: "node", key: section.to, el: <NavItemLink key={section.to} item={section} collapsed={collapsed} /> });
+          });
+
+          // Remove leading, trailing, and consecutive dividers
+          const cleaned: Rendered[] = [];
+          for (const v of visible) {
+            if (v.type === "divider") {
+              const last = cleaned[cleaned.length - 1];
+              if (!last || last.type === "divider") continue; // leading or consecutive
+              cleaned.push(v);
+            } else {
+              cleaned.push(v);
+            }
+          }
+          // Remove trailing divider
+          while (cleaned.length > 0 && cleaned[cleaned.length - 1].type === "divider") cleaned.pop();
+
+          return cleaned.map((v) =>
+            v.type === "divider"
+              ? collapsed ? null : <div key={`div-${v.idx}`} className="my-1.5 border-t border-white/8" />
+              : <React.Fragment key={v.key}>{v.el}</React.Fragment>
           );
-        })}
+        })()}
       </nav>
 
       {/* ── Footer ── */}

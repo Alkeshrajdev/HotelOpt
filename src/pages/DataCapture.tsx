@@ -7,7 +7,7 @@
 //   Step 4: Shared preview — read-only summary + anomaly flags
 //   Step 5: Confirmation (record in Maker–Checker queue)
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   AlertTriangle,
   ArrowLeft,
@@ -350,7 +350,7 @@ function PickMethod({
   onPick: (m: Method) => void;
   onBack: () => void;
 }) {
-  const ALL_METHODS: Method[] = ["manual", "ocr", "bulk", "qr", "api", "survey"];
+  const ALL_METHODS: Method[] = ["manual", "ocr", "bulk", "qr", "api", "survey", "ai-assist"];
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -412,12 +412,13 @@ function PickMethod({
 
 function iconFor(m: Method) {
   switch (m) {
-    case "manual": return <ClipboardEdit size={18} />;
-    case "ocr":    return <ScanLine size={18} />;
-    case "bulk":   return <Upload size={18} />;
-    case "qr":     return <QrCode size={18} />;
-    case "api":    return <Plug size={18} />;
-    case "survey": return <MessageSquare size={18} />;
+    case "manual":    return <ClipboardEdit size={18} />;
+    case "ocr":       return <ScanLine size={18} />;
+    case "bulk":      return <Upload size={18} />;
+    case "qr":        return <QrCode size={18} />;
+    case "api":       return <Plug size={18} />;
+    case "survey":    return <MessageSquare size={18} />;
+    case "ai-assist": return <Sparkles size={18} />;
   }
 }
 
@@ -446,12 +447,13 @@ function MethodWorkflow({
           </span>
         </div>
 
-        {method === "manual"  && <ManualWorkflow cfg={cfg} onPreview={onPreview} />}
-        {method === "ocr"     && <OcrWorkflow cfg={cfg} onPreview={onPreview} />}
-        {method === "bulk"    && <BulkWorkflow cfg={cfg} onPreview={onPreview} />}
-        {method === "qr"      && <QrWorkflow cfg={cfg} onPreview={onPreview} />}
-        {method === "api"     && <ApiWorkflow cfg={cfg} />}
-        {method === "survey"  && <SurveyWorkflow cfg={cfg} />}
+        {method === "manual"    && <ManualWorkflow cfg={cfg} onPreview={onPreview} />}
+        {method === "ocr"       && <OcrWorkflow cfg={cfg} onPreview={onPreview} />}
+        {method === "bulk"      && <BulkWorkflow cfg={cfg} onPreview={onPreview} />}
+        {method === "qr"        && <QrWorkflow cfg={cfg} onPreview={onPreview} />}
+        {method === "api"       && <ApiWorkflow cfg={cfg} />}
+        {method === "survey"    && <SurveyWorkflow cfg={cfg} />}
+        {method === "ai-assist" && <AiAssistWorkflow cfg={cfg} onPreview={onPreview} />}
       </div>
 
       <div className="col-span-12 lg:col-span-4 space-y-4">
@@ -2075,7 +2077,8 @@ function SurveyWorkflow({ cfg }: { cfg: DataTypeConfig }) {
         }
       />
 
-      {createMode ? (
+
+      {createMode && (
         <div className="p-5 grid grid-cols-2 gap-4">
           <Field label="Campaign name" required><input className="input" placeholder="e.g. Q3 Supplier sustainability survey" /></Field>
           <Field label="Audience" required>
@@ -2108,7 +2111,8 @@ function SurveyWorkflow({ cfg }: { cfg: DataTypeConfig }) {
             <button className="btn-primary">Send invitations</button>
           </div>
         </div>
-      ) : (
+      )}
+      {!createMode && (
         <div className="overflow-x-auto">
           <table className="min-w-full">
             <thead>
@@ -2139,6 +2143,439 @@ function SurveyWorkflow({ cfg }: { cfg: DataTypeConfig }) {
               })}
             </tbody>
           </table>
+        </div>
+      )}
+    </Card>
+  );
+}
+
+/* =================================================================== */
+/* AI Assist workflow — 4 phases: upload → analyzing → questions → extraction */
+/* =================================================================== */
+
+type AiPhase = "upload" | "analyzing" | "questions" | "extraction";
+
+const ANALYSIS_STEPS = [
+  "Reading file structure…",
+  "Detecting data type and format…",
+  "Extracting consumption values…",
+  "Cross-referencing emission factors…",
+  "Running anomaly checks…",
+  "Preparing field mapping…",
+];
+
+type QaPair = { question: string; chips: string[]; key: string };
+
+const AI_QUESTIONS: Record<string, QaPair[]> = {
+  energy: [
+    { key: "meter",  question: "Which meter does this bill cover?",                              chips: ["Main electricity meter", "Diesel generator", "District cooling", "Natural gas", "Solar PV"] },
+    { key: "period", question: "Does Apr 2026 look correct as the billing period?",              chips: ["Yes, Apr 2026", "No — let me correct it", "Covers multiple months"] },
+  ],
+  water: [
+    { key: "source", question: "What is the water source for this bill?",                        chips: ["Municipal supply", "Borewell / well water", "Recycled / greywater", "Rainwater harvested"] },
+    { key: "period", question: "Is Apr 2026 the correct billing period?",                        chips: ["Yes, Apr 2026", "No — I'll update it", "Bi-monthly bill"] },
+  ],
+  waste: [
+    { key: "streams", question: "Which waste streams does this report cover?",                   chips: ["Organic / food", "Mixed recyclable", "Landfill", "Glass", "Hazardous", "All streams"] },
+    { key: "period",  question: "Is the collection period Apr 2026?",                            chips: ["Yes, Apr 2026", "No — different period", "Weekly data"] },
+  ],
+  procurement: [
+    { key: "category", question: "Which Scope 3 category does this invoice fall under?",        chips: ["Cat 1 — Purchased goods & services", "Cat 2 — Capital goods", "Cat 4 — Upstream transport"] },
+    { key: "period",   question: "Is Apr 2026 the invoice date / period?",                      chips: ["Yes, Apr 2026", "No — different date", "Quarterly invoice"] },
+  ],
+  "travel-commute": [
+    { key: "category", question: "Is this business travel or employee commute data?",           chips: ["Business travel (Cat 6)", "Employee commute (Cat 7)", "Both"] },
+    { key: "period",   question: "Does Apr 2026 look correct as the report period?",            chips: ["Yes, Apr 2026", "No — different period"] },
+  ],
+  social: [
+    { key: "subtype", question: "What kind of social data does this report contain?",           chips: ["Headcount / HR", "Training records", "H&S incidents", "Community engagement"] },
+    { key: "period",  question: "Is Apr 2026 the correct period for this report?",              chips: ["Yes, Apr 2026", "No — different period"] },
+  ],
+  generic: [
+    { key: "period",  question: "Does the extracted period — Apr 2026 — look correct?",        chips: ["Yes, confirmed", "No — I'll correct it", "Not sure"] },
+    { key: "confirm", question: "Should I proceed with these extracted values?",                chips: ["Yes — looks right", "I want to review first"] },
+  ],
+};
+
+type AiExtractedField = { key: string; label: string; value: string; conf: "high" | "medium" | "low"; reasoning: string };
+
+const AI_EXTRACTED: Record<string, AiExtractedField[]> = {
+  energy: [
+    { key: "sourceType",  label: "Source type",      value: "Electricity — grid",      conf: "high",   reasoning: "Header: 'EmiratesGreen Power Co.' — grid electricity provider" },
+    { key: "period",      label: "Billing period",   value: "2026-04",                 conf: "high",   reasoning: "Invoice date field: '1 April 2026 – 30 April 2026'" },
+    { key: "consumption", label: "Consumption",      value: "412580",                  conf: "high",   reasoning: "Line item 'Total kWh': 412,580 — confirmed by tariff calculation" },
+    { key: "unit",        label: "Unit",             value: "kWh",                     conf: "high",   reasoning: "Unit column consistently 'kWh' throughout document" },
+    { key: "cost",        label: "Cost",             value: "64920",                   conf: "medium", reasoning: "Total due field — currency matched from property country (UAE → AED)" },
+    { key: "meterId",     label: "Meter ID",         value: "ELEC-MAIN-01",            conf: "medium", reasoning: "Partially obscured text. Extracted: 'ELEC-MA*N-01'" },
+    { key: "invoiceRef",  label: "Invoice reference", value: "INV-2026-04-0082",       conf: "low",    reasoning: "Barcode decoded — verify against physical invoice" },
+  ],
+  water: [
+    { key: "sourceType",  label: "Source type",      value: "Municipal supply",        conf: "high",   reasoning: "Letterhead: 'Dubai Municipality Water Authority'" },
+    { key: "period",      label: "Billing period",   value: "2026-04",                 conf: "high",   reasoning: "Billing period explicitly stated on page 1" },
+    { key: "consumption", label: "Consumption",      value: "1840",                    conf: "high",   reasoning: "Total m³ field found at bottom of bill" },
+    { key: "unit",        label: "Unit",             value: "m³",                      conf: "high",   reasoning: "Unit column header: m³" },
+    { key: "cost",        label: "Cost",             value: "3680",                    conf: "medium", reasoning: "Total due field extracted — verify currency" },
+    { key: "invoiceRef",  label: "Invoice reference", value: "WTR-2026-04-019",        conf: "medium", reasoning: "Reference number partially legible on top-right" },
+  ],
+  waste: [
+    { key: "stream",        label: "Waste stream",   value: "Organic / food",          conf: "high",   reasoning: "Report header: 'Organic waste collection log — Kitchen'" },
+    { key: "date",          label: "Collection date", value: "2026-04-30",             conf: "high",   reasoning: "Report end date field" },
+    { key: "quantity",      label: "Quantity",        value: "2840",                   conf: "high",   reasoning: "Total column sum: 2,840 kg across 28 collection days" },
+    { key: "unit",          label: "Unit",            value: "kg",                     conf: "high",   reasoning: "Column header: 'Weight (kg)'" },
+    { key: "disposalRoute", label: "Disposal route",  value: "Composted",              conf: "medium", reasoning: "Contractor field: 'GreenCycle Composting Ltd'" },
+    { key: "contractor",    label: "Contractor",      value: "GreenCycle Composting Ltd", conf: "high", reasoning: "Company name on report letterhead" },
+  ],
+  procurement: [
+    { key: "category",    label: "Scope 3 category",  value: "Cat 1 — Purchased goods & services", conf: "high",   reasoning: "Invoice type: standard goods purchase from supplier" },
+    { key: "vendor",      label: "Vendor",             value: "FreshFoods Distribution Ltd",         conf: "high",   reasoning: "Supplier name on invoice header" },
+    { key: "description", label: "Description",        value: "Monthly food & beverage supplies",    conf: "high",   reasoning: "Line item description field" },
+    { key: "amount",      label: "Amount",             value: "28400",                               conf: "high",   reasoning: "Invoice total extracted" },
+    { key: "unit",        label: "Currency",           value: "USD",                                 conf: "medium", reasoning: "Currency symbol '$' found — assumed USD" },
+    { key: "invoiceRef",  label: "Invoice reference",  value: "FF-2026-04-0112",                    conf: "medium", reasoning: "Invoice number partially obscured" },
+  ],
+  "travel-commute": [
+    { key: "category",  label: "Category",    value: "Cat 6 — Business travel",  conf: "high",   reasoning: "Document title: 'Business Travel Expense Report'" },
+    { key: "mode",      label: "Mode",        value: "Air — long-haul",          conf: "medium", reasoning: "Airline references found — haul classification inferred from route codes" },
+    { key: "period",    label: "Period",      value: "2026-04",                  conf: "high",   reasoning: "Report period stated in header" },
+    { key: "distance",  label: "Distance",    value: "24800",                    conf: "low",    reasoning: "Sum of route distances — verify against booking system" },
+    { key: "unit",      label: "Unit",        value: "pkm",                      conf: "medium", reasoning: "Passenger-km assumed from person × km data" },
+  ],
+  social: [
+    { key: "subType",   label: "Sub-type",    value: "Headcount snapshot",       conf: "high",   reasoning: "Report title: 'Monthly HR Headcount Report'" },
+    { key: "period",    label: "Period",      value: "2026-04",                  conf: "high",   reasoning: "Report date field" },
+    { key: "value",     label: "Value",       value: "248",                      conf: "high",   reasoning: "Total headcount figure on summary page" },
+    { key: "unit",      label: "Unit",        value: "count",                    conf: "high",   reasoning: "Headcount is a count" },
+    { key: "breakdown", label: "Breakdown",   value: "FTE: 198, PTE: 50",        conf: "medium", reasoning: "Sub-totals found on page 2 — verify against HR system" },
+  ],
+  generic: [
+    { key: "period",      label: "Period",      value: "2026-04",                conf: "high",   reasoning: "Date extracted from document header" },
+    { key: "value",       label: "Value",       value: "",                       conf: "low",    reasoning: "Multiple numeric fields found — please enter the correct value" },
+    { key: "description", label: "Description", value: "Extracted from uploaded document", conf: "medium", reasoning: "AI summarised document content" },
+  ],
+};
+
+function AiAssistWorkflow({
+  cfg, onPreview,
+}: {
+  cfg: DataTypeConfig;
+  onPreview: (r: CaptureResult) => void;
+}) {
+  const [phase, setPhase]               = useState<AiPhase>("upload");
+  const [file, setFile]                 = useState<File | null>(null);
+  const [analysisStep, setAnalysisStep] = useState(0);
+  const [qaAnswers, setQaAnswers]       = useState<Record<string, string>>({});
+  const [qaIdx, setQaIdx]               = useState(0);
+  const [editValues, setEditValues]     = useState<Record<string, string>>({});
+  const [properties, setProperties]     = useState<Property[]>([]);
+  const [propertyId, setPropertyId]     = useState<string>("");
+  const dropRef                         = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    listProperties().then((rows) => {
+      setProperties(rows);
+      if (rows[0]) setPropertyId(rows[0].id);
+    });
+  }, []);
+
+  const questions = AI_QUESTIONS[cfg.key] ?? AI_QUESTIONS["generic"];
+  const extracted = AI_EXTRACTED[cfg.key] ?? AI_EXTRACTED["generic"];
+
+  useEffect(() => {
+    if (phase === "extraction") {
+      const initial: Record<string, string> = {};
+      for (const f of extracted) initial[f.key] = f.value;
+      setEditValues(initial);
+    }
+  }, [phase]);
+
+  function startAnalysis(f: File) {
+    setFile(f);
+    setPhase("analyzing");
+    setAnalysisStep(0);
+    ANALYSIS_STEPS.forEach((_, idx) => {
+      setTimeout(() => {
+        setAnalysisStep(idx + 1);
+        if (idx === ANALYSIS_STEPS.length - 1) {
+          setTimeout(() => { setPhase("questions"); setQaIdx(0); }, 600);
+        }
+      }, (idx + 1) * 700);
+    });
+  }
+
+  function handleDrop(e: React.DragEvent) {
+    e.preventDefault();
+    const dropped = e.dataTransfer.files[0];
+    if (dropped) startAnalysis(dropped);
+  }
+
+  function answerQuestion(key: string, answer: string) {
+    setQaAnswers((prev) => ({ ...prev, [key]: answer }));
+    if (qaIdx < questions.length - 1) {
+      setQaIdx((i) => i + 1);
+    } else {
+      setPhase("extraction");
+    }
+  }
+
+  function handleReset() {
+    setPhase("upload");
+    setFile(null);
+    setAnalysisStep(0);
+    setQaAnswers({});
+    setQaIdx(0);
+    setEditValues({});
+  }
+
+  function handleUseData() {
+    const property = properties.find((p) => p.id === propertyId);
+    const displayRows = extracted.map((f) => ({
+      label: f.label,
+      value: editValues[f.key] ?? f.value,
+    }));
+    const lowConfFields = extracted.filter((f) => f.conf !== "high").map((f) => f.label);
+    const anomalies = lowConfFields.length > 0
+      ? [`AI confidence was medium/low on: ${lowConfFields.join(", ")}. Please verify these values.`]
+      : [];
+    onPreview({
+      propertyId,
+      propertyName: property?.name ?? "",
+      currency: getCurrencyFromCountry(property?.country ?? null),
+      values: editValues,
+      files: file ? [file] : [],
+      anomalies,
+      displayRows,
+    });
+  }
+
+  return (
+    <Card>
+      <CardHeader
+        title={`AI Assist — ${cfg.label}`}
+        hint="Drop a file · AI extracts · you review"
+        right={
+          phase !== "upload" ? (
+            <button onClick={handleReset} className="btn-ghost h-7 px-2 text-[12px]">
+              <X size={12} /> Start over
+            </button>
+          ) : undefined
+        }
+      />
+
+      {/* ── Phase 1: Upload ── */}
+      {phase === "upload" && (
+        <div className="p-5 space-y-4">
+          <div className="flex items-start gap-2 rounded-xl bg-brand-50 border border-brand-100 p-3 text-[12px] text-brand-900">
+            <Sparkles size={14} className="text-brand-700 mt-0.5 shrink-0" />
+            <span>
+              Drop any raw file — a PDF bill, Excel report, scanned invoice, or image receipt.
+              AI reads it, extracts relevant fields, asks a couple of clarifying questions,
+              and prepares a preview for your approval.{" "}
+              <strong>Nothing is committed without your review.</strong>
+            </span>
+          </div>
+
+          <div
+            ref={dropRef}
+            onDragOver={(e) => e.preventDefault()}
+            onDrop={handleDrop}
+            onClick={() => {
+              const input = document.createElement("input");
+              input.type = "file";
+              input.accept = ".pdf,.xlsx,.xls,.csv,.doc,.docx,.jpg,.jpeg,.png";
+              input.onchange = () => { if (input.files?.[0]) startAnalysis(input.files[0]); };
+              input.click();
+            }}
+            className="rounded-xl border-2 border-dashed border-brand-200 bg-brand-50/40 p-10 text-center cursor-pointer hover:border-brand-400 hover:bg-brand-50 transition-colors"
+          >
+            <Sparkles size={32} className="mx-auto text-brand-400 mb-3" />
+            <div className="text-sm font-semibold text-ink-700">Drop your file here</div>
+            <div className="text-[12px] text-ink-500 mt-1">or click to browse</div>
+            <div className="flex flex-wrap justify-center gap-2 mt-4">
+              {[
+                { icon: <ScanLine size={12} />, label: "PDF bill" },
+                { icon: <FileSpreadsheet size={12} />, label: "Excel / CSV" },
+                { icon: <ScanLine size={12} />, label: "Scanned invoice" },
+                { icon: <ClipboardEdit size={12} />, label: "Word report" },
+                { icon: <ImageIcon size={12} />, label: "Image / receipt" },
+              ].map((fmt) => (
+                <span
+                  key={fmt.label}
+                  className="chip inline-flex items-center gap-1 rounded-full bg-white border border-ink-200 text-ink-600 text-[11px] px-2 py-1"
+                >
+                  {fmt.icon} {fmt.label}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Phase 2: Analyzing ── */}
+      {phase === "analyzing" && (
+        <div className="p-5 space-y-4">
+          <div className="flex items-center gap-2 text-[13px] text-ink-600">
+            <Sparkles size={16} className="text-brand-600 shrink-0" />
+            <span>Analysing <strong className="text-ink-900">{file?.name}</strong>…</span>
+          </div>
+
+          <div className="space-y-1.5">
+            {ANALYSIS_STEPS.map((step, idx) => {
+              const done   = analysisStep > idx + 1;
+              const active = analysisStep === idx + 1;
+              return (
+                <div
+                  key={step}
+                  className={cn(
+                    "flex items-center gap-3 px-3 py-2 rounded-lg text-[13px] transition-all",
+                    done   && "text-good",
+                    active && "bg-brand-50 border border-brand-100 text-brand-700 font-medium",
+                    !done && !active && "text-ink-400"
+                  )}
+                >
+                  {done
+                    ? <CheckCircle2 size={14} className="shrink-0 text-good" />
+                    : active
+                      ? <Loader2 size={14} className="shrink-0 animate-spin text-brand-600" />
+                      : <span className="w-3.5 h-3.5 rounded-full border border-ink-300 shrink-0" />
+                  }
+                  {step}
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="rounded-xl bg-ink-50 border border-ink-200 p-3 text-[12px] text-ink-500">
+            Processing is on-platform. Your file is not sent to any external service.
+          </div>
+        </div>
+      )}
+
+      {/* ── Phase 3: Chat-style Q&A ── */}
+      {phase === "questions" && (
+        <div className="p-5 space-y-4">
+          <div className="flex items-center gap-2 text-[12px] text-ink-500">
+            <CheckCircle2 size={13} className="text-good shrink-0" />
+            <span>File analysed — <strong className="text-ink-700">{file?.name}</strong></span>
+          </div>
+
+          <div className="space-y-5 max-w-lg">
+            {questions.slice(0, qaIdx + 1).map((qa, idx) => (
+              <div key={qa.key} className="space-y-2">
+                {/* AI bubble */}
+                <div className="flex items-start gap-2">
+                  <div className="w-7 h-7 rounded-full bg-brand-100 grid place-items-center shrink-0 mt-0.5">
+                    <Sparkles size={13} className="text-brand-700" />
+                  </div>
+                  <div className="bg-ink-50 border border-ink-200 rounded-xl rounded-tl-none px-3 py-2 text-[13px] text-ink-800 leading-snug">
+                    {qa.question}
+                  </div>
+                </div>
+
+                {/* User reply (answered) or chip options (current) */}
+                {qaAnswers[qa.key] ? (
+                  <div className="flex justify-end">
+                    <div className="bg-brand-700 text-white rounded-xl rounded-tr-none px-3 py-1.5 text-[13px] max-w-xs">
+                      {qaAnswers[qa.key]}
+                    </div>
+                  </div>
+                ) : idx === qaIdx ? (
+                  <div className="flex flex-wrap gap-2 pl-9">
+                    {qa.chips.map((chip) => (
+                      <button
+                        key={chip}
+                        onClick={() => answerQuestion(qa.key, chip)}
+                        className="chip rounded-full bg-white border border-brand-200 text-brand-700 hover:bg-brand-50 hover:border-brand-400 text-[12px] px-3 py-1.5 transition-colors"
+                      >
+                        {chip}
+                      </button>
+                    ))}
+                  </div>
+                ) : null}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ── Phase 4: Extraction table ── */}
+      {phase === "extraction" && (
+        <div className="p-5 space-y-4">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex items-center gap-2 text-[12px] text-ink-500">
+              <CheckCircle2 size={13} className="text-good shrink-0" />
+              <span>Extraction complete — review and edit before continuing</span>
+            </div>
+            <Field label="Property" required>
+              <select
+                className="input max-w-xs"
+                value={propertyId}
+                onChange={(e) => setPropertyId(e.target.value)}
+              >
+                {properties.map((p) => (
+                  <option key={p.id} value={p.id}>{p.name}</option>
+                ))}
+              </select>
+            </Field>
+          </div>
+
+          <div className="rounded-xl border border-ink-200 overflow-hidden">
+            <table className="min-w-full">
+              <thead className="bg-ink-50">
+                <tr>
+                  <th className="table-th">Field</th>
+                  <th className="table-th">Extracted value</th>
+                  <th className="table-th">Confidence</th>
+                  <th className="table-th">AI reasoning</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-ink-100">
+                {extracted.map((f) => (
+                  <tr
+                    key={f.key}
+                    className={cn(
+                      f.conf === "low"    && "bg-bad/5",
+                      f.conf === "medium" && "bg-warn/5"
+                    )}
+                  >
+                    <td className="table-td font-medium text-ink-800">{f.label}</td>
+                    <td className="table-td">
+                      {f.conf === "high" ? (
+                        <span className="font-medium text-ink-900">{editValues[f.key] ?? f.value}</span>
+                      ) : (
+                        <input
+                          className={cn(
+                            "input h-7 text-[12px] px-2 max-w-[180px]",
+                            f.conf === "low" ? "border-bad/40 bg-bad/5" : "border-warn/40 bg-warn/5"
+                          )}
+                          value={editValues[f.key] ?? f.value}
+                          onChange={(e) => setEditValues((v) => ({ ...v, [f.key]: e.target.value }))}
+                        />
+                      )}
+                    </td>
+                    <td className="table-td">
+                      <Badge tone={f.conf === "high" ? "good" : f.conf === "medium" ? "warn" : "bad"}>
+                        {f.conf === "high" ? "High" : f.conf === "medium" ? "Medium — verify" : "Low — edit"}
+                      </Badge>
+                    </td>
+                    <td className="table-td text-[11px] text-ink-500 max-w-[220px] leading-snug">
+                      {f.reasoning}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="flex items-center gap-2 rounded-xl bg-brand-50 border border-brand-100 p-3 text-[12px] text-brand-900">
+            <Sparkles size={13} className="text-brand-700 shrink-0" />
+            Medium and low confidence fields are editable above. All fields can be updated in the preview step before submission.
+          </div>
+
+          <div className="flex items-center justify-end gap-2">
+            <button onClick={handleUseData} className="btn-primary">
+              Use this data <ArrowRight size={14} />
+            </button>
+          </div>
         </div>
       )}
     </Card>

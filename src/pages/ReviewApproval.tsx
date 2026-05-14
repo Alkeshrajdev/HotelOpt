@@ -37,6 +37,7 @@ import {
   Image as ImageIcon,
   Link2,
   Lock,
+  Mail,
   MessageCircle,
   Pencil,
   Search,
@@ -68,6 +69,63 @@ import {
 import { cn } from "@/lib/utils";
 
 type DetailTab = "details" | "evidence" | "comments" | "ai-ocr" | "audit";
+type PageTab = "queue" | "status";
+
+/* ------------------------------------------------------------------ */
+/* Capture Status types & mock data                                     */
+/* ------------------------------------------------------------------ */
+type CaptureStatus = "approved" | "pending" | "draft" | "missing" | "na";
+
+type StatusRow = {
+  dataType: string;
+  key: string;
+  pillar: string;
+  responsible: { name: string; email: string; role: string };
+  cells: Record<string, CaptureStatus>;
+};
+
+const STATUS_MONTHS = ["2025-11", "2025-12", "2026-01", "2026-02", "2026-03", "2026-04"];
+const STATUS_MONTH_LABELS: Record<string, string> = {
+  "2025-11": "Nov '25",
+  "2025-12": "Dec '25",
+  "2026-01": "Jan '26",
+  "2026-02": "Feb '26",
+  "2026-03": "Mar '26",
+  "2026-04": "Apr '26",
+};
+
+const STATUS_MOCK: Record<string, StatusRow[]> = {
+  "Greenview Resort": [
+    { dataType: "Electricity", key: "electricity", pillar: "Energy", responsible: { name: "Priya Nair", email: "priya.nair@greenview.com", role: "Property Manager" }, cells: { "2025-11": "approved", "2025-12": "approved", "2026-01": "approved", "2026-02": "pending", "2026-03": "draft", "2026-04": "missing" } },
+    { dataType: "Natural Gas", key: "gas", pillar: "Energy", responsible: { name: "Priya Nair", email: "priya.nair@greenview.com", role: "Property Manager" }, cells: { "2025-11": "approved", "2025-12": "approved", "2026-01": "approved", "2026-02": "approved", "2026-03": "missing", "2026-04": "missing" } },
+    { dataType: "Water", key: "water", pillar: "Water", responsible: { name: "Rahul Mehta", email: "rahul.mehta@greenview.com", role: "Facilities Lead" }, cells: { "2025-11": "approved", "2025-12": "approved", "2026-01": "pending", "2026-02": "missing", "2026-03": "missing", "2026-04": "missing" } },
+    { dataType: "General Waste", key: "waste-general", pillar: "Waste", responsible: { name: "Rahul Mehta", email: "rahul.mehta@greenview.com", role: "Facilities Lead" }, cells: { "2025-11": "approved", "2025-12": "approved", "2026-01": "approved", "2026-02": "draft", "2026-03": "missing", "2026-04": "missing" } },
+    { dataType: "Recycled Waste", key: "waste-recycle", pillar: "Waste", responsible: { name: "Rahul Mehta", email: "rahul.mehta@greenview.com", role: "Facilities Lead" }, cells: { "2025-11": "approved", "2025-12": "approved", "2026-01": "approved", "2026-02": "approved", "2026-03": "missing", "2026-04": "missing" } },
+    { dataType: "Refrigerant", key: "refrigerant", pillar: "Carbon", responsible: { name: "Priya Nair", email: "priya.nair@greenview.com", role: "Property Manager" }, cells: { "2025-11": "approved", "2025-12": "missing", "2026-01": "missing", "2026-02": "missing", "2026-03": "missing", "2026-04": "missing" } },
+    { dataType: "Headcount", key: "headcount", pillar: "Social", responsible: { name: "Anita Roy", email: "anita.roy@greenview.com", role: "HR Manager" }, cells: { "2025-11": "approved", "2025-12": "approved", "2026-01": "approved", "2026-02": "approved", "2026-03": "approved", "2026-04": "pending" } },
+    { dataType: "Training Hours", key: "training", pillar: "Social", responsible: { name: "Anita Roy", email: "anita.roy@greenview.com", role: "HR Manager" }, cells: { "2025-11": "approved", "2025-12": "approved", "2026-01": "approved", "2026-02": "approved", "2026-03": "missing", "2026-04": "missing" } },
+  ],
+  "Blue Horizon Hotel": [
+    { dataType: "Electricity", key: "electricity", pillar: "Energy", responsible: { name: "James Okafor", email: "james.okafor@bluehorizon.com", role: "Property Manager" }, cells: { "2025-11": "approved", "2025-12": "approved", "2026-01": "approved", "2026-02": "approved", "2026-03": "approved", "2026-04": "draft" } },
+    { dataType: "Natural Gas", key: "gas", pillar: "Energy", responsible: { name: "James Okafor", email: "james.okafor@bluehorizon.com", role: "Property Manager" }, cells: { "2025-11": "approved", "2025-12": "approved", "2026-01": "approved", "2026-02": "approved", "2026-03": "draft", "2026-04": "missing" } },
+    { dataType: "Water", key: "water", pillar: "Water", responsible: { name: "Sophie Laurent", email: "sophie.laurent@bluehorizon.com", role: "Facilities Lead" }, cells: { "2025-11": "approved", "2025-12": "approved", "2026-01": "approved", "2026-02": "approved", "2026-03": "approved", "2026-04": "approved" } },
+    { dataType: "General Waste", key: "waste-general", pillar: "Waste", responsible: { name: "Sophie Laurent", email: "sophie.laurent@bluehorizon.com", role: "Facilities Lead" }, cells: { "2025-11": "approved", "2025-12": "approved", "2026-01": "approved", "2026-02": "approved", "2026-03": "missing", "2026-04": "missing" } },
+    { dataType: "Recycled Waste", key: "waste-recycle", pillar: "Waste", responsible: { name: "Sophie Laurent", email: "sophie.laurent@bluehorizon.com", role: "Facilities Lead" }, cells: { "2025-11": "approved", "2025-12": "approved", "2026-01": "approved", "2026-02": "approved", "2026-03": "approved", "2026-04": "missing" } },
+    { dataType: "Refrigerant", key: "refrigerant", pillar: "Carbon", responsible: { name: "James Okafor", email: "james.okafor@bluehorizon.com", role: "Property Manager" }, cells: { "2025-11": "approved", "2025-12": "approved", "2026-01": "approved", "2026-02": "approved", "2026-03": "approved", "2026-04": "na" } },
+    { dataType: "Headcount", key: "headcount", pillar: "Social", responsible: { name: "Fatima Al-Rashid", email: "fatima.alrashid@bluehorizon.com", role: "HR Manager" }, cells: { "2025-11": "approved", "2025-12": "approved", "2026-01": "approved", "2026-02": "approved", "2026-03": "approved", "2026-04": "approved" } },
+    { dataType: "Training Hours", key: "training", pillar: "Social", responsible: { name: "Fatima Al-Rashid", email: "fatima.alrashid@bluehorizon.com", role: "HR Manager" }, cells: { "2025-11": "approved", "2025-12": "approved", "2026-01": "approved", "2026-02": "approved", "2026-03": "pending", "2026-04": "missing" } },
+  ],
+  "Palm Residences": [
+    { dataType: "Electricity", key: "electricity", pillar: "Energy", responsible: { name: "Carlos Mendoza", email: "carlos.mendoza@palmresidences.com", role: "Property Manager" }, cells: { "2025-11": "approved", "2025-12": "approved", "2026-01": "missing", "2026-02": "missing", "2026-03": "missing", "2026-04": "missing" } },
+    { dataType: "Natural Gas", key: "gas", pillar: "Energy", responsible: { name: "Carlos Mendoza", email: "carlos.mendoza@palmresidences.com", role: "Property Manager" }, cells: { "2025-11": "approved", "2025-12": "na", "2026-01": "na", "2026-02": "na", "2026-03": "na", "2026-04": "na" } },
+    { dataType: "Water", key: "water", pillar: "Water", responsible: { name: "Yuki Tanaka", email: "yuki.tanaka@palmresidences.com", role: "Facilities Lead" }, cells: { "2025-11": "approved", "2025-12": "approved", "2026-01": "approved", "2026-02": "draft", "2026-03": "missing", "2026-04": "missing" } },
+    { dataType: "General Waste", key: "waste-general", pillar: "Waste", responsible: { name: "Yuki Tanaka", email: "yuki.tanaka@palmresidences.com", role: "Facilities Lead" }, cells: { "2025-11": "approved", "2025-12": "approved", "2026-01": "missing", "2026-02": "missing", "2026-03": "missing", "2026-04": "missing" } },
+    { dataType: "Recycled Waste", key: "waste-recycle", pillar: "Waste", responsible: { name: "Yuki Tanaka", email: "yuki.tanaka@palmresidences.com", role: "Facilities Lead" }, cells: { "2025-11": "approved", "2025-12": "approved", "2026-01": "approved", "2026-02": "missing", "2026-03": "missing", "2026-04": "missing" } },
+    { dataType: "Refrigerant", key: "refrigerant", pillar: "Carbon", responsible: { name: "Carlos Mendoza", email: "carlos.mendoza@palmresidences.com", role: "Property Manager" }, cells: { "2025-11": "approved", "2025-12": "missing", "2026-01": "missing", "2026-02": "missing", "2026-03": "missing", "2026-04": "missing" } },
+    { dataType: "Headcount", key: "headcount", pillar: "Social", responsible: { name: "Nina Patel", email: "nina.patel@palmresidences.com", role: "HR Manager" }, cells: { "2025-11": "approved", "2025-12": "approved", "2026-01": "approved", "2026-02": "approved", "2026-03": "approved", "2026-04": "pending" } },
+    { dataType: "Training Hours", key: "training", pillar: "Social", responsible: { name: "Nina Patel", email: "nina.patel@palmresidences.com", role: "HR Manager" }, cells: { "2025-11": "approved", "2025-12": "approved", "2026-01": "missing", "2026-02": "missing", "2026-03": "missing", "2026-04": "missing" } },
+  ],
+};
 
 type FilterState = {
   search: string;
@@ -103,6 +161,7 @@ export default function ReviewApproval() {
   });
   const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
   const [tab, setTab] = useState<DetailTab>("details");
+  const [pageTab, setPageTab] = useState<PageTab>("queue");
 
   const properties = useMemo(
     () => Array.from(new Set(INITIAL_RECORDS.map((r) => r.property))).sort(),
@@ -267,6 +326,27 @@ export default function ReviewApproval() {
         }
       />
 
+      {/* Page-level tab strip */}
+      <div className="flex gap-0.5 border-b border-ink-100 -mt-1">
+        {([["queue", "Approval Queue"], ["status", "Capture Status"]] as const).map(([key, label]) => (
+          <button
+            key={key}
+            onClick={() => setPageTab(key)}
+            className={cn(
+              "px-4 py-2.5 text-[13px] font-medium border-b-2 -mb-px whitespace-nowrap transition-colors",
+              pageTab === key
+                ? "border-brand-600 text-brand-700"
+                : "border-transparent text-ink-500 hover:text-ink-800 hover:border-ink-200"
+            )}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {pageTab === "status" && <CaptureStatusTab />}
+
+      {pageTab === "queue" && <>
       {/* Summary cards */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
         <SummaryCard label="Pending review" value={summary.pending} icon={<Clock size={14} />} tone="warn"  onClick={() => setFilters((f) => ({ ...f, status: "submitted" }))} active={filters.status === "submitted"} />
@@ -446,6 +526,277 @@ export default function ReviewApproval() {
         onClose={() => setDialog({ open: false, action: "approve" })}
         onConfirm={(c) => transition(dialog.action, c)}
       />
+      </>}
+    </div>
+  );
+}
+
+/* =================================================================== */
+/* Capture Status Tab                                                   */
+/* =================================================================== */
+
+function CaptureStatusChip({ status }: { status: CaptureStatus }) {
+  if (status === "approved") return <span className="inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[11px] font-medium bg-good/10 text-good"><CheckCircle2 size={10} />Approved</span>;
+  if (status === "pending")  return <span className="inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[11px] font-medium bg-warn/10 text-amber-700"><Clock size={10} />Pending</span>;
+  if (status === "draft")    return <span className="inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[11px] font-medium bg-brand-50 text-brand-700"><Pencil size={10} />Draft</span>;
+  if (status === "missing")  return <span className="inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[11px] font-medium bg-bad/10 text-bad"><AlertTriangle size={10} />Missing</span>;
+  return <span className="inline-flex rounded-md px-2 py-0.5 text-[11px] font-medium bg-ink-100 text-ink-400">N/A</span>;
+}
+
+type ReminderGroup = {
+  responsible: { name: string; email: string; role: string };
+  items: { dataType: string; months: string[] }[];
+};
+
+function ReminderModal({
+  property,
+  groups,
+  onClose,
+}: {
+  property: string;
+  groups: ReminderGroup[];
+  onClose: () => void;
+}) {
+  const [sent, setSent] = useState(false);
+  const [bodies, setBodies] = useState<Record<string, string>>(() => {
+    const init: Record<string, string> = {};
+    for (const g of groups) {
+      const missing = g.items.map((i) => `  • ${i.dataType} — ${i.months.join(", ")}`).join("\n");
+      init[g.responsible.email] =
+        `Hi ${g.responsible.name.split(" ")[0]},\n\nWe noticed the following data entries are still missing for ${property}:\n\n${missing}\n\nCould you please submit or clarify these by end of week?\n\nThank you,\nSustainability Team`;
+    }
+    return init;
+  });
+  const [activeEmail, setActiveEmail] = useState(groups[0]?.responsible.email ?? "");
+
+  if (sent) {
+    return (
+      <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
+        <div className="bg-white rounded-2xl shadow-pop max-w-sm w-full p-8 text-center space-y-4">
+          <div className="w-12 h-12 rounded-full bg-good/10 grid place-items-center mx-auto">
+            <CheckCircle2 size={22} className="text-good" />
+          </div>
+          <div>
+            <h3 className="font-bold text-ink-900 text-base">Reminders sent</h3>
+            <p className="text-[13px] text-ink-500 mt-1">{groups.length} email{groups.length > 1 ? "s" : ""} dispatched to responsible contacts.</p>
+          </div>
+          <button onClick={onClose} className="btn-primary w-full">Done</button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl shadow-pop max-w-2xl w-full max-h-[88vh] flex flex-col overflow-hidden">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-ink-200 shrink-0">
+          <div>
+            <h3 className="font-bold text-ink-900 text-base">Send data reminders</h3>
+            <p className="text-[12px] text-ink-500 mt-0.5">{groups.length} responsible contact{groups.length > 1 ? "s" : ""} · {property}</p>
+          </div>
+          <button onClick={onClose} className="w-7 h-7 grid place-items-center rounded-lg hover:bg-ink-100"><X size={14} /></button>
+        </div>
+
+        <div className="flex flex-1 overflow-hidden">
+          {/* Left: person list */}
+          <div className="w-48 shrink-0 border-r border-ink-200 overflow-y-auto">
+            {groups.map((g) => (
+              <button
+                key={g.responsible.email}
+                onClick={() => setActiveEmail(g.responsible.email)}
+                className={cn(
+                  "w-full text-left px-3 py-3 border-b border-ink-100 transition-colors",
+                  activeEmail === g.responsible.email ? "bg-brand-50" : "hover:bg-ink-50"
+                )}
+              >
+                <div className="text-[12px] font-semibold text-ink-900 truncate">{g.responsible.name}</div>
+                <div className="text-[11px] text-ink-500 truncate">{g.responsible.role}</div>
+                <div className="text-[11px] text-ink-400 truncate mt-0.5">{g.items.length} item{g.items.length > 1 ? "s" : ""} missing</div>
+              </button>
+            ))}
+          </div>
+
+          {/* Right: email editor */}
+          <div className="flex-1 flex flex-col overflow-hidden p-4 gap-3">
+            {(() => {
+              const g = groups.find((x) => x.responsible.email === activeEmail)!;
+              if (!g) return null;
+              return (
+                <>
+                  <div className="flex items-center gap-2 text-[12px] text-ink-600">
+                    <Mail size={13} className="text-ink-400" />
+                    <span className="font-medium">{g.responsible.email}</span>
+                    <span className="ml-auto text-ink-400">{g.items.length} item{g.items.length > 1 ? "s" : ""}</span>
+                  </div>
+                  <div className="rounded-xl border border-ink-200 bg-ink-50 px-3 py-2">
+                    <div className="text-[11px] font-semibold text-ink-500 mb-1">Missing items</div>
+                    <ul className="space-y-1">
+                      {g.items.map((item) => (
+                        <li key={item.dataType} className="text-[12px] text-ink-700 flex items-center gap-2">
+                          <AlertTriangle size={10} className="text-bad shrink-0" />
+                          <span className="font-medium">{item.dataType}</span>
+                          <span className="text-ink-400">— {item.months.join(", ")}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  <textarea
+                    className="input flex-1 min-h-[180px] py-2 font-mono text-[12px] resize-none"
+                    value={bodies[activeEmail]}
+                    onChange={(e) => setBodies((b) => ({ ...b, [activeEmail]: e.target.value }))}
+                  />
+                </>
+              );
+            })()}
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between px-5 py-3 border-t border-ink-200 shrink-0">
+          <span className="text-[12px] text-ink-500">{groups.length} email{groups.length > 1 ? "s" : ""} will be sent</span>
+          <div className="flex gap-2">
+            <button onClick={onClose} className="btn-secondary">Cancel</button>
+            <button onClick={() => setSent(true)} className="btn-primary">
+              <Mail size={14} /> Send reminders
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function CaptureStatusTab() {
+  const propertyNames = Object.keys(STATUS_MOCK);
+  const [property, setProperty] = useState(propertyNames[0]);
+  const [reminderOpen, setReminderOpen] = useState(false);
+
+  const rows = STATUS_MOCK[property] ?? [];
+
+  const totalCells = rows.length * STATUS_MONTHS.length;
+  const approved  = rows.reduce((n, r) => n + Object.values(r.cells).filter((s) => s === "approved").length, 0);
+  const missing   = rows.reduce((n, r) => n + Object.values(r.cells).filter((s) => s === "missing").length, 0);
+  const pending   = rows.reduce((n, r) => n + Object.values(r.cells).filter((s) => s === "pending" || s === "draft").length, 0);
+
+  // Build reminder groups: group missing items by responsible email
+  const reminderGroups: ReminderGroup[] = useMemo(() => {
+    const map = new Map<string, ReminderGroup>();
+    for (const row of rows) {
+      const missingMonths = STATUS_MONTHS.filter((m) => row.cells[m] === "missing").map((m) => STATUS_MONTH_LABELS[m]);
+      if (missingMonths.length === 0) continue;
+      const email = row.responsible.email;
+      if (!map.has(email)) {
+        map.set(email, { responsible: row.responsible, items: [] });
+      }
+      map.get(email)!.items.push({ dataType: row.dataType, months: missingMonths });
+    }
+    return Array.from(map.values());
+  }, [rows]);
+
+  return (
+    <div className="space-y-4">
+      {/* Summary strip */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div className="rounded-xl border border-ink-200 bg-white p-3">
+          <div className="text-[11px] text-ink-500 mb-1">Coverage</div>
+          <div className="text-xl font-bold text-ink-900">{Math.round((approved / (totalCells || 1)) * 100)}%</div>
+          <div className="text-[11px] text-ink-400">{approved}/{totalCells} cells approved</div>
+        </div>
+        <div className="rounded-xl border border-bad/25 bg-bad/5 p-3">
+          <div className="text-[11px] text-bad mb-1">Missing</div>
+          <div className="text-xl font-bold text-bad">{missing}</div>
+          <div className="text-[11px] text-bad/70">entries not submitted</div>
+        </div>
+        <div className="rounded-xl border border-warn/25 bg-warn/5 p-3">
+          <div className="text-[11px] text-amber-700 mb-1">In progress</div>
+          <div className="text-xl font-bold text-amber-700">{pending}</div>
+          <div className="text-[11px] text-amber-600/70">pending or draft</div>
+        </div>
+        <div className="rounded-xl border border-ink-200 bg-white p-3 flex flex-col justify-between">
+          <div className="text-[11px] text-ink-500 mb-1">Contacts to remind</div>
+          <div className="text-xl font-bold text-ink-900">{reminderGroups.length}</div>
+          <button
+            disabled={reminderGroups.length === 0}
+            onClick={() => setReminderOpen(true)}
+            className="btn-primary text-[12px] mt-2 disabled:opacity-40"
+          >
+            <Mail size={13} /> Send reminders
+          </button>
+        </div>
+      </div>
+
+      {/* Property picker */}
+      <div className="flex items-center gap-3">
+        <div className="text-[12px] font-medium text-ink-600">Property</div>
+        <div className="flex gap-1 flex-wrap">
+          {propertyNames.map((p) => (
+            <button
+              key={p}
+              onClick={() => setProperty(p)}
+              className={cn(
+                "px-3 py-1.5 rounded-lg text-[12px] font-medium transition-colors border",
+                property === p
+                  ? "bg-brand-600 text-white border-brand-600"
+                  : "bg-white text-ink-600 border-ink-200 hover:border-brand-300 hover:text-brand-700"
+              )}
+            >
+              {p}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Legend */}
+      <div className="flex flex-wrap gap-3 text-[11px]">
+        {([["approved", "Approved"], ["pending", "Pending review"], ["draft", "Draft"], ["missing", "Missing"], ["na", "Not applicable"]] as [CaptureStatus, string][]).map(([s, label]) => (
+          <div key={s} className="flex items-center gap-1.5">
+            <CaptureStatusChip status={s} />
+            <span className="text-ink-500">{label}</span>
+          </div>
+        ))}
+      </div>
+
+      {/* Matrix grid */}
+      <div className="rounded-xl border border-ink-200 overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="min-w-full text-[12px]">
+            <thead>
+              <tr className="bg-ink-50 border-b border-ink-200">
+                <th className="text-left px-4 py-2.5 font-semibold text-ink-700 min-w-[160px]">Data type</th>
+                <th className="text-left px-3 py-2.5 font-semibold text-ink-700 min-w-[100px]">Pillar</th>
+                <th className="text-left px-3 py-2.5 font-semibold text-ink-700 min-w-[140px]">Responsible</th>
+                {STATUS_MONTHS.map((m) => (
+                  <th key={m} className="text-center px-2 py-2.5 font-semibold text-ink-700 min-w-[100px]">{STATUS_MONTH_LABELS[m]}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-ink-100">
+              {rows.map((row) => (
+                <tr key={row.key} className="hover:bg-ink-50/50">
+                  <td className="px-4 py-2.5 font-medium text-ink-900">{row.dataType}</td>
+                  <td className="px-3 py-2.5 text-ink-500">{row.pillar}</td>
+                  <td className="px-3 py-2.5">
+                    <div className="font-medium text-ink-800">{row.responsible.name}</div>
+                    <div className="text-[11px] text-ink-400">{row.responsible.role}</div>
+                  </td>
+                  {STATUS_MONTHS.map((m) => (
+                    <td key={m} className="px-2 py-2.5 text-center">
+                      <CaptureStatusChip status={row.cells[m] ?? "missing"} />
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {reminderOpen && (
+        <ReminderModal
+          property={property}
+          groups={reminderGroups}
+          onClose={() => setReminderOpen(false)}
+        />
+      )}
     </div>
   );
 }

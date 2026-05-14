@@ -18,7 +18,7 @@ import {
   Zap,
 } from "lucide-react";
 
-export type Method = "manual" | "ocr" | "bulk" | "qr" | "api" | "survey";
+export type Method = "manual" | "ocr" | "bulk" | "qr" | "api" | "survey" | "ai-assist";
 export type ConnectionStatus = "active" | "configured" | "not-configured" | "action-needed" | "optional";
 
 export type DataTypeKey =
@@ -115,7 +115,7 @@ export const DATA_TYPES: DataTypeConfig[] = [
     icon: Zap,
     iconBg: "bg-pillar-energy/10 text-pillar-energy",
     pillar: "energy",
-    methods: ["manual", "ocr", "bulk", "api"],
+    methods: ["manual", "ocr", "bulk", "api", "ai-assist"],
     brdRef: "FR-1.2.1",
     fields: [
       {
@@ -162,7 +162,7 @@ export const DATA_TYPES: DataTypeConfig[] = [
     icon: Droplet,
     iconBg: "bg-info/10 text-info",
     pillar: "water",
-    methods: ["manual", "ocr", "bulk", "api"],
+    methods: ["manual", "ocr", "bulk", "api", "ai-assist"],
     brdRef: "FR-1.2.2",
     fields: [
       {
@@ -202,7 +202,7 @@ export const DATA_TYPES: DataTypeConfig[] = [
     icon: Recycle,
     iconBg: "bg-pillar-waste/10 text-pillar-waste",
     pillar: "waste",
-    methods: ["manual", "bulk", "qr", "api"],
+    methods: ["manual", "bulk", "qr", "api", "ai-assist"],
     brdRef: "FR-1.2.3",
     fields: [
       {
@@ -275,7 +275,7 @@ export const DATA_TYPES: DataTypeConfig[] = [
     icon: Truck,
     iconBg: "bg-pillar-social/10 text-pillar-social",
     pillar: "carbon",
-    methods: ["manual", "ocr", "bulk", "api", "survey"],
+    methods: ["manual", "ocr", "bulk", "api", "survey", "ai-assist"],
     brdRef: "FR-1.2.5",
     fields: [
       {
@@ -315,7 +315,7 @@ export const DATA_TYPES: DataTypeConfig[] = [
     icon: Plane,
     iconBg: "bg-indigo-50 text-indigo-700",
     pillar: "carbon",
-    methods: ["manual", "ocr", "bulk", "api", "survey"],
+    methods: ["manual", "ocr", "bulk", "api", "survey", "ai-assist"],
     brdRef: "FR-1.2.5",
     fields: [
       {
@@ -450,7 +450,7 @@ export const DATA_TYPES: DataTypeConfig[] = [
     icon: Users,
     iconBg: "bg-pillar-social/10 text-pillar-social",
     pillar: "social",
-    methods: ["manual", "bulk", "api", "survey"],
+    methods: ["manual", "bulk", "api", "survey", "ai-assist"],
     brdRef: "FR-1.2.8 / 9 / 10 / 11 / 12",
     fields: [
       {
@@ -567,12 +567,13 @@ export const METHOD_META: Record<
   Method,
   { label: string; description: string; brdRef: string }
 > = {
-  manual: { label: "Manual entry",          description: "Always available — DP-02. Form-based input.",                          brdRef: "FR-1.2" },
-  ocr:    { label: "OCR — bills & invoices", description: "Upload JPG / PNG / PDF. Confidence scores per field. Edit and submit.", brdRef: "FR-1.3" },
-  bulk:   { label: "Bulk CSV / Excel",       description: "Download template, validate row-by-row, all-or-none commit.",          brdRef: "FR-1.4" },
-  qr:     { label: "QR scan",                description: "Mobile-first. Sub-30s flow with offline queue.",                       brdRef: "FR-1.5" },
-  api:    { label: "API integrations",       description: "PMS, BMS, accounting, HR, weather, hauler.",                           brdRef: "FR-1.7" },
-  survey: { label: "Surveys",                description: "Supplier, employee, guest. Pre-populates the entry form.",             brdRef: "FR-1.6" },
+  manual:     { label: "Manual entry",          description: "Always available — DP-02. Form-based input.",                          brdRef: "FR-1.2" },
+  ocr:        { label: "OCR — bills & invoices", description: "Upload JPG / PNG / PDF. Confidence scores per field. Edit and submit.", brdRef: "FR-1.3" },
+  bulk:       { label: "Bulk CSV / Excel",       description: "Download template, validate row-by-row, all-or-none commit.",          brdRef: "FR-1.4" },
+  qr:         { label: "QR scan",                description: "Mobile-first. Sub-30s flow with offline queue.",                       brdRef: "FR-1.5" },
+  api:        { label: "API integrations",       description: "PMS, BMS, accounting, HR, weather, hauler.",                           brdRef: "FR-1.7" },
+  survey:     { label: "Surveys",                description: "Supplier, employee, guest. Pre-populates the entry form.",             brdRef: "FR-1.6" },
+  "ai-assist": { label: "AI Assist",             description: "Drop any raw file — bill, invoice, report, receipt. AI extracts the data, asks clarifying questions, and prepares a preview.", brdRef: "FR-1.8" },
 };
 
 /* =================================================================== */
