@@ -24,6 +24,7 @@ import ExternalView from "./External";
 import CarbonInventoryView from "./CarbonInventory";
 import DataQualityView from "./DataQuality";
 import EvidenceView from "./Evidence";
+import EnergyOverviewView from "./EnergyOverview";
 import EnergyPerformanceView from "./EnergyPerformance";
 import EnergyByPropertyView from "./EnergyByProperty";
 import EnergyBenchmarksView from "./EnergyBenchmarks";
@@ -194,7 +195,8 @@ export default function PerformanceShell() {
       </div>
 
       {/* View body */}
-      {view === "overview"           && <OverviewView pillar={pillar} />}
+      {view === "overview"           && pillar === "energy" && <EnergyOverviewView />}
+      {view === "overview"           && pillar !== "energy" && <OverviewView pillar={pillar} />}
       {view === "performance"        && <EnergyPerformanceView />}
       {view === "by-property"        && <EnergyByPropertyView />}
       {view === "benchmarks"         && <EnergyBenchmarksView />}
