@@ -137,25 +137,23 @@ export default function Sidebar({ collapsed, onToggle }: Props) {
 
       {/* ── Brand + client context ── */}
       <div className="shrink-0 border-b sidebar-divider">
-        <div className={cn("flex items-center", collapsed ? "h-16 justify-center px-2" : "h-16 px-4")}>
+        <div className={cn("flex items-center", collapsed ? "h-16 justify-center px-2" : "h-14 px-3")}>
           {collapsed ? (
-            /* Collapsed: small square logo mark */
-            <div className="w-9 h-9 rounded-xl bg-white grid place-items-center shadow-sm shrink-0 overflow-hidden">
+            /* Collapsed: just the icon portion of the dark logo */
+            <div className="w-9 h-9 rounded-xl shrink-0 overflow-hidden">
               <img
-                src="/Logo.png"
+                src="/LogoDark.png"
                 alt="Hotel Optimizer"
-                className="w-full h-full object-cover object-top"
+                className="w-[200%] h-full object-cover object-left"
               />
             </div>
           ) : (
-            /* Expanded: full logo on white pill */
-            <div className="rounded-xl bg-white px-3 py-1.5 shadow-sm">
-              <img
-                src="/Logo.png"
-                alt="Hotel Optimizer"
-                className="h-9 w-auto object-contain"
-              />
-            </div>
+            /* Expanded: dark logo blends with sidebar background — no container needed */
+            <img
+              src="/LogoDark.png"
+              alt="Hotel Optimizer"
+              className="h-10 w-auto object-contain"
+            />
           )}
         </div>
 

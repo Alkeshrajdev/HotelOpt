@@ -31,9 +31,8 @@ export default function Login() {
       {/* Left visual panel */}
       <div className="hidden lg:flex flex-col justify-between p-10 bg-gradient-to-br from-brand-700 to-brand-900 text-white">
         <div>
-          <div className="inline-block rounded-2xl bg-white px-4 py-2.5 shadow-sm">
-            <img src="/Logo.png" alt="Hotel Optimizer" className="h-10 w-auto object-contain" />
-          </div>
+          {/* Dark logo (white on green) — blends with the dark panel */}
+          <img src="/LogoDark.png" alt="Hotel Optimizer" className="h-12 w-auto object-contain" />
         </div>
         <div>
           <div className="text-[13px] uppercase tracking-widest opacity-80">
@@ -52,6 +51,9 @@ export default function Login() {
       {/* Right form */}
       <div className="flex items-center justify-center p-6">
         <div className="w-full max-w-sm">
+
+          {/* Light coloured logo — visible on mobile where left panel is hidden */}
+          <img src="/LogoLight.png" alt="Hotel Optimizer" className="h-10 w-auto object-contain mb-6 lg:hidden" />
 
           <form onSubmit={onSubmit}>
             <h1 className="text-2xl font-extrabold text-ink-900">Sign in</h1>
