@@ -1,6 +1,6 @@
 import { FormEvent, useState } from "react";
 import { Navigate, useLocation } from "react-router-dom";
-import { Leaf, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 
 export default function Login() {
@@ -30,13 +30,9 @@ export default function Login() {
     <div className="min-h-screen grid lg:grid-cols-2 bg-ink-50">
       {/* Left visual panel */}
       <div className="hidden lg:flex flex-col justify-between p-10 bg-gradient-to-br from-brand-700 to-brand-900 text-white">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-white/15 grid place-items-center">
-            <Leaf size={20} />
-          </div>
-          <div className="leading-tight">
-            <div className="text-[15px] font-extrabold tracking-tight">HOTEL</div>
-            <div className="text-[15px] font-extrabold -mt-1 tracking-tight">OPTIMIZER</div>
+        <div>
+          <div className="inline-block rounded-2xl bg-white px-4 py-2.5 shadow-sm">
+            <img src="/logo.png" alt="Hotel Optimizer" className="h-10 w-auto object-contain" />
           </div>
         </div>
         <div>

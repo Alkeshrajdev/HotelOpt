@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
-import { Building2, ChevronLeft, ChevronRight, Leaf } from "lucide-react";
+import { Building2, ChevronLeft, ChevronRight } from "lucide-react";
 import { NAV } from "@/lib/nav";
 import type { NavGroup, NavItem, Role } from "@/lib/nav";
 import { useAuth } from "@/lib/auth";
@@ -137,14 +137,24 @@ export default function Sidebar({ collapsed, onToggle }: Props) {
 
       {/* ── Brand + client context ── */}
       <div className="shrink-0 border-b sidebar-divider">
-        <div className="h-16 flex items-center px-4 gap-2.5">
-          <div className="w-9 h-9 rounded-xl bg-white/10 ring-1 ring-white/10 grid place-items-center text-white shadow-sm shrink-0">
-            <Leaf size={18} />
-          </div>
-          {!collapsed && (
-            <div className="leading-tight min-w-0">
-              <div className="text-[15px] font-extrabold text-white tracking-tight">HOTEL</div>
-              <div className="text-[15px] font-extrabold text-white -mt-1 tracking-tight">OPTIMIZER</div>
+        <div className={cn("flex items-center", collapsed ? "h-16 justify-center px-2" : "h-16 px-4")}>
+          {collapsed ? (
+            /* Collapsed: small square logo mark */
+            <div className="w-9 h-9 rounded-xl bg-white grid place-items-center shadow-sm shrink-0 overflow-hidden">
+              <img
+                src="/logo.png"
+                alt="Hotel Optimizer"
+                className="w-full h-full object-cover object-top"
+              />
+            </div>
+          ) : (
+            /* Expanded: full logo on white pill */
+            <div className="rounded-xl bg-white px-3 py-1.5 shadow-sm">
+              <img
+                src="/logo.png"
+                alt="Hotel Optimizer"
+                className="h-9 w-auto object-contain"
+              />
             </div>
           )}
         </div>
