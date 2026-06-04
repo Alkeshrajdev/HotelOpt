@@ -137,34 +137,26 @@ export default function Sidebar({ collapsed, onToggle }: Props) {
 
       {/* ── Brand + client context ── */}
       <div className="shrink-0 border-b sidebar-divider">
-        <div className={cn("flex items-center justify-center", collapsed ? "h-16 px-2" : "px-3 pt-4 pb-3")}>
-          {collapsed ? (
-            /* Collapsed: compact square badge */
-            <div className="w-10 h-10 rounded-xl shrink-0 overflow-hidden">
-              <img src="/LogoDark.png" alt="Hotel Optimizer" className="w-full h-full object-cover" />
+        {/* Logo text — styled to match logo typography */}
+        <div className={cn("flex items-center gap-2.5", collapsed ? "h-16 justify-center px-2" : "h-16 px-4")}>
+          {/* Icon badge — small building mark */}
+          <div className="w-8 h-8 rounded-lg bg-white/12 grid place-items-center shrink-0">
+            <Building2 size={15} className="text-white" />
+          </div>
+          {!collapsed && (
+            <div className="leading-none min-w-0">
+              {/* "HOTEL" — bold, white, like the logo's primary wordmark */}
+              <div className="text-[15px] font-extrabold text-white tracking-widest uppercase">Hotel</div>
+              {/* "OPTIMIZER" — lighter, muted, like the logo's secondary line */}
+              <div className="text-[11px] font-medium text-white/55 tracking-[0.2em] uppercase mt-0.5">Optimizer</div>
             </div>
-          ) : (
-            /* Expanded: large square logo — image is square so we honour its
-               natural aspect ratio and let it fill a generous area */
-            <img
-              src="/LogoDark.png"
-              alt="Hotel Optimizer"
-              className="w-40 h-40 object-contain"
-            />
           )}
         </div>
 
-        {collapsed ? (
-          <div className="flex justify-center pb-3">
-            <div className="w-8 h-8 rounded-lg bg-white/8 grid place-items-center text-white/50">
-              <Building2 size={14} />
-            </div>
-          </div>
-        ) : (
+        {/* Client context */}
+        {!collapsed && (
           <div className="px-4 pb-3 space-y-0.5">
-            <div className="text-[10px] font-semibold uppercase tracking-[0.1em] text-white/35 mb-1">
-              Client
-            </div>
+            <div className="text-[10px] font-semibold uppercase tracking-[0.1em] text-white/35 mb-1">Client</div>
             <div className="text-[13px] font-semibold text-white/90 truncate">Acme Hotels</div>
             <div className="flex items-center gap-1.5 text-[11px] text-white/45">
               <Building2 size={10} className="shrink-0" />
