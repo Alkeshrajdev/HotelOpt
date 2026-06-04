@@ -24,7 +24,6 @@ import { Card } from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import KpiTile from "@/components/ui/KpiTile";
 import Modal from "@/components/ui/Modal";
-import DemoNotice from "@/components/ui/DemoNotice";
 import { cn } from "@/lib/utils";
 
 // ─── types ─────────────────────────────────────────────────────────────────
@@ -1017,7 +1016,6 @@ export default function WaterManagement() {
   return (
     <div className="min-h-screen bg-neutral-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
-        <DemoNotice message="Demo mode — all water data shown is simulated for Dubai Marina Hotel (320 rooms)." />
 
         <PageHeader
           eyebrow="Smart Operations · Water"

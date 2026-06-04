@@ -4,7 +4,6 @@ import { Card } from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import KpiTile from "@/components/ui/KpiTile";
 import Modal from "@/components/ui/Modal";
-import DemoNotice from "@/components/ui/DemoNotice";
 import { cn } from "@/lib/utils";
 import {
   Zap,
@@ -1445,7 +1444,6 @@ export default function EnergyManagement() {
 
   return (
     <div className="space-y-6 pb-12">
-      <DemoNotice message="Showing demo data for Dubai Marina Hotel (320 rooms). Connect your sub-meter API, BMS, and DEWA bill import to populate live figures." />
 
       <PageHeader
         eyebrow="Smart Operations · Energy"

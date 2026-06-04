@@ -30,7 +30,6 @@ import {
   XCircle,
 } from "lucide-react";
 import PageHeader from "@/components/ui/PageHeader";
-import DemoNotice from "@/components/ui/DemoNotice";
 import { Card, CardHeader } from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import ProgressBar from "@/components/ui/ProgressBar";
@@ -102,7 +101,6 @@ export default function SupplierPortal() {
 
   return (
     <div className="space-y-5">
-      <DemoNotice message="Supplier emission factors shown are representative samples. In a live environment, factors are submitted and verified by each supplier." />
       <PageHeader
         eyebrow="Supplier management"
         title="Supplier Portal"

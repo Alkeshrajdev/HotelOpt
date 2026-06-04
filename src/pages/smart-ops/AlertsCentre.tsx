@@ -20,7 +20,6 @@ import PageHeader from "@/components/ui/PageHeader";
 import { Card, CardHeader } from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import Modal from "@/components/ui/Modal";
-import DemoNotice from "@/components/ui/DemoNotice";
 import { cn } from "@/lib/utils";
 
 type AlertSeverity = "Critical" | "High" | "Medium" | "Low" | "Info";
@@ -430,7 +429,6 @@ export default function AlertsCentre() {
         }
       />
 
-      <DemoNotice message="Displaying 14 representative alerts for Dubai Marina Hotel. Connect live meters and BMS to receive real-time alerts." />
 
       {/* Summary stats strip */}
       <div className="flex flex-wrap items-center gap-3 p-4 rounded-xl border border-ink-100 bg-white">

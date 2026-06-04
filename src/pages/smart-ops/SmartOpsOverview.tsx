@@ -23,7 +23,6 @@ import PageHeader from "@/components/ui/PageHeader";
 import { Card, CardHeader } from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import KpiTile from "@/components/ui/KpiTile";
-import DemoNotice from "@/components/ui/DemoNotice";
 import { cn } from "@/lib/utils";
 
 const ENERGY_BY_SYSTEM = [
@@ -195,8 +194,6 @@ export default function SmartOpsOverview() {
         title="Smart Operations"
         subtitle="Monitor energy, water, IAQ, and asset performance across hotel operations"
       />
-
-      <DemoNotice message="Displaying representative data for Dubai Marina Hotel (320 rooms). Connect live meters and sensors to enable real-time monitoring." />
 
       {/* Row 1 — Top KPI drill-down tiles */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -574,7 +571,7 @@ export default function SmartOpsOverview() {
           <div className="mt-3 pt-3 border-t border-ink-100 flex items-center gap-2">
             <Cpu size={12} className="text-ink-400" />
             <p className="text-[11px] text-ink-400">
-              Dubai Marina Hotel · 320 rooms · Data as of 06 May 2026, 10:30 GST · All values are demo data
+              Dubai Marina Hotel · 320 rooms · Data as of 06 May 2026, 10:30 GST
             </p>
           </div>
         </div>

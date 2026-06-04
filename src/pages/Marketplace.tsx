@@ -13,7 +13,6 @@ import PageHeader from "@/components/ui/PageHeader";
 import { Card } from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import Modal from "@/components/ui/Modal";
-import DemoNotice from "@/components/ui/DemoNotice";
 import { cn } from "@/lib/utils";
 
 /* ================================================================== */
@@ -1131,7 +1130,6 @@ export default function Marketplace() {
 
   return (
     <div className="p-6 space-y-5">
-      <DemoNotice message="Products and suppliers shown are representative samples for evaluation. All claims, certifications, and pricing should be independently verified before procurement." />
 
       <PageHeader
         eyebrow="Marketplace"

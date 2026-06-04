@@ -66,6 +66,11 @@ export const NAV: NavSection[] = [
 
   { type: "divider" },
 
+  // ── Performance & Reporting ──────────────────────────────────────────
+  { type: "item", to: "/performance/energy/overview", label: "Performance",    icon: BarChart3,   matchPrefix: "/performance", roles: ["property_sm", "super_admin"] },
+
+  { type: "divider" },
+
   // ── Workspace ────────────────────────────────────────────────────────
   { type: "item", to: "/data-capture",    label: "Data Capture",      icon: Database,       roles: ["maker", "property_sm", "super_admin"] },
   { type: "item", to: "/review-approval", label: "Review & Approval", icon: ClipboardCheck, badge: "24", roles: ["maker", "checker", "property_sm", "super_admin"] },
@@ -93,8 +98,7 @@ export const NAV: NavSection[] = [
 
   { type: "divider" },
 
-  // ── Performance & Reporting ──────────────────────────────────────────
-  { type: "item", to: "/performance/energy/overview", label: "Performance",    icon: BarChart3,   matchPrefix: "/performance", roles: ["property_sm", "super_admin"] },
+  // ── Actions & other ──────────────────────────────────────────────────
   { type: "item", to: "/actions",                     label: "Actions",        icon: Lightbulb,   badge: "3",  roles: ["property_sm", "super_admin"] },
   { type: "item", to: "/reports",                     label: "Reports",        icon: FileText,    roles: ["checker", "property_sm", "super_admin"] },
   { type: "item", to: "/certifications",              label: "Certifications", icon: Award,       roles: ["checker", "property_sm", "super_admin"] },

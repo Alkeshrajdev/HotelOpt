@@ -5,7 +5,6 @@ import { Card } from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import KpiTile from "@/components/ui/KpiTile";
 import Modal from "@/components/ui/Modal";
-import DemoNotice from "@/components/ui/DemoNotice";
 import { cn } from "@/lib/utils";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -1102,7 +1101,6 @@ export default function SavingsVerification() {
   return (
     <div className="min-h-screen bg-slate-50">
       <div className="max-w-screen-2xl mx-auto px-6 py-6 space-y-6">
-        <DemoNotice message="Savings data is illustrative for Dubai Marina Hotel. Connect meter and sub-meter data streams for automated baseline and post-action calculations." />
 
         <PageHeader
           eyebrow="Smart Operations · Savings"

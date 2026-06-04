@@ -33,7 +33,6 @@ import {
   X,
 } from "lucide-react";
 import PageHeader from "@/components/ui/PageHeader";
-import DemoNotice from "@/components/ui/DemoNotice";
 import { Card, CardHeader } from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import Modal from "@/components/ui/Modal";
@@ -160,7 +159,6 @@ export default function GuestEngagement() {
           </>
         }
       />
-      <DemoNotice message="Guest-facing claims and metrics shown are illustrative. All public claims require verified data and evidence review before going live." />
 
       {/* Tabs */}
       <div className="flex gap-1 border-b border-ink-200 pb-0">

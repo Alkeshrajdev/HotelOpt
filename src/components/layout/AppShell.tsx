@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { Outlet } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import Topbar from "./Topbar";
-import DemoNotice from "@/components/ui/DemoNotice";
 import { TopbarProvider } from "@/lib/topbarContext";
 
 export default function AppShell() {
@@ -24,7 +23,6 @@ export default function AppShell() {
         <Sidebar collapsed={collapsed} onToggle={() => setCollapsed((c) => !c)} />
         <div className="flex-1 flex flex-col min-w-0">
           <Topbar />
-          <DemoNotice />
           <main className="flex-1 overflow-y-auto">
             <div className="px-6 py-5 max-w-[1600px] mx-auto">
               <Outlet />
