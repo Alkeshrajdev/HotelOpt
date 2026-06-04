@@ -142,7 +142,7 @@ export default function Sidebar({ collapsed, onToggle }: Props) {
             /* Collapsed: small square logo mark */
             <div className="w-9 h-9 rounded-xl bg-white grid place-items-center shadow-sm shrink-0 overflow-hidden">
               <img
-                src="/logo.png"
+                src="/Logo.png"
                 alt="Hotel Optimizer"
                 className="w-full h-full object-cover object-top"
               />
@@ -151,7 +151,7 @@ export default function Sidebar({ collapsed, onToggle }: Props) {
             /* Expanded: full logo on white pill */
             <div className="rounded-xl bg-white px-3 py-1.5 shadow-sm">
               <img
-                src="/logo.png"
+                src="/Logo.png"
                 alt="Hotel Optimizer"
                 className="h-9 w-auto object-contain"
               />
