@@ -137,24 +137,19 @@ export default function Sidebar({ collapsed, onToggle }: Props) {
 
       {/* ── Brand + client context ── */}
       <div className="shrink-0 border-b sidebar-divider">
-        <div className={cn("flex items-center", collapsed ? "h-16 justify-center px-2" : "h-14 px-3")}>
+        <div className={cn("flex items-center justify-center", collapsed ? "h-16 px-2" : "px-3 pt-4 pb-3")}>
           {collapsed ? (
-            /* Collapsed: square crop — icon fills the badge */
-            <div className="w-9 h-9 rounded-xl shrink-0 overflow-hidden flex items-center justify-center">
-              <img
-                src="/LogoDark.png"
-                alt="Hotel Optimizer"
-                className="w-9 h-9 object-cover"
-              />
+            /* Collapsed: compact square badge */
+            <div className="w-10 h-10 rounded-xl shrink-0 overflow-hidden">
+              <img src="/LogoDark.png" alt="Hotel Optimizer" className="w-full h-full object-cover" />
             </div>
           ) : (
-            /* Expanded: fill the full brand area width, image is square so
-               we give a wide fixed container and use object-contain so
-               the whole logo (icon + wordmark) is visible */
+            /* Expanded: large square logo — image is square so we honour its
+               natural aspect ratio and let it fill a generous area */
             <img
               src="/LogoDark.png"
               alt="Hotel Optimizer"
-              className="w-full h-12 object-contain object-left"
+              className="w-40 h-40 object-contain"
             />
           )}
         </div>

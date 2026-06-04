@@ -31,8 +31,12 @@ export default function Login() {
       {/* Left visual panel */}
       <div className="hidden lg:flex flex-col justify-between p-10 bg-gradient-to-br from-brand-700 to-brand-900 text-white">
         <div>
-          {/* Dark logo (white on green) — blends with the dark panel */}
-          <img src="/LogoDark.png" alt="Hotel Optimizer" className="w-48 h-48 object-contain object-left" />
+          {/* Light coloured logo — white bg with rounded corners floats on the dark panel */}
+          <img
+            src="/LogoLight.png"
+            alt="Hotel Optimizer"
+            className="w-48 rounded-2xl shadow-lg"
+          />
         </div>
         <div>
           <div className="text-[13px] uppercase tracking-widest opacity-80">
