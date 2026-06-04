@@ -756,7 +756,7 @@ export default function PortfolioReports() {
   const reportBlocked = REPORTING_STATUS.filter(r => r.status === "Blocked").length;
 
   return (
-    <div className="p-6 max-w-[1200px] mx-auto space-y-6">
+    <div className="space-y-6">
       <PageHeader title="Reports & Certifications" />
 
       {/* Alert strip */}
