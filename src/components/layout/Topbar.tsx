@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
   ArrowRight,
   BarChart3,
@@ -28,7 +28,10 @@ import {
   CreditCard,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
-import { useTopbar, DATA_BASIS_LABEL, type DataBasis } from "@/lib/topbarContext";
+import {
+  useTopbar, DATA_BASIS_LABEL, type DataBasis,
+  getTopbarConfig, YEAR_OPTIONS, MONTH_OPTIONS, type OpsGranularity,
+} from "@/lib/topbarContext";
 import { cn } from "@/lib/utils";
 
 /* ── Filter options ────────────────────────────────────────────────────────── */
@@ -162,16 +165,25 @@ const DATA_BASIS_OPTIONS: DataBasis[] = ["approved", "approved+provisional", "dr
 /* ── Topbar ──────────────────────────────────────────────────────────────── */
 export default function Topbar() {
   const { profile, session, signOut } = useAuth();
-  const { property, region, period, dataBasis, setProperty, setRegion, setPeriod, setDataBasis } = useTopbar();
+  const {
+    property, setProperty, region, setRegion, dataBasis, setDataBasis,
+    year, setYear, month, setMonth, compareYear, setCompareYear,
+    opsGranularity, setOpsGranularity, opsCustomStart, setOpsCustomStart,
+    opsCustomEnd, setOpsCustomEnd,
+  } = useTopbar();
   const navigate = useNavigate();
+  const location = useLocation();
+  const cfg      = getTopbarConfig(location.pathname);
 
-  const [menuOpen,       setMenuOpen]       = useState(false);
-  const [notifOpen,      setNotifOpen]      = useState(false);
-  const [basisOpen,      setBasisOpen]      = useState(false);
-  const [filtersOpen,    setFiltersOpen]    = useState(false);
-  const [propertyOpen,   setPropertyOpen]   = useState(false);
-  const [regionOpen,     setRegionOpen]     = useState(false);
-  const [periodOpen,     setPeriodOpen]     = useState(false);
+  const [menuOpen,        setMenuOpen]        = useState(false);
+  const [notifOpen,       setNotifOpen]       = useState(false);
+  const [basisOpen,       setBasisOpen]       = useState(false);
+  const [filtersOpen,     setFiltersOpen]     = useState(false);
+  const [propertyOpen,    setPropertyOpen]    = useState(false);
+  const [regionOpen,      setRegionOpen]      = useState(false);
+  const [yearOpen,        setYearOpen]        = useState(false);
+  const [compareYearOpen, setCompareYearOpen] = useState(false);
+  const [monthOpen,       setMonthOpen]       = useState(false);
   const [activeNotifCategory, setActiveNotifCategory] = useState("review");
   const [readIds,        setReadIds]        = useState<Set<string>>(new Set());
 
@@ -184,23 +196,27 @@ export default function Topbar() {
   const [contactForm, setContactForm] = useState({ subject: "", message: "" });
   const [contactSent, setContactSent] = useState(false);
 
-  const menuRef       = useRef<HTMLDivElement>(null);
-  const notifRef      = useRef<HTMLDivElement>(null);
-  const basisRef      = useRef<HTMLDivElement>(null);
-  const filterRef     = useRef<HTMLDivElement>(null);
-  const propertyRef   = useRef<HTMLDivElement>(null);
-  const regionRef     = useRef<HTMLDivElement>(null);
-  const periodRef     = useRef<HTMLDivElement>(null);
+  const menuRef        = useRef<HTMLDivElement>(null);
+  const notifRef       = useRef<HTMLDivElement>(null);
+  const basisRef       = useRef<HTMLDivElement>(null);
+  const filterRef      = useRef<HTMLDivElement>(null);
+  const propertyRef    = useRef<HTMLDivElement>(null);
+  const regionRef      = useRef<HTMLDivElement>(null);
+  const yearRef        = useRef<HTMLDivElement>(null);
+  const compareYearRef = useRef<HTMLDivElement>(null);
+  const monthRef       = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const onClick = (e: MouseEvent) => {
-      if (menuRef.current     && !menuRef.current.contains(e.target as Node))     setMenuOpen(false);
-      if (notifRef.current    && !notifRef.current.contains(e.target as Node))    setNotifOpen(false);
-      if (basisRef.current    && !basisRef.current.contains(e.target as Node))    setBasisOpen(false);
-      if (filterRef.current   && !filterRef.current.contains(e.target as Node))   setFiltersOpen(false);
-      if (propertyRef.current && !propertyRef.current.contains(e.target as Node)) setPropertyOpen(false);
-      if (regionRef.current   && !regionRef.current.contains(e.target as Node))   setRegionOpen(false);
-      if (periodRef.current   && !periodRef.current.contains(e.target as Node))   setPeriodOpen(false);
+      if (menuRef.current        && !menuRef.current.contains(e.target as Node))        setMenuOpen(false);
+      if (notifRef.current       && !notifRef.current.contains(e.target as Node))       setNotifOpen(false);
+      if (basisRef.current       && !basisRef.current.contains(e.target as Node))       setBasisOpen(false);
+      if (filterRef.current      && !filterRef.current.contains(e.target as Node))      setFiltersOpen(false);
+      if (propertyRef.current    && !propertyRef.current.contains(e.target as Node))    setPropertyOpen(false);
+      if (regionRef.current      && !regionRef.current.contains(e.target as Node))      setRegionOpen(false);
+      if (yearRef.current        && !yearRef.current.contains(e.target as Node))        setYearOpen(false);
+      if (compareYearRef.current && !compareYearRef.current.contains(e.target as Node)) setCompareYearOpen(false);
+      if (monthRef.current       && !monthRef.current.contains(e.target as Node))       setMonthOpen(false);
     };
     document.addEventListener("mousedown", onClick);
     return () => document.removeEventListener("mousedown", onClick);
@@ -256,126 +272,214 @@ export default function Topbar() {
     <>
       <header className="h-16 border-b border-ink-200 bg-white dark-surface flex items-center px-4 sm:px-6 gap-3 sm:gap-4 shrink-0 z-20">
 
-        {/* ── Context filters (xl+) ── */}
-        <div className="hidden xl:flex items-center gap-2">
-          <div className="relative" ref={propertyRef}>
-            <FilterPill
-              icon={<Building2 size={13} />}
-              label="Property"
-              value={property}
-              onClick={() => { setPropertyOpen((v) => !v); setRegionOpen(false); setPeriodOpen(false); }}
-            />
-            {propertyOpen && (
-              <div className="absolute left-0 top-12 w-56 card shadow-pop z-40 py-1 overflow-hidden max-h-72 overflow-y-auto">
-                {PROPERTY_OPTIONS.map((opt) => (
-                  <button
-                    key={opt}
-                    onClick={() => { setProperty(opt); setPropertyOpen(false); }}
-                    className={cn("w-full text-left px-3 py-2 text-[12px] hover:bg-ink-50 flex items-center gap-2", opt === property && "font-semibold text-brand-700")}
-                  >
-                    {opt === property && <CheckCircle2 size={12} className="text-good shrink-0" />}
-                    {opt !== property && <span className="w-[12px] shrink-0" />}
-                    {opt}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
+        {/* ── Context filters — desktop (xl+) ── */}
+        <div className="hidden xl:flex items-center gap-2 flex-wrap">
 
-          <div className="relative" ref={regionRef}>
-            <FilterPill
-              icon={<Map size={13} />}
-              label="Region"
-              value={region}
-              onClick={() => { setRegionOpen((v) => !v); setPropertyOpen(false); setPeriodOpen(false); }}
-            />
-            {regionOpen && (
-              <div className="absolute left-0 top-12 w-44 card shadow-pop z-40 py-1 overflow-hidden">
-                {REGION_OPTIONS.map((opt) => (
-                  <button
-                    key={opt}
-                    onClick={() => { setRegion(opt); setRegionOpen(false); }}
-                    className={cn("w-full text-left px-3 py-2 text-[12px] hover:bg-ink-50 flex items-center gap-2", opt === region && "font-semibold text-brand-700")}
-                  >
-                    {opt === region && <CheckCircle2 size={12} className="text-good shrink-0" />}
-                    {opt !== region && <span className="w-[12px] shrink-0" />}
-                    {opt}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-
-          <div className="relative" ref={periodRef}>
-            <FilterPill
-              icon={<CalendarRange size={13} />}
-              label="Period"
-              value={period}
-              onClick={() => { setPeriodOpen((v) => !v); setPropertyOpen(false); setRegionOpen(false); }}
-            />
-            {periodOpen && (
-              <div className="absolute left-0 top-12 w-52 card shadow-pop z-40 py-1 overflow-hidden">
-                {PERIOD_OPTIONS.map((opt) => (
-                  <button
-                    key={opt}
-                    onClick={() => { setPeriod(opt); setPeriodOpen(false); }}
-                    className={cn("w-full text-left px-3 py-2 text-[12px] hover:bg-ink-50 flex items-center gap-2", opt === period && "font-semibold text-brand-700")}
-                  >
-                    {opt === period && <CheckCircle2 size={12} className="text-good shrink-0" />}
-                    {opt !== period && <span className="w-[12px] shrink-0" />}
-                    {opt}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-
-          <div className="relative" ref={basisRef}>
-            <button
-              onClick={() => setBasisOpen((v) => !v)}
-              className={cn(
-                "inline-flex items-center gap-1.5 h-8 px-2.5 rounded-lg border text-[12px] font-medium transition-colors",
-                dataBasis === "approved"
-                  ? "border-good/30 bg-good/8 text-good"
-                  : "border-warn/30 bg-warn/8 text-warn"
+          {/* Property */}
+          {cfg.showProperty && (
+            <div className="relative" ref={propertyRef}>
+              <FilterPill
+                icon={<Building2 size={13} />}
+                label="PROPERTY"
+                value={property}
+                onClick={() => { setPropertyOpen((v) => !v); setRegionOpen(false); setYearOpen(false); setCompareYearOpen(false); setMonthOpen(false); }}
+              />
+              {propertyOpen && (
+                <DropdownList
+                  options={PROPERTY_OPTIONS} value={property}
+                  onSelect={setProperty} onClose={() => setPropertyOpen(false)}
+                  width="w-56"
+                />
               )}
-            >
-              <Database size={12} />
-              {DATA_BASIS_LABEL[dataBasis]}
-              <ChevronDown size={11} className="opacity-60" />
-            </button>
+            </div>
+          )}
 
-            {basisOpen && (
-              <div className="absolute left-0 top-10 w-52 card shadow-pop z-40 py-1 overflow-hidden">
-                {DATA_BASIS_OPTIONS.map((opt) => (
-                  <button
-                    key={opt}
-                    onClick={() => { setDataBasis(opt); setBasisOpen(false); }}
-                    className={cn(
-                      "w-full text-left px-3 py-2 text-sm hover:bg-ink-50 flex items-center gap-2",
-                      opt === dataBasis && "font-semibold text-brand-700"
-                    )}
-                  >
-                    {opt === dataBasis && <CheckCircle2 size={13} className="text-good shrink-0" />}
-                    {opt !== dataBasis && <span className="w-[13px] shrink-0" />}
-                    {DATA_BASIS_LABEL[opt]}
-                  </button>
-                ))}
-                {dataBasis !== "approved" && (
-                  <div className="mx-2 mb-2 mt-1 rounded-lg bg-warn/10 border border-warn/25 px-2 py-1.5 text-[11px] text-warn leading-snug">
-                    Non-approved data included — not suitable for external disclosure.
-                  </div>
+          {/* Region */}
+          {cfg.showRegion && (
+            <div className="relative" ref={regionRef}>
+              <FilterPill
+                icon={<Map size={13} />}
+                label="REGION"
+                value={region}
+                onClick={() => { setRegionOpen((v) => !v); setPropertyOpen(false); setYearOpen(false); }}
+              />
+              {regionOpen && (
+                <DropdownList
+                  options={REGION_OPTIONS} value={region}
+                  onSelect={setRegion} onClose={() => setRegionOpen(false)}
+                />
+              )}
+            </div>
+          )}
+
+          {/* Period: single year */}
+          {cfg.periodType === "year" && (
+            <div className="relative" ref={yearRef}>
+              <FilterPill
+                icon={<CalendarRange size={13} />}
+                label="YEAR"
+                value={String(year)}
+                onClick={() => { setYearOpen((v) => !v); setPropertyOpen(false); setRegionOpen(false); }}
+              />
+              {yearOpen && (
+                <DropdownList
+                  options={YEAR_OPTIONS.map(String)} value={String(year)}
+                  onSelect={(v) => setYear(Number(v))} onClose={() => setYearOpen(false)}
+                />
+              )}
+            </div>
+          )}
+
+          {/* Period: month + year */}
+          {cfg.periodType === "month-year" && (
+            <>
+              <div className="relative" ref={monthRef}>
+                <FilterPill
+                  icon={<CalendarRange size={13} />}
+                  label="MONTH"
+                  value={MONTH_OPTIONS[month - 1]}
+                  onClick={() => { setMonthOpen((v) => !v); setYearOpen(false); setPropertyOpen(false); }}
+                />
+                {monthOpen && (
+                  <DropdownList
+                    options={MONTH_OPTIONS} value={MONTH_OPTIONS[month - 1]}
+                    onSelect={(v) => setMonth(MONTH_OPTIONS.indexOf(v) + 1)}
+                    onClose={() => setMonthOpen(false)} width="w-36"
+                  />
                 )}
               </div>
-            )}
-          </div>
+              <div className="relative" ref={yearRef}>
+                <FilterPill
+                  label="YEAR"
+                  value={String(year)}
+                  onClick={() => { setYearOpen((v) => !v); setMonthOpen(false); setPropertyOpen(false); }}
+                />
+                {yearOpen && (
+                  <DropdownList
+                    options={YEAR_OPTIONS.map(String)} value={String(year)}
+                    onSelect={(v) => setYear(Number(v))} onClose={() => setYearOpen(false)}
+                  />
+                )}
+              </div>
+            </>
+          )}
+
+          {/* Period: year + compare year */}
+          {cfg.periodType === "year-compare" && (
+            <>
+              <div className="relative" ref={yearRef}>
+                <FilterPill
+                  icon={<CalendarRange size={13} />}
+                  label="YEAR"
+                  value={String(year)}
+                  onClick={() => { setYearOpen((v) => !v); setCompareYearOpen(false); setPropertyOpen(false); }}
+                />
+                {yearOpen && (
+                  <DropdownList
+                    options={YEAR_OPTIONS.map(String)} value={String(year)}
+                    onSelect={(v) => { const n = Number(v); setYear(n); if (compareYear === n) setCompareYear(null); }}
+                    onClose={() => setYearOpen(false)}
+                  />
+                )}
+              </div>
+              <span className="text-[11px] font-semibold text-ink-400 px-0.5 self-end mb-1">vs</span>
+              <div className="relative" ref={compareYearRef}>
+                <FilterPill
+                  label="COMPARE"
+                  value={compareYear ? String(compareYear) : "None"}
+                  onClick={() => { setCompareYearOpen((v) => !v); setYearOpen(false); setPropertyOpen(false); }}
+                  dimmed={!compareYear}
+                />
+                {compareYearOpen && (
+                  <DropdownList
+                    options={["None", ...YEAR_OPTIONS.filter((y) => y !== year).map(String)]}
+                    value={compareYear ? String(compareYear) : "None"}
+                    onSelect={(v) => setCompareYear(v === "None" ? null : Number(v))}
+                    onClose={() => setCompareYearOpen(false)}
+                  />
+                )}
+              </div>
+            </>
+          )}
+
+          {/* Period: Smart Ops granularity */}
+          {cfg.periodType === "ops" && (
+            <>
+              <div className="flex items-center gap-0.5 bg-ink-100 p-1 rounded-xl">
+                {(["day", "week", "month", "year", "custom"] as OpsGranularity[]).map((g) => (
+                  <button
+                    key={g}
+                    onClick={() => setOpsGranularity(g)}
+                    className={cn("tab text-[11px] py-1 px-2.5 capitalize", g === opsGranularity && "tab-active")}
+                  >
+                    {g.charAt(0).toUpperCase() + g.slice(1)}
+                  </button>
+                ))}
+              </div>
+              {opsGranularity === "custom" && (
+                <div className="flex items-center gap-1.5">
+                  <input
+                    type="date"
+                    value={opsCustomStart}
+                    onChange={(e) => setOpsCustomStart(e.target.value)}
+                    className="h-8 px-2 rounded-lg border border-ink-200 bg-white text-[11px] text-ink-700 focus:outline-none focus:ring-1 focus:ring-brand-500"
+                  />
+                  <span className="text-[11px] text-ink-400">→</span>
+                  <input
+                    type="date"
+                    value={opsCustomEnd}
+                    onChange={(e) => setOpsCustomEnd(e.target.value)}
+                    className="h-8 px-2 rounded-lg border border-ink-200 bg-white text-[11px] text-ink-700 focus:outline-none focus:ring-1 focus:ring-brand-500"
+                  />
+                </div>
+              )}
+            </>
+          )}
+
+          {/* Data basis */}
+          {cfg.showDataBasis && (
+            <div className="relative" ref={basisRef}>
+              <button
+                onClick={() => setBasisOpen((v) => !v)}
+                className={cn(
+                  "inline-flex items-center gap-1.5 h-8 px-2.5 rounded-lg border text-[12px] font-medium transition-colors",
+                  dataBasis === "approved"
+                    ? "border-good/30 bg-good/8 text-good"
+                    : "border-warn/30 bg-warn/8 text-warn"
+                )}
+              >
+                <Database size={12} />
+                {DATA_BASIS_LABEL[dataBasis]}
+                <ChevronDown size={11} className="opacity-60" />
+              </button>
+              {basisOpen && (
+                <div className="absolute left-0 top-10 w-52 card shadow-pop z-40 py-1 overflow-hidden">
+                  {DATA_BASIS_OPTIONS.map((opt) => (
+                    <button
+                      key={opt}
+                      onClick={() => { setDataBasis(opt); setBasisOpen(false); }}
+                      className={cn("w-full text-left px-3 py-2 text-sm hover:bg-ink-50 flex items-center gap-2", opt === dataBasis && "font-semibold text-brand-700")}
+                    >
+                      {opt === dataBasis && <CheckCircle2 size={13} className="text-good shrink-0" />}
+                      {opt !== dataBasis && <span className="w-[13px] shrink-0" />}
+                      {DATA_BASIS_LABEL[opt]}
+                    </button>
+                  ))}
+                  {dataBasis !== "approved" && (
+                    <div className="mx-2 mb-2 mt-1 rounded-lg bg-warn/10 border border-warn/25 px-2 py-1.5 text-[11px] text-warn leading-snug">
+                      Non-approved data included — not suitable for external disclosure.
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
-        {/* ── Compact filters (below xl) ── */}
+        {/* ── Compact filters — mobile (below xl) ── */}
         <div className="xl:hidden relative" ref={filterRef}>
           <button onClick={() => setFiltersOpen((v) => !v)} className="btn-secondary h-8 px-2.5 text-[12px]">
             <SlidersHorizontal size={13} /> Filters
-            <span className="chip bg-brand-50 text-brand-700 ml-0.5">4</span>
           </button>
           {filtersOpen && (
             <div className="absolute left-0 top-10 w-[300px] card shadow-pop z-40">
@@ -383,65 +487,94 @@ export default function Topbar() {
                 <span className="text-sm font-semibold text-ink-900">Filters</span>
                 <button onClick={() => setFiltersOpen(false)} className="btn-ghost w-7 h-7 p-0"><X size={13} /></button>
               </div>
-              <div className="p-3 space-y-2">
-                <div>
-                  <span className="text-[11px] font-medium text-ink-500">Property</span>
-                  <select
-                    value={property}
-                    onChange={(e) => setProperty(e.target.value)}
-                    className="mt-1 w-full h-9 px-3 rounded-lg border border-ink-200 bg-white text-sm text-ink-700 focus:outline-none focus:ring-2 focus:ring-brand-500"
-                  >
-                    {PROPERTY_OPTIONS.map((o) => <option key={o}>{o}</option>)}
-                  </select>
-                </div>
-                <div>
-                  <span className="text-[11px] font-medium text-ink-500">Region</span>
-                  <select
-                    value={region}
-                    onChange={(e) => setRegion(e.target.value)}
-                    className="mt-1 w-full h-9 px-3 rounded-lg border border-ink-200 bg-white text-sm text-ink-700 focus:outline-none focus:ring-2 focus:ring-brand-500"
-                  >
-                    {REGION_OPTIONS.map((o) => <option key={o}>{o}</option>)}
-                  </select>
-                </div>
-                <div>
-                  <span className="text-[11px] font-medium text-ink-500">Period</span>
-                  <select
-                    value={period}
-                    onChange={(e) => setPeriod(e.target.value)}
-                    className="mt-1 w-full h-9 px-3 rounded-lg border border-ink-200 bg-white text-sm text-ink-700 focus:outline-none focus:ring-2 focus:ring-brand-500"
-                  >
-                    {PERIOD_OPTIONS.map((o) => <option key={o}>{o}</option>)}
-                  </select>
-                </div>
-                <label className="block">
-                  <span className="text-[11px] font-medium text-ink-500">Data Basis</span>
-                  <div className="mt-1 space-y-1">
-                    {DATA_BASIS_OPTIONS.map((opt) => (
-                      <button
-                        key={opt}
-                        onClick={() => setDataBasis(opt)}
-                        className={cn(
-                          "w-full text-left px-3 py-1.5 rounded-lg text-sm flex items-center gap-2 transition-colors",
-                          opt === dataBasis ? "bg-brand-50 text-brand-700 font-semibold" : "hover:bg-ink-50 text-ink-700"
-                        )}
-                      >
-                        {opt === dataBasis && <CheckCircle2 size={13} className="text-good shrink-0" />}
-                        {opt !== dataBasis && <span className="w-[13px] shrink-0" />}
-                        {DATA_BASIS_LABEL[opt]}
-                      </button>
-                    ))}
+              <div className="p-3 space-y-3">
+                {cfg.showProperty && (
+                  <div>
+                    <span className="text-[11px] font-medium text-ink-500 uppercase tracking-wide">Property</span>
+                    <select value={property} onChange={(e) => setProperty(e.target.value)}
+                      className="mt-1 w-full h-9 px-3 rounded-lg border border-ink-200 bg-white text-sm text-ink-700 focus:outline-none">
+                      {PROPERTY_OPTIONS.map((o) => <option key={o}>{o}</option>)}
+                    </select>
                   </div>
-                </label>
+                )}
+                {cfg.showRegion && (
+                  <div>
+                    <span className="text-[11px] font-medium text-ink-500 uppercase tracking-wide">Region</span>
+                    <select value={region} onChange={(e) => setRegion(e.target.value)}
+                      className="mt-1 w-full h-9 px-3 rounded-lg border border-ink-200 bg-white text-sm text-ink-700 focus:outline-none">
+                      {REGION_OPTIONS.map((o) => <option key={o}>{o}</option>)}
+                    </select>
+                  </div>
+                )}
+                {(cfg.periodType === "year" || cfg.periodType === "year-compare") && (
+                  <div>
+                    <span className="text-[11px] font-medium text-ink-500 uppercase tracking-wide">Year</span>
+                    <select value={year} onChange={(e) => setYear(Number(e.target.value))}
+                      className="mt-1 w-full h-9 px-3 rounded-lg border border-ink-200 bg-white text-sm text-ink-700 focus:outline-none">
+                      {YEAR_OPTIONS.map((y) => <option key={y} value={y}>{y}</option>)}
+                    </select>
+                  </div>
+                )}
+                {cfg.periodType === "year-compare" && (
+                  <div>
+                    <span className="text-[11px] font-medium text-ink-500 uppercase tracking-wide">Compare with</span>
+                    <select value={compareYear ?? ""} onChange={(e) => setCompareYear(e.target.value ? Number(e.target.value) : null)}
+                      className="mt-1 w-full h-9 px-3 rounded-lg border border-ink-200 bg-white text-sm text-ink-700 focus:outline-none">
+                      <option value="">None</option>
+                      {YEAR_OPTIONS.filter((y) => y !== year).map((y) => <option key={y} value={y}>{y}</option>)}
+                    </select>
+                  </div>
+                )}
+                {cfg.periodType === "month-year" && (
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <span className="text-[11px] font-medium text-ink-500 uppercase tracking-wide">Month</span>
+                      <select value={month} onChange={(e) => setMonth(Number(e.target.value))}
+                        className="mt-1 w-full h-9 px-3 rounded-lg border border-ink-200 bg-white text-sm text-ink-700 focus:outline-none">
+                        {MONTH_OPTIONS.map((m, i) => <option key={m} value={i + 1}>{m}</option>)}
+                      </select>
+                    </div>
+                    <div>
+                      <span className="text-[11px] font-medium text-ink-500 uppercase tracking-wide">Year</span>
+                      <select value={year} onChange={(e) => setYear(Number(e.target.value))}
+                        className="mt-1 w-full h-9 px-3 rounded-lg border border-ink-200 bg-white text-sm text-ink-700 focus:outline-none">
+                        {YEAR_OPTIONS.map((y) => <option key={y} value={y}>{y}</option>)}
+                      </select>
+                    </div>
+                  </div>
+                )}
+                {cfg.periodType === "ops" && (
+                  <div>
+                    <span className="text-[11px] font-medium text-ink-500 uppercase tracking-wide">View</span>
+                    <div className="mt-1 flex flex-wrap gap-1">
+                      {(["day","week","month","year","custom"] as OpsGranularity[]).map((g) => (
+                        <button key={g} onClick={() => setOpsGranularity(g)}
+                          className={cn("tab text-[11px] capitalize", g === opsGranularity && "tab-active")}>
+                          {g.charAt(0).toUpperCase() + g.slice(1)}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {cfg.showDataBasis && (
+                  <div>
+                    <span className="text-[11px] font-medium text-ink-500 uppercase tracking-wide">Data Basis</span>
+                    <div className="mt-1 space-y-1">
+                      {DATA_BASIS_OPTIONS.map((opt) => (
+                        <button key={opt} onClick={() => setDataBasis(opt)}
+                          className={cn("w-full text-left px-3 py-1.5 rounded-lg text-sm flex items-center gap-2 transition-colors",
+                            opt === dataBasis ? "bg-brand-50 text-brand-700 font-semibold" : "hover:bg-ink-50 text-ink-700")}>
+                          {opt === dataBasis && <CheckCircle2 size={13} className="text-good shrink-0" />}
+                          {opt !== dataBasis && <span className="w-[13px] shrink-0" />}
+                          {DATA_BASIS_LABEL[opt]}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
-              <div className="px-4 py-3 border-t border-ink-200 flex justify-end gap-2">
-                <button
-                  onClick={() => { setProperty(PROPERTY_OPTIONS[0]); setRegion(REGION_OPTIONS[0]); setPeriod(PERIOD_OPTIONS[0]); }}
-                  className="btn-ghost h-8 px-2 text-[12px]"
-                >
-                  Reset
-                </button>
-                <button onClick={() => setFiltersOpen(false)} className="btn-primary h-8 px-3 text-[12px]">Apply</button>
+              <div className="px-4 py-3 border-t border-ink-200 flex justify-end">
+                <button onClick={() => setFiltersOpen(false)} className="btn-primary h-8 px-3 text-[12px]">Done</button>
               </div>
             </div>
           )}
@@ -825,18 +958,59 @@ export default function Topbar() {
 }
 
 /* ── Sub-components ─────────────────────────────────────────────────────── */
-function FilterPill({ icon, label, value, onClick }: { icon: React.ReactNode; label: string; value: string; onClick?: () => void }) {
+function FilterPill({
+  icon, label, value, onClick, dimmed = false,
+}: {
+  icon?: React.ReactNode;
+  label: string;
+  value: string;
+  onClick?: () => void;
+  dimmed?: boolean;
+}) {
   return (
     <div className="flex flex-col">
-      <span className="text-[10px] font-medium text-ink-400 uppercase tracking-wide">{label}</span>
+      <span className="text-[10px] font-medium text-ink-400 uppercase tracking-[0.06em]">{label}</span>
       <button
         onClick={onClick}
-        className="mt-0.5 inline-flex items-center gap-1.5 h-8 px-2.5 rounded-lg border border-ink-200 bg-white text-[12px] font-medium text-ink-700 hover:bg-ink-50 transition-colors"
+        className={cn(
+          "mt-0.5 inline-flex items-center gap-1.5 h-8 px-2.5 rounded-lg border border-ink-200 bg-white text-[12px] font-medium hover:bg-ink-50 transition-colors",
+          dimmed ? "text-ink-400" : "text-ink-700"
+        )}
       >
-        <span className="text-ink-400">{icon}</span>
+        {icon && <span className="text-ink-400">{icon}</span>}
         {value}
         <ChevronDown size={11} className="text-ink-400" />
       </button>
+    </div>
+  );
+}
+
+function DropdownList({
+  options, value, onSelect, onClose, width = "w-44",
+}: {
+  options: string[];
+  value: string;
+  onSelect: (v: string) => void;
+  onClose: () => void;
+  width?: string;
+}) {
+  return (
+    <div className={cn("absolute left-0 top-12 card shadow-pop z-40 py-1 overflow-y-auto max-h-64", width)}>
+      {options.map((opt) => (
+        <button
+          key={opt}
+          onClick={() => { onSelect(opt); onClose(); }}
+          className={cn(
+            "w-full text-left px-3 py-2 text-[12px] hover:bg-ink-50 flex items-center gap-2",
+            opt === value && "font-semibold text-brand-700"
+          )}
+        >
+          {opt === value
+            ? <CheckCircle2 size={12} className="text-good shrink-0" />
+            : <span className="w-[12px] shrink-0" />}
+          {opt}
+        </button>
+      ))}
     </div>
   );
 }

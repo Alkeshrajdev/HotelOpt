@@ -353,52 +353,6 @@ export default function EnergyOverview() {
         </div>
       </div>
 
-      {/* ── Targets ─────────────────────────────────────────────────────── */}
-      <Card>
-        <CardHeader title="Targets" hint="Current performance vs 2030 commitment" />
-        <div className="overflow-x-auto">
-          <table className="min-w-full">
-            <thead>
-              <tr className="bg-ink-50">
-                <th className="table-th">Metric</th>
-                <th className="table-th">Baseline</th>
-                <th className="table-th">Target year</th>
-                <th className="table-th">Target</th>
-                <th className="table-th">Current</th>
-                <th className="table-th">Gap</th>
-                <th className="table-th">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {[
-                { metric: "Energy intensity (kWh/ORN)", baseline: "2022", targetYear: "2030", target: "18.5", current: "24.0", gap: "−5.5 kWh/ORN", rag: "amber" },
-                { metric: "Renewable energy share (%)",  baseline: "2022", targetYear: "2030", target: "100%", current: "78%",  gap: "+22 pp",       rag: "green" },
-                { metric: "tCO₂e / ORN (SBTi aligned)", baseline: "2019", targetYear: "2030", target: "0.025", current: "0.041", gap: "−0.016",     rag: "amber" },
-              ].map((r) => (
-                <tr key={r.metric} className="hover:bg-ink-50/50">
-                  <td className="table-td font-medium text-ink-900">{r.metric}</td>
-                  <td className="table-td text-ink-500">{r.baseline}</td>
-                  <td className="table-td text-ink-500">{r.targetYear}</td>
-                  <td className="table-td font-semibold text-ink-700">{r.target}</td>
-                  <td className="table-td font-bold text-ink-900">{r.current}</td>
-                  <td className="table-td text-ink-500">{r.gap}</td>
-                  <td className="table-td">
-                    <span className={cn(
-                      "chip text-[11px] font-semibold",
-                      r.rag === "green"
-                        ? "bg-good/10 text-good border border-good/20"
-                        : "bg-warn/10 text-warn border border-warn/25"
-                    )}>
-                      {r.rag === "green" ? "On track" : "Off track"}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </Card>
-
     </div>
   );
 }
