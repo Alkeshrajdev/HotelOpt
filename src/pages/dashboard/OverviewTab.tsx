@@ -77,9 +77,11 @@ export default function OverviewTab({ onNavigate }: Props) {
 
   const chartData = [...PORTFOLIO_HOTELS]
     .sort((a, b) => (b[active.field] as number) - (a[active.field] as number))
-    .map((h) => ({
+    .map((h, i) => ({
       name: h.shortName,
       value: h[active.field] as number,
+      fill: HOTEL_COLORS[i % HOTEL_COLORS.length],
+      unit: active.unit,
     }));
 
   const totalValue = PORTFOLIO_HOTELS.reduce((s, h) => s + (h[active.field] as number), 0);
@@ -197,10 +199,11 @@ export default function OverviewTab({ onNavigate }: Props) {
             </div>
             <ResponsiveContainer width="100%" height={260}>
               <Treemap
-                data={chartData.map((d, i) => ({ ...d, fill: HOTEL_COLORS[i % HOTEL_COLORS.length], unit: active.unit }))}
+                data={chartData}
                 dataKey="value"
                 aspectRatio={4 / 3}
                 stroke="#fff"
+                isAnimationActive={false}
                 content={<TreemapCell />}
               >
                 <Tooltip

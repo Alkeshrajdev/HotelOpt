@@ -104,6 +104,21 @@ export default function Login() {
               Sign in
             </button>
           </form>
+
+          <div className="relative my-6">
+            <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-ink-200" /></div>
+            <div className="relative flex justify-center"><span className="bg-white px-3 text-[11px] text-ink-400">or</span></div>
+          </div>
+
+          <button
+            onClick={signInDemo}
+            className="w-full btn-secondary text-[13px] h-10"
+          >
+            Continue as Demo
+          </button>
+          <p className="mt-2 text-center text-[11px] text-ink-400">
+            Sample data · no credentials required
+          </p>
         </div>
       </div>
     </div>
