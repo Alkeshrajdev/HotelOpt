@@ -17,6 +17,7 @@ import {
   ToggleRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import PageHeader from "@/components/ui/PageHeader";
 
 type Tab = "hotels" | "groups" | "targets" | "users" | "rules" | "escalations";
 
@@ -563,12 +564,7 @@ export default function PortfolioSetup() {
 
   return (
     <div className="p-6 max-w-[1200px] mx-auto space-y-6">
-      <div>
-        <h1 className="text-2xl font-extrabold text-ink-900">Portfolio Setup</h1>
-        <p className="text-sm text-ink-500 mt-1">
-          Manage portfolio hotels, groups, targets, users, reporting rules, and escalation settings.
-        </p>
-      </div>
+      <PageHeader title="Portfolio Setup" />
 
       <div className="flex gap-1 border-b border-ink-100 overflow-x-auto">
         {TABS.map(t => {

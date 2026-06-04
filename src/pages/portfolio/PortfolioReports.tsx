@@ -24,6 +24,7 @@ import {
   LayoutGrid,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import PageHeader from "@/components/ui/PageHeader";
 
 type Tab = "status" | "generate" | "certification" | "evidence" | "calendar" | "history";
 
@@ -756,12 +757,7 @@ export default function PortfolioReports() {
 
   return (
     <div className="p-6 max-w-[1200px] mx-auto space-y-6">
-      <div>
-        <h1 className="text-2xl font-extrabold text-ink-900">Reports & Certifications</h1>
-        <p className="text-sm text-ink-500 mt-1">
-          Generate consolidated portfolio reports, track certification readiness, manage evidence gaps, and monitor audit timelines.
-        </p>
-      </div>
+      <PageHeader title="Reports & Certifications" />
 
       {/* Alert strip */}
       <div className="flex flex-wrap gap-3">
