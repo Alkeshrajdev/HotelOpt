@@ -8,6 +8,8 @@ import {
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell,
   ReferenceLine, LineChart, Line, CartesianGrid, ComposedChart,
+  ScatterChart, Scatter, ZAxis, LabelList,
+  RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
 } from "recharts";
 import { Card, CardHeader } from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
@@ -397,6 +399,14 @@ const TRAINING_FILTER_OPTS: { key: TrainingFilter; label: string }[] = [
   { key: "coc",           label: "CoC"           },
 ];
 
+// Scatter data: training hrs vs LTIFR per hotel
+const SAFETY_SCATTER = PORTFOLIO_SOCIAL_BY_HOTEL.map((h) => ({
+  name: h.hotel.replace(" Hotel","").replace("Residences ","").replace(" Resort","").replace("The ",""),
+  x: h.trainingHrs,
+  y: h.ltifr,
+  z: h.fte,
+}));
+
 function SocialPerformance({ onDrilldown }: { onDrilldown: (k: string, l: string) => void }) {
   const [trainingFilter, setTrainingFilter] = useState<TrainingFilter>("overall");
 
@@ -419,6 +429,51 @@ function SocialPerformance({ onDrilldown }: { onDrilldown: (k: string, l: string
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+
+      {/* Safety Scatter — Training hrs vs LTIFR */}
+      <Card>
+        <CardHeader
+          title="Safety: Training vs LTIFR"
+          hint="each dot = one hotel · x = training hrs/employee · y = injury rate · size = headcount"
+        />
+        <div className="px-4 pb-4 pt-2">
+          <ResponsiveContainer width="100%" height={270}>
+            <ScatterChart margin={{ top: 10, right: 20, bottom: 20, left: 10 }}>
+              <CartesianGrid stroke="#F1F5F9" strokeDasharray="3 3" />
+              <XAxis
+                dataKey="x" type="number" name="Training hrs"
+                label={{ value: "Training hrs / employee", position: "insideBottom", offset: -10, fontSize: 10, fill: "#94A3B8" }}
+                tick={{ fontSize: 10, fill: "#64748B" }} axisLine={false} tickLine={false}
+                domain={[0, 50]}
+              />
+              <YAxis
+                dataKey="y" type="number" name="LTIFR"
+                label={{ value: "LTIFR", angle: -90, position: "insideLeft", offset: 10, fontSize: 10, fill: "#94A3B8" }}
+                tick={{ fontSize: 10, fill: "#64748B" }} axisLine={false} tickLine={false}
+                domain={[0, 2.2]}
+              />
+              <ZAxis dataKey="z" range={[60, 300]} name="Headcount" />
+              <Tooltip
+                contentStyle={{ fontSize: 11, borderRadius: 8, border: "1px solid #E2E8F0" }}
+                formatter={(val: number, name: string) => [
+                  name === "Training hrs" ? `${val} hrs` : name === "LTIFR" ? val.toFixed(2) : `${val} FTE`,
+                  name,
+                ]}
+              />
+              <ReferenceLine x={24} stroke="#CBD5E1" strokeDasharray="4 2" label={{ value: "Avg 24h", fontSize: 9, fill: "#94A3B8", position: "top" }} />
+              <ReferenceLine y={0.82} stroke="#CBD5E1" strokeDasharray="4 2" label={{ value: "Avg 0.82", fontSize: 9, fill: "#94A3B8", position: "right" }} />
+              <Scatter
+                data={SAFETY_SCATTER}
+                fill="#0F766E"
+                fillOpacity={0.75}
+              >
+                <LabelList dataKey="name" position="top" style={{ fontSize: 8, fill: "#64748B" }} />
+              </Scatter>
+            </ScatterChart>
+          </ResponsiveContainer>
+          <InsightLine text="Hotels with >24 hrs training/employee tend to have lower LTIFR. Montrose Paris and Bay View lead; Airport Dubai is an outlier." />
+        </div>
+      </Card>
 
       {/* Turnover by Hotel */}
       <Card>
@@ -566,6 +621,15 @@ function SocialPerformance({ onDrilldown }: { onDrilldown: (k: string, l: string
 
 // ── 3. Governance & Supplier Controls ─────────────────────────────────────────
 
+const GOV_RADAR_DATA = [
+  { dim: "Anti-Corruption", score: 90 },
+  { dim: "Whistleblowing",  score: 80 },
+  { dim: "Supplier CoC",    score: 72 },
+  { dim: "EF Declaration",  score: 65 },
+  { dim: "Attestations",    score: 81 },
+  { dim: "Data Governance", score: 88 },
+];
+
 function GovernanceControls({ onDrilldown }: { onDrilldown: (k: string, l: string) => void }) {
   const avgAttestation = Math.round(
     PORTFOLIO_GOVERNANCE_BY_HOTEL.reduce((s, h) => s + h.attestationsPct, 0) / PORTFOLIO_GOVERNANCE_BY_HOTEL.length
@@ -574,6 +638,26 @@ function GovernanceControls({ onDrilldown }: { onDrilldown: (k: string, l: strin
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+
+      {/* Governance Radar */}
+      <Card>
+        <CardHeader title="Governance Completeness" hint="portfolio avg score per dimension (0–100)" />
+        <div className="px-2 pb-4 pt-1">
+          <ResponsiveContainer width="100%" height={270}>
+            <RadarChart data={GOV_RADAR_DATA} margin={{ top: 10, right: 30, bottom: 10, left: 30 }}>
+              <PolarGrid stroke="#E2E8F0" />
+              <PolarAngleAxis dataKey="dim" tick={{ fontSize: 9, fill: "#64748B", fontWeight: 600 }} />
+              <PolarRadiusAxis angle={30} domain={[0, 100]} tick={{ fontSize: 8, fill: "#94A3B8" }} tickCount={5} />
+              <Radar name="Score" dataKey="score" stroke="#7C3AED" fill="#7C3AED" fillOpacity={0.2} strokeWidth={2} />
+              <Tooltip contentStyle={{ fontSize: 11, borderRadius: 8 }} formatter={(v: number) => [`${v}/100`, "Score"]} />
+            </RadarChart>
+          </ResponsiveContainer>
+          <div className="flex justify-center gap-4 text-[10px] text-ink-500 -mt-1">
+            <span>Weakest: <span className="font-semibold text-warn">EF Declaration (65)</span></span>
+            <span>Strongest: <span className="font-semibold text-good">Anti-Corruption (90)</span></span>
+          </div>
+        </div>
+      </Card>
 
       {/* Policy Status Matrix */}
       <Card>

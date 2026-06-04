@@ -16,6 +16,8 @@ import {
   Pie,
   Cell,
   Legend,
+  ComposedChart,
+  LabelList,
 } from "recharts";
 import { Card, CardHeader } from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
@@ -935,6 +937,16 @@ function WaterSection() {
 
 // ─── WASTE ───────────────────────────────────────────────────────────────────
 
+// Waterfall: YoY diversion change per stream. base = invisible stack offset for waterfall effect.
+const WASTE_WATERFALL = [
+  { name: "F&B",       value:  +6, base: 0  },
+  { name: "General",   value:  -3, base: 3  },
+  { name: "Events",    value:  +2, base: 0  },
+  { name: "Hazardous", value:  -1, base: 1  },
+  { name: "Kitchen",   value:  +4, base: 0  },
+  { name: "Net Change",value:  +8, base: 0  },
+];
+
 function WasteSection() {
   const [drilldown, setDrilldown] = useState<DrilldownState>(null);
   const diversionData = [...PORTFOLIO_HOTELS]
@@ -963,6 +975,52 @@ function WasteSection() {
       ]} />
 
       <SectionHeader confidence={AVG_CONFIDENCE} hubTo="/performance/waste/overview" hubLabel="Open Waste Hub" />
+
+      {/* Waterfall — YoY diversion change by stream */}
+      <Card>
+        <CardHeader
+          title="Diversion Change by Stream — YoY Waterfall"
+          hint="positive = improved diversion · negative = worsened · net portfolio change"
+        />
+        <div className="px-4 pb-4 pt-2">
+          <ResponsiveContainer width="100%" height={220}>
+            <ComposedChart
+              data={WASTE_WATERFALL}
+              margin={{ top: 10, right: 20, bottom: 0, left: 10 }}
+              barCategoryGap="25%"
+            >
+              <CartesianGrid vertical={false} stroke="#F1F5F9" />
+              <XAxis dataKey="name" tick={{ fontSize: 10, fill: "#64748B" }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fontSize: 10, fill: "#64748B" }} axisLine={false} tickLine={false}
+                tickFormatter={(v) => `${v > 0 ? "+" : ""}${v}%`} />
+              <Tooltip
+                contentStyle={{ fontSize: 11, borderRadius: 8, border: "1px solid #E2E8F0" }}
+                formatter={(v: number, name: string) =>
+                  name === "invisible" ? null : [`${v > 0 ? "+" : ""}${v}%`, "Diversion change"]
+                }
+              />
+              <ReferenceLine y={0} stroke="#CBD5E1" />
+              {/* invisible base bar for waterfall stacking */}
+              <Bar dataKey="base" stackId="wf" fill="transparent" radius={0} />
+              <Bar dataKey="value" stackId="wf" radius={4} maxBarSize={40}>
+                <LabelList
+                  dataKey="value"
+                  position="top"
+                  style={{ fontSize: 10, fontWeight: 700, fill: "#334155" }}
+                  formatter={(v: number) => `${v > 0 ? "+" : ""}${v}%`}
+                />
+                {WASTE_WATERFALL.map((entry) => (
+                  <Cell
+                    key={entry.name}
+                    fill={entry.name === "Net Change" ? "#0F766E" : entry.value >= 0 ? "#22C55E" : "#EF4444"}
+                    fillOpacity={entry.name === "Net Change" ? 1 : 0.75}
+                  />
+                ))}
+              </Bar>
+            </ComposedChart>
+          </ResponsiveContainer>
+        </div>
+      </Card>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
 

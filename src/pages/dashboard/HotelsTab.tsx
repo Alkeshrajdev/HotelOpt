@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { TrendingDown, TrendingUp, ExternalLink, ArrowUpDown } from "lucide-react";
 import Badge from "@/components/ui/Badge";
+import { Card, CardHeader } from "@/components/ui/Card";
 import { PORTFOLIO_HOTELS, PORTFOLIO_GOVERNANCE_BY_HOTEL } from "@/lib/mock";
 import { cn } from "@/lib/utils";
 
@@ -235,6 +236,45 @@ function HotelCard({ h }: { h: typeof PORTFOLIO_HOTELS[0] }) {
   );
 }
 
+const HEATMAP_METRICS = [
+  {
+    key: "carbon", label: "Carbon", unit: "kgCO₂/RN",
+    field: "carbonIntensity",
+    format: (v: number) => v.toFixed(0),
+    tone: (v: number): "good" | "warn" | "bad" => v < 55 ? "good" : v < 75 ? "warn" : "bad",
+  },
+  {
+    key: "energy", label: "Energy", unit: "kWh/RN",
+    field: "energyIntensity",
+    format: (v: number) => v.toFixed(0),
+    tone: (v: number): "good" | "warn" | "bad" => v < 100 ? "good" : v < 140 ? "warn" : "bad",
+  },
+  {
+    key: "water", label: "Water", unit: "L/GN",
+    field: "waterIntensity",
+    format: (v: number) => v.toFixed(0),
+    tone: (v: number): "good" | "warn" | "bad" => v < 450 ? "good" : v < 700 ? "warn" : "bad",
+  },
+  {
+    key: "diversion", label: "Diversion", unit: "%",
+    field: "diversion_pct",
+    format: (v: number) => `${v}%`,
+    tone: (v: number): "good" | "warn" | "bad" => v >= 55 ? "good" : v >= 35 ? "warn" : "bad",
+  },
+  {
+    key: "renewable", label: "Renewable", unit: "%",
+    field: "renewablePct",
+    format: (v: number) => `${v}%`,
+    tone: (v: number): "good" | "warn" | "bad" => v >= 30 ? "good" : v >= 10 ? "warn" : "bad",
+  },
+  {
+    key: "data", label: "Data", unit: "months",
+    field: "dataConfidence",
+    format: (v: number) => `${Math.round(v / 100 * 12)}/12`,
+    tone: (v: number): "good" | "warn" | "bad" => v >= 90 ? "good" : v >= 65 ? "warn" : "bad",
+  },
+];
+
 export default function HotelsTab() {
   const [region, setRegion] = useState<Region>("All");
   const [sortField, setSortField] = useState<SortField>("carbonIntensity");
@@ -301,6 +341,56 @@ export default function HotelsTab() {
         <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-bad inline-block" />Action needed</span>
         <span className="text-ink-400 ml-auto">{sorted.length} hotel{sorted.length !== 1 ? "s" : ""} · sorted by {SORT_OPTIONS.find(o => o.field === sortField)?.label}</span>
       </div>
+
+      {/* ── Heatmap matrix ── */}
+      <Card>
+        <CardHeader title="Portfolio Heat Map" hint="10 hotels × 6 metrics — green = good, red = needs action" />
+        <div className="px-4 pb-4 pt-2 overflow-x-auto">
+          <table className="w-full text-[11px]">
+            <thead>
+              <tr>
+                <th className="text-left pr-3 pb-2 font-medium text-ink-500 min-w-[140px]">Hotel</th>
+                {HEATMAP_METRICS.map(m => (
+                  <th key={m.key} className="pb-2 font-medium text-ink-500 text-center min-w-[80px]">
+                    <div>{m.label}</div>
+                    <div className="text-[9px] font-normal text-ink-400">{m.unit}</div>
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody className="space-y-1">
+              {PORTFOLIO_HOTELS.map((h) => (
+                <tr key={h.name} className="group">
+                  <td className="pr-3 py-1 font-medium text-ink-800 text-[11px] truncate max-w-[140px]">
+                    {h.shortName}
+                  </td>
+                  {HEATMAP_METRICS.map(m => {
+                    const raw = h[m.field as keyof typeof h] as number;
+                    const tone = m.tone(raw);
+                    return (
+                      <td key={m.key} className="py-1 px-1 text-center">
+                        <div className={cn(
+                          "rounded-lg px-2 py-1.5 text-[11px] font-semibold tabular-nums mx-auto",
+                          tone === "good" ? "bg-good/12 text-good" :
+                          tone === "warn" ? "bg-warn/15 text-amber-700" :
+                          "bg-bad/12 text-bad"
+                        )}>
+                          {m.format(raw)}
+                        </div>
+                      </td>
+                    );
+                  })}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <div className="flex gap-4 mt-3 text-[10px] text-ink-500">
+            <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded bg-good/15 inline-block" /> On track</span>
+            <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded bg-warn/15 inline-block" /> At risk</span>
+            <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded bg-bad/15 inline-block" /> Action needed</span>
+          </div>
+        </div>
+      </Card>
 
       {/* Hotel cards */}
       {sorted.length > 0 ? (

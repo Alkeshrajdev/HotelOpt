@@ -12,13 +12,8 @@ import {
   ArrowRight,
 } from "lucide-react";
 import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  Cell,
+  Treemap, ResponsiveContainer, Tooltip,
+  RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
 } from "recharts";
 import { Card, CardHeader } from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
@@ -46,6 +41,35 @@ const CERT_ALERTS = [
   { text: "2 hotels have no active certification",    href: "/portfolio/reports-certifications", tone: "bad"  as const },
   { text: "Travelife audit scheduled in 45 days",     href: "/portfolio/reports-certifications", tone: "neutral" as const },
 ];
+
+const ESG_RADAR_DATA = [
+  { pillar: "Carbon",     score: 72, target: 100 },
+  { pillar: "Energy",     score: 68, target: 100 },
+  { pillar: "Water",      score: 75, target: 100 },
+  { pillar: "Waste",      score: 42, target: 100 },
+  { pillar: "Social",     score: 81, target: 100 },
+  { pillar: "Governance", score: 86, target: 100 },
+];
+
+function TreemapCell(props: any) {
+  const { x, y, width, height, name, value, fill, unit } = props;
+  const showLabel = width > 50 && height > 30;
+  return (
+    <g>
+      <rect x={x} y={y} width={width} height={height} fill={fill} rx={4} />
+      {showLabel && (
+        <>
+          <text x={x + 8} y={y + 18} fontSize={11} fontWeight={600} fill="#fff" style={{ pointerEvents: "none" }}>
+            {name}
+          </text>
+          <text x={x + 8} y={y + 32} fontSize={10} fill="rgba(255,255,255,0.75)" style={{ pointerEvents: "none" }}>
+            {value >= 1000 ? `${(value / 1000).toFixed(1)}k` : value} {unit}
+          </text>
+        </>
+      )}
+    </g>
+  );
+}
 
 export default function OverviewTab({ onNavigate }: Props) {
   const [metric, setMetric] = useState<Metric>("carbon");
@@ -143,66 +167,75 @@ export default function OverviewTab({ onNavigate }: Props) {
         </button>
       </div>
 
-      {/* Portfolio Contribution by Hotel chart */}
-      <Card>
-        <CardHeader
-          title="Portfolio Contribution by Hotel"
-          hint="ranked by selected metric — click bars to drill down"
-          right={
-            <div className="flex gap-1 flex-wrap justify-end">
-              {METRIC_OPTIONS.map((m) => (
-                <button
-                  key={m.key}
-                  onClick={() => setMetric(m.key)}
-                  className={cn(
-                    "px-3 py-1 rounded-md text-[11px] font-semibold transition-colors",
-                    metric === m.key ? "bg-brand-700 text-white" : "bg-ink-100 text-ink-600 hover:bg-ink-200"
-                  )}
-                >
-                  {m.label}
-                </button>
-              ))}
-            </div>
-          }
-        />
-        <div className="px-6 pb-6 pt-2">
-          <div className="mb-3 flex items-center gap-3 text-[12px] text-ink-500">
-            <span>Portfolio total: <span className="font-bold text-ink-900">{totalValue.toLocaleString()} {active.unit}</span></span>
-          </div>
-          <ResponsiveContainer width="100%" height={280}>
-            <BarChart
-              data={chartData}
-              layout="vertical"
-              margin={{ top: 0, right: 60, bottom: 0, left: 120 }}
-            >
-              <XAxis
-                type="number"
-                tick={{ fontSize: 10, fill: "#64748B" }}
-                axisLine={false}
-                tickLine={false}
-                tickFormatter={(v) => v >= 1000 ? `${(v / 1000).toFixed(0)}k` : String(v)}
-              />
-              <YAxis
-                type="category"
-                dataKey="name"
-                width={116}
-                tick={{ fontSize: 11, fill: "#334155" }}
-                axisLine={false}
-                tickLine={false}
-              />
-              <Tooltip
-                contentStyle={{ fontSize: 12, borderRadius: 8, border: "1px solid #E2E8F0" }}
-                formatter={(val: number) => [`${val.toLocaleString()} ${active.unit}`, active.label]}
-              />
-              <Bar dataKey="value" radius={[0, 4, 4, 0]} maxBarSize={20}>
-                {chartData.map((entry, i) => (
-                  <Cell key={entry.name} fill={HOTEL_COLORS[i % HOTEL_COLORS.length]} />
+      {/* Portfolio Contribution + ESG Radar */}
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
+        {/* Treemap — portfolio contribution */}
+        <Card className="lg:col-span-3">
+          <CardHeader
+            title="Portfolio Contribution by Hotel"
+            hint="area = share of total — click a metric to switch"
+            right={
+              <div className="flex gap-1 flex-wrap justify-end">
+                {METRIC_OPTIONS.map((m) => (
+                  <button
+                    key={m.key}
+                    onClick={() => setMetric(m.key)}
+                    className={cn(
+                      "px-3 py-1 rounded-md text-[11px] font-semibold transition-colors",
+                      metric === m.key ? "bg-brand-700 text-white" : "bg-ink-100 text-ink-600 hover:bg-ink-200"
+                    )}
+                  >
+                    {m.label}
+                  </button>
                 ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-      </Card>
+              </div>
+            }
+          />
+          <div className="px-4 pb-4 pt-1">
+            <div className="mb-2 text-[12px] text-ink-500">
+              Portfolio total: <span className="font-bold text-ink-900">{totalValue.toLocaleString()} {active.unit}</span>
+            </div>
+            <ResponsiveContainer width="100%" height={260}>
+              <Treemap
+                data={chartData.map((d, i) => ({ ...d, fill: HOTEL_COLORS[i % HOTEL_COLORS.length], unit: active.unit }))}
+                dataKey="value"
+                aspectRatio={4 / 3}
+                stroke="#fff"
+                content={<TreemapCell />}
+              >
+                <Tooltip
+                  contentStyle={{ fontSize: 12, borderRadius: 8, border: "1px solid #E2E8F0" }}
+                  formatter={(val: number) => [`${val.toLocaleString()} ${active.unit}`, active.label]}
+                />
+              </Treemap>
+            </ResponsiveContainer>
+          </div>
+        </Card>
+
+        {/* Radar — 6-pillar ESG score */}
+        <Card className="lg:col-span-2">
+          <CardHeader title="ESG Pillar Scores" hint="portfolio avg vs 2026 target (100 = target met)" />
+          <div className="px-2 pb-4 pt-1">
+            <ResponsiveContainer width="100%" height={260}>
+              <RadarChart data={ESG_RADAR_DATA} margin={{ top: 10, right: 20, bottom: 10, left: 20 }}>
+                <PolarGrid stroke="#E2E8F0" />
+                <PolarAngleAxis
+                  dataKey="pillar"
+                  tick={{ fontSize: 10, fill: "#64748B", fontWeight: 600 }}
+                />
+                <PolarRadiusAxis angle={90} domain={[0, 100]} tick={{ fontSize: 9, fill: "#94A3B8" }} tickCount={4} />
+                <Radar name="Score" dataKey="score" stroke="#0F766E" fill="#0F766E" fillOpacity={0.25} strokeWidth={2} />
+                <Radar name="Target" dataKey="target" stroke="#CBD5E1" fill="transparent" strokeDasharray="4 2" strokeWidth={1.5} />
+                <Tooltip contentStyle={{ fontSize: 12, borderRadius: 8 }} />
+              </RadarChart>
+            </ResponsiveContainer>
+            <div className="flex items-center gap-4 justify-center text-[10px] text-ink-500 mt-1">
+              <span className="flex items-center gap-1.5"><span className="w-3 h-0.5 bg-brand-700 inline-block rounded" /> Current</span>
+              <span className="flex items-center gap-1.5"><span className="w-3 h-0.5 bg-ink-300 inline-block rounded border-dashed" /> Target</span>
+            </div>
+          </div>
+        </Card>
+      </div>
 
       {/* Target Status Summary + Cert Alerts */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
