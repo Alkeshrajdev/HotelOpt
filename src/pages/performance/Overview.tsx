@@ -10,7 +10,6 @@ import {
   Zap,
 } from "lucide-react";
 import KpiTile from "@/components/ui/KpiTile";
-import EvidenceMeta from "@/components/ui/EvidenceMeta";
 import Modal from "@/components/ui/Modal";
 import { Card, CardHeader } from "@/components/ui/Card";
 import IntensityChart from "@/components/charts/IntensityChart";
@@ -72,13 +71,13 @@ type PillarConfig = {
 
 const ENERGY_CFG: PillarConfig = {
   kpis: [
-    { id: "energy-score",     icon: <Zap size={18} />,   iconBg: "bg-pillar-energy/10 text-pillar-energy", label: "Energy Score", value: "82", unit: "%", caption: "data compliance" },
-    { id: "energy-index",     icon: <Target size={18} />,iconBg: "bg-pillar-energy/10 text-pillar-energy", label: "Performance Index", value: "91", delta: -4.2 },
-    { id: "energy-intensity", icon: <Zap size={18} />,   iconBg: "bg-warn/10 text-warn",                   label: "Energy Intensity", value: "24", unit: "kWh/ORN", delta: -6.0 },
+    { id: "energy-total",     icon: <Zap size={18} />,   iconBg: "bg-pillar-energy/10 text-pillar-energy", label: "Total consumption", value: "2,840", unit: "MWh", delta: -8.2 },
+    { id: "energy-intensity", icon: <Zap size={18} />,   iconBg: "bg-warn/10 text-warn",                   label: "Energy intensity", value: "24.0", unit: "kWh/ORN", delta: -6.0 },
+    { id: "energy-cost",      icon: <Target size={18} />,iconBg: "bg-pillar-energy/10 text-pillar-energy", label: "Energy cost", value: "$4.6M", delta: -4.0 },
     { id: "renewable",        icon: <Zap size={18} />,   iconBg: "bg-brand-50 text-brand-700",             label: "Renewable share", value: "78", unit: "%", delta: 3.0, goodDirection: "up" },
   ],
-  trendTitle: "Energy intensity over time",
-  trendHint: "kWh/OR · USD/OR · kWh/ORN",
+  trendTitle: "Energy consumption over time",
+  trendHint: "kWh/ORN · monthly",
   trend: { kind: "intensity", data: MONTHLY_INTENSITY },
   showTargets: true,
 };
@@ -210,8 +209,6 @@ export default function Overview({ pillar }: { pillar: PillarKey }) {
   const [drill, setDrill] = useState<string | null>(null);
   const drillContent = drill ? getDrill(drill) : null;
 
-  const evidence = EVIDENCE_BY_PILLAR[pillar];
-
   return (
     <div className="space-y-5">
       {/* KPI tiles */}
@@ -230,25 +227,6 @@ export default function Overview({ pillar }: { pillar: PillarKey }) {
             onClick={() => setDrill(k.id)}
           />
         ))}
-      </div>
-
-      {/* Provenance / evidence meta — supports audit-ready by default */}
-      <div className="card card-pad flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <div className="text-[12px] font-semibold uppercase tracking-[0.08em] text-ink-500">
-            Evidence &amp; provenance
-          </div>
-          <div className="mt-1">
-            <EvidenceMeta
-              records={evidence.records}
-              matchPct={evidence.matchPct}
-              lastApproved={evidence.lastApproved}
-            />
-          </div>
-        </div>
-        <div className="text-[12px] text-ink-500">
-          Click any KPI tile for the full audit trail and source breakdown.
-        </div>
       </div>
 
       {/* Trend + breakdown */}

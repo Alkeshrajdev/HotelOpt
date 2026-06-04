@@ -15,7 +15,6 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import PageHeader from "@/components/ui/PageHeader";
-import WorkflowStrip from "@/components/ui/WorkflowStrip";
 import { cn } from "@/lib/utils";
 
 import OverviewView from "./Overview";
@@ -25,6 +24,9 @@ import ExternalView from "./External";
 import CarbonInventoryView from "./CarbonInventory";
 import DataQualityView from "./DataQuality";
 import EvidenceView from "./Evidence";
+import EnergyPerformanceView from "./EnergyPerformance";
+import EnergyByPropertyView from "./EnergyByProperty";
+import EnergyBenchmarksView from "./EnergyBenchmarks";
 
 export type PillarKey =
   | "energy"
@@ -41,7 +43,11 @@ export type ViewKey =
   | "external-comparison"
   | "carbon-inventory"
   | "data-quality"
-  | "evidence";
+  | "evidence"
+  // energy-specific (new simplified views)
+  | "performance"
+  | "by-property"
+  | "benchmarks";
 
 const PILLAR_DEFS: { key: PillarKey; label: string; icon: LucideIcon; activeColor: string }[] = [
   { key: "energy",     label: "Energy",     icon: Zap,         activeColor: "text-pillar-energy" },
@@ -53,17 +59,20 @@ const PILLAR_DEFS: { key: PillarKey; label: string; icon: LucideIcon; activeColo
 ];
 
 const VIEW_LABEL: Record<ViewKey, string> = {
-  "overview": "Overview",
-  "genuine-performance": "Genuine Performance",
-  "internal-comparison": "Internal Comparison",
-  "external-comparison": "External Comparison",
-  "carbon-inventory": "Carbon Inventory",
-  "data-quality": "Data Quality",
-  "evidence": "Evidence",
+  "overview":             "Overview",
+  "genuine-performance":  "Genuine Performance",
+  "internal-comparison":  "Internal Comparison",
+  "external-comparison":  "External Comparison",
+  "carbon-inventory":     "Carbon Inventory",
+  "data-quality":         "Data Quality",
+  "evidence":             "Evidence",
+  "performance":          "Performance",
+  "by-property":          "By Property",
+  "benchmarks":           "Benchmarks",
 };
 
 const PILLAR_VIEWS: Record<PillarKey, ViewKey[]> = {
-  energy:     ["overview", "genuine-performance", "internal-comparison", "external-comparison", "data-quality"],
+  energy:     ["overview", "performance", "by-property", "benchmarks"],
   water:      ["overview", "genuine-performance", "internal-comparison", "external-comparison", "data-quality"],
   waste:      ["overview", "genuine-performance", "internal-comparison", "external-comparison", "data-quality"],
   carbon:     ["overview", "genuine-performance", "internal-comparison", "external-comparison", "carbon-inventory", "data-quality"],
@@ -120,6 +129,9 @@ function isViewKey(s: string): s is ViewKey {
     "carbon-inventory",
     "data-quality",
     "evidence",
+    "performance",
+    "by-property",
+    "benchmarks",
   ].includes(s);
 }
 
@@ -141,15 +153,9 @@ export default function PerformanceShell() {
   }
   const view: ViewKey = viewParam;
 
-  const wf = PILLAR_WORKFLOW[pillar];
-
   return (
     <div className="space-y-5">
-      <PageHeader
-        eyebrow={`Pillar dashboard · ${PILLAR_DEFS.find((p) => p.key === pillar)!.label}`}
-        title={PILLAR_TITLE[pillar]}
-        subtitle={PILLAR_DESCRIPTIONS[pillar]}
-      />
+      <PageHeader title={PILLAR_TITLE[pillar]} />
 
       {/* Pillar tab strip */}
       <div className="flex items-center gap-1 border-b border-ink-200 overflow-x-auto -mt-2">
@@ -187,54 +193,17 @@ export default function PerformanceShell() {
         ))}
       </div>
 
-      {/* Pillar workflow strip — shows next-action context for this pillar */}
-      <WorkflowStrip
-        stations={[
-          {
-            key: "capture",
-            label: "Data Capture",
-            value: wf.capture,
-            tone: wf.capture.startsWith("9") || wf.capture.startsWith("8") ? "ok" : "warn",
-            href: "/data-capture",
-          },
-          {
-            key: "review",
-            label: "Pending Review",
-            value: `${wf.pending} records`,
-            tone: wf.pending === 0 ? "complete" : wf.pending > 15 ? "warn" : "info",
-            href: `/review-approval?status=submitted&pillar=${pillar}`,
-          },
-          {
-            key: "quality",
-            label: "Data Quality",
-            value: wf.quality,
-            tone: wf.quality.startsWith("9") || wf.quality.startsWith("8") ? "ok" : "warn",
-            href: `/performance/${pillar}/data-quality`,
-          },
-          {
-            key: "gp",
-            label: "GP Ready",
-            value: wf.gpReady ? "Yes · base 2022" : "Not applicable",
-            tone: wf.gpReady ? "complete" : "info",
-          },
-          {
-            key: "reports",
-            label: "Reports Ready",
-            value: wf.reportsReady,
-            tone: "info",
-            href: "/reports",
-          },
-        ]}
-      />
-
       {/* View body */}
-      {view === "overview" && <OverviewView pillar={pillar} />}
+      {view === "overview"           && <OverviewView pillar={pillar} />}
+      {view === "performance"        && <EnergyPerformanceView />}
+      {view === "by-property"        && <EnergyByPropertyView />}
+      {view === "benchmarks"         && <EnergyBenchmarksView />}
       {view === "genuine-performance" && <GenuineView pillar={pillar} />}
       {view === "internal-comparison" && <InternalView pillar={pillar} />}
       {view === "external-comparison" && <ExternalView pillar={pillar} />}
-      {view === "carbon-inventory" && <CarbonInventoryView />}
-      {view === "data-quality" && <DataQualityView pillar={pillar} />}
-      {view === "evidence" && <EvidenceView pillar={pillar} />}
+      {view === "carbon-inventory"   && <CarbonInventoryView />}
+      {view === "data-quality"       && <DataQualityView pillar={pillar} />}
+      {view === "evidence"           && <EvidenceView pillar={pillar} />}
 
     </div>
   );
