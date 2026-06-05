@@ -28,6 +28,12 @@ import EnergyOverviewView from "./EnergyOverview";
 import EnergyPerformanceView from "./EnergyPerformance";
 import EnergyByPropertyView from "./EnergyByProperty";
 import EnergyBenchmarksView from "./EnergyBenchmarks";
+import PillarOverviewView from "./PillarOverview";
+import PillarPerformanceView from "./PillarPerformance";
+import PillarByPropertyView from "./PillarByProperty";
+import PillarBenchmarksView from "./PillarBenchmarks";
+import SocialOverviewView from "./SocialOverview";
+import GovernanceOverviewView from "./GovernanceOverview";
 
 export type PillarKey =
   | "energy"
@@ -74,11 +80,11 @@ const VIEW_LABEL: Record<ViewKey, string> = {
 
 const PILLAR_VIEWS: Record<PillarKey, ViewKey[]> = {
   energy:     ["overview", "performance", "by-property", "benchmarks"],
-  water:      ["overview", "genuine-performance", "internal-comparison", "external-comparison", "data-quality"],
-  waste:      ["overview", "genuine-performance", "internal-comparison", "external-comparison", "data-quality"],
-  carbon:     ["overview", "genuine-performance", "internal-comparison", "external-comparison", "carbon-inventory", "data-quality"],
-  social:     ["overview", "internal-comparison", "data-quality", "evidence"],
-  governance: ["overview", "internal-comparison", "data-quality", "evidence"],
+  water:      ["overview", "performance", "by-property", "benchmarks"],
+  waste:      ["overview", "performance", "by-property", "benchmarks"],
+  carbon:     ["overview", "performance", "by-property", "benchmarks"],
+  social:     ["overview"],
+  governance: ["overview"],
 };
 
 const PILLAR_DESCRIPTIONS: Record<PillarKey, string> = {
@@ -195,17 +201,19 @@ export default function PerformanceShell() {
       </div>
 
       {/* View body */}
-      {view === "overview"           && pillar === "energy" && <EnergyOverviewView />}
-      {view === "overview"           && pillar !== "energy" && <OverviewView pillar={pillar} />}
-      {view === "performance"        && <EnergyPerformanceView />}
-      {view === "by-property"        && <EnergyByPropertyView />}
-      {view === "benchmarks"         && <EnergyBenchmarksView />}
-      {view === "genuine-performance" && <GenuineView pillar={pillar} />}
-      {view === "internal-comparison" && <InternalView pillar={pillar} />}
-      {view === "external-comparison" && <ExternalView pillar={pillar} />}
-      {view === "carbon-inventory"   && <CarbonInventoryView />}
-      {view === "data-quality"       && <DataQualityView pillar={pillar} />}
-      {view === "evidence"           && <EvidenceView pillar={pillar} />}
+      {view === "overview" && pillar === "energy"     && <EnergyOverviewView />}
+      {view === "overview" && pillar === "social"     && <SocialOverviewView />}
+      {view === "overview" && pillar === "governance" && <GovernanceOverviewView />}
+      {view === "overview" && (pillar === "water" || pillar === "waste" || pillar === "carbon") && <PillarOverviewView pillar={pillar} />}
+
+      {view === "performance" && pillar === "energy"  && <EnergyPerformanceView />}
+      {view === "performance" && (pillar === "water" || pillar === "waste" || pillar === "carbon") && <PillarPerformanceView pillar={pillar} />}
+
+      {view === "by-property" && pillar === "energy"  && <EnergyByPropertyView />}
+      {view === "by-property" && (pillar === "water" || pillar === "waste" || pillar === "carbon") && <PillarByPropertyView pillar={pillar} />}
+
+      {view === "benchmarks" && pillar === "energy"   && <EnergyBenchmarksView />}
+      {view === "benchmarks" && (pillar === "water" || pillar === "waste" || pillar === "carbon") && <PillarBenchmarksView pillar={pillar} />}
 
     </div>
   );
