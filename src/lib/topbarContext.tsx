@@ -36,7 +36,7 @@ export function getTopbarConfig(pathname: string): TopbarConfig {
   if (pathname.startsWith("/performance"))
     return { periodType: "year-compare", showProperty: true,  showRegion: false, showDataBasis: false };
   if (pathname.startsWith("/portfolio/dashboard") || pathname === "/dashboard")
-    return { periodType: "none",         showProperty: false, showRegion: false, showDataBasis: false };
+    return { periodType: "year",         showProperty: false, showRegion: true,  showDataBasis: true  };
   if (pathname.startsWith("/data-capture"))
     return { periodType: "month-year",   showProperty: true,  showRegion: false, showDataBasis: false };
   if (pathname.startsWith("/review-approval"))

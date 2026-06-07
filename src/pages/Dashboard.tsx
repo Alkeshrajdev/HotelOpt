@@ -6,7 +6,6 @@ import EnvironmentTab from "./dashboard/EnvironmentTab";
 import TargetsTab from "./dashboard/TargetsTab";
 import HotelsTab from "./dashboard/HotelsTab";
 import SocialGovernanceTab from "./dashboard/SocialGovernanceTab";
-import FilterBar, { DashboardFilters, DEFAULT_FILTERS } from "./dashboard/FilterBar";
 import { cn } from "@/lib/utils";
 
 const TABS = [
@@ -20,8 +19,7 @@ const TABS = [
 type TabKey = (typeof TABS)[number]["key"];
 
 export default function Dashboard() {
-  const [tab, setTab]         = useState<TabKey>("overview");
-  const [filters, setFilters] = useState<DashboardFilters>(DEFAULT_FILTERS);
+  const [tab, setTab] = useState<TabKey>("overview");
 
   return (
     <div>
@@ -51,10 +49,8 @@ export default function Dashboard() {
         ))}
       </div>
 
-      <FilterBar filters={filters} onChange={setFilters} />
-
       <div className="mt-6">
-        {tab === "overview"    && <OverviewTab filters={filters} onNavigate={(t) => setTab(t as TabKey)} />}
+        {tab === "overview"    && <OverviewTab onNavigate={(t) => setTab(t as TabKey)} />}
         {tab === "environment" && <EnvironmentTab />}
         {tab === "targets"     && <TargetsTab />}
         {tab === "hotels"      && <HotelsTab />}
