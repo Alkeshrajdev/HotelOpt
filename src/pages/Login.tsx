@@ -4,7 +4,7 @@ import { Loader2 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 
 export default function Login() {
-  const { session, signIn, loading } = useAuth();
+  const { session, signIn, signInDemo, loading } = useAuth();
   const location = useLocation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -104,6 +104,19 @@ export default function Login() {
               Sign in
             </button>
           </form>
+
+          <div className="flex items-center gap-3 mt-4">
+            <div className="flex-1 h-px bg-ink-200" />
+            <span className="text-[11px] text-ink-400">or</span>
+            <div className="flex-1 h-px bg-ink-200" />
+          </div>
+          <button
+            type="button"
+            onClick={signInDemo}
+            className="btn-secondary w-full mt-4 text-[13px]"
+          >
+            Continue as Demo
+          </button>
 
         </div>
       </div>
