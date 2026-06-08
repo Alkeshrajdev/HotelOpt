@@ -1,11 +1,11 @@
-import { Link } from "react-router-dom";
+import { useState } from "react";
 import {
   Zap, Droplet, Cloud, Recycle,
   DollarSign, TrendingDown, ArrowRight,
 } from "lucide-react";
 import {
   ComposedChart, Bar, Line, XAxis, YAxis, Tooltip,
-  ResponsiveContainer, CartesianGrid, Legend,
+  ResponsiveContainer, CartesianGrid, ReferenceLine,
 } from "recharts";
 import { cn } from "@/lib/utils";
 
@@ -13,26 +13,38 @@ type Props = { onNavigate: (tab: string) => void };
 
 /* ─── Mock data ──────────────────────────────────────────────────────────── */
 
-// Monthly portfolio-level cost ($k) + carbon intensity (kgCO₂e/ORN)
-// TY = May 2025 – Apr 2026 | PY = May 2024 – Apr 2025
+// Monthly portfolio-level cost ($k) broken out by utility + carbon intensity
+// TY = May 2025 – Apr 2026  |  PY = May 2024 – Apr 2025
+// Split: Energy ≈65% · Water ≈20% · Waste ≈15%
 const MONTHLY = [
-  { month:"May", costTY:348, costPY:371, intensity:11.6 },
-  { month:"Jun", costTY:405, costPY:431, intensity:13.1 },
-  { month:"Jul", costTY:458, costPY:488, intensity:14.8 },
-  { month:"Aug", costTY:466, costPY:496, intensity:15.1 },
-  { month:"Sep", costTY:421, costPY:448, intensity:13.7 },
-  { month:"Oct", costTY:401, costPY:427, intensity:14.8 },
-  { month:"Nov", costTY:377, costPY:401, intensity:15.9 },
-  { month:"Dec", costTY:390, costPY:415, intensity:15.6 },
-  { month:"Jan", costTY:367, costPY:391, intensity:15.3 },
-  { month:"Feb", costTY:344, costPY:366, intensity:14.8 },
-  { month:"Mar", costTY:384, costPY:409, intensity:14.5 },
-  { month:"Apr", costTY:421, costPY:448, intensity:17.7 },
+  { month:"May", energyTY:226, waterTY:70,  wasteTY:52,  energyPY:241, waterPY:74,  wastePY:56,  costPY:371,  intensity:11.6 },
+  { month:"Jun", energyTY:263, waterTY:81,  wasteTY:61,  energyPY:280, waterPY:86,  wastePY:65,  costPY:431,  intensity:13.1 },
+  { month:"Jul", energyTY:298, waterTY:92,  wasteTY:68,  energyPY:317, waterPY:98,  wastePY:73,  costPY:488,  intensity:14.8 },
+  { month:"Aug", energyTY:303, waterTY:93,  wasteTY:70,  energyPY:322, waterPY:99,  wastePY:75,  costPY:496,  intensity:15.1 },
+  { month:"Sep", energyTY:274, waterTY:84,  wasteTY:63,  energyPY:291, waterPY:90,  wastePY:67,  costPY:448,  intensity:13.7 },
+  { month:"Oct", energyTY:261, waterTY:80,  wasteTY:60,  energyPY:278, waterPY:85,  wastePY:64,  costPY:427,  intensity:14.8 },
+  { month:"Nov", energyTY:245, waterTY:75,  wasteTY:57,  energyPY:261, waterPY:80,  wastePY:60,  costPY:401,  intensity:15.9 },
+  { month:"Dec", energyTY:254, waterTY:78,  wasteTY:58,  energyPY:270, waterPY:83,  wastePY:62,  costPY:415,  intensity:15.6 },
+  { month:"Jan", energyTY:239, waterTY:73,  wasteTY:55,  energyPY:254, waterPY:78,  wastePY:59,  costPY:391,  intensity:15.3 },
+  { month:"Feb", energyTY:224, waterTY:68,  wasteTY:52,  energyPY:238, waterPY:73,  wastePY:55,  costPY:366,  intensity:14.8 },
+  { month:"Mar", energyTY:250, waterTY:77,  wasteTY:57,  energyPY:266, waterPY:82,  wastePY:61,  costPY:409,  intensity:14.5 },
+  { month:"Apr", energyTY:274, waterTY:84,  wasteTY:63,  energyPY:291, waterPY:90,  wastePY:67,  costPY:448,  intensity:17.7 },
 ];
 
-const TOTAL_TY   = MONTHLY.reduce((s, m) => s + m.costTY, 0); // 4,782
-const TOTAL_PY   = MONTHLY.reduce((s, m) => s + m.costPY, 0); // 5,091
+const TOTAL_TY   = MONTHLY.reduce((s, m) => s + m.energyTY + m.waterTY + m.wasteTY, 0); // 4,782
+const TOTAL_PY   = MONTHLY.reduce((s, m) => s + m.costPY, 0);                           // 5,091
 const SAVINGS    = TOTAL_PY - TOTAL_TY; // ~309
+
+/* ─── Metric toggle config ────────────────────────────────────────────────── */
+type Metric = "energy" | "water" | "waste" | "combined" | "carbon";
+
+const METRICS: { key: Metric; label: string; color: string; pyKey: string }[] = [
+  { key: "energy",   label: "Energy",   color: "#D97706", pyKey: "energyPY" },
+  { key: "water",    label: "Water",    color: "#0EA5E9", pyKey: "waterPY"  },
+  { key: "waste",    label: "Waste",    color: "#7C3AED", pyKey: "wastePY"  },
+  { key: "combined", label: "Combined", color: "#0F6A3C", pyKey: "costPY"   },
+  { key: "carbon",   label: "Carbon",   color: "#0f766e", pyKey: ""         },
+];
 
 /* ─── Executive Snapshot tiles ───────────────────────────────────────────── */
 type SnapTile = {
@@ -143,27 +155,76 @@ const EFF_TILES: EffTile[] = [
 ];
 
 /* ─── Tooltip ────────────────────────────────────────────────────────────── */
-function ChartTip({ active, payload, label }: {
+function ChartTip({ active, payload, label, metric }: {
   active?: boolean;
-  payload?: { dataKey: string; value: number; color: string }[];
+  payload?: { dataKey: string; value: number; color: string; name?: string }[];
   label?: string;
+  metric: Metric;
 }) {
   if (!active || !payload?.length) return null;
-  const ty = payload.find(p => p.dataKey === "costTY");
-  const py = payload.find(p => p.dataKey === "costPY");
-  const int = payload.find(p => p.dataKey === "intensity");
-  const diff = ty && py ? ty.value - py.value : null;
-  return (
-    <div className="bg-white border border-ink-200 rounded-xl shadow-pop px-3.5 py-3 text-[12px] min-w-[180px]">
-      <div className="font-semibold text-ink-800 mb-2">{label}</div>
-      {ty && <div className="flex justify-between gap-4"><span className="text-ink-500">Cost (this year)</span><span className="font-bold text-ink-900">${ty.value}k</span></div>}
-      {py && <div className="flex justify-between gap-4"><span className="text-ink-500">Cost (prior year)</span><span className="text-ink-400">${py.value}k</span></div>}
-      {diff !== null && (
-        <div className={cn("flex justify-between gap-4 mt-1 pt-1 border-t border-ink-100 font-semibold", diff < 0 ? "text-good" : "text-bad")}>
-          <span>Saving</span><span>{diff < 0 ? "+" : "−"}${Math.abs(diff)}k</span>
+
+  if (metric === "carbon") {
+    const int = payload.find((p) => p.dataKey === "intensity");
+    return (
+      <div className="bg-white border border-ink-200 rounded-xl shadow-pop px-3.5 py-3 text-[12px] min-w-[160px]">
+        <div className="font-semibold text-ink-800 mb-2">{label}</div>
+        {int && (
+          <div className="flex justify-between gap-4">
+            <span className="text-ink-500">Carbon intensity</span>
+            <span className="font-bold text-teal-700">{int.value} kgCO₂e/ORN</span>
+          </div>
+        )}
+        <div className="flex justify-between gap-4 mt-1 text-ink-400 text-[11px]">
+          <span>2030 target</span><span>11.0 kgCO₂e/ORN</span>
         </div>
-      )}
-      {int && <div className="flex justify-between gap-4 mt-1.5 border-t border-ink-100 pt-1.5"><span className="text-ink-500">Carbon intensity</span><span className="font-bold text-teal-700">{int.value} kgCO₂e/ORN</span></div>}
+      </div>
+    );
+  }
+
+  const metricCfg = METRICS.find((m) => m.key === metric)!;
+  const pyKey     = metricCfg.pyKey;
+
+  if (metric === "combined") {
+    const eTY = payload.find((p) => p.dataKey === "energyTY")?.value ?? 0;
+    const wTY = payload.find((p) => p.dataKey === "waterTY")?.value  ?? 0;
+    const dTY = payload.find((p) => p.dataKey === "wasteTY")?.value  ?? 0;
+    const tot = eTY + wTY + dTY;
+    const py  = payload.find((p) => p.dataKey === pyKey)?.value ?? 0;
+    const diff = tot - py;
+    return (
+      <div className="bg-white border border-ink-200 rounded-xl shadow-pop px-3.5 py-3 text-[12px] min-w-[190px]">
+        <div className="font-semibold text-ink-800 mb-2">{label}</div>
+        <div className="space-y-0.5">
+          <div className="flex justify-between gap-4"><span className="text-amber-600">Energy</span><span className="font-medium">${eTY}k</span></div>
+          <div className="flex justify-between gap-4"><span className="text-sky-500">Water</span><span className="font-medium">${wTY}k</span></div>
+          <div className="flex justify-between gap-4"><span className="text-violet-600">Waste</span><span className="font-medium">${dTY}k</span></div>
+        </div>
+        <div className="border-t border-ink-100 mt-1.5 pt-1.5 space-y-0.5">
+          <div className="flex justify-between gap-4 font-semibold"><span className="text-ink-700">Total TY</span><span>${tot}k</span></div>
+          <div className="flex justify-between gap-4 text-ink-400"><span>Prior year</span><span>${py}k</span></div>
+          <div className={cn("flex justify-between gap-4 font-semibold", diff < 0 ? "text-good" : "text-bad")}>
+            <span>vs PY</span><span>{diff < 0 ? "−" : "+"}${Math.abs(diff)}k</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Energy / Water / Waste
+  const tyKey  = `${metric}TY` as const;
+  const ty     = payload.find((p) => p.dataKey === tyKey)?.value ?? 0;
+  const py     = payload.find((p) => p.dataKey === pyKey)?.value ?? 0;
+  const diff   = ty - py;
+  const labels: Record<string, string> = { energy: "Energy", water: "Water", waste: "Waste" };
+
+  return (
+    <div className="bg-white border border-ink-200 rounded-xl shadow-pop px-3.5 py-3 text-[12px] min-w-[170px]">
+      <div className="font-semibold text-ink-800 mb-2">{label}</div>
+      <div className="flex justify-between gap-4"><span className="text-ink-500">{labels[metric]} (TY)</span><span className="font-bold text-ink-900">${ty}k</span></div>
+      <div className="flex justify-between gap-4"><span className="text-ink-400">{labels[metric]} (PY)</span><span className="text-ink-400">${py}k</span></div>
+      <div className={cn("flex justify-between gap-4 mt-1 pt-1 border-t border-ink-100 font-semibold", diff < 0 ? "text-good" : "text-bad")}>
+        <span>vs PY</span><span>{diff < 0 ? "−" : "+"}${Math.abs(diff)}k</span>
+      </div>
     </div>
   );
 }
@@ -184,6 +245,9 @@ function SectionLabel({ title, action, onClick }: { title: string; action?: stri
 
 /* ─── Main ───────────────────────────────────────────────────────────────── */
 export default function OverviewTab({ onNavigate }: Props) {
+  const [metric, setMetric] = useState<Metric>("combined");
+  const metricCfg = METRICS.find((m) => m.key === metric)!;
+
   return (
     <div className="space-y-8">
 
@@ -223,60 +287,182 @@ export default function OverviewTab({ onNavigate }: Props) {
 
       {/* ── 2. Cost & Performance Trend ───────────────────────────────────── */}
       <div>
-        <SectionLabel
-          title="Portfolio Cost & Performance Trend"
-          action="View environment"
-          onClick={() => onNavigate("environment")}
-        />
+        {/* Header row: title + metric switcher */}
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-[11px] font-bold uppercase tracking-[0.1em] text-ink-400">
+            Portfolio Cost &amp; Performance Trend
+          </h2>
+          <div className="flex items-center gap-1 bg-ink-100 rounded-lg p-0.5">
+            {METRICS.map((m) => (
+              <button
+                key={m.key}
+                onClick={() => setMetric(m.key)}
+                className={cn(
+                  "px-2.5 h-6 text-[11px] font-medium rounded-md transition-colors",
+                  metric === m.key
+                    ? "bg-white text-ink-900 shadow-sm"
+                    : "text-ink-500 hover:text-ink-700"
+                )}
+              >
+                {m.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
         <div className="card p-6">
           {/* Summary strip */}
           <div className="flex flex-wrap gap-6 mb-5 text-[12px]">
-            <div>
-              <span className="text-ink-500">This year  </span>
-              <span className="font-bold text-ink-900">${(TOTAL_TY / 1000).toFixed(1)}M total spend</span>
-            </div>
-            <div>
-              <span className="text-ink-500">Prior year  </span>
-              <span className="font-semibold text-ink-400">${(TOTAL_PY / 1000).toFixed(1)}M</span>
-            </div>
-            <div>
-              <span className="text-ink-500">Saving  </span>
-              <span className="font-bold text-good">${SAVINGS}k saved</span>
-            </div>
+            {metric !== "carbon" && (
+              <>
+                <div>
+                  <span className="text-ink-500">This year  </span>
+                  <span className="font-bold text-ink-900">${(TOTAL_TY / 1000).toFixed(1)}M total spend</span>
+                </div>
+                <div>
+                  <span className="text-ink-500">Prior year  </span>
+                  <span className="font-semibold text-ink-400">${(TOTAL_PY / 1000).toFixed(1)}M</span>
+                </div>
+                <div>
+                  <span className="text-ink-500">Saving  </span>
+                  <span className="font-bold text-good">${SAVINGS}k saved</span>
+                </div>
+              </>
+            )}
+            {metric === "carbon" && (
+              <div>
+                <span className="text-ink-500">Carbon intensity  </span>
+                <span className="font-bold text-ink-900">avg 14.6 kgCO₂e/ORN  </span>
+                <span className="text-[11px] text-good font-semibold">2030 target: 11.0</span>
+              </div>
+            )}
+
+            {/* Legend */}
             <div className="ml-auto flex items-center gap-3 text-[11px] text-ink-500">
-              <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm inline-block bg-brand-700 opacity-80" />This year</span>
-              <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm inline-block bg-slate-200" />Prior year</span>
-              <span className="flex items-center gap-1.5"><span className="w-4 border-t-2 border-dashed border-teal-600 inline-block" />Carbon intensity</span>
+              {metric === "combined" && (
+                <>
+                  <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm inline-block bg-amber-500" />Energy</span>
+                  <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm inline-block bg-sky-400" />Water</span>
+                  <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm inline-block bg-violet-600" />Waste</span>
+                </>
+              )}
+              {metric !== "combined" && metric !== "carbon" && (
+                <span className="flex items-center gap-1.5">
+                  <span className="w-3 h-3 rounded-sm inline-block" style={{ background: metricCfg.color }} />
+                  {metricCfg.label}
+                </span>
+              )}
+              {metric !== "carbon" && (
+                <span className="flex items-center gap-1.5">
+                  <span className="w-5 border-t-2 border-dashed border-slate-400 inline-block" />
+                  Prior year
+                </span>
+              )}
+              {metric === "carbon" && (
+                <>
+                  <span className="flex items-center gap-1.5"><span className="w-5 border-t-2 border-teal-600 inline-block" />Intensity</span>
+                  <span className="flex items-center gap-1.5"><span className="w-5 border-t-2 border-dashed border-green-600 inline-block" />2030 target</span>
+                </>
+              )}
             </div>
           </div>
+
           <ResponsiveContainer width="100%" height={280}>
-            <ComposedChart data={MONTHLY} barGap={2} barCategoryGap="22%">
+            <ComposedChart data={MONTHLY} barCategoryGap="28%">
               <CartesianGrid vertical={false} stroke="#f3f4f6" />
               <XAxis dataKey="month" tick={{ fontSize:11, fill:"#6b7280" }} axisLine={false} tickLine={false} />
-              <YAxis
-                yAxisId="cost" orientation="left"
-                tick={{ fontSize:11, fill:"#6b7280" }}
-                tickFormatter={v => `$${v}k`}
-                axisLine={false} tickLine={false} width={52}
-                domain={[200, 600]}
+
+              {/* Cost Y-axis (non-carbon modes) */}
+              {metric !== "carbon" && (
+                <YAxis
+                  yAxisId="main" orientation="left"
+                  tick={{ fontSize:11, fill:"#6b7280" }}
+                  tickFormatter={(v) => `$${v}k`}
+                  axisLine={false} tickLine={false} width={52}
+                />
+              )}
+
+              {/* Carbon Y-axis */}
+              {metric === "carbon" && (
+                <YAxis
+                  yAxisId="main" orientation="left"
+                  tick={{ fontSize:11, fill:"#0f766e" }}
+                  tickFormatter={(v) => `${v}`}
+                  axisLine={false} tickLine={false} width={40}
+                  domain={[8, 22]}
+                  label={{ value:"kgCO₂e/ORN", angle:-90, position:"insideLeft", offset:-2, style:{ fontSize:9, fill:"#0f766e" } }}
+                />
+              )}
+
+              <Tooltip
+                content={(props) => (
+                  <ChartTip
+                    active={props.active}
+                    payload={props.payload as { dataKey: string; value: number; color: string }[]}
+                    label={props.label}
+                    metric={metric}
+                  />
+                )}
+                cursor={{ fill:"rgba(0,0,0,0.025)" }}
               />
-              <YAxis
-                yAxisId="int" orientation="right"
-                tick={{ fontSize:11, fill:"#0f766e" }}
-                tickFormatter={v => `${v}`}
-                axisLine={false} tickLine={false} width={36}
-                domain={[8, 22]}
-                label={{ value:"kgCO₂e/ORN", angle:90, position:"insideRight", offset:8, style:{ fontSize:9, fill:"#0f766e" } }}
-              />
-              <Tooltip content={<ChartTip />} cursor={{ fill:"rgba(0,0,0,0.025)" }} />
-              <Bar yAxisId="cost" dataKey="costPY" name="Prior year" fill="#e2e8f0" radius={[3,3,0,0]} isAnimationActive={false} />
-              <Bar yAxisId="cost" dataKey="costTY" name="This year"  fill="#0F6A3C" radius={[3,3,0,0]} isAnimationActive={false} opacity={0.85} />
-              <Line
-                yAxisId="int" dataKey="intensity" name="Carbon intensity"
-                stroke="#0f766e" strokeWidth={2} strokeDasharray="5 3"
-                dot={{ fill:"#0f766e", r:3 }} activeDot={{ r:5 }}
-                isAnimationActive={false}
-              />
+
+              {/* ── Bars — Combined mode (stacked) ── */}
+              {metric === "combined" && (
+                <>
+                  <Bar yAxisId="main" dataKey="energyTY" stackId="s" fill="#F59E0B" radius={[0,0,0,0]} isAnimationActive={false} />
+                  <Bar yAxisId="main" dataKey="waterTY"  stackId="s" fill="#38BDF8" radius={[0,0,0,0]} isAnimationActive={false} />
+                  <Bar yAxisId="main" dataKey="wasteTY"  stackId="s" fill="#7C3AED" radius={[3,3,0,0]} isAnimationActive={false} />
+                </>
+              )}
+
+              {/* ── Bar — Energy / Water / Waste single mode ── */}
+              {(metric === "energy" || metric === "water" || metric === "waste") && (
+                <Bar
+                  yAxisId="main"
+                  dataKey={`${metric}TY`}
+                  fill={metricCfg.color}
+                  radius={[3,3,0,0]}
+                  isAnimationActive={false}
+                  opacity={0.9}
+                />
+              )}
+
+              {/* ── Dashed prior-year line (all non-carbon) ── */}
+              {metric !== "carbon" && (
+                <Line
+                  yAxisId="main"
+                  dataKey={metricCfg.pyKey}
+                  stroke="#94a3b8"
+                  strokeWidth={1.5}
+                  strokeDasharray="5 3"
+                  dot={false}
+                  activeDot={{ r: 4, fill: "#94a3b8" }}
+                  isAnimationActive={false}
+                />
+              )}
+
+              {/* ── Carbon intensity line ── */}
+              {metric === "carbon" && (
+                <>
+                  <Line
+                    yAxisId="main"
+                    dataKey="intensity"
+                    stroke="#0f766e"
+                    strokeWidth={2}
+                    dot={{ fill:"#0f766e", r:3 }}
+                    activeDot={{ r:5 }}
+                    isAnimationActive={false}
+                  />
+                  <ReferenceLine
+                    yAxisId="main"
+                    y={11}
+                    stroke="#16a34a"
+                    strokeDasharray="4 2"
+                    strokeWidth={1.5}
+                    label={{ value:"2030 target", position:"insideTopRight", fontSize:10, fill:"#16a34a" }}
+                  />
+                </>
+              )}
             </ComposedChart>
           </ResponsiveContainer>
         </div>

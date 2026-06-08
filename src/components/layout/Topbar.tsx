@@ -28,6 +28,7 @@ import {
   CreditCard,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
+import DashboardFilterBar from "../../pages/dashboard/FilterBar";
 import {
   useTopbar, DATA_BASIS_LABEL, type DataBasis,
   getTopbarConfig, YEAR_OPTIONS, MONTH_OPTIONS, type OpsGranularity,
@@ -171,9 +172,10 @@ export default function Topbar() {
     opsGranularity, setOpsGranularity, opsCustomStart, setOpsCustomStart,
     opsCustomEnd, setOpsCustomEnd,
   } = useTopbar();
-  const navigate = useNavigate();
-  const location = useLocation();
-  const cfg      = getTopbarConfig(location.pathname);
+  const navigate     = useNavigate();
+  const location     = useLocation();
+  const cfg          = getTopbarConfig(location.pathname);
+  const isDashboard  = location.pathname.startsWith("/portfolio/dashboard") || location.pathname === "/dashboard";
 
   const [menuOpen,        setMenuOpen]        = useState(false);
   const [notifOpen,       setNotifOpen]       = useState(false);
@@ -272,8 +274,11 @@ export default function Topbar() {
     <>
       <header className="h-16 border-b border-ink-200 bg-white dark-surface flex items-center px-4 sm:px-6 gap-3 sm:gap-4 shrink-0 z-20">
 
+        {/* ── Dashboard filter bar (replaces standard filters + search) ── */}
+        {isDashboard && <DashboardFilterBar />}
+
         {/* ── Context filters — desktop (xl+) ── */}
-        <div className="hidden xl:flex items-center gap-2 flex-wrap">
+        {!isDashboard && <div className="hidden xl:flex items-center gap-2 flex-wrap">
 
           {/* Property */}
           {cfg.showProperty && (
@@ -474,10 +479,10 @@ export default function Topbar() {
               )}
             </div>
           )}
-        </div>
+        </div>}
 
         {/* ── Compact filters — mobile (below xl) ── */}
-        <div className="xl:hidden relative" ref={filterRef}>
+        {!isDashboard && <div className="xl:hidden relative" ref={filterRef}>
           <button onClick={() => setFiltersOpen((v) => !v)} className="btn-secondary h-8 px-2.5 text-[12px]">
             <SlidersHorizontal size={13} /> Filters
           </button>
@@ -578,10 +583,10 @@ export default function Topbar() {
               </div>
             </div>
           )}
-        </div>
+        </div>}
 
         {/* ── Search bar (opens ⌘K modal) ── */}
-        <div className="relative flex-1 max-w-lg">
+        {!isDashboard && <div className="relative flex-1 max-w-lg">
           <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-400 pointer-events-none" />
           <input
             readOnly
@@ -590,7 +595,7 @@ export default function Topbar() {
             placeholder="Search properties, reports, suppliers, actions…"
           />
           <span className="kbd absolute right-3 top-1/2 -translate-y-1/2 hidden sm:inline">⌘K</span>
-        </div>
+        </div>}
 
         {/* ── Right cluster ── */}
         <div className="ml-auto flex items-center gap-1.5 sm:gap-2">

@@ -14,6 +14,15 @@ export const DATA_BASIS_LABEL: Record<DataBasis, string> = {
   "pending":              "Pending review",
 };
 
+/* ─── Dashboard filter types ─────────────────────────────────────────────── */
+export type DashMode = "year" | "month";
+
+export type DashComparison =
+  | { type: "prior-year"; year: number }
+  | { type: "same-month-ly" }
+  | { type: "prior-month" }
+  | { type: "custom"; year: number; month: number };
+
 /* ─── Period types ───────────────────────────────────────────────────────── */
 export type PeriodType =
   | "year"          // single calendar year picker
@@ -36,7 +45,7 @@ export function getTopbarConfig(pathname: string): TopbarConfig {
   if (pathname.startsWith("/performance"))
     return { periodType: "year-compare", showProperty: true,  showRegion: false, showDataBasis: false };
   if (pathname.startsWith("/portfolio/dashboard") || pathname === "/dashboard")
-    return { periodType: "year",         showProperty: false, showRegion: true,  showDataBasis: true  };
+    return { periodType: "none",         showProperty: false, showRegion: false, showDataBasis: false };
   if (pathname.startsWith("/data-capture"))
     return { periodType: "month-year",   showProperty: true,  showRegion: false, showDataBasis: false };
   if (pathname.startsWith("/review-approval"))
@@ -88,6 +97,17 @@ type TopbarCtx = {
   setRegion:         (v: string) => void;
   dataBasis:         DataBasis;
   setDataBasis:      (v: DataBasis) => void;
+  // Dashboard-specific filters
+  dashHotelIds:       "all" | string[];
+  setDashHotelIds:    (v: "all" | string[]) => void;
+  dashMode:           DashMode;
+  setDashMode:        (v: DashMode) => void;
+  dashYear:           number;
+  setDashYear:        (v: number) => void;
+  dashMonth:          number;
+  setDashMonth:       (v: number) => void;
+  dashComparison:     DashComparison;
+  setDashComparison:  (v: DashComparison) => void;
   // Computed helpers (backward compat)
   period:            string;
   lastRefreshed:     Date;
@@ -110,6 +130,13 @@ export function TopbarProvider({ children }: { children: ReactNode }) {
   const [region,         setRegion]         = useState("All Regions");
   const [dataBasis,      setDataBasis]      = useState<DataBasis>("approved");
   const [lastRefreshed]                     = useState(new Date());
+
+  // Dashboard filter state
+  const [dashHotelIds,   setDashHotelIds]   = useState<"all" | string[]>("all");
+  const [dashMode,       setDashMode]       = useState<DashMode>("year");
+  const [dashYear,       setDashYear]       = useState(2025);
+  const [dashMonth,      setDashMonth]      = useState(now.getMonth() + 1);
+  const [dashComparison, setDashComparison] = useState<DashComparison>({ type: "prior-year", year: 2024 });
 
   const hhmm = lastRefreshed.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 
@@ -136,6 +163,11 @@ export function TopbarProvider({ children }: { children: ReactNode }) {
       property,       setProperty,
       region,         setRegion,
       dataBasis,      setDataBasis,
+      dashHotelIds,   setDashHotelIds,
+      dashMode,       setDashMode,
+      dashYear,       setDashYear,
+      dashMonth,      setDashMonth,
+      dashComparison, setDashComparison,
       period,
       lastRefreshed,
       contextLine,
