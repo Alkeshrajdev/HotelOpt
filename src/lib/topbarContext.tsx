@@ -15,12 +15,14 @@ export const DATA_BASIS_LABEL: Record<DataBasis, string> = {
 };
 
 /* ─── Dashboard filter types ─────────────────────────────────────────────── */
-export type DashMode = "year" | "month";
+export type DashMode = "year" | "quarter" | "month";
 
 export type DashComparison =
-  | { type: "prior-year"; year: number }
+  | { type: "prior-year";     year: number }
   | { type: "same-month-ly" }
   | { type: "prior-month" }
+  | { type: "same-quarter-ly" }
+  | { type: "prior-quarter" }
   | { type: "custom"; year: number; month: number };
 
 /* ─── Period types ───────────────────────────────────────────────────────── */
@@ -106,6 +108,8 @@ type TopbarCtx = {
   setDashYear:        (v: number) => void;
   dashMonth:          number;
   setDashMonth:       (v: number) => void;
+  dashQuarter:        number;
+  setDashQuarter:     (v: number) => void;
   dashComparison:     DashComparison;
   setDashComparison:  (v: DashComparison) => void;
   // Computed helpers (backward compat)
@@ -136,6 +140,7 @@ export function TopbarProvider({ children }: { children: ReactNode }) {
   const [dashMode,       setDashMode]       = useState<DashMode>("year");
   const [dashYear,       setDashYear]       = useState(2025);
   const [dashMonth,      setDashMonth]      = useState(now.getMonth() + 1);
+  const [dashQuarter,    setDashQuarter]    = useState(2);
   const [dashComparison, setDashComparison] = useState<DashComparison>({ type: "prior-year", year: 2024 });
 
   const hhmm = lastRefreshed.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
@@ -167,6 +172,7 @@ export function TopbarProvider({ children }: { children: ReactNode }) {
       dashMode,       setDashMode,
       dashYear,       setDashYear,
       dashMonth,      setDashMonth,
+      dashQuarter,    setDashQuarter,
       dashComparison, setDashComparison,
       period,
       lastRefreshed,

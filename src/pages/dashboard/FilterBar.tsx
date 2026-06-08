@@ -65,30 +65,36 @@ function DropdownItem({
 }
 
 /* ── Desktop controls ───────────────────────────────────────────────────────── */
+const QUARTERS = ["Q1", "Q2", "Q3", "Q4"];
+
 function DesktopControls() {
   const {
     dashHotelIds, setDashHotelIds,
     dashMode, setDashMode,
     dashYear, setDashYear,
     dashMonth, setDashMonth,
+    dashQuarter, setDashQuarter,
     dashComparison, setDashComparison,
   } = useTopbar();
 
   const [propsOpen,      setPropsOpen]      = useState(false);
   const [yearOpen,       setYearOpen]       = useState(false);
   const [monthOpen,      setMonthOpen]      = useState(false);
+  const [quarterOpen,    setQuarterOpen]    = useState(false);
   const [cmpYearOpen,    setCmpYearOpen]    = useState(false);
 
-  const propsRef   = useRef<HTMLDivElement>(null);
-  const yearRef    = useRef<HTMLDivElement>(null);
-  const monthRef   = useRef<HTMLDivElement>(null);
-  const cmpYearRef = useRef<HTMLDivElement>(null);
+  const propsRef    = useRef<HTMLDivElement>(null);
+  const yearRef     = useRef<HTMLDivElement>(null);
+  const monthRef    = useRef<HTMLDivElement>(null);
+  const quarterRef  = useRef<HTMLDivElement>(null);
+  const cmpYearRef  = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const close = (e: MouseEvent) => {
       if (propsRef.current   && !propsRef.current.contains(e.target as Node))   setPropsOpen(false);
       if (yearRef.current    && !yearRef.current.contains(e.target as Node))    setYearOpen(false);
       if (monthRef.current   && !monthRef.current.contains(e.target as Node))   setMonthOpen(false);
+      if (quarterRef.current && !quarterRef.current.contains(e.target as Node)) setQuarterOpen(false);
       if (cmpYearRef.current && !cmpYearRef.current.contains(e.target as Node)) setCmpYearOpen(false);
     };
     document.addEventListener("mousedown", close);
@@ -128,8 +134,9 @@ function DesktopControls() {
 
   const switchMode = (m: DashMode) => {
     setDashMode(m);
-    if (m === "year")  setDashComparison({ type: "prior-year", year: dashYear - 1 });
-    if (m === "month") setDashComparison({ type: "same-month-ly" });
+    if (m === "year")    setDashComparison({ type: "prior-year", year: dashYear - 1 });
+    if (m === "quarter") setDashComparison({ type: "same-quarter-ly" });
+    if (m === "month")   setDashComparison({ type: "same-month-ly" });
   };
 
   const compYears = YEAR_OPTIONS.filter((y) => y < dashYear);
@@ -218,23 +225,50 @@ function DesktopControls() {
 
       {/* ── Mode toggle ─────────────────────────────────────────────────── */}
       <div className="flex items-center bg-ink-100 rounded-lg p-0.5 shrink-0">
-        {(["year", "month"] as DashMode[]).map((m) => (
+        {(["year", "quarter", "month"] as DashMode[]).map((m) => (
           <button
             key={m}
             onClick={() => switchMode(m)}
             className={cn(
-              "px-3 h-6 text-[12px] font-medium rounded-md transition-colors",
+              "px-2.5 h-6 text-[12px] font-medium rounded-md transition-colors",
               m === dashMode
                 ? "bg-white text-ink-900 shadow-sm"
                 : "text-ink-500 hover:text-ink-700"
             )}
           >
-            {m === "year" ? "Year" : "Month"}
+            {m === "year" ? "Year" : m === "quarter" ? "Quarter" : "Month"}
           </button>
         ))}
       </div>
 
       {/* ── Period picker ───────────────────────────────────────────────── */}
+      {/* Quarter picker */}
+      {dashMode === "quarter" && (
+        <div className="relative" ref={quarterRef}>
+          <button
+            onClick={() => { setQuarterOpen((v) => !v); setYearOpen(false); }}
+            className="inline-flex items-center gap-1 h-8 px-2.5 rounded-lg border border-ink-200 bg-white text-[12px] font-medium text-ink-700 hover:bg-ink-50 transition-colors"
+          >
+            {QUARTERS[dashQuarter - 1]}
+            <ChevronDown size={11} className="text-ink-400" />
+          </button>
+          {quarterOpen && (
+            <div className="absolute left-0 top-10 w-20 card shadow-pop z-50 py-1">
+              {QUARTERS.map((q, i) => (
+                <DropdownItem
+                  key={q}
+                  selected={(i + 1) === dashQuarter}
+                  onClick={() => { setDashQuarter(i + 1); setQuarterOpen(false); }}
+                >
+                  {q}
+                </DropdownItem>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Month picker */}
       {dashMode === "month" && (
         <div className="relative" ref={monthRef}>
           <button
@@ -317,6 +351,29 @@ function DesktopControls() {
         </div>
       )}
 
+      {/* ── Comparison — quarter mode ────────────────────────────────────── */}
+      {dashMode === "quarter" && (
+        <div className="flex items-center gap-1.5">
+          {([
+            { key: "same-quarter-ly" as const, label: "Same Qtr LY" },
+            { key: "prior-quarter"   as const, label: "Prior Qtr"   },
+          ] as const).map(({ key, label }) => (
+            <button
+              key={key}
+              onClick={() => setDashComparison({ type: key })}
+              className={cn(
+                "h-7 px-2.5 rounded-lg text-[11px] font-medium transition-colors whitespace-nowrap",
+                dashComparison.type === key
+                  ? "bg-brand-700 text-white"
+                  : "bg-ink-100 text-ink-600 hover:bg-ink-200"
+              )}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      )}
+
       {/* ── Comparison — month mode ──────────────────────────────────────── */}
       {dashMode === "month" && (
         <div className="flex items-center gap-1.5">
@@ -384,6 +441,7 @@ function MobileControls() {
     dashMode, setDashMode,
     dashYear, setDashYear,
     dashMonth, setDashMonth,
+    dashQuarter, setDashQuarter,
     dashComparison, setDashComparison,
   } = useTopbar();
 
@@ -398,10 +456,11 @@ function MobileControls() {
     return () => document.removeEventListener("mousedown", close);
   }, []);
 
-  const switchMode = (m: DashMode) => {
+  const switchModeMobile = (m: DashMode) => {
     setDashMode(m);
-    if (m === "year")  setDashComparison({ type: "prior-year", year: dashYear - 1 });
-    if (m === "month") setDashComparison({ type: "same-month-ly" });
+    if (m === "year")    setDashComparison({ type: "prior-year", year: dashYear - 1 });
+    if (m === "quarter") setDashComparison({ type: "same-quarter-ly" });
+    if (m === "month")   setDashComparison({ type: "same-month-ly" });
   };
 
   return (
@@ -431,16 +490,16 @@ function MobileControls() {
             <div>
               <span className="text-[11px] font-medium text-ink-500 uppercase tracking-wide block mb-1.5">View period</span>
               <div className="flex items-center bg-ink-100 rounded-lg p-0.5 w-fit">
-                {(["year", "month"] as DashMode[]).map((m) => (
+                {(["year", "quarter", "month"] as DashMode[]).map((m) => (
                   <button
                     key={m}
-                    onClick={() => switchMode(m)}
+                    onClick={() => switchModeMobile(m)}
                     className={cn(
-                      "px-4 h-7 text-[12px] font-medium rounded-md transition-colors",
+                      "px-3 h-7 text-[12px] font-medium rounded-md transition-colors",
                       m === dashMode ? "bg-white text-ink-900 shadow-sm" : "text-ink-500"
                     )}
                   >
-                    {m === "year" ? "Year" : "Month"}
+                    {m === "year" ? "Year" : m === "quarter" ? "Qtr" : "Month"}
                   </button>
                 ))}
               </div>
@@ -457,6 +516,20 @@ function MobileControls() {
                 {YEAR_OPTIONS.map((y) => <option key={y} value={y}>{y}</option>)}
               </select>
             </div>
+
+            {/* Quarter (only in quarter mode) */}
+            {dashMode === "quarter" && (
+              <div>
+                <span className="text-[11px] font-medium text-ink-500 uppercase tracking-wide block mb-1.5">Quarter</span>
+                <select
+                  value={dashQuarter}
+                  onChange={(e) => setDashQuarter(Number(e.target.value))}
+                  className="w-full h-9 px-3 rounded-lg border border-ink-200 bg-white text-sm text-ink-700 focus:outline-none"
+                >
+                  {QUARTERS.map((q, i) => <option key={q} value={i + 1}>{q}</option>)}
+                </select>
+              </div>
+            )}
 
             {/* Month (only in month mode) */}
             {dashMode === "month" && (
@@ -485,6 +558,27 @@ function MobileControls() {
                     <option key={y} value={y}>{y}</option>
                   ))}
                 </select>
+              )}
+              {dashMode === "quarter" && (
+                <div className="space-y-1.5">
+                  {([
+                    { key: "same-quarter-ly" as const, label: "Same quarter last year" },
+                    { key: "prior-quarter"   as const, label: "Prior quarter" },
+                  ] as const).map(({ key, label }) => (
+                    <button
+                      key={key}
+                      onClick={() => setDashComparison({ type: key })}
+                      className={cn(
+                        "w-full text-left px-3 py-2 rounded-lg text-sm transition-colors",
+                        dashComparison.type === key
+                          ? "bg-brand-50 text-brand-700 font-semibold"
+                          : "bg-ink-50 text-ink-600 hover:bg-ink-100"
+                      )}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
               )}
               {dashMode === "month" && (
                 <div className="space-y-1.5">

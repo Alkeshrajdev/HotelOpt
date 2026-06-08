@@ -31,9 +31,32 @@ const MONTHLY = [
   { month:"Apr", energyTY:274, waterTY:84,  wasteTY:63,  energyPY:291, waterPY:90,  wastePY:67,  costPY:448,  intensity:17.7 },
 ];
 
+// Quarterly portfolio costs ($k) — last 8 quarters
+// Q1=Jan-Mar  Q2=Apr-Jun  Q3=Jul-Sep  Q4=Oct-Dec
+const QUARTERLY = [
+  { quarter:"Q1 '24", energyTY:758, waterTY:232, wasteTY:174, energyPY:807, waterPY:247, wastePY:185, costPY:1239, intensity:16.2 },
+  { quarter:"Q2 '24", energyTY:812, waterTY:250, wasteTY:187, energyPY:865, waterPY:266, wastePY:199, costPY:1330, intensity:15.4 },
+  { quarter:"Q3 '24", energyTY:931, waterTY:286, wasteTY:214, energyPY:991, waterPY:305, wastePY:228, costPY:1524, intensity:16.5 },
+  { quarter:"Q4 '24", energyTY:808, waterTY:248, wasteTY:186, energyPY:860, waterPY:264, wastePY:198, costPY:1322, intensity:15.8 },
+  { quarter:"Q1 '25", energyTY:713, waterTY:218, wasteTY:164, energyPY:758, waterPY:232, wastePY:174, costPY:1164, intensity:15.1 },
+  { quarter:"Q2 '25", energyTY:763, waterTY:235, wasteTY:176, energyPY:812, waterPY:250, wastePY:187, costPY:1249, intensity:12.8 },
+  { quarter:"Q3 '25", energyTY:875, waterTY:269, wasteTY:201, energyPY:931, waterPY:286, wastePY:214, costPY:1431, intensity:14.5 },
+  { quarter:"Q4 '25", energyTY:760, waterTY:233, wasteTY:175, energyPY:808, waterPY:248, wastePY:186, costPY:1242, intensity:15.4 },
+];
+
+// Annual portfolio costs ($k) — 4-year YoY view
+const ANNUAL = [
+  { year:"2022", energyTY:3680, waterTY:1132, wasteTY:849, costPY:0,    intensity:18.4 },
+  { year:"2023", energyTY:3450, waterTY:1062, wasteTY:797, costPY:5661, intensity:17.1 },
+  { year:"2024", energyTY:3309, waterTY:1016, wasteTY:761, costPY:5309, intensity:15.9 },
+  { year:"2025", energyTY:3111, waterTY:955,  wasteTY:716, costPY:5086, intensity:14.8 },
+];
+
 const TOTAL_TY   = MONTHLY.reduce((s, m) => s + m.energyTY + m.waterTY + m.wasteTY, 0); // 4,782
 const TOTAL_PY   = MONTHLY.reduce((s, m) => s + m.costPY, 0);                           // 5,091
 const SAVINGS    = TOTAL_PY - TOTAL_TY; // ~309
+
+type Aggregation = "monthly" | "quarterly" | "annually";
 
 /* ─── Metric toggle config ────────────────────────────────────────────────── */
 type Metric = "energy" | "water" | "waste" | "combined" | "carbon";
@@ -245,8 +268,19 @@ function SectionLabel({ title, action, onClick }: { title: string; action?: stri
 
 /* ─── Main ───────────────────────────────────────────────────────────────── */
 export default function OverviewTab({ onNavigate }: Props) {
-  const [metric, setMetric] = useState<Metric>("combined");
+  const [metric,      setMetric]      = useState<Metric>("combined");
+  const [aggregation, setAggregation] = useState<Aggregation>("monthly");
   const metricCfg = METRICS.find((m) => m.key === metric)!;
+
+  // Pick the right dataset + x-axis key based on aggregation
+  const chartData = aggregation === "monthly"   ? MONTHLY
+                  : aggregation === "quarterly" ? QUARTERLY
+                  : ANNUAL;
+  const xKey      = aggregation === "monthly"   ? "month"
+                  : aggregation === "quarterly" ? "quarter"
+                  : "year";
+  // Annual mode: bars tell the YoY story on their own — no prior-year line
+  const showPYLine = aggregation !== "annually" && metric !== "carbon";;
 
   return (
     <div className="space-y-8">
@@ -287,33 +321,57 @@ export default function OverviewTab({ onNavigate }: Props) {
 
       {/* ── 2. Cost & Performance Trend ───────────────────────────────────── */}
       <div>
-        {/* Header row: title + metric switcher */}
-        <div className="flex items-center justify-between mb-4">
+        {/* Header row: title + controls */}
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
           <h2 className="text-[11px] font-bold uppercase tracking-[0.1em] text-ink-400">
             Portfolio Cost &amp; Performance Trend
           </h2>
-          <div className="flex items-center gap-1 bg-ink-100 rounded-lg p-0.5">
-            {METRICS.map((m) => (
-              <button
-                key={m.key}
-                onClick={() => setMetric(m.key)}
-                className={cn(
-                  "px-2.5 h-6 text-[11px] font-medium rounded-md transition-colors",
-                  metric === m.key
-                    ? "bg-white text-ink-900 shadow-sm"
-                    : "text-ink-500 hover:text-ink-700"
-                )}
-              >
-                {m.label}
-              </button>
-            ))}
+          <div className="flex items-center gap-2 flex-wrap">
+            {/* Aggregation toggle */}
+            <div className="flex items-center bg-ink-100 rounded-lg p-0.5">
+              {(["monthly", "quarterly", "annually"] as Aggregation[]).map((a) => (
+                <button
+                  key={a}
+                  onClick={() => setAggregation(a)}
+                  className={cn(
+                    "px-2.5 h-6 text-[11px] font-medium rounded-md transition-colors capitalize",
+                    aggregation === a
+                      ? "bg-white text-ink-900 shadow-sm"
+                      : "text-ink-500 hover:text-ink-700"
+                  )}
+                >
+                  {a === "monthly" ? "Monthly" : a === "quarterly" ? "Quarterly" : "Annually"}
+                </button>
+              ))}
+            </div>
+
+            {/* Divider */}
+            <span className="h-4 w-px bg-ink-200" />
+
+            {/* Metric switcher */}
+            <div className="flex items-center bg-ink-100 rounded-lg p-0.5">
+              {METRICS.map((m) => (
+                <button
+                  key={m.key}
+                  onClick={() => setMetric(m.key)}
+                  className={cn(
+                    "px-2.5 h-6 text-[11px] font-medium rounded-md transition-colors",
+                    metric === m.key
+                      ? "bg-white text-ink-900 shadow-sm"
+                      : "text-ink-500 hover:text-ink-700"
+                  )}
+                >
+                  {m.label}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
         <div className="card p-6">
           {/* Summary strip */}
           <div className="flex flex-wrap gap-6 mb-5 text-[12px]">
-            {metric !== "carbon" && (
+            {metric !== "carbon" && aggregation === "monthly" && (
               <>
                 <div>
                   <span className="text-ink-500">This year  </span>
@@ -328,6 +386,20 @@ export default function OverviewTab({ onNavigate }: Props) {
                   <span className="font-bold text-good">${SAVINGS}k saved</span>
                 </div>
               </>
+            )}
+            {metric !== "carbon" && aggregation === "quarterly" && (
+              <div>
+                <span className="text-ink-500">Last 8 quarters  </span>
+                <span className="font-bold text-ink-900">Q1 2024 — Q4 2025</span>
+                <span className="text-ink-400 ml-3">dashed line = prior year equivalent quarter</span>
+              </div>
+            )}
+            {metric !== "carbon" && aggregation === "annually" && (
+              <div>
+                <span className="text-ink-500">Year-on-year  </span>
+                <span className="font-bold text-ink-900">2022 — 2025</span>
+                <span className="text-ink-400 ml-3">each bar = full calendar year total</span>
+              </div>
             )}
             {metric === "carbon" && (
               <div>
@@ -352,10 +424,10 @@ export default function OverviewTab({ onNavigate }: Props) {
                   {metricCfg.label}
                 </span>
               )}
-              {metric !== "carbon" && (
+              {showPYLine && (
                 <span className="flex items-center gap-1.5">
                   <span className="w-5 border-t-2 border-dashed border-slate-400 inline-block" />
-                  Prior year
+                  {aggregation === "quarterly" ? "Same qtr prior year" : "Prior year"}
                 </span>
               )}
               {metric === "carbon" && (
@@ -368,9 +440,9 @@ export default function OverviewTab({ onNavigate }: Props) {
           </div>
 
           <ResponsiveContainer width="100%" height={280}>
-            <ComposedChart data={MONTHLY} barCategoryGap="28%">
+            <ComposedChart data={chartData} barCategoryGap={aggregation === "annually" ? "40%" : "28%"}>
               <CartesianGrid vertical={false} stroke="#f3f4f6" />
-              <XAxis dataKey="month" tick={{ fontSize:11, fill:"#6b7280" }} axisLine={false} tickLine={false} />
+              <XAxis dataKey={xKey} tick={{ fontSize:11, fill:"#6b7280" }} axisLine={false} tickLine={false} />
 
               {/* Cost Y-axis (non-carbon modes) */}
               {metric !== "carbon" && (
@@ -427,8 +499,8 @@ export default function OverviewTab({ onNavigate }: Props) {
                 />
               )}
 
-              {/* ── Dashed prior-year line (all non-carbon) ── */}
-              {metric !== "carbon" && (
+              {/* ── Dashed prior-year line (monthly + quarterly only, not annually) ── */}
+              {showPYLine && (
                 <Line
                   yAxisId="main"
                   dataKey={metricCfg.pyKey}
