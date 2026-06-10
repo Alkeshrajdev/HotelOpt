@@ -59,6 +59,7 @@ export const NAV: NavSection[] = [
     roles: ["super_admin"],
     items: [
       { to: "/portfolio/dashboard",               label: "Dashboard",           icon: LayoutDashboard, matchPrefix: "/portfolio/dashboard" },
+      { to: "/properties",                        label: "Properties",          icon: Building2 },
       { to: "/portfolio/setup",                   label: "Setup",               icon: SettingsIcon },
       { to: "/portfolio/reports-certifications",  label: "Reports & Certs",     icon: FileText },
     ],
@@ -74,7 +75,6 @@ export const NAV: NavSection[] = [
   // ── Workspace ────────────────────────────────────────────────────────
   { type: "item", to: "/data-capture",    label: "Data Capture",      icon: Database,       roles: ["maker", "property_sm", "super_admin"] },
   { type: "item", to: "/review-approval", label: "Review & Approval", icon: ClipboardCheck, badge: "24", roles: ["maker", "checker", "property_sm", "super_admin"] },
-  { type: "item", to: "/properties",      label: "Properties",        icon: Building2,      roles: ["property_sm", "super_admin"] },
 
   { type: "divider" },
 
