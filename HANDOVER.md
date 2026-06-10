@@ -78,134 +78,38 @@ git push "https://Alkeshrajdev:${TOKEN}@github.com/Alkeshrajdev/HotelOpt.git" ma
 - `DemoNotice`: amber dismissible banner in AppShell when demo session active
 - Demo profile activates when `VITE_SUPABASE_URL` is missing **or** user clicks "Continue as Demo"
 
----
+### 7. Dashboard FilterBar — replaces topbar filters
+**Files:** `src/pages/dashboard/FilterBar.tsx` (new), `src/components/layout/Topbar.tsx`, `src/lib/topbarContext.tsx`
 
-## Next task — Portfolio Dashboard redesign (NOT YET DONE)
+- Topbar search bar and Region/Year/Approved-only filters **removed** from `/portfolio/dashboard` route
+- New `DashboardFilterBar` renders inline in the topbar for the dashboard route, taking that freed space
+- **Properties multi-select**: grouped by region (EMEA 7 · APAC 2 · Africa 1), indeterminate checkboxes, region-level toggle, adaptive label ("All Properties" / "EMEA (7)" / "3 of 10 properties" / hotel name)
+- **Mode toggle**: `Year | Quarter | Month`
+- **Period picker**: Year → single year select · Quarter → Q1/Q2/Q3/Q4 + year · Month → month + year
+- **Comparison selector**: Year → prior-year dropdown · Quarter → Same Qtr LY / Prior Qtr pills · Month → Same month LY / Prior month / Custom pills (Custom reveals inline date selects)
+- Filter state (`dashHotelIds`, `dashMode`, `dashYear`, `dashQuarter`, `dashMonth`, `dashComparison`) lives in `TopbarContext`
+- Mobile: compact "Filters" button opens a full panel with all controls
+- `DashMode` type: `"year" | "quarter" | "month"` — exported from `topbarContext.tsx`
+- `DashComparison` type: union of 6 variants — exported from `topbarContext.tsx`
 
-This is the spec for the next session. Do **not** attempt to implement this yourself — hand it to the new session.
+### 8. Dashboard — 5-way metric switcher + aggregation toggle
+**File:** `src/pages/dashboard/OverviewTab.tsx`
 
-### Context
-`src/pages/Dashboard.tsx` is the 5-tab shell (Overview / Environment / Targets / Hotels / Social & Governance).
-`src/pages/dashboard/OverviewTab.tsx` is the current Overview tab — 6 equal KPI tiles + a composed chart + efficiency cards.
-The topbar (`src/components/layout/Topbar.tsx`) currently shows Region + Year + "Approved only" filters for the dashboard route.
-
-### What needs to be built
-
-#### A. Remove old topbar filters from the dashboard route
-In `src/lib/topbarContext.tsx`, the function `getTopbarConfig` returns for `/portfolio/dashboard`:
-```
-{ periodType: "year", showProperty: false, showRegion: true, showDataBasis: true }
-```
-Change it to:
-```
-{ periodType: "none", showProperty: false, showRegion: false, showDataBasis: false }
-```
-This removes Region, Year, and "Approved only" from the topbar on the dashboard. The topbar search bar and right-side controls (Ask AI, notifications, user) stay.
-
-#### B. New FilterBar component inside the dashboard
-Create `src/pages/dashboard/FilterBar.tsx`. It lives **below the tab bar** inside `Dashboard.tsx`, above the tab content. Dashboard.tsx owns the filter state and passes it down.
-
-**Filter state type:**
-```typescript
-export type DashboardFilters = {
-  hotelIds: "all" | string[];     // "all" or array of hotel IDs from PORTFOLIO_HOTELS
-  mode: "year" | "month";
-  year: number;                   // e.g. 2025
-  month: number | null;           // 1–12, null in year mode
-  comparison:
-    | { type: "prior-year"; year: number }
-    | { type: "same-month-ly" }
-    | { type: "prior-month" }
-    | { type: "custom"; year: number; month: number };
-};
-
-export const DEFAULT_FILTERS: DashboardFilters = {
-  hotelIds: "all",
-  mode: "year",
-  year: 2025,
-  month: null,
-  comparison: { type: "prior-year", year: 2024 },
-};
-```
-
-**Filter bar layout (left → right):**
-1. **Properties dropdown** — expandable tree grouped by `region` from `PORTFOLIO_HOTELS`. Multi-select with indeterminate checkboxes. Selecting a region selects all its hotels. Label: "All Properties" / "EMEA (7)" / "3 of 10 properties" / hotel name.
-2. **Divider** (1px vertical line)
-3. **Mode toggle** — segmented control: `Year | Month`
-4. **Period picker** — Year mode: single year `<select>`. Month mode: month `<select>` + year `<select>`.
-5. **"vs" label + comparison selector** — Year mode: year `<select>` (defaults to year−1). Month mode: three pill buttons `Same month LY | Prior month | Custom` — Custom reveals month+year selects inline.
-
-Regions in data: **EMEA** (7 hotels), **APAC** (2 hotels), **Africa** (1 hotel).
-
-#### C. OverviewTab — accept filters + responsive data + redesign
-
-`OverviewTab` receives `{ filters: DashboardFilters; onNavigate: (tab: string) => void }`.
-
-**Data derivation:**
-- Filter `PORTFOLIO_HOTELS` by `filters.hotelIds`
-- Compute shares (`filteredEnergy / allEnergy`, etc.) to scale the hardcoded `MONTHLY` cost data
-- `PORTFOLIO_SCOPE3_CATEGORIES` is exported from `src/lib/mock.ts` — use it for Scope 3 total
-
-**Layout — four sections:**
-
-**1. Executive Snapshot**
-Title: `Executive Snapshot — {periodLabel}` e.g. "2025 vs 2024"
-
-*3 primary tiles* (larger, `border-l-4` accent):
-- **Total Spend** — `$X.XXM`, `−X.X% vs {compLabel}`
-- **Total GHG** — `X.Xk tCO₂e`, unit `Scope 1, 2 & 3`, sub-label `S1+2: X.Xk · S3: X.Xk`, delta `−X.X% vs last year`
-- **Est. cost avoidance** — `$Xk`, unit `vs {compLabel} spend`, highlight green
-
-*3 secondary tiles* (compact horizontal — icon left, value right, delta chip far right):
-- Energy (MWh), Water (m³), Waste diversion (%)
-
-In **month mode** the tiles switch to monthly values: Total cost $Xk, Carbon intensity X.X kgCO₂e/ORN, Est. cost avoidance $Xk vs comparison; secondary: Energy cost $Xk, Water cost $Xk, Waste diversion %.
-
-**2. Portfolio Cost & Performance**
-Header right side: `Cost | Carbon` toggle (segmented control, year mode only).
-
-Layout: `grid-cols-1 xl:grid-cols-12`
-- **Chart (xl:col-span-8)**:
-  - *Year / Cost mode*: 12-month stacked bars (energy/water/waste $k) + dashed prior-year line. Single Y-axis only (no dual axis, no carbon overlay on this chart).
-  - *Year / Carbon mode*: Simple line chart of `intensity` per month + `ReferenceLine` at `y={11}` labelled "2030 target".
-  - *Month mode*: Horizontal stacked bar chart — one row per filtered hotel, sorted by total descending. No toggle (carbon toggle only relevant in year mode).
-- **Insights panel (xl:col-span-4)** — year mode only, 4 stacked cards:
-  1. `X/12 months below prior year spend` (green highlight)
-  2. Best month: month name + `−$Xk vs prior year`
-  3. Peak carbon intensity: `X.X kgCO₂e/ORN` + month name
-  4. Est. avoidance breakdown: mini progress bars for Energy / Water / Waste %
-
-**3. Efficiency — intensity per occupied room night**
-Keep as static portfolio-level benchmarks (not filter-reactive — data scales are inconsistent):
-- Energy 24.0 kWh/ORN, −6%, 42% to target
-- Water 0.23 m³/ORN, −8%, 50%
-- Carbon 16.3 kgCO₂e/ORN, −10%, 52%
-- Waste diversion: compute from `PORTFOLIO_HOTELS` weighted average (≈44%), progress toward 80% by 2030
-
-**4. Hotel Performance** (new section, year mode)
-Two side-by-side cards:
-
-*Leaders — lowest carbon intensity* (filtered to `dataConfidence >= 70`):
-- Rank 1–3 by `(h.carbonIntensity + h.yoyCarbon * 3)` ascending
-- Show: rank badge, hotel name, region + confidence%, carbon intensity kgCO₂e/ORN, YoY chip
-
-*Needs attention*:
-- Score: `(70 − confidence) * 2` if confidence < 70, + `(carbonIntensity − 60)` if > 60, + `(2 + yoyCarbon) * 4` if yoyCarbon > −2
-- Top 3 by score descending
-- Show: warning icon, hotel name, reason string, carbon intensity, data% or YoY chip
-
-Reason function:
-```typescript
-function attentionReason(h): string {
-  if (h.dataConfidence < 50) return "Low data confidence";
-  if (h.dataConfidence < 70) return "Data gaps detected";
-  if (h.carbonIntensity > 70) return "High carbon intensity";
-  if (h.yoyCarbon > -2) return "Minimal YoY improvement";
-  return "Needs review";
-}
-```
-
-**Remove:** bottom navigation pills (the 4 "Environment detail / Targets / Hotels / Social" buttons).
+- **Metric switcher** (5 options, top-right of trend section): `Energy | Water | Waste | Combined | Carbon`
+  - Energy: amber bar (TY) + dashed grey prior-year line
+  - Water: sky-blue bar + dashed prior-year line
+  - Waste: violet bar + dashed prior-year line
+  - Combined: 3 stacked bars (energy + water + waste) + dashed prior-year total line
+  - Carbon: teal line (intensity) + dashed green 2030 reference line at 11 kgCO₂e/ORN
+- **Aggregation toggle** (3 options, top-left of trend section): `Monthly | Quarterly | Annually`
+  - Monthly: 12-month view (May–Apr), dashed prior-year line — original behaviour
+  - Quarterly: last 8 quarters (Q1 '24 → Q4 '25), dashed same-quarter-prior-year line
+  - Annually: 2022 · 2023 · 2024 · 2025 bars — true YoY view, no dashed line needed
+- `MONTHLY` data expanded with per-utility columns (`energyTY`, `waterTY`, `wasteTY`, `energyPY`, `waterPY`, `wastePY`, `costPY`, `intensity`)
+- `QUARTERLY` dataset added (8 quarters with same column structure)
+- `ANNUAL` dataset added (4 years: 2022–2025)
+- Summary strip and chart legend update contextually per aggregation mode
+- Tooltip adapts per metric: shows breakdown in Combined, intensity vs target in Carbon
 
 ---
 
@@ -218,23 +122,27 @@ src/
     mock.ts                 — all mock data (PORTFOLIO_HOTELS, PORTFOLIO_SCOPE3_CATEGORIES, etc.)
     dataCaptureConfig.ts    — data capture pillar/method config
     auth.tsx                — Supabase auth + demo fallback (signInDemo)
-    topbarContext.tsx        — per-route topbar filter config (getTopbarConfig)
+    topbarContext.tsx        — per-route topbar config + DashboardFilter state
+                              exports: DashMode, DashComparison types
   components/layout/
     Sidebar.tsx             — sidebar with collapsible groups
-    Topbar.tsx              — property/period/dataBasis filters
+    Topbar.tsx              — renders DashboardFilterBar for dashboard route,
+                              standard filters + search for all other routes
     AppShell.tsx            — layout wrapper + DemoNotice
   components/ui/
     DemoNotice.tsx          — amber demo mode banner
   pages/
     Login.tsx               — sign in + "Continue as Demo" button
-    Dashboard.tsx           — 5-tab portfolio dashboard shell (no FilterBar yet)
+    Dashboard.tsx           — 5-tab portfolio dashboard shell
     dashboard/
-      OverviewTab.tsx       — current: 6 equal KPI tiles + composed chart (to be redesigned)
+      FilterBar.tsx         — dashboard filter controls (renders inside Topbar)
+      OverviewTab.tsx       — KPI tiles + trend chart (metric + aggregation toggles)
       EnvironmentTab.tsx    — Carbon/Energy/Water/Waste with Waterfall
       HotelsTab.tsx         — Heatmap matrix + hotel cards
       SocialGovernanceTab.tsx — Scatter + Radar + existing charts
     DataCapture.tsx         — 5-step wizard incl. AiAssistWorkflow
     ReviewApproval.tsx      — Approval Queue + Capture Status tabs
+    Properties.tsx          — portfolio-level property registry (see next task)
   public/
     LogoLight.png           — coloured logo (white bg)
     LogoDark.png            — white logo (dark green bg)
@@ -248,3 +156,58 @@ src/
 - `signInDemo()` sets in-memory session with role `super_admin` — does not persist across hard navigation
 - Role enum: `maker | checker | property_sm | super_admin`
 - Demo profile activates when `VITE_SUPABASE_URL` is missing **or** user clicks "Continue as Demo"
+
+---
+
+## Next task — Relocate Properties page
+
+### The problem
+`/properties` (`src/pages/Properties.tsx`) is currently a sidebar item in the workspace section alongside Data Capture and Review & Approval. This is wrong — it is a **portfolio-level admin/configuration tool**, not a day-to-day workspace tool.
+
+What the Properties page actually is:
+- Master registry of all 72 properties across the portfolio
+- Shows per-property: status, rooms, GFA, region, brand, data completeness %, GP readiness, certifications
+- Has "Add property" button and full advanced filter panel
+- Eyebrow label: "Configuration hub"
+
+Currently in `src/lib/nav.ts`:
+```typescript
+{ type: "item", to: "/properties", label: "Properties", icon: Building2, roles: ["property_sm", "super_admin"] },
+```
+This places it as a flat workspace item visible to both `property_sm` and `super_admin`.
+
+### What needs to change
+
+**1. Move into the Portfolio sidebar group** (`super_admin` only)
+
+In `src/lib/nav.ts`, the Portfolio group currently has:
+```typescript
+{
+  type: "group",
+  label: "Portfolio",
+  icon: FolderOpen,
+  matchPrefix: "/portfolio",
+  roles: ["super_admin"],
+  items: [
+    { to: "/portfolio/dashboard",              label: "Dashboard",       icon: LayoutDashboard },
+    { to: "/portfolio/setup",                  label: "Setup",           icon: SettingsIcon    },
+    { to: "/portfolio/reports-certifications", label: "Reports & Certs", icon: FileText        },
+  ],
+},
+```
+
+Add Properties as a new item in this group (or replace "Setup" if that page is a stub):
+```typescript
+{ to: "/properties", label: "Properties", icon: Building2 },
+```
+
+**2. Remove from workspace section**
+
+Delete the flat `{ type: "item", to: "/properties", ... }` line from the workspace section.
+
+**3. Remove `property_sm` access**
+
+A property manager has no business managing the master property registry. The individual property detail page (`/properties/:id`) can remain accessible to `property_sm` but the registry list should be `super_admin` only — which is already enforced by it being inside the Portfolio group.
+
+### Decision on "Setup" sub-item
+Check whether `/portfolio/setup` has a real page or is a stub. If it's a stub/placeholder, replace it with Properties. If it has real content, keep both as separate items.
