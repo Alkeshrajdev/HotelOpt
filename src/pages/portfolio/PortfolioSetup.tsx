@@ -106,19 +106,19 @@ const CERT_BADGE: Record<string, string> = {
 
 function HotelsTab() {
   const included = HOTELS.filter(h => h.included).length;
-  const ready    = HOTELS.filter(h => h.included && h.dataApproved >= 80).length;
-  const missing  = HOTELS.filter(h => h.included && h.dataApproved < 80).length;
-  const gaps     = HOTELS.filter(h => h.included && h.certStatus !== "Current" && h.certStatus !== "—").length;
+  const blocked  = HOTELS.filter(h => h.included && h.reportStatus === "Blocked").length;
+  const atRisk   = HOTELS.filter(h => h.included && h.reportStatus === "At Risk").length;
+  const certGaps = HOTELS.filter(h => h.included && h.certStatus !== "Current" && h.certStatus !== "—").length;
 
   return (
     <div className="space-y-4">
-      {/* Readiness summary */}
+      {/* Scope summary */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
-          { label: "Hotels in portfolio", val: included, colour: "text-ink-900" },
-          { label: "Ready for reporting",  val: ready,    colour: "text-good"    },
-          { label: "Missing data",         val: missing,  colour: "text-warn"    },
-          { label: "Evidence gaps",        val: gaps,     colour: "text-warn"    },
+          { label: "In portfolio",  val: `${included} / ${HOTELS.length}`, colour: "text-ink-900" },
+          { label: "Blocked",       val: blocked,  colour: blocked  > 0 ? "text-bad"  : "text-good" },
+          { label: "At risk",       val: atRisk,   colour: atRisk   > 0 ? "text-warn" : "text-good" },
+          { label: "Cert gaps",     val: certGaps, colour: certGaps > 0 ? "text-warn" : "text-good" },
         ].map(s => (
           <div key={s.label} className="rounded-xl border border-ink-100 bg-ink-50 p-3 text-center">
             <div className={cn("text-2xl font-extrabold", s.colour)}>{s.val}</div>
@@ -127,16 +127,16 @@ function HotelsTab() {
         ))}
       </div>
 
-      <div className="flex items-center justify-between">
-        <p className="text-sm text-ink-500">{HOTELS.length} hotels · {included} included in portfolio</p>
-        <button className="btn-primary flex items-center gap-1.5 text-[13px]"><Plus size={14} /> Add Hotels to Portfolio</button>
+      <div className="flex items-center justify-between gap-3">
+        <p className="text-sm text-ink-500">{HOTELS.length} hotels · {included} included in this reporting cycle · edit hotel master data in <Link to="/properties" className="text-brand-600 hover:underline font-medium">Properties</Link></p>
+        <button className="btn-primary flex items-center gap-1.5 text-[13px] shrink-0"><Plus size={14} /> Add to Portfolio</button>
       </div>
 
       <div className="overflow-x-auto">
         <table className="w-full text-[12px]">
           <thead>
             <tr className="border-b border-ink-100">
-              {["Hotel", "Brand / Type", "Country", "Rooms", "GFA m²", "Approved %", "Pending", "Reports", "Certification", "In Portfolio", ""].map(h => (
+              {["Hotel", "Report Status", "Certification", "Pending", "In Portfolio", ""].map(h => (
                 <th key={h} className="text-left text-[10px] font-semibold text-ink-400 uppercase tracking-wider py-2 px-2 first:pl-0 last:pr-0 whitespace-nowrap">{h}</th>
               ))}
             </tr>
@@ -148,28 +148,16 @@ function HotelsTab() {
                   <Link to={`/properties/${h.id}`} className="font-medium text-ink-900 hover:text-brand-600 flex items-center gap-1 whitespace-nowrap">
                     {h.name} <ChevronRight size={11} className="opacity-0 group-hover:opacity-60 transition-opacity" />
                   </Link>
+                  <div className="text-[10px] text-ink-400">{h.city}, {h.country}</div>
                 </td>
-                <td className="py-2.5 px-2 text-ink-500">
-                  <div className="text-[11px]">{h.brand}</div>
-                  <div className="text-[10px] text-ink-400">{h.type}</div>
-                </td>
-                <td className="py-2.5 px-2 text-ink-500 whitespace-nowrap">{h.city}, {h.country}</td>
-                <td className="py-2.5 px-2 text-ink-700 tabular-nums">{h.rooms.toLocaleString()}</td>
-                <td className="py-2.5 px-2 text-ink-500 tabular-nums">{h.gfa.toLocaleString()}</td>
-                <td className="py-2.5 px-2">
-                  <div className="flex items-center gap-1.5">
-                    <div className="w-12 h-1.5 rounded-full bg-ink-100 overflow-hidden">
-                      <div className={cn("h-full rounded-full", h.dataApproved >= 80 ? "bg-good" : h.dataApproved >= 60 ? "bg-warn" : "bg-bad")} style={{ width: `${h.dataApproved}%` }} />
-                    </div>
-                    <span className={cn("font-semibold tabular-nums", h.dataApproved >= 80 ? "text-good" : h.dataApproved >= 60 ? "text-warn" : "text-bad")}>{h.dataApproved}%</span>
-                  </div>
-                </td>
-                <td className="py-2.5 px-2 text-ink-500 tabular-nums">{h.pendingRecords > 0 ? <span className="text-warn font-medium">{h.pendingRecords}</span> : <span className="text-ink-300">—</span>}</td>
                 <td className="py-2.5 px-2">
                   <span className={cn("chip text-[10px]", REPORT_BADGE[h.reportStatus])}>{h.reportStatus}</span>
                 </td>
                 <td className="py-2.5 px-2">
                   <span className={cn("chip text-[10px]", CERT_BADGE[h.certStatus])}>{h.certStatus}</span>
+                </td>
+                <td className="py-2.5 px-2 text-ink-500 tabular-nums">
+                  {h.pendingRecords > 0 ? <span className="text-warn font-medium">{h.pendingRecords}</span> : <span className="text-ink-300">—</span>}
                 </td>
                 <td className="py-2.5 px-2">
                   {h.included ? (
@@ -177,7 +165,7 @@ function HotelsTab() {
                   ) : (
                     <div>
                       <span className="chip bg-ink-100 text-ink-400 text-[10px]">No</span>
-                      {h.exclusion && <div className="text-[10px] text-ink-400 mt-0.5 max-w-[140px] leading-snug">{h.exclusion}</div>}
+                      {h.exclusion && <div className="text-[10px] text-ink-400 mt-0.5 max-w-[200px] leading-snug">{h.exclusion}</div>}
                     </div>
                   )}
                 </td>
