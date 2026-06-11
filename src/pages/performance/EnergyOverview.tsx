@@ -216,7 +216,7 @@ export default function EnergyOverview() {
           icon={<Leaf size={18} />}
           iconBg="bg-brand-50 text-brand-700"
           label="Renewable share"
-          value="78"
+          value="12"
           unit="%"
           delta={3.0}
           goodDirection="up"

@@ -1731,13 +1731,13 @@ function QrWorkflow({ cfg, onPreview }: { cfg: DataTypeConfig; onPreview: (r: Ca
   function handlePreviewContinue() {
     onPreview({
       propertyId: "",
-      propertyName: "Greenview Resort",
+      propertyName: "Skyline Dubai",
       currency: "USD",
       values: { stream, weight, staffId, notes, contaminated: contaminated ? "yes" : "no", timestamp },
       files: [],
       anomalies: [],
       displayRows: [
-        { label: "Property", value: "Greenview Resort" },
+        { label: "Property", value: "Skyline Dubai" },
         { label: "Collection point", value: "Kitchen — Loading Bay" },
         { label: "Stream", value: stream },
         { label: "Weight", value: `${weight} kg` },
@@ -1792,7 +1792,7 @@ function QrWorkflow({ cfg, onPreview }: { cfg: DataTypeConfig; onPreview: (r: Ca
                 <div className="space-y-3">
                   <div className="text-[10px] uppercase tracking-wider text-ink-500">Step 2 of 4</div>
                   <div className="rounded-lg bg-brand-50 border border-brand-100 p-2 text-[12px] text-brand-800">
-                    Greenview Resort · Kitchen — Loading Bay
+                    Skyline Dubai · Kitchen — Loading Bay
                   </div>
                   <div>
                     <div className="text-[12px] font-medium text-ink-700 mb-1">Stream</div>
@@ -1849,7 +1849,7 @@ function QrWorkflow({ cfg, onPreview }: { cfg: DataTypeConfig; onPreview: (r: Ca
                   <h3 className="text-base font-bold text-ink-900">Preview &amp; submit</h3>
                   <div className="text-[10px] text-ink-400">{timestamp}</div>
                   <ul className="text-[13px] divide-y divide-ink-200 rounded-lg border border-ink-200">
-                    <QrRow label="Property" value="Greenview Resort" />
+                    <QrRow label="Property" value="Skyline Dubai" />
                     <QrRow label="Point" value="Kitchen — Loading Bay" />
                     <QrRow label="Stream" value={stream} />
                     <QrRow label="Weight" value={`${weight} kg`} />

@@ -125,8 +125,8 @@ export default function Internal({ pillar }: { pillar: PillarKey }) {
           <CardHeader title="Side-by-side comparison" />
           <div className="p-5 space-y-3">
             <div className="grid grid-cols-2 gap-2">
-              <select className="input"><option>Greenview Resort</option></select>
-              <select className="input"><option>Mountain Lodge</option></select>
+              <select className="input"><option>Skyline Dubai</option></select>
+              <select className="input"><option>Peaks Resort Zermatt</option></select>
             </div>
             <KvCompare label="EUI (kWh/ORN)" a="22" b="28" winner="a" />
             <KvCompare label="Water (m³/ORN)" a="0.41" b="0.46" winner="a" />

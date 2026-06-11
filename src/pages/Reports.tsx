@@ -489,7 +489,7 @@ const CERT_ROWS: CertRow[] = [
     coverage: "142 tCO₂e market-based Scope 2 offset",
     status: "Active",
     serialRange: "I-REC-AP-2025-001 — 012",
-    claimText: "Greenview Resort: 100% renewable electricity (market-based), Jan–Dec 2025",
+    claimText: "Skyline Dubai: 100% renewable electricity (market-based), Jan–Dec 2025",
     evidenceRef: "GHG Inventory FY 2025 · Scope 2 MB",
   },
   {
@@ -498,7 +498,7 @@ const CERT_ROWS: CertRow[] = [
     coverage: "37 tCO₂e market-based Scope 2 offset",
     status: "Active",
     serialRange: "EAC-EU-2026-Q1-001 — 004",
-    claimText: "City Centre Hotel: renewable electricity (EAC), Q1 2026",
+    claimText: "The Pavilion London: renewable electricity (EAC), Q1 2026",
     evidenceRef: "GHG Inventory FY 2026 · Scope 2 MB (partial)",
   },
   {

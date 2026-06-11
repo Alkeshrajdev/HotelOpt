@@ -94,7 +94,7 @@ const STATUS_MONTH_LABELS: Record<string, string> = {
 };
 
 const STATUS_MOCK: Record<string, StatusRow[]> = {
-  "Greenview Resort": [
+  "Skyline Dubai": [
     { dataType: "Electricity", key: "electricity", pillar: "Energy", responsible: { name: "Priya Nair", email: "priya.nair@greenview.com", role: "Property Manager" }, cells: { "2025-11": "approved", "2025-12": "approved", "2026-01": "approved", "2026-02": "pending", "2026-03": "draft", "2026-04": "missing" } },
     { dataType: "Natural Gas", key: "gas", pillar: "Energy", responsible: { name: "Priya Nair", email: "priya.nair@greenview.com", role: "Property Manager" }, cells: { "2025-11": "approved", "2025-12": "approved", "2026-01": "approved", "2026-02": "approved", "2026-03": "missing", "2026-04": "missing" } },
     { dataType: "Water", key: "water", pillar: "Water", responsible: { name: "Rahul Mehta", email: "rahul.mehta@greenview.com", role: "Facilities Lead" }, cells: { "2025-11": "approved", "2025-12": "approved", "2026-01": "pending", "2026-02": "missing", "2026-03": "missing", "2026-04": "missing" } },

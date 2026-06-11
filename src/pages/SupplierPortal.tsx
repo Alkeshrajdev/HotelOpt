@@ -34,6 +34,7 @@ import { Card, CardHeader } from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import ProgressBar from "@/components/ui/ProgressBar";
 import Modal from "@/components/ui/Modal";
+import Abbr from "@/components/ui/Abbr";
 import { SUPPLIERS } from "@/lib/mock";
 import { cn } from "@/lib/utils";
 
@@ -195,7 +196,7 @@ function ClientView() {
                 <th className="table-th">Supplier</th>
                 <th className="table-th">Category</th>
                 <th className="table-th">Country</th>
-                <th className="table-th">EF declaration</th>
+                <th className="table-th"><Abbr term="EF">EF</Abbr> declaration</th>
                 <th className="table-th">Data freshness</th>
                 <th className="table-th">Linked records</th>
                 <th className="table-th">Response</th>
@@ -746,10 +747,10 @@ function SupplierView() {
             right={<Badge tone="info"><Inbox size={11} /> 3 open</Badge>}
           />
           <ul className="p-5 space-y-2 text-sm">
-            <Request from="Greenview Resort (Hotel Optimizer)" ask="Refresh laundry-specific EF for FY 2026"      due="Due 2026-05-15"       clients={4} status="open" />
-            <Request from="City Centre Hotel (Hotel Optimizer)" ask="Upload latest ISO 14001 certificate"         due="Due 2026-06-01"       clients={2} status="open" />
-            <Request from="Mountain Lodge (Hotel Optimizer)"   ask="Confirm modern slavery statement"             due="Due 2026-06-10"       clients={1} status="open" />
-            <Request from="Seaside Hotel (Hotel Optimizer)"    ask="Quarterly volume reconciliation"              due="Submitted 2026-04-12" clients={1} status="submitted" />
+            <Request from="Skyline Dubai (Hotel Optimizer)" ask="Refresh laundry-specific EF for FY 2026"      due="Due 2026-05-15"       clients={4} status="open" />
+            <Request from="The Pavilion London (Hotel Optimizer)" ask="Upload latest ISO 14001 certificate"         due="Due 2026-06-01"       clients={2} status="open" />
+            <Request from="Peaks Resort Zermatt (Hotel Optimizer)"   ask="Confirm modern slavery statement"             due="Due 2026-06-10"       clients={1} status="open" />
+            <Request from="Oceanfront Cape Town (Hotel Optimizer)"    ask="Quarterly volume reconciliation"              due="Submitted 2026-04-12" clients={1} status="submitted" />
           </ul>
         </Card>
 

@@ -61,7 +61,7 @@ interface AssetRow {
   vsBaselineDirection: "worse" | "normal" | "below";
   vsBaselinePct: number;
   alert: string | null;
-  estimatedLossAed: number | null;
+  estimatedLossUsd: number | null;
 }
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
@@ -276,7 +276,7 @@ const ASSETS: AssetRow[] = [
     vsBaselineDirection: "worse",
     vsBaselinePct: 28,
     alert: "Efficiency 28% above baseline — immediate maintenance review",
-    estimatedLossAed: 6200,
+    estimatedLossUsd: 1690,
   },
   {
     id: "a02",
@@ -292,7 +292,7 @@ const ASSETS: AssetRow[] = [
     vsBaselineDirection: "worse",
     vsBaselinePct: 8,
     alert: null,
-    estimatedLossAed: 1800,
+    estimatedLossUsd: 490,
   },
   {
     id: "a03",
@@ -308,7 +308,7 @@ const ASSETS: AssetRow[] = [
     vsBaselineDirection: "normal",
     vsBaselinePct: 0,
     alert: null,
-    estimatedLossAed: null,
+    estimatedLossUsd: null,
   },
   {
     id: "a04",
@@ -324,7 +324,7 @@ const ASSETS: AssetRow[] = [
     vsBaselineDirection: "worse",
     vsBaselinePct: 18,
     alert: "Running outside scheduled hours — review BMS time schedule",
-    estimatedLossAed: 1100,
+    estimatedLossUsd: 300,
   },
   {
     id: "a05",
@@ -340,7 +340,7 @@ const ASSETS: AssetRow[] = [
     vsBaselineDirection: "worse",
     vsBaselinePct: 22,
     alert: "Energy per cover 22% above benchmark — check equipment standby behaviour",
-    estimatedLossAed: 2400,
+    estimatedLossUsd: 650,
   },
   {
     id: "a06",
@@ -356,7 +356,7 @@ const ASSETS: AssetRow[] = [
     vsBaselineDirection: "normal",
     vsBaselinePct: 0,
     alert: null,
-    estimatedLossAed: null,
+    estimatedLossUsd: null,
   },
   {
     id: "a07",
@@ -372,7 +372,7 @@ const ASSETS: AssetRow[] = [
     vsBaselineDirection: "below",
     vsBaselinePct: 4,
     alert: null,
-    estimatedLossAed: null,
+    estimatedLossUsd: null,
   },
   {
     id: "a08",
@@ -388,7 +388,7 @@ const ASSETS: AssetRow[] = [
     vsBaselineDirection: "normal",
     vsBaselinePct: 0,
     alert: null,
-    estimatedLossAed: null,
+    estimatedLossUsd: null,
   },
 ];
 
@@ -592,8 +592,8 @@ function OverviewTab() {
           icon={<DollarSign className="w-5 h-5" />}
           iconBg="bg-amber-50"
           label="Energy cost"
-          value="142,250"
-          unit="AED"
+          value="38,690"
+          unit="USD"
           delta={-6.8}
           deltaUnit="% vs last month"
           goodDirection="down"
@@ -1115,9 +1115,9 @@ function PeakDemandTab() {
           <p className="text-xs text-gray-500 uppercase tracking-wider font-semibold mb-1">
             Estimated demand charge
           </p>
-          <p className="text-3xl font-bold text-amber-700 font-mono">AED 8,420</p>
+          <p className="text-3xl font-bold text-amber-700 font-mono">USD 2,290</p>
           <p className="text-xs text-gray-500 mt-1">This month</p>
-          <p className="text-xs text-gray-400 mt-2">AED 10/kW above threshold</p>
+          <p className="text-xs text-gray-400 mt-2">USD 3/kW above threshold</p>
         </Card>
       </div>
 
@@ -1202,7 +1202,7 @@ function PeakDemandTab() {
               action: "Stagger laundry start times to 22:00–06:00",
               detail:
                 "Shift laundry cycle starts to the off-peak window to avoid coinciding with afternoon chiller load. Programme laundry timers or BMS schedule.",
-              saving: "AED 2,800/month",
+              saving: "USD 762/month",
               tone: "good" as const,
             },
             {
@@ -1210,7 +1210,7 @@ function PeakDemandTab() {
               action: "Enable chiller staging controls to prevent simultaneous full-load",
               detail:
                 "Implement chiller sequencing in BMS so Chiller 01 and Chiller 02 cannot both ramp to full capacity simultaneously. Lead/lag configuration required.",
-              saving: "AED 3,400/month",
+              saving: "USD 925/month",
               tone: "good" as const,
             },
             {
@@ -1241,7 +1241,7 @@ function PeakDemandTab() {
       </Card>
 
       <DataSourceNote
-        text="Peak demand data sourced from Level 2 — Main Incomer 01 (15-minute interval). Demand charge estimate uses DEWA commercial tariff schedule (AED 10/kW above 750 kW threshold). Savings estimates are indicative based on historical demand profiles and are not guaranteed."
+        text="Peak demand data sourced from Level 2 — Main Incomer 01 (15-minute interval). Demand charge estimate uses DEWA commercial tariff schedule (USD 3/kW above 750 kW threshold). Savings estimates are indicative based on historical demand profiles and are not guaranteed."
       />
     </div>
   );
@@ -1331,9 +1331,9 @@ function AssetEfficiencyTab() {
                   </Badge>
                 </td>
                 <td className="px-4 py-3 whitespace-nowrap text-sm">
-                  {a.estimatedLossAed !== null ? (
+                  {a.estimatedLossUsd !== null ? (
                     <span className="font-mono font-semibold text-red-700">
-                      AED {a.estimatedLossAed.toLocaleString()}/mo
+                      USD {a.estimatedLossUsd.toLocaleString()}/mo
                     </span>
                   ) : (
                     <span className="text-gray-400">—</span>
@@ -1391,9 +1391,9 @@ function AssetEfficiencyTab() {
                 <Badge tone={baselineBadgeTone(selectedAsset.vsBaselineDirection)}>
                   {selectedAsset.vsBaseline}
                 </Badge>
-                {selectedAsset.estimatedLossAed !== null && (
+                {selectedAsset.estimatedLossUsd !== null && (
                   <p className="text-xs text-red-600 mt-2 font-semibold">
-                    Est. loss: AED {selectedAsset.estimatedLossAed.toLocaleString()}/month
+                    Est. loss: USD {selectedAsset.estimatedLossUsd.toLocaleString()}/month
                   </p>
                 )}
               </div>

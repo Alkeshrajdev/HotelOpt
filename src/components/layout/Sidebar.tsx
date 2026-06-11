@@ -9,6 +9,8 @@ import { cn } from "@/lib/utils";
 type Props = {
   collapsed: boolean;
   onToggle: () => void;
+  mobileOpen?: boolean;
+  onMobileClose?: () => void;
 };
 
 function hasRole(roles: Role[] | undefined, role: Role) {
@@ -128,12 +130,21 @@ function NavGroupSection({
   );
 }
 
-export default function Sidebar({ collapsed, onToggle }: Props) {
+export default function Sidebar({ collapsed, onToggle, mobileOpen = false, onMobileClose }: Props) {
   const { profile } = useAuth();
   const role: Role = profile?.role ?? "maker";
 
   return (
-    <aside className={cn("sidebar-shell", collapsed ? "w-[72px]" : "w-[252px]")}>
+    <aside
+      className={cn(
+        "sidebar-shell w-[252px] z-40 transition-transform duration-200",
+        // Mobile: off-canvas drawer that slides in.
+        "fixed inset-y-0 left-0 lg:static lg:z-auto lg:translate-x-0",
+        mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
+        // Desktop: optional icon-rail collapse.
+        collapsed ? "lg:w-[72px]" : "lg:w-[252px]"
+      )}
+    >
 
       {/* ── Brand + client context ── */}
       <div className="shrink-0 border-b sidebar-divider">
@@ -160,14 +171,20 @@ export default function Sidebar({ collapsed, onToggle }: Props) {
             <div className="text-[13px] font-semibold text-white/90 truncate">Acme Hotels</div>
             <div className="flex items-center gap-1.5 text-[11px] text-white/45">
               <Building2 size={10} className="shrink-0" />
-              <span className="truncate">All Properties (72)</span>
+              <span className="truncate">All Properties (10)</span>
             </div>
           </div>
         )}
       </div>
 
       {/* ── Nav ── */}
-      <nav className="flex-1 overflow-y-auto py-3 px-2.5 space-y-0.5">
+      <nav
+        className="flex-1 overflow-y-auto py-3 px-2.5 space-y-0.5"
+        onClick={(e) => {
+          // On mobile, tapping a destination link dismisses the drawer.
+          if ((e.target as HTMLElement).closest("a")) onMobileClose?.();
+        }}
+      >
         {(() => {
           // Build visible sections first so we can strip orphan dividers
           type Rendered = { type: "divider"; idx: number } | { type: "node"; key: string; el: React.ReactNode };
@@ -221,7 +238,7 @@ export default function Sidebar({ collapsed, onToggle }: Props) {
 
       <button
         onClick={onToggle}
-        className="m-3 mt-0 nav-item justify-start"
+        className="m-3 mt-0 nav-item justify-start hidden lg:flex"
         aria-label="Collapse sidebar"
       >
         <ChevronLeft

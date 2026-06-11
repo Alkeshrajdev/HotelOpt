@@ -61,8 +61,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    // Demo mode: no Supabase credentials — skip auth entirely.
-    if (!SUPABASE_CONFIGURED || !supabase) {
+    // Demo mode: no Supabase credentials, OR an explicit demo session that was
+    // started earlier (persisted so a page refresh keeps the user signed in).
+    const demoActive =
+      typeof localStorage !== "undefined" && localStorage.getItem("ho_demo") === "1";
+    if (!SUPABASE_CONFIGURED || !supabase || demoActive) {
       setSession(DEMO_SESSION);
       setProfile(DEMO_PROFILE);
       setLoading(false);
@@ -104,10 +107,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return { error: error?.message ?? null };
       },
       signInDemo: () => {
+        if (typeof localStorage !== "undefined") localStorage.setItem("ho_demo", "1");
         setSession(DEMO_SESSION);
         setProfile(DEMO_PROFILE);
       },
       signOut: async () => {
+        if (typeof localStorage !== "undefined") localStorage.removeItem("ho_demo");
+        setSession(null);
+        setProfile(null);
         if (!supabase) return;
         await supabase.auth.signOut();
       },

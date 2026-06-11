@@ -87,7 +87,7 @@ const INITIAL_MESSAGES: Message[] = [
     role: "user",
     ts: "09:41",
     text: "Why did our Energy Intensity rise last month even though occupancy was the same?",
-    context: { role: "Sustainability Manager", pillar: "energy", property: "Greenview Resort" },
+    context: { role: "Sustainability Manager", pillar: "energy", property: "Skyline Dubai" },
   },
   {
     id: "m2",
@@ -106,7 +106,7 @@ const INITIAL_MESSAGES: Message[] = [
       { label: "Draft a checker comment summarising this",          requiresApproval: true },
     ],
     actionCards: [
-      { type: "create-action",   label: "Create action",   detail: "Review BMS schedules for chillers — Greenview Resort" },
+      { type: "create-action",   label: "Create action",   detail: "Review BMS schedules for chillers — Skyline Dubai" },
       { type: "flag-review",     label: "Flag for review", detail: "Mark diesel double-count for checker resolution" },
     ],
   },
@@ -187,7 +187,7 @@ export default function AIAssistant() {
       role:    "user",
       ts:      now,
       text:    draft.trim(),
-      context: { role: "Sustainability Manager", property: "Greenview Resort" },
+      context: { role: "Sustainability Manager", property: "Skyline Dubai" },
     };
     const refuse = /stock|invest|price/i.test(draft);
     const aiMsg: Message = refuse

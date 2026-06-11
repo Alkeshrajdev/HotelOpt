@@ -15,6 +15,7 @@ import Badge from "@/components/ui/Badge";
 import ProgressBar from "@/components/ui/ProgressBar";
 import RowActionsMenu from "@/components/properties/RowActionsMenu";
 import AddPropertyModal from "@/components/properties/AddPropertyModal";
+import InfoHint, { SUSTAINABILITY_SCORE_EXPLAINER } from "@/components/ui/InfoHint";
 import {
   CERTIFICATIONS,
   OPERATION_TYPES,
@@ -138,7 +139,7 @@ export default function Properties() {
       {/* Summary strip */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
         <SummaryTile label="Total properties" value={String(summary.total)} hint={`${PROPERTIES.length} on platform`} />
-        <SummaryTile label="Average score"    value={String(summary.avgScore)}     hint="0–100 sustainability" />
+        <SummaryTile label="Average score"    value={String(summary.avgScore)}     hint="0–100 sustainability" info={SUSTAINABILITY_SCORE_EXPLAINER} />
         <SummaryTile label="Data completeness" value={`${summary.avgCompleteness}%`} hint="approved records" tone="info" />
         <SummaryTile label="GP ready"          value={`${summary.gpReady} / ${summary.total}`} hint="full baseline + 12 mo data" tone="good" />
       </div>
@@ -389,11 +390,13 @@ function SummaryTile({
   label,
   value,
   hint,
+  info,
   tone = "neutral",
 }: {
   label: string;
   value: string;
   hint?: string;
+  info?: string;
   tone?: "neutral" | "good" | "info";
 }) {
   const ring =
@@ -404,8 +407,9 @@ function SummaryTile({
         : "border-ink-200 bg-white";
   return (
     <div className={cn("rounded-xl border p-4", ring)}>
-      <div className="text-[11px] uppercase tracking-wide font-semibold text-ink-500">
+      <div className="flex items-center gap-1 text-[11px] uppercase tracking-wide font-semibold text-ink-500">
         {label}
+        {info && <InfoHint text={info} />}
       </div>
       <div className="text-2xl font-bold text-ink-900 mt-0.5">{value}</div>
       {hint && <div className="text-[11px] text-ink-500">{hint}</div>}

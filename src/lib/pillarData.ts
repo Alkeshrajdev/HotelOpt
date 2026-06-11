@@ -16,7 +16,7 @@ const ENERGY_KPIS: PillarKpiSpec[] = [
   { id: "energy-score",     label: "Energy Score",      value: "82", unit: "%",       caption: "data compliance",            drilldown: "energy-score" },
   { id: "energy-index",     label: "Performance Index", value: "91",                  delta: -4.2,                            drilldown: "energy-index" },
   { id: "energy-intensity", label: "Energy Intensity",  value: "24", unit: "kWh/ORN", delta: -6.0,                            drilldown: "energy-intensity" },
-  { id: "renewable",        label: "Renewable share",   value: "78", unit: "%",       delta: 3.0, goodDirection: "up",        drilldown: "renewable" },
+  { id: "renewable",        label: "Renewable share",   value: "12", unit: "%",       delta: 3.0, goodDirection: "up",        drilldown: "renewable" },
 ];
 export const ENERGY = { kpis: ENERGY_KPIS };
 
@@ -43,12 +43,12 @@ export const WATER = {
     { name: "Other",                value: 4,  color: "#A5F3FC" },
   ],
   byProperty: [
-    { name: "Greenview Resort",  value: 0.41 },
-    { name: "Mountain Lodge",    value: 0.46 },
-    { name: "Seaside Hotel",     value: 0.52 },
-    { name: "City Centre Hotel", value: 0.39 },
-    { name: "Palm Beach Resort", value: 0.44 },
-    { name: "Airport Hotel",     value: 0.61 },
+    { name: "Skyline Dubai",  value: 0.41 },
+    { name: "Peaks Resort Zermatt",    value: 0.46 },
+    { name: "Oceanfront Cape Town",     value: 0.52 },
+    { name: "The Pavilion London", value: 0.39 },
+    { name: "Marina Residences Barcelona", value: 0.44 },
+    { name: "Airport Hotel Dubai",     value: 0.61 },
   ],
 };
 
@@ -77,12 +77,12 @@ export const WASTE = {
     { name: "E-waste",          value: 2,  color: "#7C3AED" },
   ],
   diversionByProperty: [
-    { name: "Greenview Resort",  value: 78 },
-    { name: "Mountain Lodge",    value: 71 },
-    { name: "Seaside Hotel",     value: 64 },
-    { name: "City Centre Hotel", value: 62 },
-    { name: "Palm Beach Resort", value: 56 },
-    { name: "Airport Hotel",     value: 41 },
+    { name: "Skyline Dubai",  value: 78 },
+    { name: "Peaks Resort Zermatt",    value: 71 },
+    { name: "Oceanfront Cape Town",     value: 64 },
+    { name: "The Pavilion London", value: 62 },
+    { name: "Marina Residences Barcelona", value: 56 },
+    { name: "Airport Hotel Dubai",     value: 41 },
   ],
   foodByMeal: [
     { name: "Breakfast", value: 62 },
@@ -182,11 +182,11 @@ export const GOVERNANCE = {
     { name: "Risk register review",           lastAttested: "—",          status: "gap"   as const },
   ],
   acByProperty: [
-    { name: "Greenview Resort",  value: 100 },
-    { name: "Mountain Lodge",    value: 98 },
-    { name: "Seaside Hotel",     value: 96 },
-    { name: "City Centre Hotel", value: 95 },
-    { name: "Palm Beach Resort", value: 94 },
-    { name: "Airport Hotel",     value: 88 },
+    { name: "Skyline Dubai",  value: 100 },
+    { name: "Peaks Resort Zermatt",    value: 98 },
+    { name: "Oceanfront Cape Town",     value: 96 },
+    { name: "The Pavilion London", value: 95 },
+    { name: "Marina Residences Barcelona", value: 94 },
+    { name: "Airport Hotel Dubai",     value: 88 },
   ],
 };

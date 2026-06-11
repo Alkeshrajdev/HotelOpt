@@ -221,7 +221,7 @@ const LEAK_ALERTS = [
     lossPerHr: "8.4 m³/hr",
     duration: "36 hrs",
     totalLoss: "302 m³",
-    cost: "AED 1,510",
+    cost: "USD 411",
     severity: "Critical",
     status: "Active",
     action: "Investigate",
@@ -234,7 +234,7 @@ const LEAK_ALERTS = [
     lossPerHr: "0.8 m³/hr",
     duration: "12 hrs",
     totalLoss: "9.6 m³",
-    cost: "AED 48",
+    cost: "USD 13",
     severity: "Low",
     status: "Active",
     action: "Monitor",
@@ -247,7 +247,7 @@ const LEAK_ALERTS = [
     lossPerHr: "1.2 m³/hr",
     duration: "4 hrs",
     totalLoss: "4.8 m³",
-    cost: "AED 24",
+    cost: "USD 7",
     severity: "Resolved",
     status: "Closed",
     action: "—",
@@ -260,7 +260,7 @@ const LEAK_ALERTS = [
     lossPerHr: "0.2 m³/hr",
     duration: "72 hrs",
     totalLoss: "14.4 m³",
-    cost: "AED 72",
+    cost: "USD 20",
     severity: "Resolved",
     status: "Closed",
     action: "—",
@@ -273,7 +273,7 @@ const LEAK_ALERTS = [
     lossPerHr: "0.4 m³/hr",
     duration: "18 hrs",
     totalLoss: "7.2 m³",
-    cost: "AED 36",
+    cost: "USD 10",
     severity: "Resolved",
     status: "Closed",
     action: "—",
@@ -464,7 +464,7 @@ function OverviewTab() {
           icon={<DollarSign size={20} />}
           iconBg="bg-emerald-100"
           label="Water Cost"
-          value="AED 42,100"
+          value="USD 11,450"
           delta={-2.8}
           deltaUnit="% vs last month"
           goodDirection="down"
@@ -526,7 +526,7 @@ function OverviewTab() {
           label="Estimated Water Loss"
           value="142"
           unit="m³"
-          caption="AED 710 estimated cost"
+          caption="USD 193 estimated cost"
         />
       </div>
 
@@ -846,7 +846,7 @@ function LeakDetectionTab() {
         <Card className="p-4">
           <p className="text-xs text-neutral-500">Estimated Loss</p>
           <p className="text-xl font-bold text-neutral-800 mt-1">302 m³</p>
-          <p className="text-xs text-red-500 mt-0.5">AED 1,510</p>
+          <p className="text-xs text-red-500 mt-0.5">USD 411</p>
         </Card>
       </div>
 

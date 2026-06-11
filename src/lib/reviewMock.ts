@@ -140,7 +140,7 @@ export const RECORDS: ReviewRecord[] = [
   // 1) Overdue + anomaly spike + low-confidence OCR — top of queue.
   {
     id: "R-1042",
-    property: "Greenview Resort",
+    property: "Skyline Dubai",
     region: "APAC",
     pillar: "energy",
     dataType: "Energy bill",
@@ -190,7 +190,7 @@ export const RECORDS: ReviewRecord[] = [
   // 2) Anomaly drop, queried in round 1 awaiting maker response.
   {
     id: "R-1041",
-    property: "City Centre Hotel",
+    property: "The Pavilion London",
     region: "EMEA",
     pillar: "water",
     dataType: "Water bill",
@@ -227,7 +227,7 @@ export const RECORDS: ReviewRecord[] = [
   // 3) Procurement (Scope 3 Cat 1) — supplier-submitted with double-count risk + AI low confidence.
   {
     id: "R-1040",
-    property: "Mountain Lodge",
+    property: "Peaks Resort Zermatt",
     region: "Americas",
     pillar: "carbon",
     dataType: "Procurement — Cat 1",
@@ -262,7 +262,7 @@ export const RECORDS: ReviewRecord[] = [
   // 4) Resubmitted after 2 query rounds — both resolved, ready for approval.
   {
     id: "R-1039",
-    property: "Seaside Hotel",
+    property: "Oceanfront Cape Town",
     region: "APAC",
     pillar: "energy",
     dataType: "District cooling",
@@ -307,7 +307,7 @@ export const RECORDS: ReviewRecord[] = [
   // 5) Approved + locked — example of post-approval state.
   {
     id: "R-1038",
-    property: "Palm Beach Resort",
+    property: "Marina Residences Barcelona",
     region: "APAC",
     pillar: "waste",
     dataType: "Waste — landfill",
@@ -338,7 +338,7 @@ export const RECORDS: ReviewRecord[] = [
   // 6) Refrigerant log — tier regression flag.
   {
     id: "R-1037",
-    property: "Grand Hotel",
+    property: "Grand Harbour Lisbon",
     region: "EMEA",
     pillar: "carbon",
     dataType: "Refrigerant log",
@@ -367,7 +367,7 @@ export const RECORDS: ReviewRecord[] = [
   // 7) Bulk CSV upload with range error — already rejected, kept for visibility.
   {
     id: "R-1036",
-    property: "Airport Hotel",
+    property: "Airport Hotel Dubai",
     region: "EMEA",
     pillar: "energy",
     dataType: "Energy — bulk CSV",
@@ -398,7 +398,7 @@ export const RECORDS: ReviewRecord[] = [
   // 8) Duplicate invoice — same supplier billed twice via two methods.
   {
     id: "R-1035",
-    property: "Greenview Resort",
+    property: "Skyline Dubai",
     region: "APAC",
     pillar: "carbon",
     dataType: "Procurement — Cat 4",

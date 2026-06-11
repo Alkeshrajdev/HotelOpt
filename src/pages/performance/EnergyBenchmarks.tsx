@@ -17,10 +17,10 @@ type Peer = {
 };
 
 const PEERS: Peer[] = [
-  { name: "You",    intensity: 24.0, perM2: 112, costPerOrn: 3.20, renewable: 78, isYou: true  },
-  { name: "Peer A", intensity: 19.2, perM2:  89, costPerOrn: 2.58, renewable: 85, isYou: false },
-  { name: "Peer B", intensity: 21.8, perM2:  98, costPerOrn: 2.91, renewable: 72, isYou: false },
-  { name: "Peer C", intensity: 26.4, perM2: 124, costPerOrn: 3.42, renewable: 61, isYou: false },
+  { name: "You",    intensity: 24.0, perM2: 112, costPerOrn: 3.20, renewable: 12, isYou: true  },
+  { name: "Peer A", intensity: 19.2, perM2:  89, costPerOrn: 2.58, renewable: 22, isYou: false },
+  { name: "Peer B", intensity: 21.8, perM2:  98, costPerOrn: 2.91, renewable: 16, isYou: false },
+  { name: "Peer C", intensity: 26.4, perM2: 124, costPerOrn: 3.42, renewable:  9, isYou: false },
 ];
 
 /* ─── Savings vs best peer ───────────────────────────────────────────────── */

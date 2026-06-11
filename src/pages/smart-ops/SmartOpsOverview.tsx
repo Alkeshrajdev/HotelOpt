@@ -52,21 +52,21 @@ const TOP_INEFFICIENT_ASSETS = [
   {
     name: "Chiller 01",
     issue: "COP 22% below baseline — compressor degradation suspected",
-    loss: "AED 8,400/month",
+    loss: "USD 2,280/month",
     icon: Thermometer,
     severity: "bad" as const,
   },
   {
     name: "AHU-05",
     issue: "Running 4 hrs outside scheduled operation window",
-    loss: "AED 2,100/month",
+    loss: "USD 571/month",
     icon: Wind,
     severity: "warn" as const,
   },
   {
     name: "Solar PV Array",
     issue: "Generating 31% below expected output — soiling likely",
-    loss: "AED 1,650/month",
+    loss: "USD 449/month",
     icon: Zap,
     severity: "warn" as const,
   },
@@ -133,9 +133,9 @@ const OPEN_MAINTENANCE = [
 ];
 
 const SAVINGS_VERIFICATION = [
-  { label: "Verified", count: 2, tone: "good" as const, amount: "AED 112,400" },
-  { label: "Monitoring", count: 3, tone: "info" as const, amount: "AED 48,600" },
-  { label: "Estimated", count: 4, tone: "neutral" as const, amount: "AED 21,400" },
+  { label: "Verified", count: 2, tone: "good" as const, amount: "USD 30,570" },
+  { label: "Monitoring", count: 3, tone: "info" as const, amount: "USD 13,220" },
+  { label: "Estimated", count: 4, tone: "neutral" as const, amount: "USD 5,820" },
 ];
 
 function BreakdownBar({ items }: { items: { label: string; pct: number; color: string }[] }) {
@@ -268,8 +268,8 @@ export default function SmartOpsOverview() {
             icon={<TrendingDown size={18} />}
             iconBg="bg-good/10 text-good"
             label="Verified savings YTD"
-            value="182,400"
-            unit="AED"
+            value="49,610"
+            unit="USD"
             goodDirection="up"
             caption="Verified · 2 of 9 measures confirmed"
             prominent
@@ -530,7 +530,7 @@ export default function SmartOpsOverview() {
               ))}
               <div className="pt-1">
                 <p className="text-[11px] font-semibold text-ink-800">
-                  Total YTD: AED 182,400
+                  Total YTD: USD 49,610
                 </p>
               </div>
             </div>

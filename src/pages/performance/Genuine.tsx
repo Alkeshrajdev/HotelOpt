@@ -172,7 +172,7 @@ export default function Genuine({ pillar }: { pillar: PillarKey }) {
                 <td className="table-td">14 Apr 2026</td>
                 <td className="table-td font-medium">F&B refurbishment (re-opened)</td>
                 <td className="table-td"><Badge tone="brand">Energy</Badge> <Badge tone="brand">Water</Badge> <Badge tone="brand">Waste</Badge></td>
-                <td className="table-td">Greenview Resort</td>
+                <td className="table-td">Skyline Dubai</td>
                 <td className="table-td">3 new outlets — chillers ran 24/7 for commissioning</td>
                 <td className="table-td"><Badge tone="good">Approved</Badge></td>
               </tr>
@@ -180,7 +180,7 @@ export default function Genuine({ pillar }: { pillar: PillarKey }) {
                 <td className="table-td">02 Feb 2026</td>
                 <td className="table-td font-medium">LED retrofit — back-of-house</td>
                 <td className="table-td"><Badge tone="brand">Energy</Badge></td>
-                <td className="table-td">Mountain Lodge</td>
+                <td className="table-td">Peaks Resort Zermatt</td>
                 <td className="table-td">3,200 fittings replaced</td>
                 <td className="table-td"><Badge tone="good">Approved</Badge></td>
               </tr>
@@ -188,7 +188,7 @@ export default function Genuine({ pillar }: { pillar: PillarKey }) {
                 <td className="table-td">22 Nov 2025</td>
                 <td className="table-td font-medium">Solar PV phase 1 commissioned</td>
                 <td className="table-td"><Badge tone="brand">Energy</Badge> <Badge tone="brand">Carbon</Badge></td>
-                <td className="table-td">Palm Beach Resort</td>
+                <td className="table-td">Marina Residences Barcelona</td>
                 <td className="table-td">240 kWp rooftop array</td>
                 <td className="table-td"><Badge tone="good">Approved</Badge></td>
               </tr>

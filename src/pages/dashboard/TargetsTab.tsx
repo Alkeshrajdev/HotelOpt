@@ -85,8 +85,19 @@ const REQUIRED_IMPROVEMENT: Record<string, string> = {
   data:   "~3% annual approval improvement to 2025",
 };
 
+// Progress along the baseline → target journey (direction-aware).
+// done = (current - baseline) / (target - baseline) works for both
+// reduction targets (lower is better) and growth targets (higher is better),
+// because numerator and denominator flip sign together.
+function journeyProgress(target: Target) {
+  const span = target.targetVal - target.baseVal;
+  if (span === 0) return 100;
+  const done = ((target.currentVal - target.baseVal) / span) * 100;
+  return Math.max(0, Math.min(100, Math.round(done)));
+}
+
 function PathwayBar({ target }: { target: Target }) {
-  const pct = Math.min(100, Math.round((target.currentVal / target.targetVal) * 100));
+  const pct = journeyProgress(target);
   const remaining = 100 - pct;
 
   return (
@@ -95,7 +106,8 @@ function PathwayBar({ target }: { target: Target }) {
         className={cn("h-full rounded-full transition-all", target.status === "bad" ? "bg-bad" : "bg-warn")}
         style={{ width: `${pct}%` }}
       />
-      <div className="absolute inset-0 flex items-center justify-end pr-3">
+      <div className="absolute inset-0 flex items-center justify-between px-3">
+        <span className="text-[10px] font-bold text-white tabular-nums">{pct}% there</span>
         <span className="text-[10px] font-bold text-ink-600 tabular-nums">{remaining}% to go</span>
       </div>
     </div>
@@ -129,17 +141,13 @@ function TargetCard({ target }: { target: Target }) {
           <div className="text-center shrink-0 w-24">
             <div className="text-[10px] text-ink-400 uppercase tracking-wide font-semibold mb-1">Baseline {target.baseYear}</div>
             <div className="text-[13px] font-bold text-ink-700 tabular-nums">
-              {target.key === "carbon" ? "100%" :
-               target.key === "energy" ? "22.5 kWh/RN" :
-               target.key === "water" ? "374 L/GN" :
-               target.key === "waste" ? "24%" :
-               target.key === "cert" ? "50%" : "77%"}
+              {target.baseLabel}
             </div>
           </div>
           <div className="flex-1 h-0.5 bg-ink-200 relative mx-2">
             <div
               className={cn("absolute inset-y-0 left-0 rounded-full", target.status === "bad" ? "bg-bad" : "bg-warn")}
-              style={{ width: `${Math.min(100, (target.currentVal / target.targetVal) * 100)}%` }}
+              style={{ width: `${journeyProgress(target)}%` }}
             />
           </div>
           {/* Current */}

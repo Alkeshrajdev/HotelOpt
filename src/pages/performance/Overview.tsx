@@ -74,7 +74,7 @@ const ENERGY_CFG: PillarConfig = {
     { id: "energy-total",     icon: <Zap size={18} />,   iconBg: "bg-pillar-energy/10 text-pillar-energy", label: "Total consumption", value: "2,840", unit: "MWh", delta: -8.2 },
     { id: "energy-intensity", icon: <Zap size={18} />,   iconBg: "bg-warn/10 text-warn",                   label: "Energy intensity", value: "24.0", unit: "kWh/ORN", delta: -6.0 },
     { id: "energy-cost",      icon: <Target size={18} />,iconBg: "bg-pillar-energy/10 text-pillar-energy", label: "Energy cost", value: "$4.6M", delta: -4.0 },
-    { id: "renewable",        icon: <Zap size={18} />,   iconBg: "bg-brand-50 text-brand-700",             label: "Renewable share", value: "78", unit: "%", delta: 3.0, goodDirection: "up" },
+    { id: "renewable",        icon: <Zap size={18} />,   iconBg: "bg-brand-50 text-brand-700",             label: "Renewable share", value: "12", unit: "%", delta: 3.0, goodDirection: "up" },
   ],
   trendTitle: "Energy consumption over time",
   trendHint: "kWh/ORN · monthly",
@@ -181,7 +181,7 @@ function getDrill(id: string): { title: string; subtitle?: string; hero?: ReactN
     case "energy-index":     return { title: "Energy Performance Index", hero: <HeroValue value="91" delta={-4.2} context="Base 100 = 2022" />, body: <PerformanceIndexDrilldown /> };
     case "energy-intensity": return { title: "Energy Intensity", hero: <HeroValue value="24.0" unit="kWh/ORN" delta={-6.0} />, body: <EnergyIntensityDrilldown /> };
     case "energy-cost":      return { title: "Energy Cost", hero: <HeroValue value="$4.6M" delta={-4.0} />, body: <EnergyCostDrilldown /> };
-    case "renewable":        return { title: "Renewable energy", hero: <HeroValue value="78" unit="/100" delta={3.0} goodDirection="up" />, body: <RenewableDrilldown /> };
+    case "renewable":        return { title: "Renewable energy", hero: <HeroValue value="12" unit="%" delta={3.0} goodDirection="up" />, body: <RenewableDrilldown /> };
     case "water-intensity":  return { title: "Water Intensity", hero: <HeroValue value="0.42" unit="m³/ORN" delta={-4.1} />, body: <WaterIntensityDrilldown /> };
     case "water-recycled":   return { title: "Recycled / greywater share", hero: <HeroValue value="22" unit="%" delta={6.0} goodDirection="up" />, body: <WaterRecycledDrilldown /> };
     case "water-leaks":      return { title: "Leak alerts", hero: <HeroValue value="2" context="active alerts" />, body: <WaterLeaksDrilldown /> };

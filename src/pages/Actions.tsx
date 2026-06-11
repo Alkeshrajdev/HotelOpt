@@ -94,7 +94,7 @@ const MEASURES: Measure[] = [
     id: "m1", code: "ENG-001",
     name: "LED retrofit — back-of-house",
     description: "Replace 3,200 fluorescent fittings with LED across kitchens, BoH corridors, and laundry.",
-    pillar: "energy", property: "Mountain Lodge",
+    pillar: "energy", property: "Peaks Resort Zermatt",
     capexClass: "capex", capexAmount: 120000, capexCurrency: "USD",
     paybackYears: 1.8, expectedImpactPct: 2.4, actualImpactPct: 2.6,
     co2eSaving: 38, priority: "high", measureType: "retrofit",
@@ -107,7 +107,7 @@ const MEASURES: Measure[] = [
     id: "m2", code: "ENG-002",
     name: "BMS optimisation — HVAC schedules",
     description: "Re-tune occupancy-driven HVAC setpoints across 14 zones.",
-    pillar: "energy", property: "Greenview Resort",
+    pillar: "energy", property: "Skyline Dubai",
     capexClass: "opex", capexAmount: 12000, capexCurrency: "USD",
     paybackYears: 0.6, expectedImpactPct: 3.1,
     co2eSaving: 22, priority: "critical", measureType: "behaviour",
@@ -120,7 +120,7 @@ const MEASURES: Measure[] = [
     id: "m3", code: "ENG-003",
     name: "Heat recovery on chillers",
     description: "Capture chiller waste heat for laundry hot water.",
-    pillar: "energy", property: "Seaside Hotel",
+    pillar: "energy", property: "Oceanfront Cape Town",
     capexClass: "capex", capexAmount: 250000, capexCurrency: "AUD",
     paybackYears: 2.6, expectedImpactPct: 4.2,
     co2eSaving: 55, priority: "high", measureType: "retrofit",
@@ -133,7 +133,7 @@ const MEASURES: Measure[] = [
     id: "m4", code: "WTR-001",
     name: "Greywater reuse — landscaping",
     description: "Divert sink greywater for irrigation, ~22 m³/day.",
-    pillar: "water", property: "Palm Beach Resort",
+    pillar: "water", property: "Marina Residences Barcelona",
     capexClass: "capex", capexAmount: 95000, capexCurrency: "THB",
     paybackYears: 3.0, expectedImpactPct: 2.8,
     co2eSaving: 4, priority: "medium", measureType: "retrofit",
@@ -146,7 +146,7 @@ const MEASURES: Measure[] = [
     id: "m5", code: "WST-001",
     name: "Food-waste segregation programme",
     description: "Add organic stream + LeanPath weighing in main kitchen.",
-    pillar: "waste", property: "City Centre Hotel",
+    pillar: "waste", property: "The Pavilion London",
     capexClass: "mixed", capexAmount: 12000, capexCurrency: "DKK",
     paybackYears: 0.9, expectedImpactPct: 1.7, actualImpactPct: 2.0,
     co2eSaving: 12, priority: "medium", measureType: "behaviour",
@@ -159,7 +159,7 @@ const MEASURES: Measure[] = [
     id: "m6", code: "CRB-001",
     name: "On-site solar PV — phase 2",
     description: "Add 240 kWp to the existing rooftop array.",
-    pillar: "carbon", property: "Greenview Resort",
+    pillar: "carbon", property: "Skyline Dubai",
     capexClass: "capex", capexAmount: 480000, capexCurrency: "USD",
     paybackYears: 4.2, expectedImpactPct: 6.5,
     co2eSaving: 142, priority: "critical", measureType: "retrofit",
@@ -172,7 +172,7 @@ const MEASURES: Measure[] = [
     id: "m7", code: "SOC-001",
     name: "Sustainability training rollout",
     description: "12-hour online + 4-hour in-person training for 240 staff.",
-    pillar: "social", property: "Mountain Lodge",
+    pillar: "social", property: "Peaks Resort Zermatt",
     capexClass: "opex", capexAmount: 8000, capexCurrency: "CAD",
     paybackYears: 0, expectedImpactPct: 0,
     co2eSaving: 0, priority: "low", measureType: "policy",
@@ -580,7 +580,7 @@ function NewActionModal({ open, onClose }: { open: boolean; onClose: () => void 
               <span className="text-[12px] font-medium text-ink-600">Property <span className="text-bad">*</span></span>
               <select className="input mt-1" value={form.property} onChange={(e) => set("property", e.target.value)}>
                 <option value="">— Select —</option>
-                {["Greenview Resort","Mountain Lodge","Seaside Hotel","City Centre Hotel","Palm Beach Resort"].map((p) => (
+                {["Skyline Dubai","Peaks Resort Zermatt","Oceanfront Cape Town","The Pavilion London","Marina Residences Barcelona"].map((p) => (
                   <option key={p} value={p}>{p}</option>
                 ))}
               </select>
@@ -804,7 +804,7 @@ const GAP_CARDS: GapCard[] = [
     icon: <Sun size={18} />,
     label: "Scope 2 shortfall detected",
     title: "Purchase I-RECs to cover residual market-based Scope 2",
-    gap: "Greenview Resort has a Scope 2 shortfall of ~142 tCO₂e after all committed physical efficiency measures. The SBTi pathway requires market-based coverage before the 2026 reporting period closes.",
+    gap: "Skyline Dubai has a Scope 2 shortfall of ~142 tCO₂e after all committed physical efficiency measures. The SBTi pathway requires market-based coverage before the 2026 reporting period closes.",
     recommendation: "Request I-RECs (Renewable Energy Certificates) in the Solutions Hub to achieve a market-based Scope 2 of zero for the shortfall period.",
     ctaLabel: "Request I-RECs in Solutions Hub",
     ctaHref: "/marketplace",

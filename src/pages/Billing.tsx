@@ -49,7 +49,7 @@ type InviteForm = { email: string; role: UserRole };
 
 const PLAN = {
   name: "Hotel Optimizer · Enterprise", type: "White-label", cycle: "Annual",
-  baseFee: 36000, perPropertyFee: 600, propertiesIncluded: 100, propertiesUsed: 72,
+  baseFee: 36000, perPropertyFee: 600, propertiesIncluded: 100, propertiesUsed: 10,
   whiteLabelLicenceFee: 12000, currency: "USD", renewsOn: "31 Dec 2026",
 };
 

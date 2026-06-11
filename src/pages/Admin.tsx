@@ -114,7 +114,7 @@ export default function Admin() {
                       {t.live ? (
                         <Badge tone="good">Available</Badge>
                       ) : (
-                        <Badge tone="neutral">Stub</Badge>
+                        <Badge tone="neutral">Soon</Badge>
                       )}
                     </div>
                     <p className="text-[12px] text-ink-500 mt-1 leading-snug">{t.body}</p>
@@ -132,7 +132,7 @@ export default function Admin() {
       <div className="rounded-xl bg-brand-50 border border-brand-100 p-3 flex items-start gap-2.5">
         <Folder size={16} className="text-brand-700 mt-0.5" />
         <div className="text-[13px] text-brand-900">
-          <strong>Sub-page status.</strong> Tiles labelled <em>Available</em> open a fully built admin sub-page. Tiles labelled <em>Stub</em> link to a placeholder workspace with the same layout shell — to be filled in as each backend area is wired up.
+          <strong>Sub-page status.</strong> Tiles labelled <em>Available</em> open a fully built admin sub-page. Tiles labelled <em>Soon</em> are on the roadmap and currently open a preview workspace with the same layout shell.
           <span className="ml-1 inline-flex items-center gap-1">
             <Users2 size={12} /> Available now: Clients · EF Library · Users &amp; Roles · Comparable Pools.
           </span>
@@ -157,7 +157,7 @@ type AuditEvent = {
 
 const ALL_EVENTS: AuditEvent[] = [
   { ts: "2026-05-02 09:14", actor: "james.wilson@",    action: "Updated EF — UAE grid 2026 Q2",          target: "Emission factor library",          ip: "185.22.14.7",   result: "success" },
-  { ts: "2026-05-02 08:50", actor: "priya.sharma@",    action: "Data submission approved",                target: "Greenview Resort",    ip: "203.0.113.42",  result: "success" },
+  { ts: "2026-05-02 08:50", actor: "priya.sharma@",    action: "Data submission approved",                target: "Skyline Dubai",    ip: "203.0.113.42",  result: "success" },
   { ts: "2026-05-02 08:41", actor: "felix.andersen@",  action: "Login",                                   target: "Session",             ip: "198.51.100.9",  result: "success" },
   { ts: "2026-05-01 16:02", actor: "platform-admin@",  action: "Activated white-label theme",             target: "Client: Aurora Hotels", ip: "10.0.0.1",    result: "success" },
   { ts: "2026-05-01 15:30", actor: "lucia.f@",         action: "Report published",                        target: "GHG Inventory 2025",  ip: "203.0.113.88",  result: "success" },
@@ -165,8 +165,8 @@ const ALL_EVENTS: AuditEvent[] = [
   { ts: "2026-04-30 11:48", actor: "james.wilson@",    action: "Invited supplier",                        target: "FreshLeaf Produce",   ip: "185.22.14.7",   result: "info"    },
   { ts: "2026-04-30 10:05", actor: "sofia.e@",         action: "Login — MFA failed",                      target: "Session",             ip: "45.33.32.156",  result: "fail"    },
   { ts: "2026-04-29 17:10", actor: "platform-admin@",  action: "Rotated API key",                         target: "QuickBooks Online",   ip: "10.0.0.1",      result: "success" },
-  { ts: "2026-04-29 16:44", actor: "priya.sharma@",    action: "Certification renewed — Green Globe",     target: "Greenview Resort",    ip: "203.0.113.42",  result: "success" },
-  { ts: "2026-04-29 15:00", actor: "felix.andersen@",  action: "Data submission created",                 target: "Mountain Lodge",      ip: "198.51.100.9",  result: "success" },
+  { ts: "2026-04-29 16:44", actor: "priya.sharma@",    action: "Certification renewed — Green Globe",     target: "Skyline Dubai",    ip: "203.0.113.42",  result: "success" },
+  { ts: "2026-04-29 15:00", actor: "felix.andersen@",  action: "Data submission created",                 target: "Peaks Resort Zermatt",      ip: "198.51.100.9",  result: "success" },
   { ts: "2026-04-28 13:20", actor: "lucia.f@",         action: "Record flagged for re-review",            target: "INV-2026-0441",       ip: "203.0.113.88",  result: "info"    },
   { ts: "2026-04-28 11:05", actor: "james.wilson@",    action: "Action created — BMS schedule review",    target: "Actions & Measures",  ip: "185.22.14.7",   result: "success" },
   { ts: "2026-04-27 09:30", actor: "platform-admin@",  action: "User suspended",                          target: "mark.osei@",          ip: "10.0.0.1",      result: "success" },

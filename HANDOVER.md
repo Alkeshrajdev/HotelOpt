@@ -159,55 +159,36 @@ src/
 
 ---
 
-## Next task — Relocate Properties page
+## ✅ Completed — Relocate Properties page + de-duplicate Setup/Hotels tab
 
-### The problem
-`/properties` (`src/pages/Properties.tsx`) is currently a sidebar item in the workspace section alongside Data Capture and Review & Approval. This is wrong — it is a **portfolio-level admin/configuration tool**, not a day-to-day workspace tool.
+**Files changed:** `src/lib/nav.ts`, `src/pages/portfolio/PortfolioSetup.tsx`
+**Commits:** `e27ba1b`, `4df511a`
 
-What the Properties page actually is:
-- Master registry of all 72 properties across the portfolio
-- Shows per-property: status, rooms, GFA, region, brand, data completeness %, GP readiness, certifications
-- Has "Add property" button and full advanced filter panel
-- Eyebrow label: "Configuration hub"
+### What was done
 
-Currently in `src/lib/nav.ts`:
-```typescript
-{ type: "item", to: "/properties", label: "Properties", icon: Building2, roles: ["property_sm", "super_admin"] },
+**1. Properties moved into Portfolio sidebar group** (`super_admin` only)
+- Added `{ to: "/properties", label: "Properties", icon: Building2 }` as the second item in the Portfolio group (after Dashboard, before Setup)
+- Removed the flat workspace-section item `{ type: "item", to: "/properties", ... }`
+- `property_sm` no longer sees the master registry list; `/properties/:id` detail pages remain accessible to them via direct link
+
+**2. Setup → Hotels tab de-duplicated**
+- Was: full hotel table duplicating Properties (Brand, Country, Rooms, GFA, Approved % bar — all already in Properties)
+- Now: lightweight **Portfolio Scope** view — Hotel name, Report Status, Cert Status, Pending records, In Portfolio toggle + exclusion reason
+- Summary tiles changed from (Ready/Missing/Evidence) → (Blocked / At Risk / Cert gaps)
+- Added inline "Properties" link in the subtitle so admins can jump to the master registry for full editing
+- Button renamed from "Add Hotels to Portfolio" → "Add to Portfolio"
+
+### Current Portfolio sidebar order
 ```
-This places it as a flat workspace item visible to both `property_sm` and `super_admin`.
-
-### What needs to change
-
-**1. Move into the Portfolio sidebar group** (`super_admin` only)
-
-In `src/lib/nav.ts`, the Portfolio group currently has:
-```typescript
-{
-  type: "group",
-  label: "Portfolio",
-  icon: FolderOpen,
-  matchPrefix: "/portfolio",
-  roles: ["super_admin"],
-  items: [
-    { to: "/portfolio/dashboard",              label: "Dashboard",       icon: LayoutDashboard },
-    { to: "/portfolio/setup",                  label: "Setup",           icon: SettingsIcon    },
-    { to: "/portfolio/reports-certifications", label: "Reports & Certs", icon: FileText        },
-  ],
-},
+Portfolio (super_admin)
+  Dashboard
+  Properties   ← master registry (72 hotels, full filter, add/edit)
+  Setup        ← portfolio scope: inclusion, groups, targets, users, rules, escalations
+  Reports & Certs
 ```
 
-Add Properties as a new item in this group (or replace "Setup" if that page is a stub):
-```typescript
-{ to: "/properties", label: "Properties", icon: Building2 },
-```
+---
 
-**2. Remove from workspace section**
+## Next task — (none recorded)
 
-Delete the flat `{ type: "item", to: "/properties", ... }` line from the workspace section.
-
-**3. Remove `property_sm` access**
-
-A property manager has no business managing the master property registry. The individual property detail page (`/properties/:id`) can remain accessible to `property_sm` but the registry list should be `super_admin` only — which is already enforced by it being inside the Portfolio group.
-
-### Decision on "Setup" sub-item
-Check whether `/portfolio/setup` has a real page or is a stub. If it's a stub/placeholder, replace it with Properties. If it has real content, keep both as separate items.
+No next task has been defined yet. Continue from here.

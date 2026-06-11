@@ -110,7 +110,7 @@ export function WaterLeaksDrilldown() {
             <div className="flex items-center gap-3">
               <ShieldAlert size={18} className="text-warn" />
               <div>
-                <div className="font-semibold text-ink-900">Cooling tower make-up — Greenview Resort</div>
+                <div className="font-semibold text-ink-900">Cooling tower make-up — Skyline Dubai</div>
                 <div className="text-[11px] text-ink-500">Anomalous flow at 02:18 — 2.4 m³/h above baseline</div>
               </div>
             </div>
@@ -120,7 +120,7 @@ export function WaterLeaksDrilldown() {
             <div className="flex items-center gap-3">
               <ShieldAlert size={18} className="text-warn" />
               <div>
-                <div className="font-semibold text-ink-900">Laundry feed — Mountain Lodge</div>
+                <div className="font-semibold text-ink-900">Laundry feed — Peaks Resort Zermatt</div>
                 <div className="text-[11px] text-ink-500">3-hour run with no batch logged</div>
               </div>
             </div>
@@ -440,21 +440,21 @@ export function WhistleblowDrilldown() {
         <ul className="p-5 space-y-2 text-sm">
           <li className="rounded-xl border border-ink-200 p-3">
             <div className="flex items-center justify-between">
-              <span className="font-semibold text-ink-900">Workplace conduct — Greenview Resort</span>
+              <span className="font-semibold text-ink-900">Workplace conduct — Skyline Dubai</span>
               <Badge tone="good">Resolved · 12 days</Badge>
             </div>
             <div className="text-[11px] text-ink-500 mt-0.5">Reported anonymously, mediated, training provided.</div>
           </li>
           <li className="rounded-xl border border-ink-200 p-3">
             <div className="flex items-center justify-between">
-              <span className="font-semibold text-ink-900">Procurement — City Centre Hotel</span>
+              <span className="font-semibold text-ink-900">Procurement — The Pavilion London</span>
               <Badge tone="good">Resolved · 21 days</Badge>
             </div>
             <div className="text-[11px] text-ink-500 mt-0.5">Vendor relationship reviewed and replaced.</div>
           </li>
           <li className="rounded-xl border border-ink-200 p-3">
             <div className="flex items-center justify-between">
-              <span className="font-semibold text-ink-900">Supplier compliance — Mountain Lodge</span>
+              <span className="font-semibold text-ink-900">Supplier compliance — Peaks Resort Zermatt</span>
               <Badge tone="good">Resolved · 9 days</Badge>
             </div>
             <div className="text-[11px] text-ink-500 mt-0.5">Supplier code of conduct re-signed.</div>

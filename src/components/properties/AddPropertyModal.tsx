@@ -299,7 +299,7 @@ export default function AddPropertyModal({
         <Section title="Identity & location" hint="Used for branding, climate normalisation (CDD/HDD by GPS), and pool isolation per BRD §2.3">
           <div className="grid grid-cols-2 gap-4">
             <Field label="Property name" required error={errors.name}>
-              <input className={cn("input", errors.name && "border-bad ring-1 ring-bad/25")} value={form.name} onChange={(e) => set("name", e.target.value)} placeholder="e.g. Greenview Resort" />
+              <input className={cn("input", errors.name && "border-bad ring-1 ring-bad/25")} value={form.name} onChange={(e) => set("name", e.target.value)} placeholder="e.g. Skyline Dubai" />
             </Field>
             <Field label="Brand">
               <input className="input" value={form.brand} onChange={(e) => set("brand", e.target.value)} />

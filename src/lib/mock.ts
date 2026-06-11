@@ -3,7 +3,7 @@ export const KPIS = {
   energyPerformanceIndex: { value: 91, delta: -4.2 },
   energyIntensity: { value: 24, unit: "kWh/ORN", delta: -6 },
   energyCost: { value: "$4.6M", delta: -4 },
-  renewableEnergy: { value: 78, suffix: "/100", delta: 3 },
+  renewableEnergy: { value: 12, suffix: "%", delta: 3 },
   occupiedRoomNights: { value: 412585, delta: 2.7 },
   guestNights: { value: 876241, delta: 4.1 },
   floorAreaM2: { value: 654812, delta: 5.7 },
@@ -101,17 +101,17 @@ export const ENERGY_DATA_QUALITY = [
 ];
 
 export const TOP_PROPERTIES = [
-  { property: "Greenview Resort",  location: "Bali, Indonesia",       score: 92, reason: "Solar PV at 78% of demand, zero-landfill waste programme" },
-  { property: "Mountain Lodge",    location: "Whistler, Canada",      score: 88, reason: "LED retrofit complete, greywater reuse saving 31% water" },
-  { property: "Seaside Hotel",     location: "Melbourne, Australia",  score: 85, reason: "Green Globe certified, highest guest engagement score" },
-  { property: "City Centre Hotel", location: "Copenhagen, Denmark",   score: 84, reason: "District heating connection, strong governance score" },
-  { property: "Palm Beach Resort", location: "Phuket, Thailand",      score: 82, reason: "Top 10% for carbon intensity vs. APAC peer resorts" },
+  { property: "Skyline Dubai",  location: "Bali, Indonesia",       score: 92, reason: "Solar PV at 78% of demand, zero-landfill waste programme" },
+  { property: "Peaks Resort Zermatt",    location: "Whistler, Canada",      score: 88, reason: "LED retrofit complete, greywater reuse saving 31% water" },
+  { property: "Oceanfront Cape Town",     location: "Melbourne, Australia",  score: 85, reason: "Green Globe certified, highest guest engagement score" },
+  { property: "The Pavilion London", location: "Copenhagen, Denmark",   score: 84, reason: "District heating connection, strong governance score" },
+  { property: "Marina Residences Barcelona", location: "Phuket, Thailand",      score: 82, reason: "Top 10% for carbon intensity vs. APAC peer resorts" },
 ];
 
 export const NEEDS_ATTENTION = [
-  { property: "Airport Hotel",   location: "Dubai, UAE",           score: 45, reason: "Diesel backup running 18% of hours — Scope 1 spike" },
-  { property: "Grand Hotel",     location: "Istanbul, Turkey",     score: 47, reason: "Water sub-metering incomplete, 3 months estimated data" },
-  { property: "Downtown Inn",    location: "Manila, Philippines",  score: 49, reason: "F&B waste missing Q3, certification evidence overdue" },
+  { property: "Airport Hotel Dubai",   location: "Dubai, UAE",           score: 45, reason: "Diesel backup running 18% of hours — Scope 1 spike" },
+  { property: "Grand Harbour Lisbon",     location: "Istanbul, Turkey",     score: 47, reason: "Water sub-metering incomplete, 3 months estimated data" },
+  { property: "Riverside Bangkok",    location: "Manila, Philippines",  score: 49, reason: "F&B waste missing Q3, certification evidence overdue" },
   { property: "Coastal Inn",     location: "Doha, Qatar",          score: 50, reason: "Cooling load 40% above regional peer benchmark" },
   { property: "Riverside Hotel", location: "Bangkok, Thailand",    score: 42, reason: "Lowest in portfolio — onboarding incomplete, 6 blockers" },
 ];
@@ -155,23 +155,23 @@ export const ENERGY_BENCHMARK = {
 };
 
 export const PROPERTIES = [
-  { id: "P-001", name: "Greenview Resort", region: "APAC", brand: "Hotel Optimizer", rooms: 240, gfa: 18500, status: "Active", score: 92 },
-  { id: "P-002", name: "Mountain Lodge", region: "Americas", brand: "Hotel Optimizer", rooms: 180, gfa: 14200, status: "Active", score: 88 },
-  { id: "P-003", name: "Seaside Hotel", region: "APAC", brand: "Hotel Optimizer", rooms: 320, gfa: 22500, status: "Active", score: 85 },
-  { id: "P-004", name: "City Centre Hotel", region: "EMEA", brand: "Hotel Optimizer", rooms: 410, gfa: 28800, status: "Active", score: 84 },
-  { id: "P-005", name: "Palm Beach Resort", region: "APAC", brand: "Hotel Optimizer", rooms: 290, gfa: 20100, status: "Active", score: 82 },
-  { id: "P-006", name: "Airport Hotel", region: "EMEA", brand: "Hotel Optimizer", rooms: 360, gfa: 24600, status: "Onboarding", score: 45 },
-  { id: "P-007", name: "Grand Hotel", region: "EMEA", brand: "Hotel Optimizer", rooms: 280, gfa: 20800, status: "Active", score: 47 },
-  { id: "P-008", name: "Downtown Inn", region: "APAC", brand: "Hotel Optimizer", rooms: 220, gfa: 16400, status: "Active", score: 49 },
+  { id: "P-001", name: "Skyline Dubai", region: "APAC", brand: "Hotel Optimizer", rooms: 240, gfa: 18500, status: "Active", score: 92 },
+  { id: "P-002", name: "Peaks Resort Zermatt", region: "Americas", brand: "Hotel Optimizer", rooms: 180, gfa: 14200, status: "Active", score: 88 },
+  { id: "P-003", name: "Oceanfront Cape Town", region: "APAC", brand: "Hotel Optimizer", rooms: 320, gfa: 22500, status: "Active", score: 85 },
+  { id: "P-004", name: "The Pavilion London", region: "EMEA", brand: "Hotel Optimizer", rooms: 410, gfa: 28800, status: "Active", score: 84 },
+  { id: "P-005", name: "Marina Residences Barcelona", region: "APAC", brand: "Hotel Optimizer", rooms: 290, gfa: 20100, status: "Active", score: 82 },
+  { id: "P-006", name: "Airport Hotel Dubai", region: "EMEA", brand: "Hotel Optimizer", rooms: 360, gfa: 24600, status: "Onboarding", score: 45 },
+  { id: "P-007", name: "Grand Harbour Lisbon", region: "EMEA", brand: "Hotel Optimizer", rooms: 280, gfa: 20800, status: "Active", score: 47 },
+  { id: "P-008", name: "Riverside Bangkok", region: "APAC", brand: "Hotel Optimizer", rooms: 220, gfa: 16400, status: "Active", score: 49 },
 ];
 
 export const REVIEW_QUEUE = [
-  { id: "R-1042", property: "Greenview Resort", type: "Energy bill", method: "OCR", maker: "F. Setiawan", submitted: "2024-04-29", flag: "Low confidence", severity: "warn" as const },
-  { id: "R-1041", property: "City Centre Hotel", type: "Waste — landfill", method: "QR", maker: "P. Lund", submitted: "2024-04-29", flag: "Spike", severity: "warn" as const },
-  { id: "R-1040", property: "Mountain Lodge", type: "Procurement Cat 1", method: "Accounting API", maker: "QuickBooks", submitted: "2024-04-28", flag: "AI low confidence", severity: "warn" as const },
-  { id: "R-1039", property: "Seaside Hotel", type: "Water — municipal", method: "Manual", maker: "L. Park", submitted: "2024-04-28", flag: "OK", severity: "good" as const },
-  { id: "R-1038", property: "Palm Beach Resort", type: "Energy — diesel", method: "Bulk CSV", maker: "K. Phuwadon", submitted: "2024-04-28", flag: "Range error", severity: "bad" as const },
-  { id: "R-1037", property: "Grand Hotel", type: "Refrigerant log", method: "Manual", maker: "E. Aksoy", submitted: "2024-04-27", flag: "Tier regression", severity: "warn" as const },
+  { id: "R-1042", property: "Skyline Dubai", type: "Energy bill", method: "OCR", maker: "F. Setiawan", submitted: "2024-04-29", flag: "Low confidence", severity: "warn" as const },
+  { id: "R-1041", property: "The Pavilion London", type: "Waste — landfill", method: "QR", maker: "P. Lund", submitted: "2024-04-29", flag: "Spike", severity: "warn" as const },
+  { id: "R-1040", property: "Peaks Resort Zermatt", type: "Procurement Cat 1", method: "Accounting API", maker: "QuickBooks", submitted: "2024-04-28", flag: "AI low confidence", severity: "warn" as const },
+  { id: "R-1039", property: "Oceanfront Cape Town", type: "Water — municipal", method: "Manual", maker: "L. Park", submitted: "2024-04-28", flag: "OK", severity: "good" as const },
+  { id: "R-1038", property: "Marina Residences Barcelona", type: "Energy — diesel", method: "Bulk CSV", maker: "K. Phuwadon", submitted: "2024-04-28", flag: "Range error", severity: "bad" as const },
+  { id: "R-1037", property: "Grand Harbour Lisbon", type: "Refrigerant log", method: "Manual", maker: "E. Aksoy", submitted: "2024-04-27", flag: "Tier regression", severity: "warn" as const },
 ];
 
 export const CERTIFICATIONS = [
@@ -215,8 +215,8 @@ export const REPORTS = [
 export const RECENT_REPORTS = [
   { name: "GRESB submission package — Q1 2024", type: "PDF + Excel", owner: "Corporate Sustainability", date: "2024-04-25" },
   { name: "CSRD ESRS E1 draft", type: "Word", owner: "Corporate Sustainability", date: "2024-04-21" },
-  { name: "GHG Protocol inventory — Greenview Resort", type: "PDF", owner: "Property SM", date: "2024-04-19" },
-  { name: "GSTC readiness dossier — Mountain Lodge", type: "PDF", owner: "Property SM", date: "2024-04-18" },
+  { name: "GHG Protocol inventory — Skyline Dubai", type: "PDF", owner: "Property SM", date: "2024-04-19" },
+  { name: "GSTC readiness dossier — Peaks Resort Zermatt", type: "PDF", owner: "Property SM", date: "2024-04-18" },
 ];
 
 export const GUEST_PAGE_METRICS = [
@@ -290,13 +290,16 @@ export const ESG_TOTALS = {
   governance: { attestationsPct: 81, supplierCodeAdoption: 74, openGaps: 34 },
 };
 
+// baseVal / baseLabel = the start of the journey; higherIsBetter flips the
+// progress maths so "% to go" is measured along baseline → target, not
+// current / target (which clamps to "0% to go" whenever current overshoots).
 export const PORTFOLIO_TARGETS = [
-  { key: "carbon", label: "Carbon Target",       area: "Carbon",     icon: "cloud",  currentLabel: "22% reduction", currentVal: 22, targetVal: 40, unit: "%",      baseYear: 2019, targetYear: 2030, gap: "18% remaining", status: "bad"  as const, hotelCount: 6,  hotelsNote: "6 hotels driving 70% of emissions", owner: "Sarah Chen"      },
-  { key: "energy", label: "Energy Target",       area: "Energy",     icon: "zap",    currentLabel: "18.4 kWh/RN",  currentVal: 18.4, targetVal: 16.5, unit: "kWh/RN", baseYear: 2022, targetYear: 2025, gap: "1.9 kWh above target", status: "warn" as const, hotelCount: 5,  hotelsNote: "5 hotels above intensity target",   owner: "Sarah Chen"      },
-  { key: "water",  label: "Water Target",        area: "Water",      icon: "droplet",currentLabel: "342 L/GN",      currentVal: 342, targetVal: 310, unit: "L/GN", baseYear: 2022, targetYear: 2025, gap: "32 L above target",  status: "warn" as const, hotelCount: 7,  hotelsNote: "7 hotels above intensity target",   owner: "Jin Park"        },
-  { key: "waste",  label: "Waste Diversion",     area: "Waste",      icon: "recycle",currentLabel: "42% diversion", currentVal: 42, targetVal: 60,  unit: "%",      baseYear: 2022, targetYear: 2025, gap: "18% below target",   status: "bad"  as const, hotelCount: 9,  hotelsNote: "9 hotels below diversion target",   owner: "Marco Rossi"     },
-  { key: "cert",   label: "Certification Target",area: "Governance", icon: "award",  currentLabel: "6 of 8 active", currentVal: 75, targetVal: 100, unit: "%",      baseYear: 2023, targetYear: 2025, gap: "2 hotels uncertified",status: "warn" as const, hotelCount: 2,  hotelsNote: "2 hotels without current cert",     owner: "Layla Al-Hassan" },
-  { key: "data",   label: "Data Approval Target",area: "Data",       icon: "shield", currentLabel: "86% approved",  currentVal: 86, targetVal: 95,  unit: "%",      baseYear: 2024, targetYear: 2025, gap: "9% below target",    status: "warn" as const, hotelCount: 4,  hotelsNote: "4 hotels with approval <80%",       owner: "Sarah Chen"      },
+  { key: "carbon", label: "Carbon Target",       area: "Carbon",     icon: "cloud",  currentLabel: "22% reduction", currentVal: 22, targetVal: 40, baseVal: 0,    baseLabel: "0% reduction",  higherIsBetter: true,  unit: "%",      baseYear: 2019, targetYear: 2030, gap: "18% reduction still required", status: "bad"  as const, hotelCount: 6,  hotelsNote: "6 hotels driving 70% of emissions", owner: "Sarah Chen"      },
+  { key: "energy", label: "Energy Target",       area: "Energy",     icon: "zap",    currentLabel: "18.4 kWh/RN",  currentVal: 18.4, targetVal: 16.5, baseVal: 22.5, baseLabel: "22.5 kWh/RN", higherIsBetter: false, unit: "kWh/RN", baseYear: 2022, targetYear: 2025, gap: "1.9 kWh above target", status: "warn" as const, hotelCount: 5,  hotelsNote: "5 hotels above intensity target",   owner: "Sarah Chen"      },
+  { key: "water",  label: "Water Target",        area: "Water",      icon: "droplet",currentLabel: "342 L/GN",      currentVal: 342, targetVal: 310, baseVal: 374,  baseLabel: "374 L/GN",    higherIsBetter: false, unit: "L/GN", baseYear: 2022, targetYear: 2025, gap: "32 L above target",  status: "warn" as const, hotelCount: 7,  hotelsNote: "7 hotels above intensity target",   owner: "Jin Park"        },
+  { key: "waste",  label: "Waste Diversion",     area: "Waste",      icon: "recycle",currentLabel: "42% diversion", currentVal: 42, targetVal: 60,  baseVal: 24,   baseLabel: "24% diversion", higherIsBetter: true,  unit: "%",      baseYear: 2022, targetYear: 2025, gap: "18 pp below target",   status: "bad"  as const, hotelCount: 9,  hotelsNote: "9 hotels below diversion target",   owner: "Marco Rossi"     },
+  { key: "cert",   label: "Certification Target",area: "Governance", icon: "award",  currentLabel: "6 of 8 active", currentVal: 75, targetVal: 100, baseVal: 50,   baseLabel: "50% certified", higherIsBetter: true,  unit: "%",      baseYear: 2023, targetYear: 2025, gap: "2 hotels uncertified",status: "warn" as const, hotelCount: 2,  hotelsNote: "2 hotels without current cert",     owner: "Layla Al-Hassan" },
+  { key: "data",   label: "Data Approval Target",area: "Data",       icon: "shield", currentLabel: "86% approved",  currentVal: 86, targetVal: 95,  baseVal: 77,   baseLabel: "77% approved",  higherIsBetter: true,  unit: "%",      baseYear: 2024, targetYear: 2025, gap: "9 pp below target",    status: "warn" as const, hotelCount: 4,  hotelsNote: "4 hotels with approval <80%",       owner: "Sarah Chen"      },
 ];
 
 export const HOTEL_HEATMAP = [

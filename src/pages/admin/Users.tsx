@@ -18,10 +18,10 @@ const ROLES = [
 
 const USERS = [
   { id: "u-1",  name: "Demo Admin",          email: "admin@demo.test",        role: "super_admin",  properties: "All",                          mfa: true,  lastActive: "Today 09:14" },
-  { id: "u-2",  name: "Demo Checker",        email: "checker@demo.test",      role: "checker",      properties: "Greenview, Mountain Lodge",     mfa: true,  lastActive: "Today 08:42" },
-  { id: "u-3",  name: "Demo Maker",          email: "maker@demo.test",        role: "maker",        properties: "Greenview, Mountain Lodge",     mfa: false, lastActive: "Today 07:30" },
-  { id: "u-4",  name: "L. Park",              email: "lpark@hotel.com",         role: "maker",        properties: "Seaside Hotel",                 mfa: true,  lastActive: "Yesterday" },
-  { id: "u-5",  name: "F. Setiawan",          email: "fsetiawan@greenview.id",  role: "maker",        properties: "Greenview Resort",              mfa: true,  lastActive: "Today 11:02" },
+  { id: "u-2",  name: "Demo Checker",        email: "checker@demo.test",      role: "checker",      properties: "Skyline Dubai, Peaks Resort Zermatt",     mfa: true,  lastActive: "Today 08:42" },
+  { id: "u-3",  name: "Demo Maker",          email: "maker@demo.test",        role: "maker",        properties: "Skyline Dubai, Peaks Resort Zermatt",     mfa: false, lastActive: "Today 07:30" },
+  { id: "u-4",  name: "L. Park",              email: "lpark@hotel.com",         role: "maker",        properties: "Oceanfront Cape Town",                 mfa: true,  lastActive: "Yesterday" },
+  { id: "u-5",  name: "F. Setiawan",          email: "fsetiawan@greenview.id",  role: "maker",        properties: "Skyline Dubai",              mfa: true,  lastActive: "Today 11:02" },
   { id: "u-6",  name: "Aurora Linens Co.",   email: "esg@aurora-linens.eu",   role: "supplier",     properties: "—",                              mfa: true,  lastActive: "Yesterday" },
   { id: "u-7",  name: "Verifier — DNV",      email: "audit-team@dnv.com",     role: "auditor",      properties: "All (read-only)",               mfa: true,  lastActive: "3 days ago" },
 ];

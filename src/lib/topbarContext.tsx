@@ -130,7 +130,7 @@ export function TopbarProvider({ children }: { children: ReactNode }) {
   const [opsGranularity, setOpsGranularity] = useState<OpsGranularity>("month");
   const [opsCustomStart, setOpsCustomStart] = useState("2026-01-01");
   const [opsCustomEnd,   setOpsCustomEnd]   = useState("2026-05-31");
-  const [property,       setProperty]       = useState("All Properties (72)");
+  const [property,       setProperty]       = useState("All Properties (10)");
   const [region,         setRegion]         = useState("All Regions");
   const [dataBasis,      setDataBasis]      = useState<DataBasis>("approved");
   const [lastRefreshed]                     = useState(new Date());
@@ -151,7 +151,7 @@ export function TopbarProvider({ children }: { children: ReactNode }) {
   const contextLine = [
     "Acme Hotels",
     region !== "All Regions" ? region : null,
-    property !== "All Properties (72)" ? property : "All Properties",
+    property !== "All Properties (10)" ? property : "All Properties",
     String(year),
     DATA_BASIS_LABEL[dataBasis],
     `Last refreshed ${hhmm}`,

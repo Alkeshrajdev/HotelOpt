@@ -31,6 +31,8 @@ import { Card, CardHeader } from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import ProgressBar from "@/components/ui/ProgressBar";
 import ReadinessChecklist from "@/components/properties/ReadinessChecklist";
+import InfoHint, { SUSTAINABILITY_SCORE_EXPLAINER } from "@/components/ui/InfoHint";
+import { GLOSSARY } from "@/components/ui/Abbr";
 import {
   CERTIFICATIONS,
   PROPERTY_CERT_READINESS,
@@ -116,9 +118,9 @@ export default function PropertyDetail() {
       {/* Hero strip */}
       <Card>
         <div className="p-6 grid grid-cols-2 md:grid-cols-4 gap-3">
-          <HeroStat label="Sustainability score" value={String(property.score)} suffix="/100" tone={property.score >= 75 ? "good" : property.score >= 60 ? "warn" : "bad"} />
+          <HeroStat label="Sustainability score" value={String(property.score)} suffix="/100" info={SUSTAINABILITY_SCORE_EXPLAINER} tone={property.score >= 75 ? "good" : property.score >= 60 ? "warn" : "bad"} />
           <HeroStat label="Data completeness"    value={`${property.dataCompleteness}%`} tone={property.dataCompleteness >= 80 ? "good" : property.dataCompleteness >= 60 ? "warn" : "bad"} />
-          <HeroStat label="GP readiness"         value={property.gpReady ? "Ready" : "Not yet"} tone={property.gpReady ? "good" : "warn"} />
+          <HeroStat label="GP readiness"         value={property.gpReady ? "Ready" : "Not yet"} info={GLOSSARY.GP} tone={property.gpReady ? "good" : "warn"} />
           <HeroStat label="Certifications"       value={`${property.certifications.length} active`} tone={property.certStatus === "ready" ? "good" : "info"} />
         </div>
       </Card>
@@ -1000,11 +1002,13 @@ function HeroStat({
   value,
   suffix,
   tone,
+  info,
 }: {
   label: string;
   value: string;
   suffix?: string;
   tone: "good" | "warn" | "bad" | "info";
+  info?: string;
 }) {
   const ring = {
     good: "border-good/25 bg-good/10/40",
@@ -1014,8 +1018,9 @@ function HeroStat({
   }[tone];
   return (
     <div className={cn("rounded-xl border p-4", ring)}>
-      <div className="text-[11px] uppercase font-semibold tracking-wide text-ink-500">
+      <div className="flex items-center gap-1 text-[11px] uppercase font-semibold tracking-wide text-ink-500">
         {label}
+        {info && <InfoHint text={info} />}
       </div>
       <div className="text-2xl font-bold text-ink-900 mt-1">
         {value}

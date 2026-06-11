@@ -229,10 +229,10 @@ export default function GenerateReportModal({
                 <span className="text-[12px] font-medium text-ink-600">Property</span>
                 <select className="input mt-1" value={form.property} onChange={(e) => set("property", e.target.value)}>
                   <option value="">— Select —</option>
-                  <option>Greenview Resort</option>
-                  <option>Mountain Lodge</option>
-                  <option>Seaside Hotel</option>
-                  <option>City Centre Hotel</option>
+                  <option>Skyline Dubai</option>
+                  <option>Peaks Resort Zermatt</option>
+                  <option>Oceanfront Cape Town</option>
+                  <option>The Pavilion London</option>
                 </select>
               </label>
             </div>

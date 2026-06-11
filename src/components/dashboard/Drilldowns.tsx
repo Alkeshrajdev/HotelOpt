@@ -112,12 +112,12 @@ export function EnergyScoreDrilldown() {
         <div className="p-6">
           <HBar
             data={[
-              { name: "Greenview Resort", value: 96 },
-              { name: "Mountain Lodge", value: 91 },
-              { name: "Seaside Hotel", value: 88 },
-              { name: "City Centre Hotel", value: 84 },
-              { name: "Palm Beach Resort", value: 79 },
-              { name: "Airport Hotel", value: 41 },
+              { name: "Skyline Dubai", value: 96 },
+              { name: "Peaks Resort Zermatt", value: 91 },
+              { name: "Oceanfront Cape Town", value: 88 },
+              { name: "The Pavilion London", value: 84 },
+              { name: "Marina Residences Barcelona", value: 79 },
+              { name: "Airport Hotel Dubai", value: 41 },
             ]}
           />
         </div>
@@ -266,11 +266,11 @@ export function EnergyCostDrilldown() {
         <div className="p-6">
           <HBar
             data={[
-              { name: "Seaside Hotel", value: 92 },
-              { name: "City Centre Hotel", value: 88 },
-              { name: "Greenview Resort", value: 76 },
-              { name: "Palm Beach Resort", value: 71 },
-              { name: "Mountain Lodge", value: 64 },
+              { name: "Oceanfront Cape Town", value: 92 },
+              { name: "The Pavilion London", value: 88 },
+              { name: "Skyline Dubai", value: 76 },
+              { name: "Marina Residences Barcelona", value: 71 },
+              { name: "Peaks Resort Zermatt", value: 64 },
             ]}
             unit="%"
           />
@@ -293,18 +293,18 @@ export function RenewableDrilldown() {
         <div className="px-6 pb-5">
           <AreaTrend
             data={[
-              { x: "May", v: 62 },
-              { x: "Jun", v: 64 },
-              { x: "Jul", v: 67 },
-              { x: "Aug", v: 70 },
-              { x: "Sep", v: 71 },
-              { x: "Oct", v: 73 },
-              { x: "Nov", v: 74 },
-              { x: "Dec", v: 75 },
-              { x: "Jan", v: 76 },
-              { x: "Feb", v: 76 },
-              { x: "Mar", v: 77 },
-              { x: "Apr", v: 78 },
+              { x: "May", v: 9 },
+              { x: "Jun", v: 9 },
+              { x: "Jul", v: 10 },
+              { x: "Aug", v: 10 },
+              { x: "Sep", v: 10 },
+              { x: "Oct", v: 11 },
+              { x: "Nov", v: 11 },
+              { x: "Dec", v: 11 },
+              { x: "Jan", v: 11 },
+              { x: "Feb", v: 12 },
+              { x: "Mar", v: 12 },
+              { x: "Apr", v: 12 },
             ]}
             dataKey="v"
             color="#EA580C"
@@ -316,13 +316,12 @@ export function RenewableDrilldown() {
         <CardHeader title="Sources" />
         <div className="p-6">
           <Donut
-            totalValue="78%"
+            totalValue="12%"
             totalLabel="renewable"
             data={[
-              { name: "On-site solar PV", value: 32, color: "#EA580C" },
-              { name: "PPA (renewable grid)", value: 38, color: "#F59E0B" },
-              { name: "I-RECs purchased", value: 8, color: "#FBBF24" },
-              { name: "Conventional grid", value: 22, color: "#94A3B8" },
+              { name: "On-site solar PV", value: 8, color: "#EA580C" },
+              { name: "I-RECs purchased", value: 4, color: "#FBBF24" },
+              { name: "Conventional grid", value: 88, color: "#94A3B8" },
             ]}
           />
         </div>
@@ -384,11 +383,11 @@ export function ScopeDrilldown({
           <div className="p-6">
             <HBar
               data={[
-                { name: "Seaside Hotel", value: 96 },
-                { name: "City Centre Hotel", value: 84 },
-                { name: "Greenview Resort", value: 71 },
-                { name: "Palm Beach Resort", value: 62 },
-                { name: "Mountain Lodge", value: 41 },
+                { name: "Oceanfront Cape Town", value: 96 },
+                { name: "The Pavilion London", value: 84 },
+                { name: "Skyline Dubai", value: 71 },
+                { name: "Marina Residences Barcelona", value: 62 },
+                { name: "Peaks Resort Zermatt", value: 41 },
               ]}
             />
           </div>

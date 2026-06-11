@@ -17,6 +17,7 @@ import {
   KeyRound,
   LogOut,
   Map,
+  Menu,
   Search,
   Settings,
   ShieldCheck,
@@ -37,7 +38,7 @@ import { cn } from "@/lib/utils";
 
 /* ── Filter options ────────────────────────────────────────────────────────── */
 const PROPERTY_OPTIONS = [
-  "All Properties (72)",
+  "All Properties (10)",
   "Skyline Dubai",
   "Airport Hotel Dubai",
   "Bay View Singapore",
@@ -126,15 +127,15 @@ const SEARCH_CATEGORY_ORDER: SearchResult["category"][] = ["Properties", "Report
 
 const SEARCH_RESULTS: SearchResult[] = [
   { id: "p1", category: "Properties", title: "Grand Hyatt Dubai",       subtitle: "5★ · Dubai, UAE · 674 rooms",       href: "/properties"     },
-  { id: "p2", category: "Properties", title: "Greenview Resort",        subtitle: "4★ · Bali, Indonesia · 220 rooms",  href: "/properties"     },
-  { id: "p3", category: "Properties", title: "Mountain Lodge",          subtitle: "3★ · Zurich, CH · 80 rooms",        href: "/properties"     },
+  { id: "p2", category: "Properties", title: "Skyline Dubai",        subtitle: "5★ · Dubai, UAE · 420 rooms",  href: "/properties"     },
+  { id: "p3", category: "Properties", title: "Peaks Resort Zermatt",          subtitle: "4★ · Zermatt, CH · 95 rooms",        href: "/properties"     },
   { id: "p4", category: "Properties", title: "Aurora Hotels HQ",        subtitle: "Corporate · London, UK",            href: "/properties"     },
   { id: "r1", category: "Reports",    title: "GHG Inventory 2025",      subtitle: "Published · Carbon",                href: "/reports"        },
   { id: "r2", category: "Reports",    title: "CSRD Draft 2025",         subtitle: "In-progress · ESRS",                href: "/reports"        },
   { id: "r3", category: "Reports",    title: "Green Key Evidence Pack", subtitle: "Pending · Certifications",          href: "/certifications" },
   { id: "a1", category: "Actions",    title: "BMS schedule review",     subtitle: "Open · Energy · Grand Hyatt Dubai", href: "/actions"        },
   { id: "a2", category: "Actions",    title: "LED retrofit — Phase 2",  subtitle: "In-progress · Energy",              href: "/actions"        },
-  { id: "a3", category: "Actions",    title: "Water audit booking",     subtitle: "Open · Water · Greenview Resort",   href: "/actions"        },
+  { id: "a3", category: "Actions",    title: "Water audit booking",     subtitle: "Open · Water · Skyline Dubai",   href: "/actions"        },
   { id: "s1", category: "Suppliers",  title: "FreshLeaf Produce",       subtitle: "Food & Bev · Active",               href: "/supplier-portal"},
   { id: "s2", category: "Suppliers",  title: "Ecofleet Logistics",      subtitle: "Transport · Active",                href: "/supplier-portal"},
 ];
@@ -164,7 +165,7 @@ const CHANGELOG: ChangelogEntry[] = [
 const DATA_BASIS_OPTIONS: DataBasis[] = ["approved", "approved+provisional", "draft", "pending"];
 
 /* ── Topbar ──────────────────────────────────────────────────────────────── */
-export default function Topbar() {
+export default function Topbar({ onMenu }: { onMenu?: () => void }) {
   const { profile, session, signOut } = useAuth();
   const {
     property, setProperty, region, setRegion, dataBasis, setDataBasis,
@@ -273,6 +274,15 @@ export default function Topbar() {
   return (
     <>
       <header className="h-16 border-b border-ink-200 bg-white dark-surface flex items-center px-4 sm:px-6 gap-3 sm:gap-4 shrink-0 z-20">
+
+        {/* ── Mobile menu toggle (hidden on desktop) ── */}
+        <button
+          onClick={onMenu}
+          className="lg:hidden -ml-1 grid place-items-center w-9 h-9 rounded-lg text-ink-600 hover:bg-ink-100 shrink-0"
+          aria-label="Open menu"
+        >
+          <Menu size={20} />
+        </button>
 
         {/* ── Dashboard filter bar (replaces standard filters + search) ── */}
         {isDashboard && <DashboardFilterBar />}

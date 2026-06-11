@@ -83,18 +83,18 @@ const METRIC_REGISTRY: PublicMetric[] = [
   { name: "Water per stay",        value: "184 L",          delta: -5,  source: "Water data",  lastApproved: "2026-04-28", isPublic: true,  brdSafe: true },
   { name: "Waste per stay",        value: "0.42 kg",        delta: -12, source: "Waste data",  lastApproved: "2026-04-26", isPublic: true,  brdSafe: true },
   { name: "Carbon per stay",       value: "8.2 kgCO₂e",    delta: -9,  source: "HCMI v1.2",  lastApproved: "2026-04-25", isPublic: true,  brdSafe: true },
-  { name: "Renewable share",       value: "78%",            delta: 3,   source: "Energy data", lastApproved: "2026-04-29", isPublic: false, brdSafe: true },
+  { name: "Renewable share",       value: "12%",            delta: 3,   source: "Energy data", lastApproved: "2026-04-29", isPublic: false, brdSafe: true },
   { name: "Diversion rate",        value: "64%",            delta: 5,   source: "Waste data",  lastApproved: "2026-04-26", isPublic: false, brdSafe: true },
   { name: "Total Scope 3",         value: "22,640 tCO₂e",   delta: -2,  source: "Supplier data", lastApproved: "2026-04-12", isPublic: false, brdSafe: false },
   { name: "Supplier EFs",          value: "54 active",      delta: 12,  source: "Supplier portal", lastApproved: "2026-04-22", isPublic: false, brdSafe: false },
 ];
 
 const CAMPAIGNS: Campaign[] = [
-  { id: "c1", name: "Spring Eco Stay 2026",         channel: "email", property: "Greenview Resort",   reach: 3840, openRate: 48, status: "active",    scheduled: "2026-04-01" },
-  { id: "c2", name: "Towel Reuse Drive — May",       channel: "qr",    property: "Mountain Lodge",     reach: 620,  openRate: 61, status: "active",    scheduled: "2026-05-01" },
-  { id: "c3", name: "EV Charging Awareness",         channel: "push",  property: "Palm Beach Resort",  reach: 1240, openRate: 33, status: "draft",     scheduled: "2026-06-01" },
+  { id: "c1", name: "Spring Eco Stay 2026",         channel: "email", property: "Skyline Dubai",   reach: 3840, openRate: 48, status: "active",    scheduled: "2026-04-01" },
+  { id: "c2", name: "Towel Reuse Drive — May",       channel: "qr",    property: "Peaks Resort Zermatt",     reach: 620,  openRate: 61, status: "active",    scheduled: "2026-05-01" },
+  { id: "c3", name: "EV Charging Awareness",         channel: "push",  property: "Marina Residences Barcelona",  reach: 1240, openRate: 33, status: "draft",     scheduled: "2026-06-01" },
   { id: "c4", name: "Earth Day Challenge",           channel: "email", property: "All properties",     reach: 9200, openRate: 52, status: "completed", scheduled: "2026-04-22" },
-  { id: "c5", name: "Plant-Based Menu Spotlight",   channel: "push",  property: "City Centre Hotel",  reach: 880,  openRate: 29, status: "draft",     scheduled: "2026-05-15" },
+  { id: "c5", name: "Plant-Based Menu Spotlight",   channel: "push",  property: "The Pavilion London",  reach: 880,  openRate: 29, status: "draft",     scheduled: "2026-05-15" },
 ];
 
 const CHANNEL_ICON: Record<Channel, React.ReactNode> = {
@@ -207,7 +207,7 @@ function PublicPageTab() {
             <div className="text-[12px] font-semibold uppercase tracking-[0.06em] text-ink-500 mb-1">Publishing status</div>
             <div className="flex items-center gap-3 flex-wrap">
               <Badge tone={STATUS_TONE[status]}>{STATUS_LABEL[status]}</Badge>
-              <span className="text-sm text-ink-700">Greenview Resort · greenview-resort.hotel-optimizer.com</span>
+              <span className="text-sm text-ink-700">Skyline Dubai · skyline-dubai.hotel-optimizer.com</span>
             </div>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
@@ -228,7 +228,7 @@ function PublicPageTab() {
 
       <div className="grid grid-cols-12 gap-4">
         <Card className="col-span-12 lg:col-span-7">
-          <CardHeader title="Public sustainability page — Greenview Resort" hint="Branded · verified · provenance-signed"
+          <CardHeader title="Public sustainability page — Skyline Dubai" hint="Branded · verified · provenance-signed"
             right={
               <div className="flex items-center gap-2">
                 <span className="text-[11px] text-ink-500 inline-flex items-center gap-1"><Languages size={12} /> Language</span>
@@ -241,7 +241,7 @@ function PublicPageTab() {
           <div className="p-6">
             <div className="rounded-2xl border border-ink-200 overflow-hidden">
               <div className="h-40 bg-gradient-to-br from-brand-700 to-brand-500 text-white p-6 flex flex-col justify-end">
-                <div className="text-[12px] uppercase tracking-wide opacity-90">Greenview Resort · Bali</div>
+                <div className="text-[12px] uppercase tracking-wide opacity-90">Skyline Dubai · Dubai</div>
                 <div className="text-2xl font-extrabold">A more sustainable stay</div>
                 <div className="text-sm opacity-90">All metrics independently verified through Hotel Optimizer.</div>
               </div>
@@ -293,7 +293,7 @@ function PublicPageTab() {
       <Card>
         <CardHeader title="Per-stay carbon footprint preview" hint="HCMI-aligned · booking confirmation" right={<Badge tone="info"><Globe size={11} /> PMS-driven</Badge>} />
         <div className="grid grid-cols-3 gap-4 p-5">
-          {[["Bali · Standard · 2 nights","14.6 kgCO₂e"],["Bali · Pool villa · 3 nights","38.4 kgCO₂e"],["Bali · Suite · 5 nights","62.1 kgCO₂e"]].map(([l,v]) => (
+          {[["Dubai · Standard · 2 nights","14.6 kgCO₂e"],["Dubai · Pool villa · 3 nights","38.4 kgCO₂e"],["Dubai · Suite · 5 nights","62.1 kgCO₂e"]].map(([l,v]) => (
             <div key={l} className="rounded-xl border border-ink-200 p-4 bg-gradient-to-br from-brand-50 to-white">
               <div className="text-[11px] text-ink-500">{l}</div>
               <div className="text-2xl font-extrabold text-brand-800 mt-1">{v}</div>
@@ -508,7 +508,7 @@ function RenewableClaimsPanel() {
 /* ================================================================== */
 
 type CampaignForm = { name: string; channel: Channel; property: string; template: string; scheduled: string };
-const CAMPAIGN_INITIAL: CampaignForm = { name: "", channel: "email", property: "Greenview Resort", template: "eco-stay", scheduled: "" };
+const CAMPAIGN_INITIAL: CampaignForm = { name: "", channel: "email", property: "Skyline Dubai", template: "eco-stay", scheduled: "" };
 
 function CampaignsTab() {
   const [campaigns, setCampaigns] = useState<Campaign[]>(CAMPAIGNS);
@@ -605,7 +605,7 @@ function CampaignsTab() {
             <div>
               <label className="block text-[12px] font-medium text-ink-700 mb-1">Property</label>
               <select className="input w-full" value={form.property} onChange={(e) => set("property", e.target.value)}>
-                {["Greenview Resort","Mountain Lodge","Palm Beach Resort","City Centre Hotel","All properties"].map((p) => (
+                {["Skyline Dubai","Peaks Resort Zermatt","Marina Residences Barcelona","The Pavilion London","All properties"].map((p) => (
                   <option key={p} value={p}>{p}</option>
                 ))}
               </select>
@@ -667,7 +667,7 @@ function SurveysTab() {
       <div className="grid grid-cols-12 gap-4">
         {/* Survey builder */}
         <Card className="col-span-12 lg:col-span-6">
-          <CardHeader title="Survey builder" hint="Active survey — Greenview Resort" />
+          <CardHeader title="Survey builder" hint="Active survey — Skyline Dubai" />
           <div className="p-4 space-y-2">
             {questions.map((q, i) => (
               <div key={q.id} className="flex items-center gap-2 rounded-xl border border-ink-200 px-3 py-2.5 bg-white hover:bg-ink-50/40">
