@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import {
   Zap, Droplet, Cloud, Recycle,
   DollarSign, TrendingDown, ArrowRight,
@@ -7,6 +8,7 @@ import {
   ComposedChart, Bar, Line, XAxis, YAxis, Tooltip,
   ResponsiveContainer, CartesianGrid, ReferenceLine,
 } from "recharts";
+import { ACTION_CENTRE } from "@/lib/mock";
 import { cn } from "@/lib/utils";
 
 type Props = { onNavigate: (tab: string) => void };
@@ -266,6 +268,37 @@ function SectionLabel({ title, action, onClick }: { title: string; action?: stri
   );
 }
 
+/* ─── Needs attention — surfaces the "act" items before the analytics ─────── */
+function NeedsAttention() {
+  if (!ACTION_CENTRE.length) return null;
+  const toneText = (s: string) =>
+    s === "bad" ? "text-bad" : s === "warn" ? "text-warn" : "text-info";
+  const toneBorder = (s: string) =>
+    s === "bad" ? "border-bad/30" : s === "warn" ? "border-warn/30" : "border-info/30";
+  return (
+    <div>
+      <SectionLabel title="Needs attention" />
+      <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-3">
+        {ACTION_CENTRE.map((it) => (
+          <Link
+            key={it.label}
+            to={it.href}
+            className={cn(
+              "card p-3 flex items-center gap-3 hover:shadow-md transition-shadow",
+              toneBorder(it.severity)
+            )}
+          >
+            <div className={cn("text-2xl font-bold tabular-nums leading-none shrink-0", toneText(it.severity))}>
+              {it.count}
+            </div>
+            <div className="text-[11px] text-ink-600 leading-tight">{it.label}</div>
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 /* ─── Main ───────────────────────────────────────────────────────────────── */
 export default function OverviewTab({ onNavigate }: Props) {
   const [metric,      setMetric]      = useState<Metric>("combined");
@@ -284,6 +317,9 @@ export default function OverviewTab({ onNavigate }: Props) {
 
   return (
     <div className="space-y-8">
+
+      {/* ── 0. Needs attention — the "act" entry point ────────────────────── */}
+      <NeedsAttention />
 
       {/* ── 1. Executive Snapshot ─────────────────────────────────────────── */}
       <div>
