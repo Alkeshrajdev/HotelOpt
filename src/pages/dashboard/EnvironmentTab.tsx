@@ -247,7 +247,7 @@ function DrilldownPanel({
                 contentStyle={{ fontSize: 12, borderRadius: 8, border: "1px solid #E2E8F0" }}
                 formatter={(v: number) => [`${v.toLocaleString()} ${data.unit}`, ""]}
               />
-              <Bar dataKey="value" radius={[0, 4, 4, 0]} maxBarSize={20}>
+              <Bar isAnimationActive={false} dataKey="value" radius={[0, 4, 4, 0]} maxBarSize={20}>
                 {sorted.map((h) => (
                   <Cell key={h.name} fill={barColor(h.flag)} />
                 ))}
@@ -358,7 +358,7 @@ function CarbonSection() {
                   contentStyle={{ fontSize: 11, borderRadius: 8, border: "1px solid #E2E8F0" }}
                   formatter={(v: number) => [`${v.toLocaleString()} tCO₂e`, ""]}
                 />
-                <Bar dataKey="tco2e" radius={[0, 4, 4, 0]} maxBarSize={14}>
+                <Bar isAnimationActive={false} dataKey="tco2e" radius={[0, 4, 4, 0]} maxBarSize={14}>
                   {SCOPE1_BREAKDOWN.map((s) => <Cell key={s.source} fill={s.color} />)}
                 </Bar>
               </BarChart>
@@ -475,7 +475,7 @@ function CarbonSection() {
                 <YAxis type="category" dataKey="category" width={0} tick={false} axisLine={false} tickLine={false} />
                 <Tooltip contentStyle={{ fontSize: 11, borderRadius: 8, border: "1px solid #E2E8F0" }}
                   formatter={(v: number) => [`${v.toLocaleString()} tCO₂e`, ""]} />
-                <Bar dataKey="tco2e" fill="#6EE7B7" radius={[0, 4, 4, 0]} maxBarSize={14} />
+                <Bar isAnimationActive={false} dataKey="tco2e" fill="#6EE7B7" radius={[0, 4, 4, 0]} maxBarSize={14} />
               </BarChart>
             </ResponsiveContainer>
             <ul className="space-y-1">
@@ -529,9 +529,9 @@ function CarbonSection() {
               <Tooltip contentStyle={{ fontSize: 12, borderRadius: 8, border: "1px solid #E2E8F0" }}
                 formatter={(v: number, n: string) => [`${v.toLocaleString()} tCO₂e`, n === "scope1" ? "Scope 1" : n === "scope2" ? "Scope 2" : "Scope 3"]} />
               <Legend iconSize={8} wrapperStyle={{ fontSize: 11 }} formatter={(v) => v === "scope1" ? "Scope 1" : v === "scope2" ? "Scope 2" : "Scope 3"} />
-              <Bar dataKey="scope1" name="scope1" stackId="a" fill="#7C3AED" maxBarSize={18} />
-              <Bar dataKey="scope2" name="scope2" stackId="a" fill="#0F766E" maxBarSize={18} />
-              <Bar dataKey="scope3" name="scope3" stackId="a" fill="#6EE7B7" radius={[0, 4, 4, 0]} maxBarSize={18} />
+              <Bar isAnimationActive={false} dataKey="scope1" name="scope1" stackId="a" fill="#7C3AED" maxBarSize={18} />
+              <Bar isAnimationActive={false} dataKey="scope2" name="scope2" stackId="a" fill="#0F766E" maxBarSize={18} />
+              <Bar isAnimationActive={false} dataKey="scope3" name="scope3" stackId="a" fill="#6EE7B7" radius={[0, 4, 4, 0]} maxBarSize={18} />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -559,8 +559,8 @@ function CarbonSection() {
                   `${v.toLocaleString()} tCO₂e`,
                   name === "carbonTarget" ? "2030 target" : "Actual"
                 ]} />
-              <Line type="monotone" dataKey="carbon" name="carbon" stroke="#0F766E" strokeWidth={2.5} dot={false} activeDot={{ r: 5, strokeWidth: 0 }} />
-              <Line type="monotone" dataKey="carbonTarget" name="carbonTarget" stroke="#0F766E" strokeWidth={1.5} strokeDasharray="5 4" dot={false} activeDot={{ r: 4, strokeWidth: 0 }} opacity={0.5} />
+              <Line isAnimationActive={false} type="monotone" dataKey="carbon" name="carbon" stroke="#0F766E" strokeWidth={2.5} dot={false} activeDot={{ r: 5, strokeWidth: 0 }} />
+              <Line isAnimationActive={false} type="monotone" dataKey="carbonTarget" name="carbonTarget" stroke="#0F766E" strokeWidth={1.5} strokeDasharray="5 4" dot={false} activeDot={{ r: 4, strokeWidth: 0 }} opacity={0.5} />
             </LineChart>
           </ResponsiveContainer>
           <div className="flex items-center gap-5 mt-1 text-[10px] text-ink-400 justify-center">
@@ -610,7 +610,7 @@ function EnergySection() {
                 <YAxis type="category" dataKey="system" width={0} tick={false} axisLine={false} tickLine={false} />
                 <Tooltip contentStyle={{ fontSize: 11, borderRadius: 8, border: "1px solid #E2E8F0" }}
                   formatter={(v: number) => [`${v.toLocaleString()} MWh`, ""]} />
-                <Bar dataKey="mwh" radius={[0, 4, 4, 0]} maxBarSize={16}>
+                <Bar isAnimationActive={false} dataKey="mwh" radius={[0, 4, 4, 0]} maxBarSize={16}>
                   {ENERGY_END_USE.map((s) => <Cell key={s.system} fill={s.color} />)}
                 </Bar>
               </BarChart>
@@ -656,7 +656,7 @@ function EnergySection() {
           <div className="px-4 pb-4 pt-4 flex flex-col items-center">
             <ResponsiveContainer width="100%" height={200}>
               <PieChart>
-                <Pie data={PORTFOLIO_ENERGY_SOURCES} dataKey="pct" nameKey="source" cx="50%" cy="50%"
+                <Pie isAnimationActive={false} data={PORTFOLIO_ENERGY_SOURCES} dataKey="pct" nameKey="source" cx="50%" cy="50%"
                   innerRadius={55} outerRadius={85} paddingAngle={2}>
                   {PORTFOLIO_ENERGY_SOURCES.map((s) => <Cell key={s.source} fill={s.color} />)}
                 </Pie>
@@ -704,7 +704,7 @@ function EnergySection() {
               <YAxis type="category" dataKey="name" width={106} tick={{ fontSize: 11, fill: "#334155" }} axisLine={false} tickLine={false} />
               <Tooltip contentStyle={{ fontSize: 12, borderRadius: 8, border: "1px solid #E2E8F0" }}
                 formatter={(v: number, _n, p) => [`${v.toFixed(1)} kWh/RN · ${p.payload.total.toLocaleString()} MWh total`, "Intensity"]} />
-              <Bar dataKey="intensity" radius={[0, 4, 4, 0]} maxBarSize={18}>
+              <Bar isAnimationActive={false} dataKey="intensity" radius={[0, 4, 4, 0]} maxBarSize={18}>
                 {intensityData.map((d) => (
                   <Cell key={d.name} fill={d.intensity > 150 ? "#EF4444" : d.intensity > 100 ? "#F59E0B" : "#22C55E"} />
                 ))}
@@ -736,8 +736,8 @@ function EnergySection() {
                   `${v.toLocaleString()} MWh`,
                   name === "energyTarget" ? "Target" : "Actual"
                 ]} />
-              <Line type="monotone" dataKey="energy" name="energy" stroke="#CA8A04" strokeWidth={2.5} dot={false} activeDot={{ r: 5, strokeWidth: 0 }} />
-              <Line type="monotone" dataKey="energyTarget" name="energyTarget" stroke="#CA8A04" strokeWidth={1.5} strokeDasharray="5 4" dot={false} activeDot={{ r: 4, strokeWidth: 0 }} opacity={0.5} />
+              <Line isAnimationActive={false} type="monotone" dataKey="energy" name="energy" stroke="#CA8A04" strokeWidth={2.5} dot={false} activeDot={{ r: 5, strokeWidth: 0 }} />
+              <Line isAnimationActive={false} type="monotone" dataKey="energyTarget" name="energyTarget" stroke="#CA8A04" strokeWidth={1.5} strokeDasharray="5 4" dot={false} activeDot={{ r: 4, strokeWidth: 0 }} opacity={0.5} />
             </LineChart>
           </ResponsiveContainer>
           <div className="flex items-center gap-5 mt-1 text-[10px] text-ink-400 justify-center">
@@ -787,7 +787,7 @@ function WaterSection() {
                 <YAxis type="category" dataKey="use" width={0} tick={false} axisLine={false} tickLine={false} />
                 <Tooltip contentStyle={{ fontSize: 11, borderRadius: 8, border: "1px solid #E2E8F0" }}
                   formatter={(v: number) => [`${v.toLocaleString()} m³`, ""]} />
-                <Bar dataKey="m3" radius={[0, 4, 4, 0]} maxBarSize={16}>
+                <Bar isAnimationActive={false} dataKey="m3" radius={[0, 4, 4, 0]} maxBarSize={16}>
                   {WATER_END_USE.map((u) => <Cell key={u.use} fill={u.color} />)}
                 </Bar>
               </BarChart>
@@ -835,7 +835,7 @@ function WaterSection() {
           <div className="px-4 pb-4 pt-4 flex flex-col items-center">
             <ResponsiveContainer width="100%" height={200}>
               <PieChart>
-                <Pie data={PORTFOLIO_WATER_SOURCES} dataKey="pct" nameKey="source" cx="50%" cy="50%"
+                <Pie isAnimationActive={false} data={PORTFOLIO_WATER_SOURCES} dataKey="pct" nameKey="source" cx="50%" cy="50%"
                   innerRadius={55} outerRadius={85} paddingAngle={2}>
                   {PORTFOLIO_WATER_SOURCES.map((s) => <Cell key={s.source} fill={s.color} />)}
                 </Pie>
@@ -889,7 +889,7 @@ function WaterSection() {
               <YAxis type="category" dataKey="name" width={106} tick={{ fontSize: 11, fill: "#334155" }} axisLine={false} tickLine={false} />
               <Tooltip contentStyle={{ fontSize: 12, borderRadius: 8, border: "1px solid #E2E8F0" }}
                 formatter={(v: number, _n, p) => [`${v.toFixed(0)} L/GN · ${p.payload.total.toLocaleString()} m³ total`, "Intensity"]} />
-              <Bar dataKey="intensity" radius={[0, 4, 4, 0]} maxBarSize={18}>
+              <Bar isAnimationActive={false} dataKey="intensity" radius={[0, 4, 4, 0]} maxBarSize={18}>
                 {intensityData.map((d) => (
                   <Cell key={d.name} fill={d.intensity > 700 ? "#EF4444" : d.intensity > 500 ? "#F59E0B" : "#22C55E"} />
                 ))}
@@ -921,8 +921,8 @@ function WaterSection() {
                   `${v.toLocaleString()} m³`,
                   name === "waterTarget" ? "Target" : "Actual"
                 ]} />
-              <Line type="monotone" dataKey="waterM3" name="waterM3" stroke="#0EA5E9" strokeWidth={2.5} dot={false} activeDot={{ r: 5, strokeWidth: 0 }} />
-              <Line type="monotone" dataKey="waterTarget" name="waterTarget" stroke="#0EA5E9" strokeWidth={1.5} strokeDasharray="5 4" dot={false} activeDot={{ r: 4, strokeWidth: 0 }} opacity={0.5} />
+              <Line isAnimationActive={false} type="monotone" dataKey="waterM3" name="waterM3" stroke="#0EA5E9" strokeWidth={2.5} dot={false} activeDot={{ r: 5, strokeWidth: 0 }} />
+              <Line isAnimationActive={false} type="monotone" dataKey="waterTarget" name="waterTarget" stroke="#0EA5E9" strokeWidth={1.5} strokeDasharray="5 4" dot={false} activeDot={{ r: 4, strokeWidth: 0 }} opacity={0.5} />
             </LineChart>
           </ResponsiveContainer>
           <div className="flex items-center gap-5 mt-1 text-[10px] text-ink-400 justify-center">
@@ -1001,8 +1001,8 @@ function WasteSection() {
               />
               <ReferenceLine y={0} stroke="#CBD5E1" />
               {/* invisible base bar for waterfall stacking */}
-              <Bar dataKey="base" stackId="wf" fill="transparent" radius={0} />
-              <Bar dataKey="value" stackId="wf" radius={4} maxBarSize={40}>
+              <Bar isAnimationActive={false} dataKey="base" stackId="wf" fill="transparent" radius={0} />
+              <Bar isAnimationActive={false} dataKey="value" stackId="wf" radius={4} maxBarSize={40}>
                 <LabelList
                   dataKey="value"
                   position="top"
@@ -1038,10 +1038,10 @@ function WasteSection() {
                   tickFormatter={(v) => `${(v / 1000).toFixed(1)}k`} />
                 <Tooltip contentStyle={{ fontSize: 11, borderRadius: 8, border: "1px solid #E2E8F0" }}
                   formatter={(v: number, n: string) => [`${v.toLocaleString()} t`, n]} />
-                <Bar dataKey="recycled"  name="Recycled"     stackId="a" fill="#22C55E" maxBarSize={48} />
-                <Bar dataKey="composted" name="Composted"    stackId="a" fill="#84CC16" maxBarSize={48} />
-                <Bar dataKey="energyRec" name="Energy rec."  stackId="a" fill="#F59E0B" maxBarSize={48} />
-                <Bar dataKey="landfill"  name="Landfill"     stackId="a" fill="#EF4444" radius={[4, 4, 0, 0]} maxBarSize={48} />
+                <Bar isAnimationActive={false} dataKey="recycled"  name="Recycled"     stackId="a" fill="#22C55E" maxBarSize={48} />
+                <Bar isAnimationActive={false} dataKey="composted" name="Composted"    stackId="a" fill="#84CC16" maxBarSize={48} />
+                <Bar isAnimationActive={false} dataKey="energyRec" name="Energy rec."  stackId="a" fill="#F59E0B" maxBarSize={48} />
+                <Bar isAnimationActive={false} dataKey="landfill"  name="Landfill"     stackId="a" fill="#EF4444" radius={[4, 4, 0, 0]} maxBarSize={48} />
               </BarChart>
             </ResponsiveContainer>
             <ul className="space-y-1">
@@ -1089,7 +1089,7 @@ function WasteSection() {
           <div className="px-4 pb-4 pt-4 flex flex-col items-center">
             <ResponsiveContainer width="100%" height={200}>
               <PieChart>
-                <Pie data={PORTFOLIO_WASTE_STREAMS} dataKey="tonnes" nameKey="stream" cx="50%" cy="50%"
+                <Pie isAnimationActive={false} data={PORTFOLIO_WASTE_STREAMS} dataKey="tonnes" nameKey="stream" cx="50%" cy="50%"
                   innerRadius={55} outerRadius={85} paddingAngle={2}>
                   {PORTFOLIO_WASTE_STREAMS.map((s) => <Cell key={s.stream} fill={s.color} />)}
                 </Pie>
@@ -1144,7 +1144,7 @@ function WasteSection() {
               <YAxis type="category" dataKey="name" width={106} tick={{ fontSize: 11, fill: "#334155" }} axisLine={false} tickLine={false} />
               <Tooltip contentStyle={{ fontSize: 12, borderRadius: 8, border: "1px solid #E2E8F0" }}
                 formatter={(v: number, _n, p) => [`${v}% diversion · ${p.payload.total.toLocaleString()} t total`, "Diversion"]} />
-              <Bar dataKey="diversion" radius={[0, 4, 4, 0]} maxBarSize={18}>
+              <Bar isAnimationActive={false} dataKey="diversion" radius={[0, 4, 4, 0]} maxBarSize={18}>
                 {diversionData.map((d) => (
                   <Cell key={d.name} fill={d.diversion >= 50 ? "#22C55E" : d.diversion >= 35 ? "#F59E0B" : "#EF4444"} />
                 ))}
@@ -1176,8 +1176,8 @@ function WasteSection() {
                   `${v}%`,
                   name === "diversionTarget" ? "Target" : "Actual"
                 ]} />
-              <Line type="monotone" dataKey="diversion" name="diversion" stroke="#9333EA" strokeWidth={2.5} dot={false} activeDot={{ r: 5, strokeWidth: 0 }} />
-              <Line type="monotone" dataKey="diversionTarget" name="diversionTarget" stroke="#9333EA" strokeWidth={1.5} strokeDasharray="5 4" dot={false} activeDot={{ r: 4, strokeWidth: 0 }} opacity={0.5} />
+              <Line isAnimationActive={false} type="monotone" dataKey="diversion" name="diversion" stroke="#9333EA" strokeWidth={2.5} dot={false} activeDot={{ r: 5, strokeWidth: 0 }} />
+              <Line isAnimationActive={false} type="monotone" dataKey="diversionTarget" name="diversionTarget" stroke="#9333EA" strokeWidth={1.5} strokeDasharray="5 4" dot={false} activeDot={{ r: 4, strokeWidth: 0 }} opacity={0.5} />
             </LineChart>
           </ResponsiveContainer>
           <div className="flex items-center gap-5 mt-1 text-[10px] text-ink-400 justify-center">

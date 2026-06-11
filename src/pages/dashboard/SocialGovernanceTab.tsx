@@ -128,7 +128,7 @@ function PeopleSection() {
               <Tooltip content={<ShortTip suffix="%" />} />
               <ReferenceLine x={avgTraining} stroke="#94A3B8" strokeDasharray="4 3" label={{ value:`Avg ${avgTraining}%`, position:"top", fontSize:10, fill:"#64748B" }} />
               <ReferenceLine x={75} stroke="#EF4444" strokeDasharray="3 3" opacity={0.3} />
-              <Bar dataKey="val" radius={[0,4,4,0]} maxBarSize={16}>
+              <Bar dataKey="val" radius={[0,4,4,0]} maxBarSize={16} isAnimationActive={false}>
                 {trainingData.map(d => <Cell key={d.name} fill={d.val>=85?"#22C55E":d.val>=70?"#F59E0B":"#EF4444"} />)}
               </Bar>
             </BarChart>
@@ -146,7 +146,7 @@ function PeopleSection() {
               <YAxis type="category" dataKey="name" width={96} tick={{ fontSize:10, fill:"#334155" }} axisLine={false} tickLine={false} />
               <Tooltip content={<ShortTip suffix="%" />} />
               <ReferenceLine x={avgTurnover} stroke="#94A3B8" strokeDasharray="4 3" label={{ value:`Avg ${avgTurnover}%`, position:"top", fontSize:10, fill:"#64748B" }} />
-              <Bar dataKey="val" radius={[0,4,4,0]} maxBarSize={16}>
+              <Bar dataKey="val" radius={[0,4,4,0]} maxBarSize={16} isAnimationActive={false}>
                 {turnoverData.map(d => <Cell key={d.name} fill={d.val>25?"#EF4444":d.val>18?"#F59E0B":"#22C55E"} />)}
               </Bar>
             </BarChart>

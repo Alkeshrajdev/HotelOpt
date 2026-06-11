@@ -49,7 +49,7 @@ const ADMIN: AdminGroup[] = [
     tiles: [
       { to: "/admin/clients",       label: "Clients & deployments", body: "Client list, deployment type (Direct SaaS / White-label / Sovereign), data isolation, billing entity.", icon: Building2, iconBg: "bg-brand-50 text-brand-700",       live: true },
       { to: "/admin/branding",      label: "White-label branding",  body: "Logo, colours, custom domain, email identity, report templates, module toggles.",                       icon: Palette,   iconBg: "bg-pillar-social/10 text-pillar-social" },
-      { to: "/admin/users",         label: "Users & roles",          body: "10 roles. Maker, Checker, Property SM, GM, Corporate, Client Admin, Auditor, Supplier, Curator, Super Admin.", icon: UserCog,  iconBg: "bg-info/10 text-info",          live: true },
+      { to: "/admin/users",         label: "Users & roles",          body: "Maker, Checker, Property SM and Super Admin roles, with maker–checker rights assigned per user.", icon: UserCog,  iconBg: "bg-info/10 text-info",          live: true },
     ],
   },
   {

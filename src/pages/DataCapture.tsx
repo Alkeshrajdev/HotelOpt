@@ -324,12 +324,15 @@ function PickDataType({ onPick }: { onPick: (k: DataTypeKey) => void }) {
                 <ChevronRight size={14} className="text-ink-300 mt-2.5" />
               </div>
               <p className="text-[12px] text-ink-500 mt-3 leading-snug">{dt.description}</p>
-              <div className="mt-3 flex flex-wrap gap-1">
-                {dt.methods.map((m) => (
+              <div className="mt-3 flex flex-wrap items-center gap-1">
+                {dt.methods.slice(0, 3).map((m) => (
                   <span key={m} className="chip rounded-full bg-ink-100 text-ink-600 text-[10px] uppercase tracking-wider">
                     {m}
                   </span>
                 ))}
+                {dt.methods.length > 3 && (
+                  <span className="text-[10px] text-ink-400">+{dt.methods.length - 3} more</span>
+                )}
               </div>
             </button>
           );
