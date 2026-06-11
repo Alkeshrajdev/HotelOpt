@@ -125,7 +125,8 @@ function HotelCard({ h }: { h: typeof PORTFOLIO_HOTELS[0] }) {
           </div>
           <div className="text-[10px] text-ink-400 mt-0.5 pl-4">{h.region} · {h.type}</div>
         </div>
-        <Badge tone={certTone(certStatus)} className="shrink-0">{certLabel(certStatus)}</Badge>
+        {/* Cert status is shown in the neutral stats row below — keeping it out of
+            the performance-RAG header avoids a green "Certified" pill on a red card. */}
       </div>
 
       {/* Metric bars */}

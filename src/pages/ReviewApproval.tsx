@@ -203,10 +203,9 @@ export default function ReviewApproval() {
     return out;
   }, [records, filters]);
 
-  const [selectedId, setSelectedId] = useState<string>(
-    INITIAL_RECORDS[0]?.id ?? ""
-  );
-  const selected = sorted.find((r) => r.id === selectedId) ?? sorted[0];
+  // "" = nothing selected → full-width queue, detail drawer closed.
+  const [selectedId, setSelectedId] = useState<string>("");
+  const selected = selectedId ? sorted.find((r) => r.id === selectedId) ?? null : null;
 
   // Comment dialog state
   const [dialog, setDialog] = useState<{ open: boolean; action: CommentAction }>({
@@ -430,9 +429,9 @@ export default function ReviewApproval() {
         </Card>
       )}
 
-      {/* Queue + detail */}
-      <div className="grid grid-cols-12 gap-4">
-        <Card className="col-span-12 lg:col-span-7">
+      {/* Queue (full width) */}
+      <div>
+        <Card>
           {sorted.length === 0 ? (
             <EmptyState icon={<ClipboardCheck size={20} />} title="No records here" description="Try clearing filters or switching role." />
           ) : (
@@ -491,32 +490,49 @@ export default function ReviewApproval() {
             </div>
           )}
         </Card>
-
-        {/* Detail panel */}
-        <div className="col-span-12 lg:col-span-5">
-          {selected ? (
-            <DetailPanel
-              record={selected}
-              tab={tab}
-              setTab={setTab}
-              role={role}
-              readOnly={readOnly}
-              onAction={(a) =>
-                setDialog({
-                  open: true,
-                  action:
-                    a === "approve" && selected.flags.length > 0
-                      ? "approve-flagged"
-                      : a,
-                })
-              }
-              onResubmit={handleMakerResubmit}
-            />
-          ) : (
-            <Card className="card-pad text-sm text-ink-500">No record selected.</Card>
-          )}
-        </div>
       </div>
+
+      {/* Detail — right slide-over drawer (keeps the queue full-width) */}
+      {selected && (
+        <>
+          <div
+            className="fixed inset-0 bg-black/30 z-40"
+            onClick={() => setSelectedId("")}
+            aria-hidden
+          />
+          <div className="fixed inset-y-0 right-0 z-50 w-full max-w-[600px] bg-white shadow-pop flex flex-col">
+            <div className="flex items-center justify-between h-12 px-4 border-b border-ink-200 shrink-0 bg-ink-50">
+              <span className="text-[12px] font-semibold uppercase tracking-wide text-ink-500">Record detail</span>
+              <button
+                onClick={() => setSelectedId("")}
+                aria-label="Close record"
+                className="grid place-items-center w-8 h-8 rounded-lg text-ink-500 hover:bg-ink-100"
+              >
+                <X size={18} />
+              </button>
+            </div>
+            <div className="flex-1 overflow-y-auto">
+              <DetailPanel
+                record={selected}
+                tab={tab}
+                setTab={setTab}
+                role={role}
+                readOnly={readOnly}
+                onAction={(a) =>
+                  setDialog({
+                    open: true,
+                    action:
+                      a === "approve" && selected.flags.length > 0
+                        ? "approve-flagged"
+                        : a,
+                  })
+                }
+                onResubmit={handleMakerResubmit}
+              />
+            </div>
+          </div>
+        </>
+      )}
 
       <CommentDialog
         open={dialog.open}
@@ -888,9 +904,9 @@ function PriorityDot({ record }: { record: ReviewRecord }) {
 
 function FlagsCell({ flags }: { flags: ReviewRecord["flags"] }) {
   if (flags.length === 0) return <span className="text-ink-300">—</span>;
-  const visible = flags.slice(0, 2);
+  const visible = flags.slice(0, 1);
   return (
-    <div className="flex flex-wrap gap-1">
+    <div className="flex items-center gap-1 whitespace-nowrap">
       {visible.map((f) => (
         <Badge key={f.key} tone={f.severity === "bad" ? "bad" : "warn"}>
           {f.label.split(" — ")[0]}

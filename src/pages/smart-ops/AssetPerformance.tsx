@@ -86,7 +86,7 @@ const ASSETS: Asset[] = [
     activeAlerts: 2,
     lastInspection: "Apr 2026",
     nextPM: "7 May 2026",
-    estimatedLoss: "USD 3,370/month",
+    estimatedLoss: "$3,370/month",
   },
   {
     id: "AST-002",
@@ -107,7 +107,7 @@ const ASSETS: Asset[] = [
     activeAlerts: 1,
     lastInspection: "Mar 2026",
     nextPM: "10 May 2026",
-    estimatedLoss: "USD 1,850/month",
+    estimatedLoss: "$1,850/month",
   },
   {
     id: "AST-003",
@@ -188,7 +188,7 @@ const ASSETS: Asset[] = [
     activeAlerts: 1,
     lastInspection: "Mar 2026",
     nextPM: "8 May 2026",
-    estimatedLoss: "USD 870/month",
+    estimatedLoss: "$870/month",
   },
   {
     id: "AST-007",
@@ -249,7 +249,7 @@ const ASSETS: Asset[] = [
     activeAlerts: 1,
     lastInspection: "Feb 2026",
     nextPM: "10 May 2026",
-    estimatedLoss: "USD 1,310/month",
+    estimatedLoss: "$1,310/month",
   },
   {
     id: "AST-010",
@@ -290,7 +290,7 @@ const ASSETS: Asset[] = [
     activeAlerts: 1,
     lastInspection: "Apr 2026",
     nextPM: "9 May 2026",
-    estimatedLoss: "USD 114/month",
+    estimatedLoss: "$114/month",
   },
   {
     id: "AST-012",
@@ -363,7 +363,7 @@ const FAULTS: FaultRecord[] = [
     detected: "8 days ago",
     duration: "8 days ongoing",
     efficiencyImpact: "–22% efficiency",
-    estimatedLoss: "USD 3,370/month",
+    estimatedLoss: "$3,370/month",
     status: "Active",
   },
   {
@@ -385,7 +385,7 @@ const FAULTS: FaultRecord[] = [
     detected: "3 days ago",
     duration: "3 days ongoing",
     efficiencyImpact: "+18% runtime energy",
-    estimatedLoss: "USD 870/month",
+    estimatedLoss: "$870/month",
     status: "Active",
   },
   {
@@ -396,7 +396,7 @@ const FAULTS: FaultRecord[] = [
     detected: "14 days ago",
     duration: "14 days ongoing",
     efficiencyImpact: "Overconsumption",
-    estimatedLoss: "USD 1,310/month",
+    estimatedLoss: "$1,310/month",
     status: "Active",
   },
   {
@@ -407,7 +407,7 @@ const FAULTS: FaultRecord[] = [
     detected: "5 days ago",
     duration: "5 days ongoing",
     efficiencyImpact: "–840 kWh/month",
-    estimatedLoss: "USD 114/month",
+    estimatedLoss: "$114/month",
     status: "Active",
   },
   {
@@ -418,7 +418,7 @@ const FAULTS: FaultRecord[] = [
     detected: "7 days ago",
     duration: "7 days ongoing",
     efficiencyImpact: "+50% runtime",
-    estimatedLoss: "USD 1,850/month",
+    estimatedLoss: "$1,850/month",
     status: "Active",
   },
   {
@@ -429,7 +429,7 @@ const FAULTS: FaultRecord[] = [
     detected: "2 days ago",
     duration: "2 days ongoing",
     efficiencyImpact: "Fan energy +12%",
-    estimatedLoss: "USD 239/month",
+    estimatedLoss: "$239/month",
     status: "Assigned",
   },
   {
@@ -440,7 +440,7 @@ const FAULTS: FaultRecord[] = [
     detected: "1 day ago",
     duration: "1 day ongoing",
     efficiencyImpact: "Minor efficiency reduction",
-    estimatedLoss: "USD 87/month",
+    estimatedLoss: "$87/month",
     status: "New",
   },
 ];
@@ -455,7 +455,7 @@ const MAINTENANCE_ACTIONS: MaintenanceAction[] = [
     status: "In Progress",
     assignedTo: "HVAC Team",
     dueDate: "7 May 2026",
-    estimatedSaving: "USD 3,370/month",
+    estimatedSaving: "$3,370/month",
     createdFrom: "Alert ALT-001",
   },
   {
@@ -467,7 +467,7 @@ const MAINTENANCE_ACTIONS: MaintenanceAction[] = [
     status: "Assigned",
     assignedTo: "BMS Team",
     dueDate: "8 May 2026",
-    estimatedSaving: "USD 870/month",
+    estimatedSaving: "$870/month",
     createdFrom: "Alert ALT-003",
   },
   {
@@ -479,7 +479,7 @@ const MAINTENANCE_ACTIONS: MaintenanceAction[] = [
     status: "Suggested",
     assignedTo: "F&B Manager",
     dueDate: "10 May 2026",
-    estimatedSaving: "USD 1,310/month",
+    estimatedSaving: "$1,310/month",
     createdFrom: "Alert ALT-004",
   },
   {
@@ -491,7 +491,7 @@ const MAINTENANCE_ACTIONS: MaintenanceAction[] = [
     status: "Approved",
     assignedTo: "Facilities",
     dueDate: "9 May 2026",
-    estimatedSaving: "USD 114/month",
+    estimatedSaving: "$114/month",
     createdFrom: "Alert ALT-005",
   },
   {
@@ -503,7 +503,7 @@ const MAINTENANCE_ACTIONS: MaintenanceAction[] = [
     status: "Assigned",
     assignedTo: "HVAC Team",
     dueDate: "12 May 2026",
-    estimatedSaving: "USD 239/month",
+    estimatedSaving: "$239/month",
     createdFrom: "Alert ALT-007",
   },
   {
@@ -515,7 +515,7 @@ const MAINTENANCE_ACTIONS: MaintenanceAction[] = [
     status: "In Progress",
     assignedTo: "Facilities",
     dueDate: "6 May 2026",
-    estimatedSaving: "USD 87/month",
+    estimatedSaving: "$87/month",
     createdFrom: "Alert ALT-008",
   },
   {
@@ -527,7 +527,7 @@ const MAINTENANCE_ACTIONS: MaintenanceAction[] = [
     status: "Suggested",
     assignedTo: "BMS Team",
     dueDate: "10 May 2026",
-    estimatedSaving: "USD 1,850/month",
+    estimatedSaving: "$1,850/month",
     createdFrom: "Alert ALT-006",
   },
   {
@@ -1292,7 +1292,7 @@ function AssetHealthTab() {
 // ─── Tab: Faults & Alerts ─────────────────────────────────────────────────────
 
 function FaultsAlertsTab() {
-  const totalEstimatedLoss = "USD 7,780/month";
+  const totalEstimatedLoss = "$7,780/month";
 
   return (
     <div className="space-y-4">

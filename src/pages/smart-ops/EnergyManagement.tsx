@@ -592,8 +592,7 @@ function OverviewTab() {
           icon={<DollarSign className="w-5 h-5" />}
           iconBg="bg-amber-50"
           label="Energy cost"
-          value="38,690"
-          unit="USD"
+          value="$38,690"
           delta={-6.8}
           deltaUnit="% vs last month"
           goodDirection="down"
@@ -1115,9 +1114,9 @@ function PeakDemandTab() {
           <p className="text-xs text-gray-500 uppercase tracking-wider font-semibold mb-1">
             Estimated demand charge
           </p>
-          <p className="text-3xl font-bold text-amber-700 font-mono">USD 2,290</p>
+          <p className="text-3xl font-bold text-amber-700 font-mono">$2,290</p>
           <p className="text-xs text-gray-500 mt-1">This month</p>
-          <p className="text-xs text-gray-400 mt-2">USD 3/kW above threshold</p>
+          <p className="text-xs text-gray-400 mt-2">$3/kW above threshold</p>
         </Card>
       </div>
 
@@ -1202,7 +1201,7 @@ function PeakDemandTab() {
               action: "Stagger laundry start times to 22:00–06:00",
               detail:
                 "Shift laundry cycle starts to the off-peak window to avoid coinciding with afternoon chiller load. Programme laundry timers or BMS schedule.",
-              saving: "USD 762/month",
+              saving: "$762/month",
               tone: "good" as const,
             },
             {
@@ -1210,7 +1209,7 @@ function PeakDemandTab() {
               action: "Enable chiller staging controls to prevent simultaneous full-load",
               detail:
                 "Implement chiller sequencing in BMS so Chiller 01 and Chiller 02 cannot both ramp to full capacity simultaneously. Lead/lag configuration required.",
-              saving: "USD 925/month",
+              saving: "$925/month",
               tone: "good" as const,
             },
             {
@@ -1241,7 +1240,7 @@ function PeakDemandTab() {
       </Card>
 
       <DataSourceNote
-        text="Peak demand data sourced from Level 2 — Main Incomer 01 (15-minute interval). Demand charge estimate uses DEWA commercial tariff schedule (USD 3/kW above 750 kW threshold). Savings estimates are indicative based on historical demand profiles and are not guaranteed."
+        text="Peak demand data sourced from Level 2 — Main Incomer 01 (15-minute interval). Demand charge estimate uses DEWA commercial tariff schedule ($3/kW above 750 kW threshold). Savings estimates are indicative based on historical demand profiles and are not guaranteed."
       />
     </div>
   );
@@ -1333,7 +1332,7 @@ function AssetEfficiencyTab() {
                 <td className="px-4 py-3 whitespace-nowrap text-sm">
                   {a.estimatedLossUsd !== null ? (
                     <span className="font-mono font-semibold text-red-700">
-                      USD {a.estimatedLossUsd.toLocaleString()}/mo
+                      ${a.estimatedLossUsd.toLocaleString()}/mo
                     </span>
                   ) : (
                     <span className="text-gray-400">—</span>
@@ -1393,7 +1392,7 @@ function AssetEfficiencyTab() {
                 </Badge>
                 {selectedAsset.estimatedLossUsd !== null && (
                   <p className="text-xs text-red-600 mt-2 font-semibold">
-                    Est. loss: USD {selectedAsset.estimatedLossUsd.toLocaleString()}/month
+                    Est. loss: ${selectedAsset.estimatedLossUsd.toLocaleString()}/month
                   </p>
                 )}
               </div>

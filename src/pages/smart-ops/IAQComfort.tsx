@@ -714,7 +714,7 @@ function Co2VentilationTab() {
               <div className="flex items-center gap-4 mt-3">
                 <div>
                   <p className="text-[10px] text-neutral-400">Estimated additional cost</p>
-                  <p className="text-xs font-medium text-neutral-700">USD 2/hr (additional cooling)</p>
+                  <p className="text-xs font-medium text-neutral-700">$2/hr (additional cooling)</p>
                 </div>
                 <div>
                   <p className="text-[10px] text-neutral-400">Estimated benefit</p>

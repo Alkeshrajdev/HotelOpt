@@ -48,7 +48,7 @@ const SAVINGS: SavingRecord[] = [
     postActionConsumption: "31,000 kWh/month",
     normalisationMethod: "Occupancy-adjusted",
     verifiedSaving: "17,200 kWh/month",
-    costSaving: "USD 2,340/month",
+    costSaving: "$2,340/month",
     carbonSaving: "7.7 tCO₂e/month",
     confidenceLevel: "High",
     evidenceStatus: "Attached",
@@ -70,7 +70,7 @@ const SAVINGS: SavingRecord[] = [
     postActionConsumption: "40,000 kWh/month",
     normalisationMethod: "Weather-adjusted",
     verifiedSaving: "28,400 kWh/month",
-    costSaving: "USD 3,860/month",
+    costSaving: "$3,860/month",
     carbonSaving: "12.8 tCO₂e/month",
     confidenceLevel: "High",
     evidenceStatus: "Attached",
@@ -92,7 +92,7 @@ const SAVINGS: SavingRecord[] = [
     postActionConsumption: "14,800 kWh/month",
     normalisationMethod: "Occupancy-adjusted",
     verifiedSaving: "8,000 kWh/month",
-    costSaving: "USD 1,740/month",
+    costSaving: "$1,740/month",
     carbonSaving: "5.8 tCO₂e/month",
     confidenceLevel: "High",
     evidenceStatus: "Attached",
@@ -114,7 +114,7 @@ const SAVINGS: SavingRecord[] = [
     postActionConsumption: "1,420 m³/month",
     normalisationMethod: "Simple before/after",
     verifiedSaving: "420 m³/month",
-    costSaving: "USD 870/month",
+    costSaving: "$870/month",
     carbonSaving: "0.4 tCO₂e/month",
     confidenceLevel: "High",
     evidenceStatus: "Attached",
@@ -136,7 +136,7 @@ const SAVINGS: SavingRecord[] = [
     postActionConsumption: "23,400 kWh/month",
     normalisationMethod: "Operating-hours adjusted",
     verifiedSaving: "~7,800 kWh/month (estimated)",
-    costSaving: "USD 2,120/month (estimated)",
+    costSaving: "$2,120/month (estimated)",
     carbonSaving: "—",
     confidenceLevel: "Medium",
     evidenceStatus: "Partial",
@@ -157,7 +157,7 @@ const SAVINGS: SavingRecord[] = [
     postActionConsumption: "13,800 kWh/month",
     normalisationMethod: "F&B-cover adjusted",
     verifiedSaving: "~4,800 kWh/month (estimated)",
-    costSaving: "USD 1,310/month (estimated)",
+    costSaving: "$1,310/month (estimated)",
     carbonSaving: "—",
     confidenceLevel: "Medium",
     evidenceStatus: "Partial",
@@ -178,7 +178,7 @@ const SAVINGS: SavingRecord[] = [
     postActionConsumption: "230 m³/month",
     normalisationMethod: "Simple before/after",
     verifiedSaving: "~90 m³/month (estimated)",
-    costSaving: "USD 381/month (estimated)",
+    costSaving: "$381/month (estimated)",
     carbonSaving: "—",
     confidenceLevel: "Medium",
     evidenceStatus: "Partial",
@@ -199,7 +199,7 @@ const SAVINGS: SavingRecord[] = [
     postActionConsumption: "6,300 kWh/month",
     normalisationMethod: "Simple before/after",
     verifiedSaving: "~2,100 kWh/month (estimated)",
-    costSaving: "USD 571/month (estimated)",
+    costSaving: "$571/month (estimated)",
     carbonSaving: "—",
     confidenceLevel: "Low",
     evidenceStatus: "Partial",
@@ -220,7 +220,7 @@ const SAVINGS: SavingRecord[] = [
     postActionConsumption: "Target: COP 3.5 (design)",
     normalisationMethod: "Baseline established — action in progress",
     verifiedSaving: "— (estimated post-repair)",
-    costSaving: "USD 3,370/month (estimated)",
+    costSaving: "$3,370/month (estimated)",
     carbonSaving: "1.8 tCO₂e/month (estimated)",
     confidenceLevel: "High",
     evidenceStatus: "Partial",
@@ -794,7 +794,7 @@ function EnergySavingsTab() {
           icon={<TrendingUp className="w-5 h-5" />}
           iconBg="bg-green-50"
           label="Verified Cost Saving"
-          value="USD 44,830"
+          value="$44,830"
           caption="Energy savings YTD"
         />
         <KpiTile
@@ -849,7 +849,7 @@ function WaterSavingsTab() {
           icon={<TrendingUp className="w-5 h-5" />}
           iconBg="bg-green-50"
           label="Verified Cost Saving"
-          value="USD 4,790"
+          value="$4,790"
           caption="Water savings YTD"
         />
         <KpiTile
@@ -1122,7 +1122,7 @@ export default function SavingsVerification() {
             icon={<CheckCircle className="w-5 h-5 text-green-600" />}
             iconBg="bg-green-50"
             label="Verified Savings YTD"
-            value="USD 49,610"
+            value="$49,610"
             caption="94.2 tCO₂e · 1,840 MWh"
             prominent
           />
@@ -1130,14 +1130,14 @@ export default function SavingsVerification() {
             icon={<TrendingUp className="w-5 h-5 text-amber-600" />}
             iconBg="bg-amber-50"
             label="Estimated (not yet verified)"
-            value="USD 42,650"
+            value="$42,650"
             caption="Pending verification"
           />
           <KpiTile
             icon={<Clock className="w-5 h-5 text-blue-600" />}
             iconBg="bg-blue-50"
             label="In Monitoring Phase"
-            value="USD 13,110"
+            value="$13,110"
             caption={`${monitoringCount} savings being monitored`}
           />
           <KpiTile

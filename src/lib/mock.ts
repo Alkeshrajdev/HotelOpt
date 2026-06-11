@@ -55,7 +55,7 @@ export const RAW_VS_GP = [
 
 export const ACTION_CENTRE = [
   { label: "Missing meter data",         count: 10, severity: "warn" as const, href: "/data-capture?flag=missing" },
-  { label: "Pending approvals",          count: 24, severity: "warn" as const, href: "/review-approval?status=submitted" },
+  { label: "Pending approvals",          count: 4, severity: "warn" as const, href: "/review-approval?status=submitted" },
   { label: "Supplier reminders",         count: 12, severity: "info" as const, href: "/supplier-portal?status=pending" },
   { label: "Certification evidence due", count: 6,  severity: "warn" as const, href: "/certifications?status=evidence-due" },
   { label: "Targets off-track",          count: 4,  severity: "bad"  as const, href: "/performance/energy/overview" },

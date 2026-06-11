@@ -54,7 +54,7 @@ const ALERTS: Alert[] = [
     system: "HVAC",
     assetOrMeter: "Chiller 01 / CH-01",
     severity: "Critical",
-    estimatedImpact: "USD 2,280/month",
+    estimatedImpact: "$2,280/month",
     impactUnit: "~420 kWh/day excess",
     confidence: "High",
     detectedAt: "Today 06:12",
@@ -71,7 +71,7 @@ const ALERTS: Alert[] = [
     system: "Domestic Water",
     assetOrMeter: "Zone 3 Sub-meter / WM-Z3",
     severity: "Critical",
-    estimatedImpact: "USD 1,690/month",
+    estimatedImpact: "$1,690/month",
     impactUnit: "~19 m³/day excess",
     confidence: "High",
     detectedAt: "Today 02:47",
@@ -105,7 +105,7 @@ const ALERTS: Alert[] = [
     system: "HVAC",
     assetOrMeter: "AHU-05 / BMS-AHU-05",
     severity: "High",
-    estimatedImpact: "USD 571/month",
+    estimatedImpact: "$571/month",
     impactUnit: "~105 kWh/day",
     confidence: "High",
     detectedAt: "Today 07:30",
@@ -156,7 +156,7 @@ const ALERTS: Alert[] = [
     system: "Kitchen",
     assetOrMeter: "Kitchen Sub-meter / EM-KIT-01",
     severity: "Medium",
-    estimatedImpact: "USD 490/month",
+    estimatedImpact: "$490/month",
     impactUnit: "+310 kWh vs benchmark",
     confidence: "Medium",
     detectedAt: "Today 08:00",
@@ -190,7 +190,7 @@ const ALERTS: Alert[] = [
     system: "Solar PV",
     assetOrMeter: "PV Inverter / PV-INV-01",
     severity: "Medium",
-    estimatedImpact: "USD 449/month",
+    estimatedImpact: "$449/month",
     impactUnit: "~55 kWh/day shortfall",
     confidence: "Medium",
     detectedAt: "Today 11:00",
@@ -207,14 +207,14 @@ const ALERTS: Alert[] = [
     system: "Laundry",
     assetOrMeter: "Laundry Sub-meter / EM-LAU-01",
     severity: "Medium",
-    estimatedImpact: "USD 256/month",
+    estimatedImpact: "$256/month",
     impactUnit: "Peak demand penalty",
     confidence: "Low",
     detectedAt: "Today 12:30",
     owner: "Housekeeping Manager",
     status: "New",
     recommendedAction: "Shift laundry wash cycles to 06:00–09:00 window before breakfast service peak, or to 14:00–17:00 after lunch. Coordinate with Housekeeping Manager to adjust linen collection schedule.",
-    details: "Laundry and kitchen are both drawing peak loads between 10:30 and 12:30, coinciding with hotel peak demand. This overlap is contributing to demand charge exposure on the DEWA tariff. Shifting laundry loads by 2 hours earlier or later could reduce the coincident peak by an estimated 18–25 kW, avoiding an estimated USD 256/month in demand charges. Confidence is Low as demand charge impact depends on the exact peak day calculation method used by DEWA.",
+    details: "Laundry and kitchen are both drawing peak loads between 10:30 and 12:30, coinciding with hotel peak demand. This overlap is contributing to demand charge exposure on the DEWA tariff. Shifting laundry loads by 2 hours earlier or later could reduce the coincident peak by an estimated 18–25 kW, avoiding an estimated $256/month in demand charges. Confidence is Low as demand charge impact depends on the exact peak day calculation method used by DEWA.",
   },
   {
     id: "A011",
@@ -224,7 +224,7 @@ const ALERTS: Alert[] = [
     system: "HVAC",
     assetOrMeter: "Chiller 02 / CH-02",
     severity: "High",
-    estimatedImpact: "USD 870/month",
+    estimatedImpact: "$870/month",
     impactUnit: "+6 hrs/day vs target",
     confidence: "High",
     detectedAt: "Yesterday 18:00",
@@ -258,7 +258,7 @@ const ALERTS: Alert[] = [
     system: "Pool & Spa",
     assetOrMeter: "Pool Makeup Meter / WM-POOL",
     severity: "Low",
-    estimatedImpact: "USD 76/month",
+    estimatedImpact: "$76/month",
     impactUnit: "+3.2 m³/day vs baseline",
     confidence: "Low",
     detectedAt: "Yesterday 09:00",
@@ -275,7 +275,7 @@ const ALERTS: Alert[] = [
     system: "HVAC",
     assetOrMeter: "AHU-03 / BMS-AHU-03",
     severity: "Medium",
-    estimatedImpact: "USD 169/month",
+    estimatedImpact: "$169/month",
     impactUnit: "+18% fan energy",
     confidence: "High",
     detectedAt: "Today 06:00",
@@ -836,7 +836,7 @@ export default function AlertsCentre() {
               <p className="text-[11px] text-ink-500 leading-snug">
                 <span className="font-semibold">Confidence note:</span>{" "}
                 {confidenceExplanation(selectedAlert.confidence, confidenceHours[selectedAlert.confidence])}{" "}
-                All cost estimates are indicative and based on DEWA blended tariff of USD 0.10/kWh and USD 1.10/m³.
+                All cost estimates are indicative and based on DEWA blended tariff of $0.10/kWh and $1.10/m³.
               </p>
             </div>
           </div>
