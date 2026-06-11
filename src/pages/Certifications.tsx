@@ -245,6 +245,7 @@ export default function Certifications() {
         subtitle="Your next audit is in 45 days. Upload missing evidence and close criteria gaps across active programmes before the deadline. Green Globe evidence pack is 12% short."
         actions={
           <>
+            <Link to="/reports" className="btn-secondary"><FileText size={14} /> Reports</Link>
             <button className="btn-secondary"><Upload size={14} /> Upload evidence</button>
             <button className="btn-primary"><FileText size={14} /> Generate dossier</button>
           </>

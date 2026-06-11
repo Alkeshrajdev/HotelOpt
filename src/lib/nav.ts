@@ -61,7 +61,7 @@ export const NAV: NavSection[] = [
       { to: "/portfolio/dashboard",               label: "Dashboard",           icon: LayoutDashboard, matchPrefix: "/portfolio/dashboard" },
       { to: "/properties",                        label: "Properties",          icon: Building2 },
       { to: "/portfolio/setup",                   label: "Setup",               icon: SettingsIcon },
-      { to: "/portfolio/reports-certifications",  label: "Reports & Certs",     icon: FileText },
+      { to: "/portfolio/reports-certifications",  label: "Reporting Readiness", icon: FileText },
     ],
   },
 

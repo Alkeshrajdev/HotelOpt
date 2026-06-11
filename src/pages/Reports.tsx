@@ -156,6 +156,7 @@ export default function Reports() {
         subtitle="5 of 7 frameworks are ready to export. 2 have blocking issues — resolve data gaps before your next disclosure deadline. AI drafts reports; sustainability managers review and finalise before any export."
         actions={
           <>
+            <Link to="/certifications" className="btn-secondary"><Award size={14} /> Certifications</Link>
             <button className="btn-secondary"><Filter size={14} /> Filters</button>
             <button className="btn-primary" onClick={() => setGenOpen(true)}>
               <Plus size={14} /> Generate report
@@ -532,7 +533,7 @@ function CertificateEvidencePanel() {
     <Card>
       <CardHeader
         title="Renewable Energy & Carbon Credit certificates"
-        hint="I-REC / EAC certificates feed market-based Scope 2. Carbon credits cover residual Scope 1 offsets. Both are automatically included in GHG Inventory exports."
+        hint="Summary of certificates feeding GHG Inventory exports (market-based Scope 2 + residual Scope 1 offsets). The full register is managed in Certifications."
         right={
           <div className="flex items-center gap-2">
             <Link to="/marketplace" className="btn-ghost h-7 px-2 text-[11px] text-brand-700 flex items-center gap-1">

@@ -757,7 +757,17 @@ export default function PortfolioReports() {
 
   return (
     <div className="space-y-6">
-      <PageHeader title="Reports & Certifications" />
+      <PageHeader
+        eyebrow="Portfolio rollup"
+        title="Reporting Readiness"
+        subtitle="Consolidated framework & certification readiness across the portfolio. Generate disclosures in Reports; fix evidence gaps in Certifications."
+        actions={
+          <>
+            <Link to="/reports" className="btn-secondary"><FileText size={14} /> Generate reports</Link>
+            <Link to="/certifications" className="btn-secondary"><Award size={14} /> Manage certifications</Link>
+          </>
+        }
+      />
 
       {/* Alert strip */}
       <div className="flex flex-wrap gap-3">
