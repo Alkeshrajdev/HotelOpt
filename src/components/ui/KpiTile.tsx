@@ -44,36 +44,31 @@ export default function KpiTile({
       onClick={onClick}
       className={cn(
         prominent ? "card-level-1" : "card",
-        "text-left p-6 w-full transition-all duration-150",
+        "text-left p-4 w-full transition-all duration-150",
         onClick && "hover:shadow-pop hover:-translate-y-0.5 cursor-pointer",
         active && "ring-2 ring-brand-500 border-brand-200"
       )}
     >
       <div className="flex items-center justify-between gap-3">
+        <div className="text-[11px] uppercase tracking-[0.06em] font-semibold text-ink-500 leading-snug">
+          {label}
+        </div>
         <div
           className={cn(
-            "w-12 h-12 rounded-xl grid place-items-center shrink-0",
+            "w-8 h-8 rounded-lg grid place-items-center shrink-0",
             iconBg
           )}
         >
           {icon}
         </div>
-        {onClick && (
-          <span className="text-[11px] font-semibold text-ink-400 inline-flex items-center gap-0.5">
-            Drill down <ChevronRight size={12} />
-          </span>
-        )}
       </div>
-      <div className="mt-4 text-[11px] uppercase tracking-[0.06em] font-semibold text-ink-500 leading-snug">
-        {label}
-      </div>
-      <div className="mt-1.5 flex items-baseline gap-1.5 flex-wrap">
+      <div className="mt-2 flex items-baseline gap-1.5 flex-wrap">
         <div className="text-kpi text-ink-900 tabular-nums whitespace-nowrap">{value}</div>
         {unit && (
           <span className="text-[12px] font-medium text-ink-500">{unit}</span>
         )}
       </div>
-      <div className="mt-2.5 flex items-center gap-2 min-h-[18px]">
+      <div className="mt-2 flex items-center gap-2 min-h-[18px]">
         {showDelta && (
           <span
             className={cn(

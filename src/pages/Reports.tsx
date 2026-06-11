@@ -167,10 +167,7 @@ export default function Reports() {
 
       {/* Report type cards */}
       <Card>
-        <CardHeader
-          title="Report types"
-          hint="Select a type to pre-configure the Generate modal, or click Generate report above for full control."
-        />
+        <CardHeader title="Report types" />
         <div className="p-5 grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3">
           {REPORT_TYPES.map((rt) => (
             <button

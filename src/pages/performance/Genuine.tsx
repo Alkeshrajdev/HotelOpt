@@ -80,7 +80,6 @@ export default function Genuine({ pillar }: { pillar: PillarKey }) {
       <InsufficientData
         title="Genuine Performance is not available for this pillar"
         body="Genuine Performance measures efficiency adjusted for occupancy and weather — concepts that don't apply to Social or Governance metrics. It is calculated for Energy, Water, Waste, and Carbon only."
-        hint="Switch to Energy, Water, Waste, or Carbon in the sidebar to see GP."
       />
     );
   }

@@ -254,10 +254,7 @@ export default function Certifications() {
 
       {/* ── Certification cards ── */}
       <Card>
-        <CardHeader
-          title="Certification portfolio"
-          hint="Click a card to open the evidence checklist and gap analysis."
-        />
+        <CardHeader title="Certification portfolio" />
         <div className="p-5 grid grid-cols-2 md:grid-cols-3 xl:grid-cols-7 gap-3">
           {CERT_CARDS.map((c) => (
             <div

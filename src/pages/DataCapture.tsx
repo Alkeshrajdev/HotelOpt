@@ -301,9 +301,6 @@ function PickDataType({ onPick }: { onPick: (k: DataTypeKey) => void }) {
           <div className="text-[12px] font-semibold uppercase tracking-[0.06em] text-ink-500">Step 1</div>
           <h2 className="text-lg font-bold text-ink-900">What do you want to capture?</h2>
         </div>
-        <p className="text-sm text-ink-500 max-w-md">
-          Every data type has its own dedicated form. Manual entry is always available; additional automated methods appear on the next step.
-        </p>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {DATA_TYPES.map((dt) => {
@@ -366,9 +363,6 @@ function PickMethod({
           </div>
           <h2 className="text-lg font-bold text-ink-900">How would you like to enter it?</h2>
         </div>
-        <p className="text-sm text-ink-500 max-w-md">
-          Manual entry is always available. Methods marked <em>Requires setup</em> need a one-time configuration in Admin.
-        </p>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
         {ALL_METHODS.map((m) => {

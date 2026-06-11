@@ -323,7 +323,6 @@ export default function OverviewTab({ onNavigate }: Props) {
 
       {/* ── 1. Executive Snapshot ─────────────────────────────────────────── */}
       <div>
-        <SectionLabel title="Executive Snapshot" />
         <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-4">
           {SNAP_TILES.map((t) => {
             const Icon = t.icon;

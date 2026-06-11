@@ -25,7 +25,6 @@ export default function External({ pillar }: { pillar: PillarKey }) {
       <InsufficientData
         title="External Comparison is not available for this pillar"
         body="Social and Governance metrics cannot be meaningfully compared across hotels in a benchmark pool — the conditions vary too much. External Comparison is available for Energy, Water, Waste, and Carbon only."
-        hint="Switch to Energy, Water, Waste, or Carbon in the sidebar to compare against the pool."
       />
     );
   }
