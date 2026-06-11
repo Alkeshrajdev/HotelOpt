@@ -7,19 +7,30 @@
 
 ---
 
-## Current status (updated 2026-06-11)
+## Current status (updated 2026-06-12)
 
-Latest commit: **`bea9c26`** on `main` (Vercel auto-deploys). `npm run lint` (= `tsc --noEmit`) passes clean; no runtime console errors.
+Latest commit: **`910932c`** on `main` (Vercel auto-deploys). `npm run lint` (= `tsc --noEmit`) passes clean; no runtime console errors.
 
-A full page-by-page UX review was done and the high-priority findings were fixed. The app is now **consistent and substance-first** (real operational/$ metrics, not vanity scores). Fixes shipped this session:
+Two review passes were completed: a **data-consistency / substance** review, then a **UI/UX design-expert** review. The app is now consistent, substance-first (real operational/$ metrics, not vanity scores), and the daily "scan → decide → act" loop is much cleaner.
 
-1. **One hotel dataset everywhere** — the dashboard and the Properties/Review/Guest pages used two different hotel lists. Everything now uses the canonical 10 hotels from `PORTFOLIO_HOTELS` (`mock.ts`); `propertiesData.ts` was rewritten to match, generic names renamed across ~18 files, and the count unified to **10** (topbar/sidebar/Billing).
-2. **Targets progress bug** — bars showed "0% to go" while saying "At Risk". Now measured along baseline→target (direction-aware) in `TargetsTab.tsx` with `baseVal`/`baseLabel`/`higherIsBetter` on `PORTFOLIO_TARGETS`.
-3. **Renewable share** reconciled to **12%** across Performance/benchmarks/drilldown/guest page (was a 78% placeholder that contradicted the per-hotel data).
-4. **Currency** — Smart Ops converted AED→USD so portfolio money is consistent with the rest of the app.
-5. **Responsive** — sidebar is now an off-canvas drawer + hamburger below `lg`; KPI tiles no longer clip on mobile. Desktop docked sidebar unchanged.
-6. **Sustainability score explained** — ⓘ tooltip (`InfoHint`) on Properties + Property Detail describing the composite (kept the score, removed the black-box feel).
-7. **Polish** — demo session now **persists across refresh** (localStorage `ho_demo`); Admin "Stub" badges → "Soon"; jargon glossary (`Abbr`) wired for GP/EF.
+### Pass 1 — data consistency & substance
+1. **One hotel dataset everywhere** — dashboard and Properties/Review/Guest used two different hotel lists. Everything now uses the canonical 10 hotels from `PORTFOLIO_HOTELS` (`mock.ts`); `propertiesData.ts` rewritten to match, generic names renamed across ~18 files, count unified to **10** (topbar/sidebar/Billing).
+2. **Targets progress bug** — "0% to go" while "At Risk". Now baseline→target (direction-aware) in `TargetsTab.tsx` via `baseVal`/`baseLabel`/`higherIsBetter` on `PORTFOLIO_TARGETS`.
+3. **Renewable share** reconciled to **12%** across Performance/benchmarks/drilldown/guest page (was a 78% placeholder).
+4. **Currency** — Smart Ops AED→USD, later unified to `$` prefix to match the rest of the app.
+5. **Responsive** — sidebar is an off-canvas drawer + hamburger below `lg`; KPI tiles no longer clip on mobile.
+6. **Sustainability score explained** — ⓘ tooltip (`InfoHint`) on Properties + Property Detail.
+7. **Polish** — demo session persists across refresh (localStorage `ho_demo`); Admin "Stub"→"Soon"; jargon glossary (`Abbr`) wired for GP/EF.
+
+### Pass 2 — UI/UX design review (P0 → P2)
+8. **Review & Approval (P0)** — detail panel is now a right **slide-over drawer** so the queue table is full-width; flag cells capped to 1 + "+N"; nav badge + dashboard "Pending approvals" aligned to the real queue count (4). (`ReviewApproval.tsx`)
+9. **"Needs attention" panel (P1)** — act-first entry point at the top of the dashboard Overview, built from the previously-dead `ACTION_CENTRE` data; severity-coloured cards deep-link to each page. (`OverviewTab.tsx`)
+10. **Hotels cert signal (P1)** — dropped the green "Certified" pill from the performance-RAG card header (it's in the neutral stats row); no more green badge on a red card. (`HotelsTab.tsx`)
+11. **Reports/Certs IA (P1, Option A)** — three pages stay distinct (generate disclosures · manage cert schemes · portfolio rollup) but clarified + cross-linked. "Portfolio → Reports & Certs" renamed **"Reporting Readiness"**; Reports↔Certifications cross-links; shared certificate block's canonical home is Certifications.
+12. **Header context (P2)** — `PageHeader` now actually renders the `eyebrow` + `subtitle` it was given (they were dropped before) and **wraps** action buttons (fixes Property Detail clip). Surfaces helpful context app-wide.
+13. **Chart flash (P2)** — `isAnimationActive={false}` on Environment (28 series) + Social & Governance (2 bars). Data Capture method pills capped to 3 + "+N".
+
+**Consciously deferred** (structural/subjective, not "polish"): Performance double-tab rework; section anchors on long pages; period-control vocabulary alignment; AI Assistant 1024–1280 tightness; Guest Engagement property picker. See the design-review notes for rationale.
 
 ---
 
@@ -202,22 +213,25 @@ Portfolio (super_admin)
   Dashboard
   Properties   ← master registry (10 hotels, full filter, add/edit)
   Setup        ← portfolio scope: inclusion, groups, targets, users, rules, escalations
-  Reports & Certs
+  Reporting Readiness   ← portfolio framework/cert readiness rollup (was "Reports & Certs")
 ```
 
 ---
 
 ## Way forward — open actions
 
-Ordered by impact. None are blocking; the app is in a consistent, demoable state.
+Ordered by impact. None are blocking; the app is consistent and demoable. The big consistency + UX items from both review passes are done (see Current status). What remains is structural/subjective or minor.
 
-### P1 — worth doing next
-1. **Consolidate Reports/Certs information architecture.** Reporting & certification content lives in three nav entries — top-nav **Reports**, top-nav **Certifications**, and **Portfolio → Reports & Certs**. Pick one canonical home and make the others link to it (or merge), so users aren't unsure where to go. Files: `pages/Reports.tsx`, `pages/Certifications.tsx`, `pages/portfolio/PortfolioReports.tsx`, `lib/nav.ts`.
-2. **Currency display style.** Money now reads as USD everywhere, but the *format* is mixed — `$4.8M` (prefix) on the dashboard vs `USD 49,610` (suffix) in Smart Ops. Pick one convention (suggest `$` prefix + compact `M/k`) and apply via a small `formatCurrency()` helper.
+### Structural / subjective (treat each as its own scoped task, not a drive-by)
+1. **Performance double-tab nav.** Two stacked tab rows (6 pillars × 4 views) add cognitive load. Consider a left segmented pillar rail or a pillar dropdown with views as the primary tabs, or a breadcrumb. Touches the whole Performance shell — design it deliberately. Files: `pages/performance/Shell.tsx` + pillar pages.
+2. **Section anchors on long pages** (Environment, Reports, Property Detail, Smart Ops). Sticky in-page sub-nav / anchor chips to cut scrolling. Lower priority now that subtitles + the "Needs attention" panel improved orientation.
+3. **Guest Engagement property picker.** Page is scoped to one property ("Skyline Dubai") with no on-page selector; wiring a real picker means threading property state through the whole page.
 
-### P2 — polish
-3. **Wider jargon coverage.** `components/ui/Abbr.tsx` + `GLOSSARY` exist but are only wired for **GP** (Property Detail) and **EF** (Supplier Portal). Adopt `<Abbr>` for remaining first-use spots if desired (ORN, GN). Note: LTIFR and COP already self-expand in adjacent text, so they're low priority.
-4. **Per-hotel "renewable share" vs portfolio 12%.** Portfolio renewable is now 12% everywhere; the per-hotel `renewablePct` values (0–42%) in `PORTFOLIO_HOTELS` are hotel-level and consistent, but if anyone wants the portfolio figure to be a *derived* weighted average rather than a constant, compute it from the hotel data.
+### Minor / cosmetic
+4. **Wider jargon coverage.** `components/ui/Abbr.tsx` + `GLOSSARY` are wired only for **GP** + **EF**. Adopt `<Abbr>` for ORN/GN if desired (LTIFR/COP already self-expand nearby).
+5. **Currency compacting.** Now consistently `$`-prefixed, but Smart Ops shows full numbers (`$49,610`) vs the dashboard's compact `$4.8M`. A `formatCurrency(n, {compact})` helper would unify the *magnitude* style too.
+6. **Period-control vocabulary.** Smart Ops uses `Day/Week/Month/Year/Custom`; dashboard/Performance use `Monthly/Quarterly/Annually`. They're genuinely different controls (real-time ops vs reporting aggregation) — align labels only if it doesn't blur that distinction.
+7. **Derived renewable %.** Portfolio renewable is a 12% constant; could be computed as an energy-weighted average from `PORTFOLIO_HOTELS` if a live figure is wanted.
 
 ### Verification checklist before each push
 - `npm run lint` (= `tsc --noEmit`) must pass.
