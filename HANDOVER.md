@@ -9,9 +9,9 @@
 
 ## Current status (updated 2026-06-12)
 
-Latest commit: **`910932c`** on `main` (Vercel auto-deploys). `npm run lint` (= `tsc --noEmit`) passes clean; no runtime console errors.
+Latest commit: **`a0f443d`** on `main` (Vercel auto-deploys). `npm run lint` (= `tsc --noEmit`) passes clean; no runtime console errors.
 
-Two review passes were completed: a **data-consistency / substance** review, then a **UI/UX design-expert** review. The app is now consistent, substance-first (real operational/$ metrics, not vanity scores), and the daily "scan → decide → act" loop is much cleaner.
+Three review passes were completed: a **data-consistency / substance** review, a **UI/UX design-expert** review, then a **density / layout cleanup** (per the client's "minimal, data-dense, no empty space" direction). The app is now consistent, substance-first (real operational/$ metrics, not vanity scores), data-dense, and the daily "scan → decide → act" loop is much cleaner.
 
 ### Pass 1 — data consistency & substance
 1. **One hotel dataset everywhere** — dashboard and Properties/Review/Guest used two different hotel lists. Everything now uses the canonical 10 hotels from `PORTFOLIO_HOTELS` (`mock.ts`); `propertiesData.ts` rewritten to match, generic names renamed across ~18 files, count unified to **10** (topbar/sidebar/Billing).
@@ -27,10 +27,19 @@ Two review passes were completed: a **data-consistency / substance** review, the
 9. **"Needs attention" panel (P1)** — act-first entry point at the top of the dashboard Overview, built from the previously-dead `ACTION_CENTRE` data; severity-coloured cards deep-link to each page. (`OverviewTab.tsx`)
 10. **Hotels cert signal (P1)** — dropped the green "Certified" pill from the performance-RAG card header (it's in the neutral stats row); no more green badge on a red card. (`HotelsTab.tsx`)
 11. **Reports/Certs IA (P1, Option A)** — three pages stay distinct (generate disclosures · manage cert schemes · portfolio rollup) but clarified + cross-linked. "Portfolio → Reports & Certs" renamed **"Reporting Readiness"**; Reports↔Certifications cross-links; shared certificate block's canonical home is Certifications.
-12. **Header context (P2)** — `PageHeader` now actually renders the `eyebrow` + `subtitle` it was given (they were dropped before) and **wraps** action buttons (fixes Property Detail clip). Surfaces helpful context app-wide.
+12. **Header actions wrap (P2)** — `PageHeader` action buttons wrap instead of clipping (fixes Property Detail). NOTE: subtitle/eyebrow rendering was briefly added here then **removed in Pass 3** (see below) — `PageHeader` now renders **title + actions only**; the `subtitle`/`eyebrow` props are kept for compat but intentionally not output.
 13. **Chart flash (P2)** — `isAnimationActive={false}` on Environment (28 series) + Social & Governance (2 bars). Data Capture method pills capped to 3 + "+N".
 
-**Consciously deferred** (structural/subjective, not "polish"): Performance double-tab rework; section anchors on long pages; period-control vocabulary alignment; AI Assistant 1024–1280 tightness; Guest Engagement property picker. See the design-review notes for rationale.
+### Pass 3 — density / layout cleanup ("minimal, data-dense")
+14. **Stripped filler text** — `PageHeader` no longer renders paragraph subtitles/eyebrows; removed instructional helper lines (Reports "Report types", Certifications "Certification portfolio", Data Capture steps 1 & 2, External/Genuine empty-state hints, the two "Switch to … in the sidebar" hints); dropped the "Executive Snapshot" filler label. **Kept** functional descriptors (chart legends, axis explanations, domain notes).
+15. **Compact KPI tiles** — `KpiTile` redesigned: label + small (32px) icon on one row, then value/delta; `p-6`→`p-4`. Removed the dead vertical space on Performance & Smart Ops. Dashboard `SNAP_TILES` (`OverviewTab`) aligned to the same pattern.
+16. **Fixed empty-space / alignment on flagged pages** (`a0f443d`):
+    - **S&G supplier funnel** (`SocialGovernanceTab`) — was capped at `max-w-xl` (right half empty); funnel now fills width + summary stats moved to a right rail.
+    - **Performance › Governance "Outstanding items"** (`GovernanceOverview`) — was label-left / chip-far-right with an empty middle; now an aligned Item · Owner · Due · Status table.
+    - **Portfolio Setup** (`PortfolioSetup`) — Hotels & Escalations tables sized to content (no inter-column chasms); Groups cards in a 2-col grid; Rules settings in a 2-col section layout (was a narrow `max-w-2xl` form). Targets/Users left full-width (already dense, 9–11 cols).
+    - **Reporting Readiness › Generate Report** (`PortfolioReports`) — wizard widened `max-w-2xl`→`max-w-4xl`. The other tabs' tables (8–10 cols) already fill the width.
+
+**Consciously deferred** (structural/subjective, not "polish"): Performance double-tab rework; section anchors on long pages; period-control vocabulary alignment; AI Assistant 1024–1280 tightness; Guest Engagement property picker. Also still slightly airy by design: the small 3–4 KPI/stat summary rows (standard dashboard pattern — tighten only if the client asks). See the design-review notes for rationale.
 
 ---
 
