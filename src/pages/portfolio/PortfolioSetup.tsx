@@ -133,7 +133,7 @@ function HotelsTab() {
       </div>
 
       <div className="overflow-x-auto">
-        <table className="w-full text-[12px]">
+        <table className="text-[12px]">
           <thead>
             <tr className="border-b border-ink-100">
               {["Hotel", "Report Status", "Certification", "Pending", "In Portfolio", ""].map(h => (
@@ -206,7 +206,7 @@ function GroupsTab() {
         </div>
         <button className="btn-primary flex items-center gap-1.5 text-[13px]"><Plus size={14} /> New Group</button>
       </div>
-      <div className="grid gap-3">
+      <div className="grid sm:grid-cols-2 gap-3">
         {visible.map(g => (
           <div key={g.id} className="rounded-xl border border-ink-100 bg-white p-4 flex items-center justify-between gap-4">
             <div className="flex-1 min-w-0">
@@ -378,7 +378,8 @@ function RulesTab() {
   const [groupingLogic, setGroupingLogic] = useState("Region");
 
   return (
-    <div className="max-w-2xl space-y-8">
+    <div className="max-w-5xl space-y-6">
+      <div className="grid lg:grid-cols-2 gap-x-6 gap-y-8 items-start">
       {/* Reporting */}
       <section>
         <h3 className="text-[12px] font-bold uppercase tracking-wider text-ink-400 mb-3">Reporting Settings</h3>
@@ -469,6 +470,7 @@ function RulesTab() {
           </label>
         </div>
       </section>
+      </div>
 
       <button className="btn-primary">Save Settings</button>
     </div>
@@ -486,7 +488,7 @@ function EscalationsTab() {
       </div>
 
       <div className="overflow-x-auto">
-        <table className="w-full text-[12px]">
+        <table className="text-[12px]">
           <thead>
             <tr className="border-b border-ink-100">
               {["Escalation Rule", "Trigger Condition", "Level 1 · Delay", "Level 2 · Delay", "Level 3 · Delay", "Active", ""].map(h => (

@@ -330,22 +330,24 @@ export default function OverviewTab({ onNavigate }: Props) {
               <div
                 key={t.label}
                 className={cn(
-                  "card p-5 flex flex-col gap-0",
+                  "card p-4 flex flex-col",
                   t.highlight && "border-good/30 bg-good/3"
                 )}
               >
-                <div className={cn("w-9 h-9 rounded-xl grid place-items-center mb-3 shrink-0", t.iconBg)}>
-                  <Icon size={16} />
+                <div className="flex items-center justify-between gap-2">
+                  <div className="text-[11px] font-semibold uppercase tracking-[0.06em] text-ink-500 leading-snug">{t.label}</div>
+                  <div className={cn("w-8 h-8 rounded-lg grid place-items-center shrink-0", t.iconBg)}>
+                    <Icon size={15} />
+                  </div>
                 </div>
-                <div className="text-[11px] font-semibold uppercase tracking-[0.06em] text-ink-500 leading-snug">{t.label}</div>
                 <div className={cn(
-                  "text-[1.7rem] font-extrabold tabular-nums mt-1 leading-none",
+                  "text-[1.7rem] font-extrabold tabular-nums mt-2 leading-none",
                   t.highlight ? "text-good" : "text-ink-900"
                 )}>
                   {t.value}
                 </div>
-                <div className="text-[11px] text-ink-400 mt-0.5">{t.unit}</div>
-                <div className={cn("text-[11px] font-semibold mt-2", t.deltaGood ? "text-good" : "text-bad")}>
+                <div className="text-[11px] text-ink-400 mt-1">{t.unit}</div>
+                <div className={cn("text-[11px] font-semibold mt-1.5", t.deltaGood ? "text-good" : "text-bad")}>
                   {t.delta}
                 </div>
               </div>

@@ -227,7 +227,7 @@ function GenerateReportTab() {
   const steps = ["Scope", "Period", "Format", "Framework", "Readiness", "Preview"];
 
   return (
-    <div className="max-w-2xl">
+    <div className="max-w-4xl">
       {/* Step indicator */}
       <div className="flex items-center gap-1 mb-8">
         {steps.map((s, i) => (

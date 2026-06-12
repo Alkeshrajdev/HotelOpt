@@ -90,24 +90,37 @@ export default function GovernanceOverview() {
       {/* Outstanding items */}
       <Card>
         <CardHeader title="Outstanding items" />
-        <div className="divide-y divide-ink-100">
-          {OUTSTANDING.map(item => (
-            <div key={item.item} className="px-6 py-4 flex items-center gap-4">
-              <div className="flex-1 min-w-0">
-                <div className="text-[13px] font-medium text-ink-900">{item.item}</div>
-                <div className="text-[11px] text-ink-400 mt-0.5">Owner: {item.owner} · Due: {item.due}</div>
-              </div>
-              <span className={cn("chip shrink-0 text-[11px] font-semibold",
-                item.status === "overdue"
-                  ? "bg-bad/10 text-bad border border-bad/20"
-                  : item.status === "due-soon"
-                  ? "bg-warn/10 text-warn border border-warn/25"
-                  : "bg-ink-100 text-ink-500"
-              )}>
-                {item.status === "overdue" ? "Overdue" : item.status === "due-soon" ? "Due soon" : "Pending"}
-              </span>
-            </div>
-          ))}
+        <div className="overflow-x-auto">
+          <table className="min-w-full text-[13px]">
+            <thead>
+              <tr className="bg-ink-50 text-left">
+                <th className="table-th">Item</th>
+                <th className="table-th">Owner</th>
+                <th className="table-th">Due</th>
+                <th className="table-th text-right">Status</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-ink-100">
+              {OUTSTANDING.map(item => (
+                <tr key={item.item} className="hover:bg-ink-50/60">
+                  <td className="table-td font-medium text-ink-900">{item.item}</td>
+                  <td className="table-td text-ink-600 whitespace-nowrap">{item.owner}</td>
+                  <td className="table-td text-ink-600 whitespace-nowrap">{item.due}</td>
+                  <td className="table-td text-right">
+                    <span className={cn("chip text-[11px] font-semibold",
+                      item.status === "overdue"
+                        ? "bg-bad/10 text-bad border border-bad/20"
+                        : item.status === "due-soon"
+                        ? "bg-warn/10 text-warn border border-warn/25"
+                        : "bg-ink-100 text-ink-500"
+                    )}>
+                      {item.status === "overdue" ? "Overdue" : item.status === "due-soon" ? "Due soon" : "Pending"}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </Card>
     </div>

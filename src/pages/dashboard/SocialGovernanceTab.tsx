@@ -236,8 +236,9 @@ function GovernanceSection() {
       {/* Supplier funnel */}
       <Card className="lg:col-span-2">
         <CardHeader title="Supplier governance funnel" />
-        <div className="px-4 pb-4 pt-3">
-          <div className="space-y-2 max-w-xl">
+        <div className="px-4 pb-4 pt-3 flex flex-col lg:flex-row lg:items-start gap-5">
+          {/* Funnel stages — fill available width */}
+          <div className="flex-1 min-w-0 space-y-2">
             {SG_SUPPLIER_FUNNEL.map((step, i) => {
               const prev = i>0 ? SG_SUPPLIER_FUNNEL[i-1].count : step.count;
               const drop = i>0 ? Math.round((1 - step.count/prev)*100) : null;
@@ -267,9 +268,10 @@ function GovernanceSection() {
               );
             })}
           </div>
-          <div className="mt-4 flex gap-3">
+          {/* Summary stats — right rail (fills the wide card) */}
+          <div className="grid grid-cols-3 lg:grid-cols-1 gap-2 lg:w-44 shrink-0">
             {[{v:"74%",l:"Code signed",t:"ink"},{v:"52%",l:"ESG submitted",t:"warn"},{v:"43%",l:"Approved",t:"bad"}].map(s => (
-              <div key={s.l} className="rounded-lg bg-ink-50 px-4 py-2 text-center">
+              <div key={s.l} className="rounded-lg bg-ink-50 px-4 py-2.5 text-center">
                 <div className={cn("text-[1.2rem] font-bold", s.t==="warn"?"text-warn":s.t==="bad"?"text-bad":"text-ink-900")}>{s.v}</div>
                 <div className="text-[10px] text-ink-400">{s.l}</div>
               </div>
