@@ -101,6 +101,41 @@ function validateRequiredFields(
   return errs;
 }
 
+// Days in a "YYYY-MM" period; falls back to 30 if unparseable.
+function daysInPeriod(period?: string): number {
+  const m = /^(\d{4})-(\d{2})$/.exec(period?.trim() ?? "");
+  if (!m) return 30;
+  return new Date(Number(m[1]), Number(m[2]), 0).getDate();
+}
+
+// ORN-specific sanity checks: ORN is the canonical denominator, so a value that
+// exceeds physical capacity (or contradicts a typed occupancy %) would corrupt
+// every per-ORN intensity downstream. Returns field-keyed error messages.
+function validateOccupancy(values: Record<string, string>): Record<string, string> {
+  const errs: Record<string, string> = {};
+  const rooms = Number(values["availableRooms"]);
+  const orn = Number(values["occupiedRoomNights"]);
+  if (!Number.isFinite(rooms) || !Number.isFinite(orn) || rooms <= 0 || orn <= 0) return errs;
+
+  const days = daysInPeriod(values["period"]);
+  const capacity = rooms * days;
+  if (orn > capacity) {
+    errs["occupiedRoomNights"] =
+      `ORN (${orn.toLocaleString()}) exceeds capacity — ${rooms} rooms × ${days} days = ${capacity.toLocaleString()} room-nights.`;
+    return errs;
+  }
+  const typedPct = values["occupancyPct"]?.trim();
+  if (typedPct) {
+    const pct = Number(typedPct);
+    const implied = (orn / capacity) * 100;
+    if (Number.isFinite(pct) && Math.abs(pct - implied) > 5) {
+      errs["occupancyPct"] =
+        `Occupancy ${pct}% doesn't reconcile with ORN ÷ capacity (${implied.toFixed(1)}%). Leave blank to auto-calculate.`;
+    }
+  }
+  return errs;
+}
+
 /* =================================================================== */
 /* Main component                                                       */
 /* =================================================================== */
@@ -774,6 +809,7 @@ function ManualWorkflow({
     setAttempted(true);
     const allFields = [...cfg.fields, ...(extraFields ?? [])];
     const errs = validateRequiredFields(allFields, values);
+    if (cfg.key === "occupancy") Object.assign(errs, validateOccupancy(values));
     if (Object.keys(errs).length > 0) {
       setErrors(errs);
       return;

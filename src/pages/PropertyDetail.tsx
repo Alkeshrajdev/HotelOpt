@@ -43,6 +43,10 @@ import {
   type RichProperty,
 } from "@/lib/propertiesData";
 import type { PillarKey } from "@/pages/performance/Shell";
+import {
+  findHotelMetricsByName, costPerOrn, carbonPerOrn, energyPerOrn,
+  waterPerGn, occupancyPct, UNIT,
+} from "@/lib/normalise";
 import { cn } from "@/lib/utils";
 
 type TabKey =
@@ -124,6 +128,31 @@ export default function PropertyDetail() {
           <HeroStat label="Certifications"       value={`${property.certifications.length} active`} tone={property.certStatus === "ready" ? "good" : "info"} />
         </div>
       </Card>
+
+      {/* Normalised performance — per ORN (canonical), water per guest-night */}
+      {(() => {
+        const m = findHotelMetricsByName(property.name);
+        if (!m) return null;
+        const occ = occupancyPct(m);
+        return (
+          <Card>
+            <div className="px-5 pt-4 text-[12px] text-ink-500">
+              Normalised performance — energy, carbon &amp; cost per{" "}
+              <span className="font-semibold text-ink-700">occupied room night (ORN)</span>, the
+              canonical denominator. Water is shown per guest-night (benchmark basis).
+              {!Number.isNaN(occ) && (
+                <span> · Occupancy <span className="font-semibold text-ink-700">{occ.toFixed(0)}%</span></span>
+              )}
+            </div>
+            <div className="p-5 pt-3 grid grid-cols-2 md:grid-cols-4 gap-3">
+              <HeroStat label="Cost / ORN"   value={`$${costPerOrn(m).toFixed(1)}`} tone="info" info="Total utility cost ÷ occupied room nights." />
+              <HeroStat label="Carbon / ORN" value={carbonPerOrn(m).toFixed(1)} suffix={UNIT.carbonOrn} tone="info" />
+              <HeroStat label="Energy / ORN" value={energyPerOrn(m).toFixed(0)} suffix={UNIT.energyOrn} tone="info" />
+              <HeroStat label="Water / GN"   value={waterPerGn(m).toFixed(0)} suffix={UNIT.waterGn} tone="info" info="Litres per guest-night — the hotel water benchmark basis (not per ORN)." />
+            </div>
+          </Card>
+        );
+      })()}
 
       {/* Setup Health summary card */}
       <SetupHealthCard property={property} />

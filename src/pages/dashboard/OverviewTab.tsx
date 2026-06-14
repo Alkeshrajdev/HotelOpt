@@ -9,6 +9,7 @@ import {
   ResponsiveContainer, CartesianGrid, ReferenceLine,
 } from "recharts";
 import { ACTION_CENTRE } from "@/lib/mock";
+import { portfolioCostPerOrn } from "@/lib/normalise";
 import { cn } from "@/lib/utils";
 
 type Props = { onNavigate: (tab: string) => void };
@@ -100,6 +101,14 @@ const SNAP_TILES: SnapTile[] = [
     delta: `from reduced consumption`,
     deltaGood: true,
     highlight: true,
+  },
+  {
+    icon: DollarSign, iconBg: "bg-ink-100 text-ink-600",
+    label: "Cost per ORN",
+    value: `$${portfolioCostPerOrn().toFixed(1)}`,
+    unit: "utility cost / occupied room night",
+    delta: `−${((1 - TOTAL_TY / TOTAL_PY) * 100).toFixed(1)}% vs last year`,
+    deltaGood: true,
   },
   {
     icon: Zap, iconBg: "bg-pillar-energy/10 text-pillar-energy",

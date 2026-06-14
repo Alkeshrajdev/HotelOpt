@@ -7,7 +7,23 @@
 
 ---
 
-## Current status (updated 2026-06-12)
+## Current status (updated 2026-06-15)
+
+Latest commit: **`a0f443d`** on `main` (Vercel auto-deploys). `npm run lint` (= `tsc --noEmit`) passes clean; no runtime console errors. **Working tree has uncommitted Task 1 changes (ORN normalisation) — not yet pushed.**
+
+### Session 2026-06-15 — Legacy-vs-upcoming review + Task 1 (ORN normalisation)
+- **`REVIEW.md`** (repo root) — full review of the legacy "Hotel Optimiser" tool (from 4 `.xls` exports: Utilities Consumption, Utilities Performance & Carbon, Benchmark & Genuine Performance, Waste Performance) vs this upcoming React app. Inputs/outputs status tables, dashboard recommendations, avoid-list, and a critical-missing backlog.
+- **Task 1 — ORN as the canonical denominator (DONE, verified, unpushed):**
+  - `src/lib/normalise.ts` (NEW) — single source of truth: `DENOM`/`UNIT`, per-hotel helpers (`costPerOrn`/`carbonPerOrn`/`energyPerOrn`/`waterPerGn`/`occupancyPct`), denominator-weighted portfolio aggregates, `findHotelMetricsByName` bridge to the registry.
+  - `mock.ts` `PORTFOLIO_HOTELS` — added `arn` (available room-nights) + `utility_cost_usd` to all 10 hotels (occupancy 55–84%, $/ORN $5–26).
+  - `dataCaptureConfig.ts` — ORN re-labelled as canonical; added optional Guest-nights field (water basis).
+  - `DataCapture.tsx` — real occupancy validation (`validateOccupancy`): ORN ≤ rooms×days, typed occupancy % must reconcile.
+  - `OverviewTab.tsx` — new **Cost per ORN** snapshot tile (derived, $18.0 portfolio).
+  - `PropertyDetail.tsx` — new "Normalised performance" card (Cost/Carbon/Energy per ORN + Water/GN + occupancy), bridged by name. Skyline verified: $25.4 · 86.7 kgCO₂e/ORN · 164 kWh/ORN · 794 L/GN · 70%.
+  - **Decision:** water stays L/guest-night (CHSB/HWMI benchmark basis), documented exception; everything else on ORN. Mechanical "sweep" of remaining intensity labels was **deliberately skipped** — low value, and the real issue is the basis split below.
+  - **⚠️ Carried to carbon-spine task:** Exec OverviewTab snapshot/efficiency tiles are hardcoded on a *different, smaller basis* (Carbon 6,730 t "Scope 1+2", 9,900 MWh, 94,800 m³ → ~16 kgCO₂e/ORN) than `PORTFOLIO_HOTELS` (42,850 t / 84,200 MWh / 552,000 m³ → ~60 kgCO₂e/ORN, which property pages already show). NOT silently rederived here because it flips headlines + breaks 2030 targets. Reconcile both, with targets, in the carbon-spine task.
+
+## Prior status (2026-06-12)
 
 Latest commit: **`a0f443d`** on `main` (Vercel auto-deploys). `npm run lint` (= `tsc --noEmit`) passes clean; no runtime console errors.
 
