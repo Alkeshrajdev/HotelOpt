@@ -9,7 +9,7 @@
 
 ## Current status (updated 2026-06-15)
 
-Latest commit: **`a0f443d`** on `main` (Vercel auto-deploys). `npm run lint` (= `tsc --noEmit`) passes clean; no runtime console errors. **Working tree has uncommitted Task 1 changes (ORN normalisation) — not yet pushed.**
+Latest commit: **`0355c04`** on `main` (Vercel auto-deploys — Task 1 ORN normalisation + legacy-tool review). `npm run lint` (= `tsc --noEmit`) passes clean; no runtime console errors.
 
 ### Session 2026-06-15 — Legacy-vs-upcoming review + Task 1 (ORN normalisation)
 - **`REVIEW.md`** (repo root) — full review of the legacy "Hotel Optimiser" tool (from 4 `.xls` exports: Utilities Consumption, Utilities Performance & Carbon, Benchmark & Genuine Performance, Waste Performance) vs this upcoming React app. Inputs/outputs status tables, dashboard recommendations, avoid-list, and a critical-missing backlog.
