@@ -11,6 +11,12 @@
 
 Latest commit on `main` (Vercel auto-deploys): Task 1 (ORN normalisation) + Task 2 (carbon-spine / single-dataset reconciliation). `npm run lint` (= `tsc --noEmit`) passes clean; no runtime console errors.
 
+### Session 2026-06-15 (cont.) — Task 9: Audit-ready GHG export (DONE, verified)
+Built a structured, defensible GHG Inventory artifact tied to the canonical carbon spine (was just report-generation UI).
+- **`pages/GhgInventory.tsx`** (NEW) at route **`/reports/ghg-inventory`** — GHG-Protocol metadata (period FY2025, organisational boundary 10 hotels · operational control, base year 2019, GWP IPCC AR6 100-yr, Scope 2 location-headline + market-memo, offsets reported separately), assurance/data-confidence block, full **Scope 1/2/3 inventory table** by source (from `SCOPE1_BREAKDOWN` / `SCOPE2_METHODS` / `PORTFOLIO_SCOPE3_CATEGORIES`) with totals from `CARBON` (S1+2 17,997 · S3 24,853 · total 42,850 · 25.2 kgCO₂e/ORN), **emission-factor provenance** table (source · standard · version), and offsets-separate panel.
+- **Real CSV export** — `downloadCsv()` builds a Blob and downloads `GHG-Inventory-FY2025.csv` (metadata + inventory rows + totals). Verified functional.
+- **Wiring** — App route added; Reports "GHG Inventory" card now navigates to the inventory (was opening the generate modal). tsc clean; browser-verified; no console errors. **This closes the last Critical-build item in REVIEW.md.**
+
 ### Session 2026-06-15 (cont.) — Task 8: Targets vs actual + gap-to-2030 (DONE, verified)
 Replaced hardcoded, off-basis, all-"off-track" targets with a derived engine.
 - **`lib/targets.ts`** (NEW) — `portfolioTargets()` derives **current** from canonical helpers (carbon 25.2 kgCO₂e/ORN · energy 117.8 kWh/ORN · water 556 L/GN · waste 42% TRUE diversion — same basis as the efficiency tiles), targets **2030**, and computes progress, gap-to-2030, **required vs actual annual rate** (energy/carbon actual = consumption-weighted per-hotel YoY), and a real **on-track / at-risk / off-track** status (ratio of actual÷required rate). Also `targetsOffTrackCount()`.

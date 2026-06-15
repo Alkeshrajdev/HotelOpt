@@ -8,6 +8,7 @@ import DataCapture from "./pages/DataCapture";
 import ReviewApproval from "./pages/ReviewApproval";
 import PerformanceShell from "./pages/performance/Shell";
 import GenuinePortfolio from "./pages/performance/GenuinePortfolio";
+import GhgInventory from "./pages/GhgInventory";
 import Reports from "./pages/Reports";
 import Certifications from "./pages/Certifications";
 import Actions from "./pages/Actions";
@@ -87,6 +88,7 @@ export default function App() {
         <Route path="/carbon-inventory" element={<Navigate to="/performance/carbon/carbon-inventory" replace />} />
 
         <Route path="/reports" element={<Reports />} />
+        <Route path="/reports/ghg-inventory" element={<GhgInventory />} />
         <Route path="/certifications" element={<Certifications />} />
         <Route path="/actions" element={<Actions />} />
         <Route path="/supplier-portal" element={<SupplierPortal />} />

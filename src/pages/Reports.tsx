@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   Archive,
   Award,
@@ -140,6 +140,7 @@ const STATUS_TONE: Record<DisclosureStatus, "good" | "warn" | "info"> = {
 };
 
 export default function Reports() {
+  const navigate = useNavigate();
   const [genOpen, setGenOpen]         = useState(false);
   const [selectedType, setSelectedType] = useState<string | null>(null);
   const [intensityMode, setIntensityMode] = useState<IntensityMode>("absolute");
@@ -172,7 +173,10 @@ export default function Reports() {
           {REPORT_TYPES.map((rt) => (
             <button
               key={rt.id}
-              onClick={() => { setSelectedType(rt.id === selectedType ? null : rt.id); setGenOpen(true); }}
+              onClick={() => {
+                if (rt.id === "ghg") { navigate("/reports/ghg-inventory"); return; }
+                setSelectedType(rt.id === selectedType ? null : rt.id); setGenOpen(true);
+              }}
               className={cn(
                 "rounded-xl border p-4 text-left transition-all hover:shadow-card hover:-translate-y-0.5",
                 selectedType === rt.id
