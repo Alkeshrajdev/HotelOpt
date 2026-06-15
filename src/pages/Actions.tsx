@@ -150,7 +150,7 @@ const MEASURES: Measure[] = [
     capexClass: "mixed", capexAmount: 12000, capexCurrency: "DKK",
     paybackYears: 0.9, expectedImpactPct: 1.7, actualImpactPct: 2.0,
     co2eSaving: 12, priority: "medium", measureType: "behaviour",
-    trigger: "Diversion rate 64% — gap to 75% target",
+    trigger: "TRUE diversion 42% (excl WtE) — gap to 60% target",
     triggerLink: "/performance/waste/overview",
     owner: "F&B Manager", dueDate: "2026-06-01",
     stage: "completed", evidenceCount: 4, createsOpEvent: true, source: "library",

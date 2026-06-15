@@ -177,7 +177,7 @@ export function WasteDiversionDrilldown() {
   return (
     <div className="grid grid-cols-12 gap-4">
       <Card className="col-span-12 lg:col-span-7">
-        <CardHeader title="Diversion rate by property" />
+        <CardHeader title="Diversion rate by property" hint="incl. waste-to-energy" />
         <div className="p-6">
           <HBar data={WASTE.diversionByProperty} />
         </div>

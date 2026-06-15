@@ -11,7 +11,7 @@ import {
 import { ACTION_CENTRE } from "@/lib/mock";
 import {
   portfolioCostPerOrn, portfolioWaterPerGn, portfolioEnergyPerOrnTotal,
-  carbonS12PerOrn, PORTFOLIO, CARBON,
+  carbonS12PerOrn, PORTFOLIO, CARBON, wasteDiversionDual,
 } from "@/lib/normalise";
 import { cn } from "@/lib/utils";
 
@@ -163,8 +163,8 @@ const SNAP_TILES: SnapTile[] = [
   {
     icon: Recycle, iconBg: "bg-pillar-waste/10 text-pillar-waste",
     label: "Waste diversion",
-    value: "64%",
-    unit: "420 t generated",
+    value: `${wasteDiversionDual()}%`,
+    unit: "diversion · excl / incl WtE",
     delta: "+6 pp vs last year",
     deltaGood: true,
   },
@@ -207,10 +207,10 @@ const EFF_TILES: EffTile[] = [
   },
   {
     icon: Recycle, color: "#7C3AED", accentBg: "border-l-[#7C3AED]",
-    label: "Waste diversion", value: "64%", unit: "diversion rate",
+    label: "Waste diversion", value: `${wasteDiversionDual()}%`, unit: "TRUE / incl WtE",
     delta: 6.0,
-    progress: 54, // (64−45)/(80−45) = 54%
-    targetLabel: "Target 80% by 2030",
+    progress: 50, // TRUE 42%: (42−24)/(60−24)
+    targetLabel: "Target 60% by 2030 (excl WtE)",
   },
 ];
 

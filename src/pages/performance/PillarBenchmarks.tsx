@@ -38,7 +38,7 @@ const CONFIGS: Record<"water"|"waste"|"carbon", BenchCfg> = {
   },
   waste: {
     peers: [
-      { name:"You",    isYou:true,  intensity:11.78, diversion:64, costPerOrn:0.61, foodPerCover:82 },
+      { name:"You",    isYou:true,  intensity:11.78, diversion:54, costPerOrn:0.61, foodPerCover:82 },
       { name:"Peer A", isYou:false, intensity:9.01, diversion:74, costPerOrn:0.47, foodPerCover:62 },
       { name:"Peer B", isYou:false, intensity:10.63, diversion:69, costPerOrn:0.55, foodPerCover:72 },
       { name:"Peer C", isYou:false, intensity:13.63, diversion:58, costPerOrn:0.71, foodPerCover:96 },

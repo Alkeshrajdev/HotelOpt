@@ -18,6 +18,7 @@ import {
   SCOPE1_BREAKDOWN,
   SCOPE2_METHODS,
   PORTFOLIO_SCOPE3_CATEGORIES,
+  PORTFOLIO_WASTE_STREAMS,
 } from "./mock";
 
 /** The shape any intensity helper needs. PORTFOLIO_HOTELS rows satisfy this. */
@@ -165,3 +166,31 @@ export const hotelCarbon = (h: { energy_mwh: number; carbon_t: number; orn: numb
     totalPerOrn: (h.carbon_t * 1000) / h.orn,
   };
 };
+
+// ── Waste diversion — WtE kept separate, never folded into the green number ──
+// Two defensible metrics: TRUE diversion EXCLUDES waste-to-energy (recycling +
+// composting + donation only); landfill diversion INCLUDES WtE. Reported side
+// by side so incineration can't inflate the headline.
+const wasteTonnes = (name: string) =>
+  PORTFOLIO_WASTE_STREAMS.find((s) => s.stream === name)?.tonnes ?? 0;
+
+export const WASTE = {
+  total:     PORTFOLIO_WASTE_STREAMS.reduce((s, x) => s + x.tonnes, 0), // 8,420 t
+  recycled:  wasteTonnes("Recycled"),
+  composted: wasteTonnes("Composted"),
+  wte:       wasteTonnes("Energy rec."),
+  landfill:  wasteTonnes("Landfill"),
+} as const;
+
+/** TRUE diversion — recycling + composting, EXCLUDING WtE (%). */
+export const wasteDiversionExclWte = () =>
+  ((WASTE.recycled + WASTE.composted) / WASTE.total) * 100; // 41.9
+/** Landfill diversion — INCLUDING WtE (%). */
+export const wasteDiversionInclWte = () =>
+  ((WASTE.recycled + WASTE.composted + WASTE.wte) / WASTE.total) * 100; // 53.9
+export const wasteWtePct = () => (WASTE.wte / WASTE.total) * 100;        // 12.0
+export const wasteLandfillPct = () => (WASTE.landfill / WASTE.total) * 100; // 46.1
+
+/** "42 / 54" dual headline — TRUE excl WtE / landfill incl WtE. */
+export const wasteDiversionDual = () =>
+  `${wasteDiversionExclWte().toFixed(0)} / ${wasteDiversionInclWte().toFixed(0)}`;

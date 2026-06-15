@@ -55,7 +55,7 @@ export const WATER = {
 /* -------- WASTE -------- */
 const WASTE_KPIS: PillarKpiSpec[] = [
   { id: "waste-intensity", label: "Waste / ORN",        value: "11.78", unit: "kg/ORN", delta: -2.4,                       drilldown: "waste-intensity" },
-  { id: "diversion",       label: "Diversion rate",     value: "64",    unit: "%",     delta: 5.1,  goodDirection: "up",   drilldown: "diversion" },
+  { id: "diversion",       label: "Diversion (excl/incl WtE)", value: "42 / 54", unit: "%", delta: 5.1, goodDirection: "up",   drilldown: "diversion" },
   { id: "food-waste",      label: "Food waste / cover", value: "82",    unit: "g",     delta: 8.6,                          drilldown: "food-waste" },
   { id: "landfill",        label: "Landfill diverted",  value: "1,260", unit: "tCO₂e", delta: 14,   goodDirection: "up",   drilldown: "diversion" },
 ];

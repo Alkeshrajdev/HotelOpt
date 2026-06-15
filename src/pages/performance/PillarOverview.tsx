@@ -110,7 +110,7 @@ const CONFIGS: Record<"water"|"waste"|"carbon", PillarCfg> = {
     kpis: [
       { label:"Total generated",  value:"8,420", unit:"t",      delta:-9.7, goodDir:"down", iconBg:"bg-pillar-waste/10 text-pillar-waste" },
       { label:"Waste intensity",  value:"11.78", unit:"kg/ORN", delta:-10.0,goodDir:"down", iconBg:"bg-warn/10 text-warn" },
-      { label:"Diversion rate",   value:"64",    unit:"%",      delta: 6.0, goodDir:"up",  iconBg:"bg-brand-50 text-brand-700" },
+      { label:"Diversion (excl/incl WtE)", value:"42 / 54", unit:"%", delta: 6.0, goodDir:"up",  iconBg:"bg-brand-50 text-brand-700" },
       { label:"Food waste",       value:"82",    unit:"g/cover",delta:-8.0, goodDir:"down", iconBg:"bg-pillar-waste/10 text-pillar-waste" },
     ],
   },
