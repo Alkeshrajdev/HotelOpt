@@ -1,6 +1,8 @@
 import { useState } from "react";
 import {
   AlertTriangle,
+  Building2,
+  Calendar,
   Check,
   CheckCircle2,
   Copy,
@@ -11,9 +13,11 @@ import {
   EyeOff,
   Key,
   Mail,
+  Minus,
   Plus,
   Receipt,
   RefreshCw,
+  RotateCcw,
   Settings,
   ShieldCheck,
   Sparkles,
@@ -26,13 +30,14 @@ import PageHeader from "@/components/ui/PageHeader";
 import { Card, CardHeader } from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import Modal from "@/components/ui/Modal";
+import { PROPERTIES } from "@/lib/propertiesData";
 import { cn } from "@/lib/utils";
 
 /* ------------------------------------------------------------------ */
 /* Types                                                                */
 /* ------------------------------------------------------------------ */
 
-type BillingTab = "billing" | "seats" | "apikeys";
+type BillingTab = "billing" | "payments" | "seats" | "apikeys";
 
 type AccessStatus  = "active" | "grace" | "suspended";
 type InvoiceStatus = "paid" | "due" | "failed" | "grace";
@@ -109,12 +114,13 @@ export default function Billing() {
       />
 
       <div className="flex gap-1 border-b border-ink-200">
-        {([["billing","Billing & Plan"],["seats","Seat management"],["apikeys","API keys"]] as [BillingTab,string][]).map(([key,label]) => (
+        {([["billing","Billing & Plan"],["payments","Payments & tracking"],["seats","Seat management"],["apikeys","API keys"]] as [BillingTab,string][]).map(([key,label]) => (
           <button key={key} onClick={() => setTab(key)} className={cn("tab text-[13px] pb-3 px-4", tab === key && "tab-active")}>{label}</button>
         ))}
       </div>
 
       {tab === "billing"  && <BillingTab />}
+      {tab === "payments" && <PaymentsTab />}
       {tab === "seats"    && <SeatsTab />}
       {tab === "apikeys"  && <ApiKeysTab />}
     </div>
@@ -470,6 +476,171 @@ function ApiKeysTab() {
         </div>
       </Modal>
     </>
+  );
+}
+
+/* ================================================================== */
+/* Tab — Payments & tracking (full billing ops)                        */
+/* ================================================================== */
+
+type PaymentStatus = "succeeded" | "failed" | "refunded" | "pending";
+const PAY_TONE: Record<PaymentStatus, "good" | "warn" | "bad" | "info"> = { succeeded: "good", failed: "bad", refunded: "info", pending: "warn" };
+
+const PAYMENTS: { id: string; date: string; desc: string; amount: number; method: string; status: PaymentStatus; ref: string }[] = [
+  { id: "PAY-1042", date: "15 Mar 2026", desc: "INV-2026-Q1 · Quarterly licence", amount: 48000,   method: "Visa •••• 4242", status: "succeeded", ref: "ch_3Nq8aF" },
+  { id: "PAY-1041", date: "22 Feb 2026", desc: "AI / OCR overage · Jan",          amount: 312.40,  method: "Visa •••• 4242", status: "succeeded", ref: "ch_3Np2bL" },
+  { id: "PAY-1040", date: "12 Dec 2025", desc: "INV-2025-Q4 · Quarterly licence", amount: 48000,   method: "Visa •••• 4242", status: "succeeded", ref: "ch_3Mp7cR" },
+  { id: "PAY-1039", date: "29 Nov 2025", desc: "INV-2025-Q4 · first attempt",      amount: 48000,   method: "Visa •••• 4242", status: "failed",    ref: "ch_3Mn1dT" },
+  { id: "PAY-1038", date: "18 Sep 2025", desc: "INV-2025-Q3 · Quarterly licence", amount: 48000,   method: "ACH · Bank of America", status: "succeeded", ref: "py_3Lk5eV" },
+  { id: "PAY-1037", date: "05 Sep 2025", desc: "Refund · duplicate charge",        amount: -1800,   method: "Visa •••• 4242", status: "refunded",  ref: "re_3Lj9fW" },
+];
+
+const CREDIT_NOTES: { id: string; date: string; reason: string; amount: number; status: string }[] = [
+  { id: "CN-014", date: "05 Sep 2025", reason: "5-property bundle credit",  amount: 1800, status: "Applied" },
+  { id: "CN-013", date: "01 Jul 2025", reason: "Onboarding goodwill credit", amount: 1200, status: "Applied" },
+];
+
+function PaymentsTab() {
+  const [addProps, setAddProps] = useState(1);
+
+  const outstanding   = 48000;            // INV-2026-Q2 (due 30 May, now overdue)
+  const overdueDays   = 16;
+  const paidYtd       = 48312.40;
+  const lifetime      = PAYMENTS.filter((p) => p.status === "succeeded").reduce((s, p) => s + p.amount, 0) + 144000;
+  const renewDays     = 199;              // to 31 Dec 2026
+  const prorationProp = Math.round(PLAN.perPropertyFee * (renewDays / 365));
+  const proration     = prorationProp * addProps;
+  const perPropAnnual = Math.round((PLAN.baseFee + PLAN.whiteLabelLicenceFee) / PLAN.propertiesUsed) + PLAN.perPropertyFee; // 5,400
+
+  return (
+    <div className="space-y-4">
+      {/* Dunning banner */}
+      <Card className="border-bad/25 bg-bad/5 card-pad flex items-start gap-3">
+        <AlertTriangle size={18} className="text-bad mt-0.5 shrink-0" />
+        <div className="text-[13px] text-bad">
+          <strong>Invoice INV-2026-Q2 is {overdueDays} days overdue</strong> (USD {outstanding.toLocaleString()}, due 30 May 2026).
+          A retry is scheduled; submissions stay enabled during the grace window. Settle to avoid suspension.
+        </div>
+        <button className="btn-primary h-8 px-3 text-[12px] ml-auto shrink-0"><CreditCard size={13} /> Pay now</button>
+      </Card>
+
+      {/* Summary */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <Tile label="Outstanding"  value={`$${outstanding.toLocaleString()}`} hint={`overdue ${overdueDays}d`} tone="bad" />
+        <Tile label="Next charge"  value={`$${outstanding.toLocaleString()}`} hint="31 Dec 2026 · renewal" tone="info" />
+        <Tile label="Paid YTD"     value={`$${paidYtd.toLocaleString()}`}     hint="2026 to date" tone="good" />
+        <Tile label="Lifetime"     value={`$${Math.round(lifetime).toLocaleString()}`} hint="since 2024" tone="brand" />
+      </div>
+
+      {/* Payment history */}
+      <Card>
+        <CardHeader title="Payment history" hint="Charges, retries, refunds · Stripe-backed" right={<button className="btn-secondary"><Download size={14} /> Export</button>} />
+        <div className="overflow-x-auto">
+          <table className="min-w-full">
+            <thead><tr className="bg-ink-50">
+              <th className="table-th">Date</th><th className="table-th">Description</th><th className="table-th">Method</th>
+              <th className="table-th text-right">Amount</th><th className="table-th">Status</th><th className="table-th">Reference</th>
+              <th className="table-th text-right pr-6">Receipt</th>
+            </tr></thead>
+            <tbody>
+              {PAYMENTS.map((p) => (
+                <tr key={p.id} className="hover:bg-ink-50/60">
+                  <td className="table-td whitespace-nowrap">{p.date}</td>
+                  <td className="table-td font-medium text-ink-900">{p.desc}</td>
+                  <td className="table-td text-ink-600 text-[12px]">{p.method}</td>
+                  <td className={cn("table-td text-right tabular-nums font-medium", p.amount < 0 && "text-info")}>
+                    {p.amount < 0 ? "−" : ""}${Math.abs(p.amount).toLocaleString(undefined, { minimumFractionDigits: p.amount % 1 ? 2 : 0 })}
+                  </td>
+                  <td className="table-td"><Badge tone={PAY_TONE[p.status]} className="capitalize">{p.status}</Badge></td>
+                  <td className="table-td font-mono text-[11px] text-ink-500">{p.ref}</td>
+                  <td className="table-td text-right pr-6">
+                    {p.status === "succeeded" || p.status === "refunded"
+                      ? <button className="btn-ghost h-7 px-2 text-[12px] text-brand-700"><Download size={12} /> PDF</button>
+                      : <span className="text-[12px] text-ink-300">—</span>}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </Card>
+
+      <div className="grid grid-cols-12 gap-4">
+        {/* Per-property cost breakdown */}
+        <Card className="col-span-12 lg:col-span-7">
+          <CardHeader title="Cost by property" hint={`USD ${perPropAnnual.toLocaleString()} / property / year · base + licence allocation`} />
+          <div className="overflow-x-auto max-h-[300px]">
+            <table className="min-w-full text-sm">
+              <thead><tr className="bg-ink-50 text-left sticky top-0">
+                <th className="table-th">Property</th><th className="table-th">Region</th><th className="table-th text-right">Annual</th>
+              </tr></thead>
+              <tbody>
+                {PROPERTIES.map((p) => (
+                  <tr key={p.id} className="border-t border-ink-100">
+                    <td className="table-td font-medium"><span className="inline-flex items-center gap-1.5"><Building2 size={12} className="text-brand-700" />{p.name}</span></td>
+                    <td className="table-td text-ink-500">{p.region}</td>
+                    <td className="table-td text-right tabular-nums">${perPropAnnual.toLocaleString()}</td>
+                  </tr>
+                ))}
+              </tbody>
+              <tfoot>
+                <tr className="border-t-2 border-ink-200 font-semibold bg-ink-50">
+                  <td className="table-td" colSpan={2}>Total · {PROPERTIES.length} properties</td>
+                  <td className="table-td text-right tabular-nums">${(perPropAnnual * PROPERTIES.length).toLocaleString()}</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </Card>
+
+        <div className="col-span-12 lg:col-span-5 space-y-4">
+          {/* Proration preview */}
+          <Card>
+            <CardHeader title="Proration preview" hint="Mid-cycle property change" />
+            <div className="p-5 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-[13px] text-ink-600">Add properties now</span>
+                <div className="inline-flex items-center gap-2">
+                  <button className="btn-secondary h-7 w-7 p-0 grid place-items-center" onClick={() => setAddProps((n) => Math.max(0, n - 1))}><Minus size={13} /></button>
+                  <span className="w-6 text-center font-semibold tabular-nums">{addProps}</span>
+                  <button className="btn-secondary h-7 w-7 p-0 grid place-items-center" onClick={() => setAddProps((n) => n + 1)}><Plus size={13} /></button>
+                </div>
+              </div>
+              <div className="rounded-xl bg-brand-50 border border-brand-100 p-3 text-[13px] text-brand-900 flex items-start gap-2">
+                <Calendar size={14} className="text-brand-700 mt-0.5 shrink-0" />
+                <span>
+                  Prorated charge today: <strong>USD {proration.toLocaleString()}</strong>
+                  {addProps > 0 && <> ({renewDays} days to renewal at ${PLAN.perPropertyFee}/property/yr)</>}.
+                  Renewal then bills <strong>${((PLAN.propertiesUsed + addProps) * perPropAnnual).toLocaleString()}/yr</strong>.
+                </span>
+              </div>
+            </div>
+          </Card>
+
+          {/* Credit notes */}
+          <Card>
+            <CardHeader title="Credit notes" hint="Applied to invoices" />
+            <div className="p-4 space-y-2">
+              {CREDIT_NOTES.map((c) => (
+                <div key={c.id} className="flex items-center justify-between rounded-xl border border-ink-200 px-3 py-2">
+                  <div className="flex items-center gap-2">
+                    <RotateCcw size={13} className="text-info shrink-0" />
+                    <div>
+                      <div className="text-[13px] font-medium text-ink-900">{c.reason}</div>
+                      <div className="text-[11px] text-ink-400">{c.id} · {c.date}</div>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-[13px] font-semibold text-good tabular-nums">−${c.amount.toLocaleString()}</div>
+                    <Badge tone="good">{c.status}</Badge>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
+        </div>
+      </div>
+    </div>
   );
 }
 
