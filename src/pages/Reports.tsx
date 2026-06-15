@@ -6,6 +6,7 @@ import {
   Bell,
   BarChart2,
   Calendar,
+  CheckCircle2,
   ChevronDown,
   ChevronRight,
   Download,
@@ -28,6 +29,7 @@ import PageHeader from "@/components/ui/PageHeader";
 import { Card, CardHeader } from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import ProgressBar from "@/components/ui/ProgressBar";
+import Modal from "@/components/ui/Modal";
 import GenerateReportModal from "@/components/reports/GenerateReportModal";
 import { RECENT_REPORTS, REPORTS } from "@/lib/mock";
 import { cn } from "@/lib/utils";
@@ -139,9 +141,154 @@ const STATUS_TONE: Record<DisclosureStatus, "good" | "warn" | "info"> = {
   draft:     "warn",
 };
 
+/* ── Report availability tracker ─────────────────────────────────────────── */
+type TrackStatus = "available" | "pending" | "overdue" | "na";
+const TRACK_TONE: Record<TrackStatus, string> = {
+  available: "bg-good", pending: "bg-warn", overdue: "bg-bad", na: "bg-ink-200",
+};
+const TRACK_BADGE: Record<TrackStatus, "good" | "warn" | "bad" | "neutral"> = {
+  available: "good", pending: "warn", overdue: "bad", na: "neutral",
+};
+
+const REPORT_TRACKER: {
+  id: string; name: string; cadence: "Monthly" | "Quarterly" | "Annual";
+  owner: string; status: TrackStatus; nextDue: string;
+  periods: { label: string; status: TrackStatus }[];
+}[] = [
+  { id: "t-1", name: "Operational utilities summary", cadence: "Monthly", owner: "Priya Nair", status: "overdue", nextDue: "due 5 Jun 2026",
+    periods: [ {label:"Jan",status:"available"},{label:"Feb",status:"available"},{label:"Mar",status:"available"},{label:"Apr",status:"available"},{label:"May",status:"available"},{label:"Jun",status:"overdue"} ] },
+  { id: "t-2", name: "GHG Inventory (Scope 1/2/3)", cadence: "Quarterly", owner: "Sarah Chen", status: "pending", nextDue: "due 15 Jul 2026",
+    periods: [ {label:"Q3'25",status:"available"},{label:"Q4'25",status:"available"},{label:"Q1'26",status:"available"},{label:"Q2'26",status:"pending"} ] },
+  { id: "t-3", name: "Board sustainability pack", cadence: "Quarterly", owner: "Sarah Chen", status: "available", nextDue: "next Q3 '26",
+    periods: [ {label:"Q3'25",status:"available"},{label:"Q4'25",status:"available"},{label:"Q1'26",status:"available"},{label:"Q2'26",status:"available"} ] },
+  { id: "t-4", name: "ESG / GRI disclosure", cadence: "Annual", owner: "Layla Al-Hassan", status: "pending", nextDue: "due 30 Sep 2026",
+    periods: [ {label:"2022",status:"available"},{label:"2023",status:"available"},{label:"2024",status:"available"},{label:"2025",status:"pending"} ] },
+  { id: "t-5", name: "Water stewardship (GRI 303)", cadence: "Annual", owner: "Jin Park", status: "na", nextDue: "from FY2026",
+    periods: [ {label:"2022",status:"na"},{label:"2023",status:"available"},{label:"2024",status:"available"},{label:"2025",status:"pending"} ] },
+];
+
+const REMINDER_CONTACTS = [
+  { id: "p1", name: "Priya Nair",      email: "priya.nair@skyline.hotel",   role: "Property SM · Skyline Dubai" },
+  { id: "p2", name: "James Okafor",    email: "james.o@bayview.hotel",       role: "Maker · Bay View Singapore" },
+  { id: "p3", name: "Sarah Chen",      email: "sarah.chen@acme.group",       role: "Corporate SM" },
+  { id: "p4", name: "Layla Al-Hassan", email: "layla.h@acme.group",          role: "Compliance Lead" },
+  { id: "p5", name: "Jin Park",        email: "jin.park@acme.group",         role: "Water Lead" },
+];
+
+function ReportTracker({ onRemind }: { onRemind: (name: string) => void }) {
+  return (
+    <Card>
+      <CardHeader
+        title="Report availability tracker"
+        hint="Monthly · quarterly · annual — what's ready, pending, or overdue"
+        right={<button className="btn-secondary h-8 px-3 text-[12px]" onClick={() => onRemind("")}><Bell size={13} /> Send reminder</button>}
+      />
+      <div className="overflow-x-auto">
+        <table className="min-w-full text-sm">
+          <thead><tr className="bg-ink-50 text-left">
+            <th className="table-th">Report</th>
+            <th className="table-th">Cadence</th>
+            <th className="table-th">Recent periods</th>
+            <th className="table-th">Status</th>
+            <th className="table-th">Next due</th>
+            <th className="table-th text-right pr-6">Action</th>
+          </tr></thead>
+          <tbody>
+            {REPORT_TRACKER.map((r) => (
+              <tr key={r.id} className="border-t border-ink-100 hover:bg-ink-50/60">
+                <td className="table-td font-medium text-ink-900">{r.name}</td>
+                <td className="table-td"><Badge tone="info">{r.cadence}</Badge></td>
+                <td className="table-td">
+                  <div className="flex items-center gap-1.5">
+                    {r.periods.map((p) => (
+                      <span key={p.label} className="flex flex-col items-center gap-0.5" title={`${p.label}: ${p.status}`}>
+                        <span className={cn("w-3.5 h-3.5 rounded-full", TRACK_TONE[p.status])} />
+                        <span className="text-[9px] text-ink-400">{p.label}</span>
+                      </span>
+                    ))}
+                  </div>
+                </td>
+                <td className="table-td"><Badge tone={TRACK_BADGE[r.status]} className="capitalize">{r.status === "na" ? "Not due" : r.status}</Badge></td>
+                <td className="table-td text-ink-500 text-[12px]">{r.nextDue}</td>
+                <td className="table-td text-right pr-6">
+                  {(r.status === "overdue" || r.status === "pending")
+                    ? <button className="btn-ghost h-7 px-2 text-[12px] text-brand-700" onClick={() => onRemind(r.name)}><Bell size={11} /> Remind {r.owner.split(" ")[0]}</button>
+                    : <span className="text-[12px] text-ink-300">—</span>}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <div className="px-5 py-2.5 border-t border-ink-100 flex items-center gap-3 text-[11px] text-ink-400">
+        {(["available","pending","overdue","na"] as TrackStatus[]).map((s) => (
+          <span key={s} className="inline-flex items-center gap-1"><span className={cn("w-2.5 h-2.5 rounded-full", TRACK_TONE[s])} />{s === "na" ? "Not due" : s}</span>
+        ))}
+      </div>
+    </Card>
+  );
+}
+
+function ReminderModal({ open, target, onClose }: { open: boolean; target: string | null; onClose: () => void }) {
+  const [selected, setSelected] = useState<string[]>([]);
+  const [msg, setMsg] = useState("");
+  const [sent, setSent] = useState(false);
+
+  const targetLabel = target || "selected data / reports";
+  const toggle = (id: string) => setSelected((s) => s.includes(id) ? s.filter((x) => x !== id) : [...s, id]);
+  const send = () => { setSent(true); setTimeout(() => { setSent(false); setSelected([]); setMsg(""); onClose(); }, 1100); };
+
+  return (
+    <Modal open={open} onClose={onClose} title="Send reminder" size="md">
+      {sent ? (
+        <div className="p-8 flex flex-col items-center gap-3">
+          <div className="w-12 h-12 rounded-full bg-good/10 grid place-items-center text-good"><CheckCircle2 size={22} /></div>
+          <div className="text-sm font-semibold text-ink-900">Reminder sent</div>
+          <div className="text-[12px] text-ink-500 text-center">{selected.length} recipient{selected.length === 1 ? "" : "s"} notified about {targetLabel}.</div>
+        </div>
+      ) : (
+        <>
+          <div className="p-5 space-y-4">
+            <div>
+              <label className="block text-[12px] font-medium text-ink-700 mb-1">Regarding</label>
+              <input className="input w-full" defaultValue={target || ""} placeholder="e.g. Q2 GHG Inventory · electricity data" id="reminder-subject" />
+            </div>
+            <div>
+              <label className="block text-[12px] font-medium text-ink-700 mb-1">Recipients</label>
+              <div className="space-y-1.5 max-h-[200px] overflow-y-auto">
+                {REMINDER_CONTACTS.map((c) => (
+                  <label key={c.id} className={cn("flex items-center gap-2.5 rounded-xl border px-3 py-2 cursor-pointer", selected.includes(c.id) ? "border-brand-300 bg-brand-50/50" : "border-ink-200")}>
+                    <input type="checkbox" checked={selected.includes(c.id)} onChange={() => toggle(c.id)} className="accent-brand-600" />
+                    <div className="min-w-0">
+                      <div className="text-[13px] font-medium text-ink-900 truncate">{c.name}</div>
+                      <div className="text-[11px] text-ink-400 truncate">{c.role} · {c.email}</div>
+                    </div>
+                  </label>
+                ))}
+              </div>
+            </div>
+            <div>
+              <label className="block text-[12px] font-medium text-ink-700 mb-1">Message <span className="text-ink-400">(optional)</span></label>
+              <textarea className="input w-full h-20" placeholder="Add a note…" value={msg} onChange={(e) => setMsg(e.target.value)} />
+            </div>
+          </div>
+          <div className="flex justify-between items-center px-5 pb-5 pt-2 border-t border-ink-200">
+            <span className="text-[12px] text-ink-400">{selected.length} selected</span>
+            <div className="flex gap-2">
+              <button className="btn-secondary" onClick={onClose}>Cancel</button>
+              <button className="btn-primary" onClick={send} disabled={selected.length === 0}><Mail size={13} /> Send reminder</button>
+            </div>
+          </div>
+        </>
+      )}
+    </Modal>
+  );
+}
+
 export default function Reports() {
   const navigate = useNavigate();
   const [genOpen, setGenOpen]         = useState(false);
+  const [reminderFor, setReminderFor] = useState<string | null>(null);
   const [selectedType, setSelectedType] = useState<string | null>(null);
   const [intensityMode, setIntensityMode] = useState<IntensityMode>("absolute");
   const [mappingOpen, setMappingOpen] = useState(true);
@@ -197,6 +344,9 @@ export default function Reports() {
           ))}
         </div>
       </Card>
+
+      {/* Report availability tracker + reminders */}
+      <ReportTracker onRemind={(name) => setReminderFor(name)} />
 
       {/* RE&O Certificate evidence panel */}
       <CertificateEvidencePanel />
@@ -465,6 +615,7 @@ export default function Reports() {
       </div>
 
       <GenerateReportModal open={genOpen} onClose={() => setGenOpen(false)} />
+      <ReminderModal open={reminderFor !== null} target={reminderFor} onClose={() => setReminderFor(null)} />
     </div>
   );
 }
