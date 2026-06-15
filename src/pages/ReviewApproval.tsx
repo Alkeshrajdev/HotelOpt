@@ -54,6 +54,7 @@ import { Card, CardHeader } from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import EmptyState from "@/components/ui/EmptyState";
 import CommentDialog, { type CommentAction } from "@/components/review/CommentDialog";
+import { useAccount } from "@/lib/account";
 import {
   RECORDS as INITIAL_RECORDS,
   ROLE_LABEL,
@@ -68,7 +69,7 @@ import {
 import { cn } from "@/lib/utils";
 
 type DetailTab = "details" | "evidence" | "comments" | "ai-ocr" | "audit";
-type PageTab = "queue" | "status";
+type PageTab = "queue" | "status" | "platform";
 
 /* ------------------------------------------------------------------ */
 /* Capture Status types & mock data                                     */
@@ -161,6 +162,7 @@ export default function ReviewApproval() {
   const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
   const [tab, setTab] = useState<DetailTab>("details");
   const [pageTab, setPageTab] = useState<PageTab>("queue");
+  const { account } = useAccount();
 
   const properties = useMemo(
     () => Array.from(new Set(INITIAL_RECORDS.map((r) => r.property))).sort(),
@@ -325,7 +327,7 @@ export default function ReviewApproval() {
 
       {/* Page-level tab strip */}
       <div className="flex gap-0.5 border-b border-ink-100 -mt-1">
-        {([["queue", "Approval Queue"], ["status", "Capture Status"]] as const).map(([key, label]) => (
+        {([["queue", "Approval Queue"], ["status", "Capture Status"], ...(account.platformReview ? [["platform", "Platform Review"]] : [])] as [PageTab, string][]).map(([key, label]) => (
           <button
             key={key}
             onClick={() => setPageTab(key)}
@@ -342,6 +344,8 @@ export default function ReviewApproval() {
       </div>
 
       {pageTab === "status" && <CaptureStatusTab />}
+
+      {pageTab === "platform" && <PlatformReviewTab />}
 
       {pageTab === "queue" && <>
       {/* Summary cards */}
@@ -541,6 +545,87 @@ export default function ReviewApproval() {
         onConfirm={(c) => transition(dialog.action, c)}
       />
       </>}
+    </div>
+  );
+}
+
+/* =================================================================== */
+/* Platform Review Tab — optional 2nd-layer QC                          */
+/* =================================================================== */
+
+type PlatformItem = {
+  id: string; property: string; dataType: string; pillar: string;
+  period: string; companyApprover: string; approvedOn: string; value: string;
+  state: "pending" | "approved" | "bypassed";
+};
+
+const PLATFORM_INITIAL: PlatformItem[] = [
+  { id: "PR-2041", property: "Skyline Dubai",        dataType: "Electricity",  pillar: "Energy", period: "May 2026", companyApprover: "Lucia Fernández", approvedOn: "12 Jun 2026", value: "742,800 kWh", state: "pending" },
+  { id: "PR-2040", property: "Bay View Singapore",   dataType: "District cooling", pillar: "Energy", period: "May 2026", companyApprover: "James Okafor", approvedOn: "12 Jun 2026", value: "612,400 kWh", state: "pending" },
+  { id: "PR-2039", property: "The Pavilion London",  dataType: "Refrigerant",  pillar: "Carbon", period: "Q2 2026", companyApprover: "Sophie Laurent", approvedOn: "11 Jun 2026", value: "R-410A · 18 kg", state: "pending" },
+  { id: "PR-2038", property: "Grand Harbour Lisbon", dataType: "Water",        pillar: "Water",  period: "May 2026", companyApprover: "Carlos Mendoza", approvedOn: "10 Jun 2026", value: "5,930 m³", state: "pending" },
+];
+
+function PlatformReviewTab() {
+  const [items, setItems] = useState<PlatformItem[]>(PLATFORM_INITIAL);
+  const set = (id: string, state: PlatformItem["state"]) =>
+    setItems((xs) => xs.map((x) => x.id === id ? { ...x, state } : x));
+
+  const pending = items.filter((i) => i.state === "pending").length;
+
+  return (
+    <div className="space-y-4">
+      <div className="rounded-xl bg-brand-50 border border-brand-100 p-3 flex items-start gap-2.5">
+        <ShieldCheck size={16} className="text-brand-700 mt-0.5 shrink-0" />
+        <div className="text-[13px] text-brand-900">
+          <strong>Second-layer QC.</strong> These records are already approved by the company's checker.
+          Give a final platform sign-off, or bypass to accept the company approval as-is. Enabled per account in
+          Admin → Clients.
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        <SummaryCard label="Awaiting platform sign-off" value={pending} icon={<ShieldAlert size={14} />} tone="warn" />
+        <SummaryCard label="Platform-approved" value={items.filter((i) => i.state === "approved").length} icon={<CheckCircle2 size={14} />} tone="good" />
+        <SummaryCard label="Bypassed" value={items.filter((i) => i.state === "bypassed").length} icon={<ArrowRight size={14} />} tone="info" />
+      </div>
+
+      <Card>
+        <CardHeader title="Company-approved · awaiting platform review" hint={`${pending} pending`} />
+        <div className="overflow-x-auto">
+          <table className="min-w-full text-sm">
+            <thead><tr className="bg-ink-50 text-left">
+              <th className="table-th">Record</th><th className="table-th">Property</th><th className="table-th">Data</th>
+              <th className="table-th">Period</th><th className="table-th">Company approver</th><th className="table-th">State</th>
+              <th className="table-th text-right pr-6">Platform action</th>
+            </tr></thead>
+            <tbody>
+              {items.map((i) => (
+                <tr key={i.id} className="border-t border-ink-100 hover:bg-ink-50/60">
+                  <td className="table-td font-mono text-[12px] text-ink-600">{i.id}</td>
+                  <td className="table-td font-medium text-ink-900">{i.property}</td>
+                  <td className="table-td">{i.dataType} <span className="text-ink-400 text-[12px]">· {i.value}</span></td>
+                  <td className="table-td text-ink-500 text-[12px]">{i.period}</td>
+                  <td className="table-td text-[12px]"><span className="inline-flex items-center gap-1"><Check size={11} className="text-good" />{i.companyApprover} · {i.approvedOn}</span></td>
+                  <td className="table-td">
+                    <Badge tone={i.state === "approved" ? "good" : i.state === "bypassed" ? "info" : "warn"} className="capitalize">{i.state === "pending" ? "Pending" : i.state}</Badge>
+                  </td>
+                  <td className="table-td text-right pr-6">
+                    {i.state === "pending" ? (
+                      <div className="flex items-center justify-end gap-1">
+                        <button className="btn-ghost h-7 px-2 text-[12px] text-ink-600" onClick={() => set(i.id, "bypassed")}>Bypass</button>
+                        <button className="btn-primary h-7 px-2.5 text-[12px]" onClick={() => set(i.id, "approved")}><Check size={11} /> Approve</button>
+                      </div>
+                    ) : (
+                      <button className="btn-ghost h-7 px-2 text-[12px] text-ink-400" onClick={() => set(i.id, "pending")}>Undo</button>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </Card>
     </div>
   );
 }

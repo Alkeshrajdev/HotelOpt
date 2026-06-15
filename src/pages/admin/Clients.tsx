@@ -107,7 +107,7 @@ function Switch({ on, onClick, disabled }: { on: boolean; onClick: () => void; d
  * it doubles as the way to preview the single-hotel experience.
  */
 function ProvisioningCard() {
-  const { account, setAccountType, toggleModule, setSingleHotelId, reset } = useAccount();
+  const { account, setAccountType, toggleModule, setSingleHotelId, setPlatformReview, reset } = useAccount();
   const isSingle = account.accountType === "single";
 
   return (
@@ -180,6 +180,22 @@ function ProvisioningCard() {
           <p className="text-[11px] text-ink-400 mt-2">
             Data Capture, Review &amp; Approval, Reports, Certifications, Billing and Admin are core — always available.
           </p>
+        </div>
+
+        {/* Quality control */}
+        <div>
+          <div className="text-[11px] uppercase tracking-wide font-semibold text-ink-500 mb-2">Quality control</div>
+          <div className="flex items-center justify-between rounded-xl border border-ink-200 px-3 py-2">
+            <div>
+              <div className="text-[13px] font-medium text-ink-900">Platform review · 2nd-layer QC <span className="text-[10px] text-ink-400 font-normal">(optional)</span></div>
+              <div className="text-[11px] text-ink-400">
+                {account.platformReview
+                  ? "On — company-approved records require a platform sign-off before they're final."
+                  : "Bypassed — the company approver's sign-off is final."}
+              </div>
+            </div>
+            <Switch on={account.platformReview} onClick={() => setPlatformReview(!account.platformReview)} />
+          </div>
         </div>
       </div>
     </Card>

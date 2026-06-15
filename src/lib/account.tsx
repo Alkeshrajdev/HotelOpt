@@ -31,6 +31,9 @@ export type AccountEntitlements = {
   singleHotelId: string;
   clientName: string;
   modules: Record<ModuleKey, boolean>;
+  /** Optional 2nd-layer QC: after the company approver signs off, records go to
+   *  a platform-admin review queue. Off = bypass (company approval is final). */
+  platformReview: boolean;
 };
 
 const DEFAULT: AccountEntitlements = {
@@ -38,6 +41,7 @@ const DEFAULT: AccountEntitlements = {
   singleHotelId: "p-001", // Skyline Dubai — GP-ready flagship
   clientName: "Acme Hotels",
   modules: { portfolio: true, smartOps: true, engagement: true, performance: true, marketplace: true, actions: true },
+  platformReview: false,
 };
 
 const KEY = "ho_account";
@@ -61,6 +65,7 @@ type AccountContextValue = {
   setAccountType: (t: "single" | "portfolio") => void;
   toggleModule: (m: ModuleKey) => void;
   setSingleHotelId: (id: string) => void;
+  setPlatformReview: (v: boolean) => void;
   reset: () => void;
 };
 
@@ -85,6 +90,7 @@ export function AccountProvider({ children }: { children: ReactNode }) {
     setAccountType: (t) => persist({ ...account, accountType: t }),
     toggleModule: (m) => persist({ ...account, modules: { ...account.modules, [m]: !account.modules[m] } }),
     setSingleHotelId: (id) => persist({ ...account, singleHotelId: id }),
+    setPlatformReview: (v) => persist({ ...account, platformReview: v }),
     reset: () => persist(DEFAULT),
   }), [account, persist]);
 

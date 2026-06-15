@@ -11,6 +11,14 @@
 
 Latest commit on `main` (Vercel auto-deploys): Task 1 (ORN normalisation) + Task 2 (carbon-spine / single-dataset reconciliation). `npm run lint` (= `tsc --noEmit`) passes clean; no runtime console errors.
 
+### Session 2026-06-15 (cont.) — Task 11: Admin/ops batch — billing, report tracker, reminders, 2-layer QC (DONE, verified)
+Four features, each committed separately:
+- **Billing → "Payments & tracking" tab** (`Billing.tsx`): dunning/overdue banner, payment summary (outstanding/next charge/paid-YTD/lifetime), payment history (charges/retries/refunds + receipts), cost-by-property breakdown, mid-cycle proration preview, credit notes.
+- **Report availability tracker** (`Reports.tsx`): monthly/quarterly/annual reports with a recent-period status strip (available/pending/overdue/not-due), next-due, owner, per-row "Remind".
+- **Reminder composer** (`Reports.tsx` `ReminderModal`): pick recipients (set of people) + subject (prefilled from the report) + message → send, with success state. Triggerable from any tracker row or header.
+- **Two-layer QC (optional)** — per-account `platformReview` flag added to `lib/account.tsx`; toggle in the Admin → Clients provisioning card ("Platform review · 2nd-layer QC"). When on, a **"Platform Review"** tab appears in Review & Approval showing company-approved records awaiting platform sign-off, with **Approve / Bypass** actions + live counts. Off = company approval is final (bypass).
+- All verified live in the browser; tsc clean; no console errors.
+
 ### Session 2026-06-15 (cont.) — Task 10: Account entitlements + single-hotel mode (DONE, verified)
 Solved "where does a 1-hotel client manage their property when Portfolio is hidden?" with a per-account entitlements system provisioned from Admin. Root cause: the Portfolio nav group bundled the multi-hotel rollup WITH the only entry point to property management.
 - **`lib/account.tsx`** (NEW) — `AccountProvider`/`useAccount()`: `accountType` (single/portfolio), `singleHotelId`, per-module flags (`portfolio, smartOps, engagement, performance, marketplace, actions`), persisted to localStorage. Mounted in `main.tsx`.
