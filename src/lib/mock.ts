@@ -59,7 +59,7 @@ export const ACTION_CENTRE = [
   { label: "Supplier reminders",         count: 12, severity: "info" as const, href: "/supplier-portal?status=pending" },
   { label: "Certification evidence due", count: 6,  severity: "warn" as const, href: "/certifications?status=evidence-due" },
   { label: "Targets off-track",          count: 4,  severity: "bad"  as const, href: "/performance/energy/overview" },
-  { label: "Adjusted performance worsening", count: 3,  severity: "bad"  as const, href: "/performance/energy/overview" },
+  { label: "Adjusted performance worsening", count: 3,  severity: "bad"  as const, href: "/genuine-performance" },
 ];
 
 export const RECOMMENDED_MEASURES = [

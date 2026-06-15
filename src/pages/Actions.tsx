@@ -99,7 +99,7 @@ const MEASURES: Measure[] = [
     paybackYears: 1.8, expectedImpactPct: 2.4, actualImpactPct: 2.6,
     co2eSaving: 38, priority: "high", measureType: "retrofit",
     trigger: "GP-E declined 1.4% — lighting share above peer median",
-    triggerLink: "/performance/energy/genuine-performance",
+    triggerLink: "/genuine-performance",
     owner: "Engineering Lead", dueDate: "2026-08-30",
     stage: "verified", evidenceCount: 3, createsOpEvent: true, source: "ai",
   },

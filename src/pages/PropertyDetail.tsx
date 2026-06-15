@@ -47,6 +47,7 @@ import {
   findHotelMetricsByName, costPerOrn, carbonPerOrn, energyPerOrn,
   waterPerGn, occupancyPct, UNIT,
 } from "@/lib/normalise";
+import GenuinePerformancePanel from "@/components/properties/GenuinePerformancePanel";
 import { cn } from "@/lib/utils";
 
 type TabKey =
@@ -64,7 +65,7 @@ const TABS: { key: TabKey; label: string; icon: any }[] = [
   { key: "configuration",  label: "Configuration",   icon: Settings },
   { key: "users",          label: "Users",           icon: Users },
   { key: "data-readiness", label: "Data Readiness",  icon: BarChart3 },
-  { key: "gp",             label: "GP Setup",        icon: Sparkles },
+  { key: "gp",             label: "Genuine Performance", icon: Sparkles },
   { key: "certifications", label: "Certifications",  icon: ShieldCheck },
   { key: "qr",             label: "QR Points",       icon: QrCode },
   { key: "history",        label: "Audit History",   icon: History },
@@ -539,7 +540,16 @@ function DataReadinessTab({ property }: { property: RichProperty }) {
 function GPSetupTab({ property }: { property: RichProperty }) {
   const baselineComplete = property.baselineYear < new Date().getFullYear();
   return (
-    <div className="grid grid-cols-12 gap-4">
+    <div className="space-y-5">
+      {property.gpReady ? (
+        <GenuinePerformancePanel propertyName={property.name} />
+      ) : (
+        <div className="rounded-xl bg-warn/10 border border-warn/25 p-3 text-[13px] text-ink-700">
+          Genuine Performance results appear once the baseline below is complete. Setup status:
+        </div>
+      )}
+
+      <div className="grid grid-cols-12 gap-4">
       <Card className="col-span-12 md:col-span-7">
         <CardHeader title="GP readiness checklist" hint="Genuine Performance requires a complete baseline year of approved data" />
         <div className="p-6">
@@ -578,6 +588,7 @@ function GPSetupTab({ property }: { property: RichProperty }) {
           <YearTile year={property.baselineYear - 2} label="Pre-baseline" />
         </div>
       </Card>
+      </div>
     </div>
   );
 }

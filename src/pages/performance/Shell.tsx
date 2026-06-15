@@ -18,7 +18,6 @@ import PageHeader from "@/components/ui/PageHeader";
 import { cn } from "@/lib/utils";
 
 import OverviewView from "./Overview";
-import GenuineView from "./Genuine";
 import InternalView from "./Internal";
 import ExternalView from "./External";
 import CarbonInventoryView from "./CarbonInventory";

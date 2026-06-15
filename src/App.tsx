@@ -7,6 +7,7 @@ import PortfolioReports from "./pages/portfolio/PortfolioReports";
 import DataCapture from "./pages/DataCapture";
 import ReviewApproval from "./pages/ReviewApproval";
 import PerformanceShell from "./pages/performance/Shell";
+import GenuinePortfolio from "./pages/performance/GenuinePortfolio";
 import Reports from "./pages/Reports";
 import Certifications from "./pages/Certifications";
 import Actions from "./pages/Actions";
@@ -80,7 +81,7 @@ export default function App() {
 
         {/* Backwards-compatible redirects */}
         <Route path="/own-performance" element={<Navigate to="/performance/energy/overview" replace />} />
-        <Route path="/genuine-performance" element={<Navigate to="/performance/energy/genuine-performance" replace />} />
+        <Route path="/genuine-performance" element={<GenuinePortfolio />} />
         <Route path="/internal-comparison" element={<Navigate to="/performance/energy/internal-comparison" replace />} />
         <Route path="/external-comparison" element={<Navigate to="/performance/energy/external-comparison" replace />} />
         <Route path="/carbon-inventory" element={<Navigate to="/performance/carbon/carbon-inventory" replace />} />
