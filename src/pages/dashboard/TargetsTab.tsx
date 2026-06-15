@@ -1,20 +1,13 @@
 import { Link } from "react-router-dom";
 import {
-  Cloud,
-  Zap,
-  Droplet,
-  Recycle,
-  Award,
-  ShieldCheck,
-  ArrowRight,
-  TrendingDown,
-  TrendingUp,
+  Cloud, Zap, Droplet, Recycle, Award, ShieldCheck,
+  ArrowRight, TrendingDown, TrendingUp, Check,
 } from "lucide-react";
 import Badge from "@/components/ui/Badge";
-import { PORTFOLIO_TARGETS, PORTFOLIO_HOTELS } from "@/lib/mock";
+import { portfolioTargets, type PortfolioTarget, type TargetStatus } from "@/lib/targets";
 import { cn } from "@/lib/utils";
 
-type Target = (typeof PORTFOLIO_TARGETS)[number];
+type Target = PortfolioTarget;
 
 const ICON_MAP: Record<string, React.ReactNode> = {
   cloud:   <Cloud size={16} />,
@@ -57,8 +50,8 @@ const DETAIL_ACTIONS: Record<string, string[]> = {
   ],
   cert: [
     "Upload missing certification evidence for Airport Hotel Dubai",
-    "Schedule Green Globe and Travelife renewals before June deadline",
-    "Close governance gaps identified in 3 hotels by Q2 2025",
+    "Schedule Green Globe and Travelife renewals before deadline",
+    "Close governance gaps identified in 3 hotels",
   ],
   data: [
     "Resolve 31 missing data submissions — chase Airport Dubai and Riverside Bangkok",
@@ -76,50 +69,39 @@ const HOTELS_DRIVING_GAP: Record<string, string[]> = {
   data:   ["Riverside Bangkok", "Airport Hotel Dubai", "Peaks Resort Zermatt"],
 };
 
-const REQUIRED_IMPROVEMENT: Record<string, string> = {
-  carbon: "~4.5% annual reduction required 2025–2030",
-  energy: "~0.7 kWh/RN reduction per year to 2025",
-  water:  "~11 L/GN reduction per year to 2025",
-  waste:  "~9% diversion improvement per year to 2025",
-  cert:   "2 hotels to achieve certification by Dec 2025",
-  data:   "~3% annual approval improvement to 2025",
+const STATUS_TONE: Record<TargetStatus, "good" | "warn" | "bad"> = {
+  "on-track": "good", "at-risk": "warn", "off-track": "bad",
+};
+const STATUS_LABEL: Record<TargetStatus, string> = {
+  "on-track": "On Track", "at-risk": "At Risk", "off-track": "Off Track",
+};
+const BAR_COLOR: Record<TargetStatus, string> = {
+  "on-track": "bg-good", "at-risk": "bg-warn", "off-track": "bg-bad",
+};
+const BORDER: Record<TargetStatus, string> = {
+  "on-track": "border-l-good", "at-risk": "border-l-warn", "off-track": "border-l-bad",
 };
 
-// Progress along the baseline → target journey (direction-aware).
-// done = (current - baseline) / (target - baseline) works for both
-// reduction targets (lower is better) and growth targets (higher is better),
-// because numerator and denominator flip sign together.
-function journeyProgress(target: Target) {
-  const span = target.targetVal - target.baseVal;
-  if (span === 0) return 100;
-  const done = ((target.currentVal - target.baseVal) / span) * 100;
-  return Math.max(0, Math.min(100, Math.round(done)));
-}
+const fmtVal = (v: number, unit: string) => (unit === "%" ? `${v}%` : `${v} ${unit}`);
 
 function PathwayBar({ target }: { target: Target }) {
-  const pct = journeyProgress(target);
-  const remaining = 100 - pct;
-
+  const pct = target.progressPct;
   return (
     <div className="relative h-5 rounded-full bg-ink-100 overflow-hidden">
-      <div
-        className={cn("h-full rounded-full transition-all", target.status === "bad" ? "bg-bad" : "bg-warn")}
-        style={{ width: `${pct}%` }}
-      />
+      <div className={cn("h-full rounded-full transition-all", BAR_COLOR[target.status])} style={{ width: `${pct}%` }} />
       <div className="absolute inset-0 flex items-center justify-between px-3">
         <span className="text-[10px] font-bold text-white tabular-nums">{pct}% there</span>
-        <span className="text-[10px] font-bold text-ink-600 tabular-nums">{remaining}% to go</span>
+        <span className="text-[10px] font-bold text-ink-600 tabular-nums">{100 - pct}% to go</span>
       </div>
     </div>
   );
 }
 
 function TargetCard({ target }: { target: Target }) {
+  const tone = STATUS_TONE[target.status];
+  const onTrack = target.status === "on-track";
   return (
-    <div className={cn(
-      "card p-5 border-l-4",
-      target.status === "bad" ? "border-l-bad" : "border-l-warn"
-    )}>
+    <div className={cn("card p-5 border-l-4", BORDER[target.status])}>
       {/* Header */}
       <div className="flex items-start justify-between gap-3 mb-4">
         <div className="flex items-center gap-3">
@@ -131,54 +113,44 @@ function TargetCard({ target }: { target: Target }) {
             <div className="text-[11px] text-ink-500">{target.area} · Baseline {target.baseYear}</div>
           </div>
         </div>
-        <Badge tone={target.status}>{target.status === "bad" ? "Off Track" : "At Risk"}</Badge>
+        <Badge tone={tone}>{STATUS_LABEL[target.status]}</Badge>
       </div>
 
       {/* Pathway: Baseline → Current → Target */}
       <div className="mb-4">
         <div className="flex items-center gap-0 mb-2">
-          {/* Baseline */}
           <div className="text-center shrink-0 w-24">
             <div className="text-[10px] text-ink-400 uppercase tracking-wide font-semibold mb-1">Baseline {target.baseYear}</div>
-            <div className="text-[13px] font-bold text-ink-700 tabular-nums">
-              {target.baseLabel}
-            </div>
+            <div className="text-[13px] font-bold text-ink-700 tabular-nums">{fmtVal(target.baseVal, target.unit)}</div>
           </div>
           <div className="flex-1 h-0.5 bg-ink-200 relative mx-2">
-            <div
-              className={cn("absolute inset-y-0 left-0 rounded-full", target.status === "bad" ? "bg-bad" : "bg-warn")}
-              style={{ width: `${journeyProgress(target)}%` }}
-            />
+            <div className={cn("absolute inset-y-0 left-0 rounded-full", BAR_COLOR[target.status])} style={{ width: `${target.progressPct}%` }} />
           </div>
-          {/* Current */}
           <div className="text-center shrink-0 w-28">
             <div className="text-[10px] text-ink-400 uppercase tracking-wide font-semibold mb-1">Current</div>
-            <div className={cn("text-[13px] font-bold tabular-nums", target.status === "bad" ? "text-bad" : "text-warn")}>
-              {target.currentLabel}
-            </div>
+            <div className={cn("text-[13px] font-bold tabular-nums", `text-${tone === "good" ? "good" : tone}`)}>{fmtVal(target.currentVal, target.unit)}</div>
           </div>
           <div className="flex-1 h-0.5 bg-ink-100 mx-2" />
-          {/* Target */}
           <div className="text-center shrink-0 w-24">
             <div className="text-[10px] text-ink-400 uppercase tracking-wide font-semibold mb-1">Target {target.targetYear}</div>
-            <div className="text-[13px] font-bold text-good tabular-nums">
-              {target.targetVal} {target.unit}
-            </div>
+            <div className="text-[13px] font-bold text-good tabular-nums">{fmtVal(target.targetVal, target.unit)}</div>
           </div>
         </div>
 
         <PathwayBar target={target} />
-        <div className="mt-1.5 text-[11px] text-ink-500">{target.gap}</div>
+        <div className="mt-1.5 text-[11px] text-ink-500">{target.gapText}</div>
       </div>
 
-      {/* Required improvement */}
+      {/* Trajectory: required vs actual rate */}
       <div className="card-level-3 px-3 py-2 mb-4 flex items-center gap-2">
-        {target.status === "bad" ? (
-          <TrendingDown size={12} className="text-bad shrink-0" />
-        ) : (
-          <TrendingUp size={12} className="text-warn shrink-0" />
-        )}
-        <span className="text-[11px] text-ink-600">{REQUIRED_IMPROVEMENT[target.key]}</span>
+        {onTrack ? <Check size={12} className="text-good shrink-0" />
+          : target.higherIsBetter ? <TrendingUp size={12} className={cn("shrink-0", `text-${tone}`)} />
+          : <TrendingDown size={12} className={cn("shrink-0", `text-${tone}`)} />}
+        <span className="text-[11px] text-ink-600">
+          Needs <strong>{target.requiredRate}{target.rateUnit}</strong> to {target.targetYear} ·
+          achieving <strong className={`text-${tone}`}>{target.actualRate}{target.rateUnit}</strong>
+          {onTrack ? " — on pace" : " — short of pace"}
+        </span>
       </div>
 
       {/* Hotels driving gap */}
@@ -217,15 +189,20 @@ function TargetCard({ target }: { target: Target }) {
 }
 
 export default function TargetsTab() {
+  const targets = portfolioTargets();
+  const on = targets.filter((t) => t.status === "on-track").length;
+  const risk = targets.filter((t) => t.status === "at-risk").length;
+  const off = targets.filter((t) => t.status === "off-track").length;
+
   return (
     <div className="space-y-5">
-      <div className="px-4 py-3 rounded-xl bg-ink-50 border border-ink-100 text-[12px] text-ink-600 flex items-center gap-2">
-        <span className="font-semibold text-ink-900">All 6 portfolio targets</span> are currently off-track or at risk.
-        Each card shows the baseline → current → target pathway with the required improvement rate and hotels driving the gap.
+      <div className="px-4 py-3 rounded-xl bg-ink-50 border border-ink-100 text-[12px] text-ink-600 flex items-center gap-2 flex-wrap">
+        <span><span className="font-semibold text-good">{on} on track</span> · <span className="font-semibold text-warn">{risk} at risk</span> · <span className="font-semibold text-bad">{off} off track</span>.</span>
+        <span className="text-ink-400">Status is derived — required annual rate to the target year vs the rate the portfolio is actually achieving. Current values come from the canonical dataset.</span>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-        {PORTFOLIO_TARGETS.map((t) => (
+        {targets.map((t) => (
           <TargetCard key={t.key} target={t} />
         ))}
       </div>

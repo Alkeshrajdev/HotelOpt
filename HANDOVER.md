@@ -11,6 +11,14 @@
 
 Latest commit on `main` (Vercel auto-deploys): Task 1 (ORN normalisation) + Task 2 (carbon-spine / single-dataset reconciliation). `npm run lint` (= `tsc --noEmit`) passes clean; no runtime console errors.
 
+### Session 2026-06-15 (cont.) — Task 8: Targets vs actual + gap-to-2030 (DONE, verified)
+Replaced hardcoded, off-basis, all-"off-track" targets with a derived engine.
+- **`lib/targets.ts`** (NEW) — `portfolioTargets()` derives **current** from canonical helpers (carbon 25.2 kgCO₂e/ORN · energy 117.8 kWh/ORN · water 556 L/GN · waste 42% TRUE diversion — same basis as the efficiency tiles), targets **2030**, and computes progress, gap-to-2030, **required vs actual annual rate** (energy/carbon actual = consumption-weighted per-hotel YoY), and a real **on-track / at-risk / off-track** status (ratio of actual÷required rate). Also `targetsOffTrackCount()`.
+- **Result (derived, realistic mix):** Energy/Water/Cert/Data **on-track**, Waste **at-risk** (3.0 vs 3.6 pp/yr), Carbon **off-track** (achieving 4.1%/yr vs 6.5%/yr needed). Fixes the old off-basis values (energy "18.4 kWh/RN", water "342 L/GN") and the wrong 2025 target year.
+- **TargetsTab** rewritten to consume the engine: 3-state status + colours, baseline→current→target pathway, gap-to-2030, "Needs X/yr · achieving Y/yr — on pace / short of pace". Banner shows the live mix.
+- Dashboard ACTION_CENTRE "Targets off-track (4)" → **"Targets behind pace (2)"** (carbon off + waste at-risk), href → /portfolio/dashboard.
+- Note: old `PORTFOLIO_TARGETS` (mock.ts) now unused — left for a cleanup pass. tsc clean; browser-verified; no console errors.
+
 ### Session 2026-06-15 (cont.) — Task 7: Retire opaque Sustainability Score (DONE, verified)
 Replaced the black-box 0–100 "Sustainability score" (a composite the client dislikes) with a concrete, **sourced** benchmark standing.
 - **`lib/benchmarks.ts`** — added `CARBON_COHORT` (S1+2 kgCO₂e/ORN: top quartile 18.24, median 21.95) + `carbonBand(s1s2PerOrn)` → {Top quartile / Above median / Below median}, tied to the CHSB cohort from Task 6.
