@@ -131,6 +131,38 @@ Three review passes were completed: a **data-consistency / substance** review, a
 
 ---
 
+## Admin Settings — section build plans
+
+Status of every Admin tile (`pages/Admin.tsx`) and a build plan for each. **Live** = a real sub-page exists; **Stub** = tile labelled "Soon", opens the `AdminStub` shell (`/admin/:section`). Provisioning, entitlements and 2-layer QC are now driven by the account context (`lib/account.tsx`) — new admin sections should read/write that where relevant.
+
+### Tenancy & branding
+- **Clients & deployments** — *Live* (`admin/Clients.tsx`). Has the client list + the live **Account provisioning** card (account type, single-hotel picker, module toggles, platform-review 2nd-layer QC, reset). **Plan:** make each *client row* editable (per-client entitlements drawer, not just the current session account); a "New client" wizard (name, deployment type, billing entity, region, starting modules); data-isolation indicator; lifecycle (activate / suspend / offboard); cross-link to that client's billing + subscription.
+- **White-label branding** — *Stub*. **Plan:** per-client theming — logo upload (light/dark), primary/accent colour pickers with a live preview pane (sidebar/topbar/login), custom domain + DNS/SSL status, email sender identity (from-name, domain, DKIM/SPF), favicon, login background, report header/footer branding, "reset to Hotel Optimizer default". Gate to deployment type = White-label.
+- **Users & roles** — *Live* (`admin/Users.tsx`). **Plan/remaining:** a role→permission matrix (maker/checker/property_sm/super_admin + Corporate SM/Auditor/Client Admin), maker–checker rights per user, property/region scoping, bulk invite, SSO-provisioned vs manual, MFA/last-login status, role-change audit trail. (Note: Billing → Seat management overlaps — decide canonical home or cross-link.)
+
+### Configuration
+- **Property configuration** — *Stub*. **Plan:** platform-level property defaults + per-property overrides (GP baseline year, enabled pillars, climate station, units, currency, reporting year, certifications, ORN denominator, facilities). "Property template" for fast onboarding; bulk-apply to new properties. Mirrors the PropertyDetail Configuration tab at the template level.
+- **Emission factor library** — *Live* (`admin/EFLibrary.tsx`). Versioned EFs by region/year/version. **Plan/remaining:** add/edit EF with effective-date ranges + source citation (IEA/IPCC/DEFRA/supplier), CSV bulk import, version lock/freeze for assurance, restate-prior-period uses the period-active EF, region-coverage gap report, GWP-set selector (AR5/AR6), change audit. (Feeds the GHG Inventory EF provenance.)
+- **GP configuration** — *Stub*. **Plan:** expose the Genuine-Performance engine knobs (`lib/genuinePerformance.ts`): per-utility sensitivity shares (weather/occupancy/activity/base, validated to sum=1), composite weights, baseline-year rules, degree-day source (Open-Meteo), GP-ready minimum-data thresholds. Preview impact on a sample property. Currently those shares/drivers are hardcoded — make them configurable per portfolio.
+- **Comparable pools** — *Live* (`admin/Pools.tsx`). **Plan/remaining:** pool definition rules (climate / star / size band / segment), per-client isolation, minimum pool size driving the Full/Directional/Reference tier (used by `External.tsx`), CHSB cohort mapping (ties to `lib/benchmarks.ts`), per-property opt-in/out, membership preview, anonymisation rules.
+- **QR management** — *Stub*. **Plan:** QR-point registry per property, generate/print sheets (PDF), point→location/campaign assignment, activate/deactivate, destination URL per point, scan analytics (over time, by point), bulk generation. Ties to PropertyDetail QR Points tab + Guest Engagement.
+- **Measure library** — *Stub*. **Plan:** capex/opex measure catalogue — per measure: default impact (energy/water/carbon %), payback years, capex band, applicability rules (property type/climate), recommended priority, M&V method. Powers auto-suggested Actions; CRUD + versioning. Ties to `Actions.tsx` + Marketplace.
+
+### Knowledge & alerts
+- **Knowledge base** — *Stub*. **Plan:** versioned articles/explainers (Knowledge Curator role), certification-criterion explainers, recommendation templates, category taxonomy, draft/publish workflow, search. Feeds AI Assistant + InfoHints + cert criteria.
+- **Alert rules** — *Stub*. **Plan:** rule builder — anomaly thresholds (spike/drop %), SLA escalations (review overdue), deadline reminders (report/cert due), integration-failure alerts; per rule: condition, severity, recipients, channel (email/in-app), cooldown. Ties to Smart Ops AlertsCentre + the new reminder composer.
+- **Report templates** — *Stub*. **Plan:** per-framework PDF/PPT/XLSX templates (GHG, GRI, CSRD, board pack), white-label overrides, section/field mapping, versioning, default-per-cadence, preview. Feeds the Reports generate flow, the new Report Tracker, and the GHG Inventory export.
+
+### Connectors & access
+- **Integrations & API keys** — *Stub*. **Plan:** OAuth connectors (QuickBooks/Xero/Workday/Opera PMS/BMS/Open-Meteo/hauler) — connect/disconnect, token status, last-sync, field mapping, sync logs/errors; webhooks; consolidate or cross-link the outbound API keys that currently live on the Billing page. Ties to `dataCaptureConfig.ts` API integrations.
+- **Security & access** — *Stub*. **Plan:** SSO (SAML/OIDC), MFA enforcement policy, IP allowlists, session timeout / concurrent-session rules, password policy, sovereign-hosting / data-residency controls per client, RBAC review, security-event log (failed logins from the audit feed). Per-client where deployment = Sovereign hosting.
+- **Subscriptions** — *Stub*. **Plan:** plan catalogue (tiers, base + per-property + white-label licence fees), trials, discounts/coupons, AI/OCR pass-through pricing, plan assignment per client, proration + dunning policy, cross-client revenue overview. **This is the platform-operator view across all clients**, complementary to the single-client **Billing** page (incl. the new Payments & tracking tab) — cross-link the two.
+- **Platform audit log** — tile is *Stub*, but a working `AuditLog` is already rendered inline on the Admin landing. **Plan:** promote `/admin/audit` to a dedicated full page (the inline one is a preview), add CSV export, date-range filter, retention policy, tamper-evidence/hash-chain indicator, drill-to-record, more event types — and de-dupe the inline-vs-dedicated rendering.
+
+> Build priority suggestion: **Subscriptions** (pairs with the Billing work just shipped) → **White-label branding** (high client-visible value, gated to White-label deployments) → **GP configuration** + **Property configuration** (unlock per-portfolio tuning of engines already built) → the rest.
+
+---
+
 ## Deploy command
 
 After every update, commit and run this to push to GitHub (Vercel auto-deploys on push):
