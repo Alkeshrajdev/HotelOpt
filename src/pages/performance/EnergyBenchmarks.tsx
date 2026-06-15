@@ -4,6 +4,8 @@ import {
 } from "recharts";
 import { DollarSign, TrendingDown } from "lucide-react";
 import { Card, CardHeader } from "@/components/ui/Card";
+import BenchmarkSource from "@/components/ui/BenchmarkSource";
+import { COHORT_MEDIAN_LABEL, COHORT_BEST_LABEL } from "@/lib/benchmarks";
 import { cn } from "@/lib/utils";
 
 /* ─── Peer data ──────────────────────────────────────────────────────────── */
@@ -17,10 +19,9 @@ type Peer = {
 };
 
 const PEERS: Peer[] = [
-  { name: "You",    intensity: 117.8, perM2: 550, costPerOrn: 3.20, renewable: 12, isYou: true  },
-  { name: "Peer A", intensity: 94.2, perM2: 437, costPerOrn: 2.58, renewable: 22, isYou: false },
-  { name: "Peer B", intensity: 107.0, perM2: 481, costPerOrn: 2.91, renewable: 16, isYou: false },
-  { name: "Peer C", intensity: 129.6, perM2: 609, costPerOrn: 3.42, renewable:  9, isYou: false },
+  { name: "You",               intensity: 117.8, perM2: 550, costPerOrn: 3.20, renewable: 12, isYou: true  },
+  { name: COHORT_MEDIAN_LABEL, intensity: 107.0, perM2: 481, costPerOrn: 2.91, renewable: 16, isYou: false },
+  { name: COHORT_BEST_LABEL,   intensity: 94.2,  perM2: 437, costPerOrn: 2.58, renewable: 22, isYou: false },
 ];
 
 /* ─── Savings vs best peer ───────────────────────────────────────────────── */
@@ -186,9 +187,7 @@ export default function EnergyBenchmarks() {
         ))}
       </div>
 
-      <p className="text-[11px] text-ink-400">
-        Peers are anonymised same-type hotels · no adjustments applied · raw operational data only
-      </p>
+      <BenchmarkSource metric="energy" />
 
     </div>
   );

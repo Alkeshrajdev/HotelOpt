@@ -11,6 +11,14 @@
 
 Latest commit on `main` (Vercel auto-deploys): Task 1 (ORN normalisation) + Task 2 (carbon-spine / single-dataset reconciliation). `npm run lint` (= `tsc --noEmit`) passes clean; no runtime console errors.
 
+### Session 2026-06-15 (cont.) — Task 6: Sourced benchmarks (DONE, verified)
+Replaced anonymous, unsourced "Peer A/B/C" benchmark bars with cited industry-standard cohort reference points.
+- **`lib/benchmarks.ts`** (NEW) — `BENCHMARK_SOURCE` (Cornell CHSB 2023 · full-service · hot/temperate · n=312; carbon per HCMI v1.2; water per HWMI 2.0; illustrative-cohort disclaimer) + `COHORT_MEDIAN_LABEL`/`COHORT_BEST_LABEL` + `benchmarkStd(metric)`.
+- **`components/ui/BenchmarkSource.tsx`** (NEW) — cited provenance footnote (source · year · cohort · n · per-metric standard · disclaimer).
+- **EnergyBenchmarks + PillarBenchmarks (water/waste/carbon)** — peers → "You / Cohort median / Top quartile" (median ≈ old Peer B, top quartile ≈ old Peer A; carbon renewable made realistic 18/35 not 84/92). Old "anonymised peers" footnotes replaced with `<BenchmarkSource metric=…/>`. **External.tsx** pool gets the same footnote.
+- **Bug fix (pre-existing, now visible):** PillarBenchmarks carbon savings was computed in kg but labelled tCO₂e — "Opportunity 4,970,600 tCO₂e / $248,530,000" → fixed to **4,971 tCO₂e / $248,550** (added carbon to the ÷1000 kg→t conversion alongside waste).
+- Verified: CHSB source + HCMI/HWMI suffixes render; "if you matched Top quartile"; tsc clean; no console errors.
+
 ### Session 2026-06-15 (cont.) — Task 5: Cost leakage / savings (DONE, verified)
 Monetised the Genuine Performance engine — **cost leakage = genuine overspend × unit cost**. A hotel using more than its drivers predict is leaking money; the gap is the recoverable savings opportunity.
 - **`lib/genuinePerformance.ts`** — added `gpCostImpact(property)` (per energy/water/waste: overspend volume × rate → $ leakage/saving) + `gpPortfolioCost()`. Rates match the canonical `utility_cost_usd` (Task 1): electricity $120/MWh, water $2/m³, waste $200/t. Carbon excluded (emission, not a bill).

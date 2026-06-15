@@ -7,6 +7,7 @@ import Badge from "@/components/ui/Badge";
 import HBar from "@/components/charts/HBar";
 import InsufficientData from "@/components/ui/InsufficientData";
 import { HeroValue } from "@/components/dashboard/Drilldowns";
+import BenchmarkSource from "@/components/ui/BenchmarkSource";
 import type { PillarKey } from "./Shell";
 
 type Drill = null | "pool" | "percentile" | "filters";
@@ -137,6 +138,8 @@ export default function External({ pillar }: { pillar: PillarKey }) {
           External Comparison is directional market context — not a rated score. Pool isolation  (no cross-pool leakage).
         </div>
       </div>
+
+      <BenchmarkSource metric={pillar} />
 
       <Modal
         open={content !== null}

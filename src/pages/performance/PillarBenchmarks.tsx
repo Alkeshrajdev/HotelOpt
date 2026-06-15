@@ -5,6 +5,8 @@
 import { BarChart, Bar, Cell, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine } from "recharts";
 import { DollarSign, TrendingDown } from "lucide-react";
 import { Card } from "@/components/ui/Card";
+import BenchmarkSource from "@/components/ui/BenchmarkSource";
+import { COHORT_MEDIAN_LABEL, COHORT_BEST_LABEL } from "@/lib/benchmarks";
 import { cn } from "@/lib/utils";
 
 type Peer = { name: string; isYou: boolean; [k: string]: number | string | boolean };
@@ -23,10 +25,9 @@ type BenchCfg = {
 const CONFIGS: Record<"water"|"waste"|"carbon", BenchCfg> = {
   water: {
     peers: [
-      { name:"You",    isYou:true,  intensity:0.77, perM2:0.32, costPerOrn:0.41, recycled:22 },
-      { name:"Peer A", isYou:false, intensity:0.60, perM2:0.24, costPerOrn:0.32, recycled:35 },
-      { name:"Peer B", isYou:false, intensity:0.71, perM2:0.28, costPerOrn:0.37, recycled:28 },
-      { name:"Peer C", isYou:false, intensity:0.87, perM2:0.36, costPerOrn:0.47, recycled:18 },
+      { name:"You",               isYou:true,  intensity:0.77, perM2:0.32, costPerOrn:0.41, recycled:22 },
+      { name:COHORT_MEDIAN_LABEL, isYou:false, intensity:0.71, perM2:0.28, costPerOrn:0.37, recycled:28 },
+      { name:COHORT_BEST_LABEL,   isYou:false, intensity:0.60, perM2:0.24, costPerOrn:0.32, recycled:35 },
     ],
     metrics: [
       { key:"intensity",  label:"Water intensity",     unit:"m³/ORN",  lowerIsBetter:true,  format:v => v.toFixed(2) },
@@ -38,10 +39,9 @@ const CONFIGS: Record<"water"|"waste"|"carbon", BenchCfg> = {
   },
   waste: {
     peers: [
-      { name:"You",    isYou:true,  intensity:11.78, diversion:54, costPerOrn:0.61, foodPerCover:82 },
-      { name:"Peer A", isYou:false, intensity:9.01, diversion:74, costPerOrn:0.47, foodPerCover:62 },
-      { name:"Peer B", isYou:false, intensity:10.63, diversion:69, costPerOrn:0.55, foodPerCover:72 },
-      { name:"Peer C", isYou:false, intensity:13.63, diversion:58, costPerOrn:0.71, foodPerCover:96 },
+      { name:"You",               isYou:true,  intensity:11.78, diversion:54, costPerOrn:0.61, foodPerCover:82 },
+      { name:COHORT_MEDIAN_LABEL, isYou:false, intensity:10.63, diversion:69, costPerOrn:0.55, foodPerCover:72 },
+      { name:COHORT_BEST_LABEL,   isYou:false, intensity:9.01,  diversion:74, costPerOrn:0.47, foodPerCover:62 },
     ],
     metrics: [
       { key:"intensity",  label:"Waste intensity",  unit:"kg/ORN",   lowerIsBetter:true,  format:v => v.toFixed(2) },
@@ -53,10 +53,9 @@ const CONFIGS: Record<"water"|"waste"|"carbon", BenchCfg> = {
   },
   carbon: {
     peers: [
-      { name:"You",    isYou:true,  intensity:25.2, scope2:18.24, costPerOrn:0.82, renewable:12 },
-      { name:"Peer A", isYou:false, intensity:18.24, scope2:12.99,  costPerOrn:0.59, renewable:92 },
-      { name:"Peer B", isYou:false, intensity:21.95, scope2:15.77, costPerOrn:0.71, renewable:84 },
-      { name:"Peer C", isYou:false, intensity:29.99, scope2:21.80, costPerOrn:0.97, renewable:65 },
+      { name:"You",               isYou:true,  intensity:25.2,  scope2:18.24, costPerOrn:0.82, renewable:12 },
+      { name:COHORT_MEDIAN_LABEL, isYou:false, intensity:21.95, scope2:15.77, costPerOrn:0.71, renewable:18 },
+      { name:COHORT_BEST_LABEL,   isYou:false, intensity:18.24, scope2:12.99, costPerOrn:0.59, renewable:35 },
     ],
     metrics: [
       { key:"intensity",  label:"Carbon intensity",   unit:"kgCO₂e/ORN", lowerIsBetter:true,  format:v => v.toFixed(1) },
@@ -141,7 +140,8 @@ export default function PillarBenchmarks({ pillar }: { pillar: "water"|"waste"|"
 
   // Approximate ORN count from total consumption
   const approxORNs = pillar === "water" ? 552000/yourVal : pillar === "waste" ? 8420000/yourVal : 17997000/yourVal;
-  const savingAmount = Math.round(Math.abs(yourVal - bestVal) * approxORNs / (pillar === "waste" ? 1000 : 1));
+  // carbon & waste intensities are in kg/ORN → ÷1000 to report tonnes
+  const savingAmount = Math.round(Math.abs(yourVal - bestVal) * approxORNs / (pillar === "waste" || pillar === "carbon" ? 1000 : 1));
   const savingUSD = Math.round(savingAmount * costPerUnit);
 
   const youRank = [...peers].sort((a,b) => (a[bestKey] as number)-(b[bestKey] as number)).findIndex(p=>p.isYou)+1;
@@ -173,7 +173,7 @@ export default function PillarBenchmarks({ pillar }: { pillar: "water"|"waste"|"
         {metrics.map(m => <MetricChart key={m.key} metric={m} peers={peers} />)}
       </div>
 
-      <p className="text-[11px] text-ink-400">Peers are anonymised same-type hotels · no adjustments applied · raw operational data</p>
+      <BenchmarkSource metric={pillar} />
     </div>
   );
 }
