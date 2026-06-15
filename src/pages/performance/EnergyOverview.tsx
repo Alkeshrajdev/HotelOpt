@@ -23,22 +23,22 @@ import { cn } from "@/lib/utils";
                  District cooling 12% · Solar PV 8% · Diesel 2%
 */
 const MONTHLY = [
-  { month: "May",  ty: 720,  py: 778,  costTY: 335, costPY: 362, grid: 460, boiler:  82, kitchen: 28, distCool:  96, solar: 42, diesel: 12 },
-  { month: "Jun",  ty: 840,  py: 906,  costTY: 391, costPY: 422, grid: 538, boiler:  70, kitchen: 33, distCool: 140, solar: 47, diesel: 12 },
-  { month: "Jul",  ty: 950,  py:1024,  costTY: 442, costPY: 476, grid: 608, boiler:  56, kitchen: 38, distCool: 160, solar: 76, diesel: 12 },
-  { month: "Aug",  ty: 965,  py:1041,  costTY: 449, costPY: 484, grid: 618, boiler:  52, kitchen: 38, distCool: 162, solar: 83, diesel: 12 },
-  { month: "Sep",  ty: 870,  py: 938,  costTY: 405, costPY: 436, grid: 556, boiler:  66, kitchen: 33, distCool: 148, solar: 55, diesel: 12 },
-  { month: "Oct",  ty: 830,  py: 895,  costTY: 386, costPY: 417, grid: 531, boiler:  80, kitchen: 33, distCool: 120, solar: 54, diesel: 12 },
-  { month: "Nov",  ty: 780,  py: 841,  costTY: 363, costPY: 391, grid: 498, boiler:  94, kitchen: 33, distCool:  90, solar: 53, diesel: 12 },
-  { month: "Dec",  ty: 805,  py: 868,  costTY: 375, costPY: 404, grid: 515, boiler: 104, kitchen: 42, distCool:  90, solar: 42, diesel: 12 },
-  { month: "Jan",  ty: 760,  py: 820,  costTY: 354, costPY: 382, grid: 487, boiler: 100, kitchen: 33, distCool:  82, solar: 46, diesel: 12 },
-  { month: "Feb",  ty: 710,  py: 765,  costTY: 330, costPY: 356, grid: 455, boiler:  92, kitchen: 30, distCool:  76, solar: 45, diesel: 12 },
-  { month: "Mar",  ty: 795,  py: 857,  costTY: 370, costPY: 399, grid: 509, boiler:  88, kitchen: 33, distCool:  84, solar: 69, diesel: 12 },
-  { month: "Apr",  ty: 875,  py: 944,  costTY: 407, costPY: 440, grid: 561, boiler:  76, kitchen: 49, distCool: 140, solar: 37, diesel: 12 },
+  { month: "May",  ty: 6124,  py: 6617,  costTY: 335, costPY: 362, grid: 3912, boiler:  697, kitchen: 238, distCool:  816, solar: 357, diesel: 102 },
+  { month: "Jun",  ty: 7144,  py: 7706,  costTY: 391, costPY: 422, grid: 4576, boiler:  595, kitchen: 281, distCool: 1191, solar: 400, diesel: 102 },
+  { month: "Jul",  ty: 8080,  py: 8709,  costTY: 442, costPY: 476, grid: 5171, boiler:  476, kitchen: 323, distCool: 1361, solar: 646, diesel: 102 },
+  { month: "Aug",  ty: 8207,  py: 8854,  costTY: 449, costPY: 484, grid: 5256, boiler:  442, kitchen: 323, distCool: 1378, solar: 706, diesel: 102 },
+  { month: "Sep",  ty: 7399,  py: 7978,  costTY: 405, costPY: 436, grid: 4729, boiler:  561, kitchen: 281, distCool: 1259, solar: 468, diesel: 102 },
+  { month: "Oct",  ty: 7059,  py: 7612,  costTY: 386, costPY: 417, grid: 4516, boiler:  680, kitchen: 281, distCool: 1021, solar: 459, diesel: 102 },
+  { month: "Nov",  ty: 6634,  py: 7153,  costTY: 363, costPY: 391, grid: 4235, boiler:  799, kitchen: 281, distCool:  765, solar: 451, diesel: 102 },
+  { month: "Dec",  ty: 6846,  py: 7382,  costTY: 375, costPY: 404, grid: 4380, boiler:  885, kitchen: 357, distCool:  765, solar: 357, diesel: 102 },
+  { month: "Jan",  ty: 6464,  py: 6974,  costTY: 354, costPY: 382, grid: 4142, boiler:  851, kitchen: 281, distCool:  697, solar: 391, diesel: 102 },
+  { month: "Feb",  ty: 6039,  py: 6506,  costTY: 330, costPY: 356, grid: 3870, boiler:  782, kitchen: 255, distCool:  646, solar: 383, diesel: 102 },
+  { month: "Mar",  ty: 6761,  py: 7289,  costTY: 370, costPY: 399, grid: 4329, boiler:  748, kitchen: 281, distCool:  714, solar: 587, diesel: 102 },
+  { month: "Apr",  ty: 7442,  py: 8029,  costTY: 407, costPY: 440, grid: 4771, boiler:  646, kitchen: 417, distCool: 1191, solar: 315, diesel: 102 },
 ];
 
-const TOTAL_TY   = MONTHLY.reduce((s, m) => s + m.ty, 0);      // 9,900 MWh
-const TOTAL_PY   = MONTHLY.reduce((s, m) => s + m.py, 0);      // 10,677 MWh
+const TOTAL_TY   = MONTHLY.reduce((s, m) => s + m.ty, 0);      // 84,200 MWh
+const TOTAL_PY   = MONTHLY.reduce((s, m) => s + m.py, 0);      // 90,809 MWh
 const TOTAL_COST = MONTHLY.reduce((s, m) => s + m.costTY, 0);  // ~4,607 $k
 
 /* ─── Source definitions ────────────────────────────────────────────────────*/
@@ -199,7 +199,7 @@ export default function EnergyOverview() {
           icon={<Activity size={18} />}
           iconBg="bg-warn/10 text-warn"
           label="Energy intensity"
-          value="24.0"
+          value="117.8"
           unit="kWh / ORN"
           delta={-6.0}
           goodDirection="down"
@@ -261,7 +261,7 @@ export default function EnergyOverview() {
                 axisLine={false}
                 tickLine={false}
                 width={40}
-                domain={[0, 1200]}
+                domain={[0, 10000]}
                 label={{ value: "MWh", angle: -90, position: "insideLeft", offset: 12, style: { fontSize: 10, fill: "#9ca3af" } }}
               />
               {/* Right axis — $k */}

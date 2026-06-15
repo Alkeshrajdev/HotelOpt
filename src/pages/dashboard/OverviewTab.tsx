@@ -9,8 +9,14 @@ import {
   ResponsiveContainer, CartesianGrid, ReferenceLine,
 } from "recharts";
 import { ACTION_CENTRE } from "@/lib/mock";
-import { portfolioCostPerOrn } from "@/lib/normalise";
+import {
+  portfolioCostPerOrn, portfolioWaterPerGn, portfolioEnergyPerOrnTotal,
+  carbonS12PerOrn, PORTFOLIO, CARBON,
+} from "@/lib/normalise";
 import { cn } from "@/lib/utils";
+
+// Carbon Scope 1+2 / ORN 2030 target (SBTi −50% pathway, base ≈ 34 kgCO₂e/ORN).
+const CARBON_ORN_TARGET_2030 = 17.0;
 
 type Props = { onNavigate: (tab: string) => void };
 
@@ -19,7 +25,7 @@ type Props = { onNavigate: (tab: string) => void };
 // Monthly portfolio-level cost ($k) broken out by utility + carbon intensity
 // TY = May 2025 – Apr 2026  |  PY = May 2024 – Apr 2025
 // Split: Energy ≈65% · Water ≈20% · Waste ≈15%
-const MONTHLY = [
+const RAW_MONTHLY = [
   { month:"May", energyTY:226, waterTY:70,  wasteTY:52,  energyPY:241, waterPY:74,  wastePY:56,  costPY:371,  intensity:11.6 },
   { month:"Jun", energyTY:263, waterTY:81,  wasteTY:61,  energyPY:280, waterPY:86,  wastePY:65,  costPY:431,  intensity:13.1 },
   { month:"Jul", energyTY:298, waterTY:92,  wasteTY:68,  energyPY:317, waterPY:98,  wastePY:73,  costPY:488,  intensity:14.8 },
@@ -36,7 +42,7 @@ const MONTHLY = [
 
 // Quarterly portfolio costs ($k) — last 8 quarters
 // Q1=Jan-Mar  Q2=Apr-Jun  Q3=Jul-Sep  Q4=Oct-Dec
-const QUARTERLY = [
+const RAW_QUARTERLY = [
   { quarter:"Q1 '24", energyTY:758, waterTY:232, wasteTY:174, energyPY:807, waterPY:247, wastePY:185, costPY:1239, intensity:16.2 },
   { quarter:"Q2 '24", energyTY:812, waterTY:250, wasteTY:187, energyPY:865, waterPY:266, wastePY:199, costPY:1330, intensity:15.4 },
   { quarter:"Q3 '24", energyTY:931, waterTY:286, wasteTY:214, energyPY:991, waterPY:305, wastePY:228, costPY:1524, intensity:16.5 },
@@ -48,16 +54,36 @@ const QUARTERLY = [
 ];
 
 // Annual portfolio costs ($k) — 4-year YoY view
-const ANNUAL = [
+const RAW_ANNUAL = [
   { year:"2022", energyTY:3680, waterTY:1132, wasteTY:849, costPY:0,    intensity:18.4 },
   { year:"2023", energyTY:3450, waterTY:1062, wasteTY:797, costPY:5661, intensity:17.1 },
   { year:"2024", energyTY:3309, waterTY:1016, wasteTY:761, costPY:5309, intensity:15.9 },
   { year:"2025", energyTY:3111, waterTY:955,  wasteTY:716, costPY:5086, intensity:14.8 },
 ];
 
-const TOTAL_TY   = MONTHLY.reduce((s, m) => s + m.energyTY + m.waterTY + m.wasteTY, 0); // 4,782
-const TOTAL_PY   = MONTHLY.reduce((s, m) => s + m.costPY, 0);                           // 5,091
-const SAVINGS    = TOTAL_PY - TOTAL_TY; // ~309
+// ── Reconcile trend magnitudes to the canonical portfolio spine ──────────────
+// Raw arrays carry the seasonal SHAPE; we rescale so the annual cost total
+// equals the canonical utility cost and the carbon-intensity series centres on
+// the canonical Scope 1+2 / ORN. (Quarterly & annual raw totals already match
+// the monthly annual total, so one factor serves all three.)
+const RAW_TOTAL_TY = RAW_MONTHLY.reduce((s, m) => s + m.energyTY + m.waterTY + m.wasteTY, 0);
+const RAW_AVG_INT  = RAW_MONTHLY.reduce((s, m) => s + m.intensity, 0) / RAW_MONTHLY.length;
+const COST_SCALE   = (PORTFOLIO.utilityCostUsd / 1000) / RAW_TOTAL_TY; // $k basis
+const INT_SCALE    = carbonS12PerOrn() / RAW_AVG_INT;
+const COST_KEYS = ["energyTY", "waterTY", "wasteTY", "energyPY", "waterPY", "wastePY", "costPY"];
+const scaleRow = (m: Record<string, number | string>) => {
+  const out: any = { ...m };
+  for (const k of COST_KEYS) if (typeof out[k] === "number") out[k] = Math.round(out[k] * COST_SCALE);
+  if (typeof out.intensity === "number") out.intensity = +(out.intensity * INT_SCALE).toFixed(1);
+  return out;
+};
+const MONTHLY   = RAW_MONTHLY.map(scaleRow);
+const QUARTERLY = RAW_QUARTERLY.map(scaleRow);
+const ANNUAL    = RAW_ANNUAL.map(scaleRow);
+
+const TOTAL_TY   = MONTHLY.reduce((s, m) => s + m.energyTY + m.waterTY + m.wasteTY, 0); // ≈ 12,892
+const TOTAL_PY   = MONTHLY.reduce((s, m) => s + m.costPY, 0);
+const SAVINGS    = TOTAL_PY - TOTAL_TY;
 
 type Aggregation = "monthly" | "quarterly" | "annually";
 
@@ -113,7 +139,7 @@ const SNAP_TILES: SnapTile[] = [
   {
     icon: Zap, iconBg: "bg-pillar-energy/10 text-pillar-energy",
     label: "Energy",
-    value: "9,900",
+    value: PORTFOLIO.energyMwh.toLocaleString("en-US"),
     unit: "MWh total",
     delta: "−7.3% vs last year",
     deltaGood: true,
@@ -121,7 +147,7 @@ const SNAP_TILES: SnapTile[] = [
   {
     icon: Droplet, iconBg: "bg-pillar-water/10 text-pillar-water",
     label: "Water",
-    value: "94,800",
+    value: PORTFOLIO.waterM3.toLocaleString("en-US"),
     unit: "m³ total",
     delta: "−7.8% vs last year",
     deltaGood: true,
@@ -129,8 +155,8 @@ const SNAP_TILES: SnapTile[] = [
   {
     icon: Cloud, iconBg: "bg-pillar-carbon/10 text-pillar-carbon",
     label: "Carbon",
-    value: "6,730",
-    unit: "tCO₂e Scope 1+2",
+    value: CARBON.s1s2.toLocaleString("en-US"),
+    unit: `tCO₂e S1+2 · S3 ${CARBON.scope3.toLocaleString("en-US")} sep.`,
     delta: "−9.4% vs last year",
     deltaGood: true,
   },
@@ -160,24 +186,24 @@ type EffTile = {
 const EFF_TILES: EffTile[] = [
   {
     icon: Zap, color: "#D97706", accentBg: "border-l-[#D97706]",
-    label: "Energy intensity", value: "24.0", unit: "kWh / ORN",
+    label: "Energy intensity", value: portfolioEnergyPerOrnTotal().toFixed(0), unit: "kWh / ORN",
     delta: -6.0,
-    progress: 42, // (28.0−24.0)/(28.0−18.5) = 42%
-    targetLabel: "Target 18.5 by 2030",
+    progress: 42, // (137−118)/(137−91)
+    targetLabel: "Target 91 kWh/ORN by 2030",
   },
   {
     icon: Droplet, color: "#0EA5E9", accentBg: "border-l-[#0EA5E9]",
-    label: "Water intensity", value: "0.23", unit: "m³ / ORN",
+    label: "Water intensity", value: portfolioWaterPerGn().toFixed(0), unit: "L / GN",
     delta: -8.0,
-    progress: 50, // (0.28−0.23)/(0.28−0.18) = 50%
-    targetLabel: "Target 0.18 by 2030",
+    progress: 50, // (612−556)/(612−500) — water on guest-night basis
+    targetLabel: "Target 500 L/GN by 2030",
   },
   {
     icon: Cloud, color: "#0F6A3C", accentBg: "border-l-[#0F6A3C]",
-    label: "Carbon intensity", value: "16.3", unit: "kgCO₂e / ORN",
+    label: "Carbon intensity", value: carbonS12PerOrn().toFixed(1), unit: "kgCO₂e / ORN",
     delta: -10.0,
-    progress: 52, // (22.0−16.3)/(22.0−11.0) = 52%
-    targetLabel: "SBTi pathway − 50% by 2030",
+    progress: 52, // (34.0−25.2)/(34.0−17.0) — Scope 1+2 basis
+    targetLabel: "SBTi −50% by 2030 (17.0)",
   },
   {
     icon: Recycle, color: "#7C3AED", accentBg: "border-l-[#7C3AED]",
@@ -209,7 +235,7 @@ function ChartTip({ active, payload, label, metric }: {
           </div>
         )}
         <div className="flex justify-between gap-4 mt-1 text-ink-400 text-[11px]">
-          <span>2030 target</span><span>11.0 kgCO₂e/ORN</span>
+          <span>2030 target</span><span>{CARBON_ORN_TARGET_2030.toFixed(1)} kgCO₂e/ORN</span>
         </div>
       </div>
     );
@@ -450,8 +476,8 @@ export default function OverviewTab({ onNavigate }: Props) {
             {metric === "carbon" && (
               <div>
                 <span className="text-ink-500">Carbon intensity  </span>
-                <span className="font-bold text-ink-900">avg 14.6 kgCO₂e/ORN  </span>
-                <span className="text-[11px] text-good font-semibold">2030 target: 11.0</span>
+                <span className="font-bold text-ink-900">avg {carbonS12PerOrn().toFixed(1)} kgCO₂e/ORN  </span>
+                <span className="text-[11px] text-good font-semibold">2030 target: {CARBON_ORN_TARGET_2030.toFixed(1)}</span>
               </div>
             )}
 
@@ -507,7 +533,7 @@ export default function OverviewTab({ onNavigate }: Props) {
                   tick={{ fontSize:11, fill:"#0f766e" }}
                   tickFormatter={(v) => `${v}`}
                   axisLine={false} tickLine={false} width={40}
-                  domain={[8, 22]}
+                  domain={[14, 34]}
                   label={{ value:"kgCO₂e/ORN", angle:-90, position:"insideLeft", offset:-2, style:{ fontSize:9, fill:"#0f766e" } }}
                 />
               )}
@@ -573,7 +599,7 @@ export default function OverviewTab({ onNavigate }: Props) {
                   />
                   <ReferenceLine
                     yAxisId="main"
-                    y={11}
+                    y={CARBON_ORN_TARGET_2030}
                     stroke="#16a34a"
                     strokeDasharray="4 2"
                     strokeWidth={1.5}
@@ -589,7 +615,7 @@ export default function OverviewTab({ onNavigate }: Props) {
       {/* ── 3. Efficiency Snapshot ────────────────────────────────────────── */}
       <div>
         <SectionLabel
-          title="Efficiency Snapshot — intensity per occupied room night"
+          title="Efficiency Snapshot — normalised intensity"
           action="View performance"
           onClick={() => onNavigate("environment")}
         />

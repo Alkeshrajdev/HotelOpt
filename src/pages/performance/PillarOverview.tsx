@@ -40,8 +40,8 @@ type PillarCfg = {
 const MONTHS = ["May","Jun","Jul","Aug","Sep","Oct","Nov","Dec","Jan","Feb","Mar","Apr"];
 
 // WATER (m³)
-const W_TY = [6800,7600,8500,8700,8200,7900,7400,7600,7200,6800,7500,8800];
-const W_PY = [7400,8200,9300,9500,8900,8600,8100,8300,7900,7400,8200,9200];
+const W_TY = [39596,44255,49496,50660,47749,45997,43090,44255,41926,39596,43673,51242];
+const W_PY = [43090,47749,54154,55319,51825,50078,47166,48331,45997,43090,47749,53572];
 const WATER_MONTHLY: MonthRow[] = MONTHS.map((m,i) => ({
   month: m, ty: W_TY[i], py: W_PY[i],
   costTY: Math.round(W_TY[i] * 1.80 / 1000 * 10) / 10,
@@ -53,8 +53,8 @@ const WATER_MONTHLY: MonthRow[] = MONTHS.map((m,i) => ({
 }));
 
 // WASTE (tonnes)
-const WT_TY = [30,34,38,38,37,36,33,35,32,30,34,43];
-const WT_PY = [33,37,42,43,41,40,37,39,37,34,38,44];
+const WT_TY = [602,682,762,762,742,722,662,702,642,602,682,862];
+const WT_PY = [662,742,842,862,822,802,742,782,742,682,762,882];
 const WASTE_MONTHLY: MonthRow[] = MONTHS.map((m,i) => ({
   month: m, ty: WT_TY[i], py: WT_PY[i],
   costTY: Math.round(WT_TY[i] * 40 / 1000 * 100) / 100,
@@ -67,8 +67,8 @@ const WASTE_MONTHLY: MonthRow[] = MONTHS.map((m,i) => ({
 }));
 
 // CARBON (tCO₂e Scope 1+2)
-const C_TY = [480,558,632,644,580,552,518,537,506,473,529,721];
-const C_PY = [535,620,702,715,642,614,576,594,562,526,587,757];
+const C_TY = [1284,1492,1690,1722,1551,1476,1385,1436,1353,1265,1414,1928];
+const C_PY = [1431,1658,1877,1912,1717,1642,1540,1588,1503,1407,1570,2024];
 const CARBON_MONTHLY: MonthRow[] = MONTHS.map((m,i) => ({
   month: m, ty: C_TY[i], py: C_PY[i],
   costTY: Math.round(C_TY[i] * 50 / 1000 * 10) / 10,
@@ -90,9 +90,9 @@ const CONFIGS: Record<"water"|"waste"|"carbon", PillarCfg> = {
       { key:"irrig",    label:"Irrigation",      fullLabel:"Irrigation",           color:"#fb923c" },
     ],
     kpis: [
-      { label:"Total consumption", value:"94,800", unit:"m³",    delta:-7.8, goodDir:"down", iconBg:"bg-pillar-water/10 text-pillar-water" },
-      { label:"Water intensity",   value:"0.23",   unit:"m³/ORN",delta:-8.0, goodDir:"down", iconBg:"bg-warn/10 text-warn" },
-      { label:"Water cost",        value:"$171k",  unit:"",       delta:-5.0, goodDir:"down", iconBg:"bg-pillar-water/10 text-pillar-water" },
+      { label:"Total consumption", value:"552,000",unit:"m³",    delta:-7.8, goodDir:"down", iconBg:"bg-pillar-water/10 text-pillar-water" },
+      { label:"Water intensity",   value:"0.77",   unit:"m³/ORN",delta:-8.0, goodDir:"down", iconBg:"bg-warn/10 text-warn" },
+      { label:"Water cost",        value:"$994k",  unit:"",       delta:-5.0, goodDir:"down", iconBg:"bg-pillar-water/10 text-pillar-water" },
       { label:"Recycled share",    value:"22",     unit:"%",      delta: 4.0, goodDir:"up",  iconBg:"bg-brand-50 text-brand-700" },
     ],
   },
@@ -108,8 +108,8 @@ const CONFIGS: Record<"water"|"waste"|"carbon", PillarCfg> = {
       { key:"hazardous",  label:"Hazardous",   fullLabel:"Hazardous waste",    color:"#ef4444" },
     ],
     kpis: [
-      { label:"Total generated",  value:"420",   unit:"t",      delta:-9.7, goodDir:"down", iconBg:"bg-pillar-waste/10 text-pillar-waste" },
-      { label:"Waste intensity",  value:"1.02",  unit:"kg/ORN", delta:-10.0,goodDir:"down", iconBg:"bg-warn/10 text-warn" },
+      { label:"Total generated",  value:"8,420", unit:"t",      delta:-9.7, goodDir:"down", iconBg:"bg-pillar-waste/10 text-pillar-waste" },
+      { label:"Waste intensity",  value:"11.78", unit:"kg/ORN", delta:-10.0,goodDir:"down", iconBg:"bg-warn/10 text-warn" },
       { label:"Diversion rate",   value:"64",    unit:"%",      delta: 6.0, goodDir:"up",  iconBg:"bg-brand-50 text-brand-700" },
       { label:"Food waste",       value:"82",    unit:"g/cover",delta:-8.0, goodDir:"down", iconBg:"bg-pillar-waste/10 text-pillar-waste" },
     ],
@@ -123,10 +123,10 @@ const CONFIGS: Record<"water"|"waste"|"carbon", PillarCfg> = {
       { key:"scope2", label:"Scope 2", fullLabel:"Scope 2 — purchased energy", color:"#f97316" },
     ],
     kpis: [
-      { label:"Scope 1+2 total",  value:"6,730", unit:"tCO₂e",    delta:-9.4, goodDir:"down", iconBg:"bg-pillar-carbon/10 text-pillar-carbon" },
-      { label:"Carbon intensity", value:"16.3",  unit:"kgCO₂e/ORN",delta:-10.0,goodDir:"down",iconBg:"bg-warn/10 text-warn" },
-      { label:"Renewable share",  value:"78",    unit:"%",          delta: 3.0, goodDir:"up",  iconBg:"bg-brand-50 text-brand-700" },
-      { label:"Scope 3 (annual)", value:"22,640",unit:"tCO₂e",     delta:-2.2, goodDir:"down", iconBg:"bg-pillar-carbon/10 text-pillar-carbon" },
+      { label:"Scope 1+2 total",  value:"17,997",unit:"tCO₂e",    delta:-9.4, goodDir:"down", iconBg:"bg-pillar-carbon/10 text-pillar-carbon" },
+      { label:"Carbon intensity", value:"25.2",  unit:"kgCO₂e/ORN",delta:-10.0,goodDir:"down",iconBg:"bg-warn/10 text-warn" },
+      { label:"Renewable share",  value:"12",    unit:"%",          delta: 3.0, goodDir:"up",  iconBg:"bg-brand-50 text-brand-700" },
+      { label:"Scope 3 (annual)", value:"24,853",unit:"tCO₂e",     delta:-2.2, goodDir:"down", iconBg:"bg-pillar-carbon/10 text-pillar-carbon" },
     ],
   },
 };

@@ -85,7 +85,7 @@ const METRIC_REGISTRY: PublicMetric[] = [
   { name: "Carbon per stay",       value: "8.2 kgCO₂e",    delta: -9,  source: "HCMI v1.2",  lastApproved: "2026-04-25", isPublic: true,  brdSafe: true },
   { name: "Renewable share",       value: "12%",            delta: 3,   source: "Energy data", lastApproved: "2026-04-29", isPublic: false, brdSafe: true },
   { name: "Diversion rate",        value: "64%",            delta: 5,   source: "Waste data",  lastApproved: "2026-04-26", isPublic: false, brdSafe: true },
-  { name: "Total Scope 3",         value: "22,640 tCO₂e",   delta: -2,  source: "Supplier data", lastApproved: "2026-04-12", isPublic: false, brdSafe: false },
+  { name: "Total Scope 3",         value: "24,853 tCO₂e",   delta: -2,  source: "Supplier data", lastApproved: "2026-04-12", isPublic: false, brdSafe: false },
   { name: "Supplier EFs",          value: "54 active",      delta: 12,  source: "Supplier portal", lastApproved: "2026-04-22", isPublic: false, brdSafe: false },
 ];
 

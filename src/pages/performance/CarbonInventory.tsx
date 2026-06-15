@@ -19,22 +19,22 @@ export default function CarbonInventory() {
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
         <KpiTile
           icon={<Cloud size={18} />} iconBg="bg-pillar-carbon/10 text-pillar-carbon"
-          label="Scope 1" value="1,820" unit="tCO₂e" delta={-3.1}
+          label="Scope 1" value="3,428" unit="tCO₂e" delta={-3.1}
           onClick={() => setDrill(1)}
         />
         <KpiTile
           icon={<Cloud size={18} />} iconBg="bg-info/10 text-info"
-          label="Scope 2 — location" value="6,420" unit="tCO₂e" delta={-7.4}
+          label="Scope 2 — location" value="14,569" unit="tCO₂e" delta={-7.4}
           onClick={() => setDrill(2)}
         />
         <KpiTile
           icon={<Cloud size={18} />} iconBg="bg-cyan-50 text-cyan-700"
-          label="Scope 2 — market" value="4,910" unit="tCO₂e" delta={-12.1}
+          label="Scope 2 — market" value="12,400" unit="tCO₂e" delta={-12.1}
           onClick={() => setDrill(2)}
         />
         <KpiTile
           icon={<Cloud size={18} />} iconBg="bg-pillar-social/10 text-pillar-social"
-          label="Scope 3 (Cat 1–7)" value="22,640" unit="tCO₂e" delta={-2.2}
+          label="Scope 3 (Cat 1–7)" value="24,853" unit="tCO₂e" delta={-2.2}
           onClick={() => setDrill(3)}
         />
       </div>
@@ -94,7 +94,7 @@ export default function CarbonInventory() {
         title="Scope 1 — direct emissions"
         subtitle="Natural gas, diesel, refrigerant leaks (GHG Protocol)"
         size="xl"
-        hero={<HeroValue value="1,820" unit="tCO₂e" delta={-3.1} context="Last 12 months · vs prior year" />}
+        hero={<HeroValue value="3,428" unit="tCO₂e" delta={-3.1} context="Last 12 months · vs prior year" />}
       >
         <ScopeDrilldown scope={1} />
       </Modal>
@@ -105,7 +105,7 @@ export default function CarbonInventory() {
         title="Scope 2 — purchased energy"
         subtitle="Electricity, district cooling, steam (location & market)"
         size="xl"
-        hero={<HeroValue value="6,140" unit="tCO₂e" delta={-9.4} context="Average of location & market views" />}
+        hero={<HeroValue value="13,485" unit="tCO₂e" delta={-9.4} context="Average of location & market views" />}
       >
         <ScopeDrilldown scope={2} />
       </Modal>
@@ -116,7 +116,7 @@ export default function CarbonInventory() {
         title="Scope 3 — value chain emissions"
         subtitle="Categories 1–7 · spend-based and supplier-specific emission factors"
         size="xl"
-        hero={<HeroValue value="22,640" unit="tCO₂e" delta={-2.2} context="Last 12 months" />}
+        hero={<HeroValue value="24,853" unit="tCO₂e" delta={-2.2} context="Last 12 months" />}
       >
         <ScopeDrilldown scope={3} />
       </Modal>

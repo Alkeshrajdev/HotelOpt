@@ -17,15 +17,15 @@ type Peer = {
 };
 
 const PEERS: Peer[] = [
-  { name: "You",    intensity: 24.0, perM2: 112, costPerOrn: 3.20, renewable: 12, isYou: true  },
-  { name: "Peer A", intensity: 19.2, perM2:  89, costPerOrn: 2.58, renewable: 22, isYou: false },
-  { name: "Peer B", intensity: 21.8, perM2:  98, costPerOrn: 2.91, renewable: 16, isYou: false },
-  { name: "Peer C", intensity: 26.4, perM2: 124, costPerOrn: 3.42, renewable:  9, isYou: false },
+  { name: "You",    intensity: 117.8, perM2: 550, costPerOrn: 3.20, renewable: 12, isYou: true  },
+  { name: "Peer A", intensity: 94.2, perM2: 437, costPerOrn: 2.58, renewable: 22, isYou: false },
+  { name: "Peer B", intensity: 107.0, perM2: 481, costPerOrn: 2.91, renewable: 16, isYou: false },
+  { name: "Peer C", intensity: 129.6, perM2: 609, costPerOrn: 3.42, renewable:  9, isYou: false },
 ];
 
 /* ─── Savings vs best peer ───────────────────────────────────────────────── */
-const YOUR_MWH      = 9900;
-const YOUR_INT      = 24.0;
+const YOUR_MWH      = 84200;
+const YOUR_INT      = 117.8;
 const ORN_COUNT     = Math.round((YOUR_MWH * 1000) / YOUR_INT);
 const BEST_PEER     = PEERS.filter((p) => !p.isYou).reduce((a, b) => a.intensity < b.intensity ? a : b);
 const SAVING_MWH    = Math.round(((YOUR_INT - BEST_PEER.intensity) / YOUR_INT) * YOUR_MWH);

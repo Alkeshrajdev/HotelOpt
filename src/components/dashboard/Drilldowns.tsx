@@ -345,18 +345,18 @@ export function ScopeDrilldown({
           <div className="px-6 pb-5">
             <AreaTrend
               data={[
-                { x: "May", v: 168 },
-                { x: "Jun", v: 175 },
-                { x: "Jul", v: 182 },
-                { x: "Aug", v: 178 },
-                { x: "Sep", v: 162 },
-                { x: "Oct", v: 152 },
-                { x: "Nov", v: 148 },
-                { x: "Dec", v: 142 },
-                { x: "Jan", v: 138 },
-                { x: "Feb", v: 134 },
-                { x: "Mar", v: 142 },
-                { x: "Apr", v: 158 },
+                { x: "May", v: 317 },
+                { x: "Jun", v: 330 },
+                { x: "Jul", v: 343 },
+                { x: "Aug", v: 335 },
+                { x: "Sep", v: 305 },
+                { x: "Oct", v: 286 },
+                { x: "Nov", v: 279 },
+                { x: "Dec", v: 268 },
+                { x: "Jan", v: 260 },
+                { x: "Feb", v: 252 },
+                { x: "Mar", v: 268 },
+                { x: "Apr", v: 298 },
               ]}
               dataKey="v"
               color="#0F6A3C"
@@ -368,12 +368,12 @@ export function ScopeDrilldown({
           <CardHeader title="Scope 1 sources" />
           <div className="p-6">
             <Donut
-              totalValue="1,820"
+              totalValue="3,428"
               totalLabel="tCO₂e (12 mo)"
               data={[
-                { name: "Natural gas", value: 980, color: "#0F6A3C" },
-                { name: "Diesel (back-up)", value: 620, color: "#7C2D12" },
-                { name: "Refrigerants (R-410A)", value: 220, color: "#F59E0B" },
+                { name: "Natural gas", value: 1846, color: "#0F6A3C" },
+                { name: "Diesel (back-up)", value: 1168, color: "#7C2D12" },
+                { name: "Refrigerants (R-410A)", value: 414, color: "#F59E0B" },
               ]}
             />
           </div>
@@ -383,11 +383,11 @@ export function ScopeDrilldown({
           <div className="p-6">
             <HBar
               data={[
-                { name: "Oceanfront Cape Town", value: 96 },
-                { name: "The Pavilion London", value: 84 },
-                { name: "Skyline Dubai", value: 71 },
-                { name: "Marina Residences Barcelona", value: 62 },
-                { name: "Peaks Resort Zermatt", value: 41 },
+                { name: "Oceanfront Cape Town", value: 181 },
+                { name: "The Pavilion London", value: 158 },
+                { name: "Skyline Dubai", value: 134 },
+                { name: "Marina Residences Barcelona", value: 117 },
+                { name: "Peaks Resort Zermatt", value: 77 },
               ]}
             />
           </div>
@@ -411,12 +411,12 @@ export function ScopeDrilldown({
           <CardHeader title="Grid mix" />
           <div className="p-6">
             <Donut
-              totalValue="6,140"
+              totalValue="14,569"
               totalLabel="tCO₂e (12 mo)"
               data={[
-                { name: "Grid electricity", value: 5400, color: "#0EA5E9" },
-                { name: "District cooling", value: 540, color: "#22D3EE" },
-                { name: "Steam (district heat)", value: 200, color: "#A5F3FC" },
+                { name: "Grid electricity", value: 12814, color: "#0EA5E9" },
+                { name: "District cooling", value: 1281, color: "#22D3EE" },
+                { name: "Steam (district heat)", value: 474, color: "#A5F3FC" },
               ]}
             />
             <div className="mt-3 text-[12px] text-ink-500">

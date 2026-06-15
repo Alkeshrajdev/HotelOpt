@@ -71,8 +71,8 @@ type PillarConfig = {
 
 const ENERGY_CFG: PillarConfig = {
   kpis: [
-    { id: "energy-total",     icon: <Zap size={18} />,   iconBg: "bg-pillar-energy/10 text-pillar-energy", label: "Total consumption", value: "2,840", unit: "MWh", delta: -8.2 },
-    { id: "energy-intensity", icon: <Zap size={18} />,   iconBg: "bg-warn/10 text-warn",                   label: "Energy intensity", value: "24.0", unit: "kWh/ORN", delta: -6.0 },
+    { id: "energy-total",     icon: <Zap size={18} />,   iconBg: "bg-pillar-energy/10 text-pillar-energy", label: "Total consumption", value: "84,200", unit: "MWh", delta: -8.2 },
+    { id: "energy-intensity", icon: <Zap size={18} />,   iconBg: "bg-warn/10 text-warn",                   label: "Energy intensity", value: "117.8", unit: "kWh/ORN", delta: -6.0 },
     { id: "energy-cost",      icon: <Target size={18} />,iconBg: "bg-pillar-energy/10 text-pillar-energy", label: "Energy cost", value: "$4.6M", delta: -4.0 },
     { id: "renewable",        icon: <Zap size={18} />,   iconBg: "bg-brand-50 text-brand-700",             label: "Renewable share", value: "12", unit: "%", delta: 3.0, goodDirection: "up" },
   ],
@@ -179,19 +179,19 @@ function getDrill(id: string): { title: string; subtitle?: string; hero?: ReactN
   switch (id) {
     case "energy-score":     return { title: "Energy Score — data compliance", subtitle: "% of required data approved this period (FR-2 / FR-3)", hero: <HeroValue value="82%" delta={1.2} goodDirection="up" />, body: <EnergyScoreDrilldown /> };
     case "energy-index":     return { title: "Energy Performance Index", hero: <HeroValue value="91" delta={-4.2} context="Base 100 = 2022" />, body: <PerformanceIndexDrilldown /> };
-    case "energy-intensity": return { title: "Energy Intensity", hero: <HeroValue value="24.0" unit="kWh/ORN" delta={-6.0} />, body: <EnergyIntensityDrilldown /> };
+    case "energy-intensity": return { title: "Energy Intensity", hero: <HeroValue value="117.8" unit="kWh/ORN" delta={-6.0} />, body: <EnergyIntensityDrilldown /> };
     case "energy-cost":      return { title: "Energy Cost", hero: <HeroValue value="$4.6M" delta={-4.0} />, body: <EnergyCostDrilldown /> };
     case "renewable":        return { title: "Renewable energy", hero: <HeroValue value="12" unit="%" delta={3.0} goodDirection="up" />, body: <RenewableDrilldown /> };
-    case "water-intensity":  return { title: "Water Intensity", hero: <HeroValue value="0.42" unit="m³/ORN" delta={-4.1} />, body: <WaterIntensityDrilldown /> };
+    case "water-intensity":  return { title: "Water Intensity", hero: <HeroValue value="0.77" unit="m³/ORN" delta={-4.1} />, body: <WaterIntensityDrilldown /> };
     case "water-recycled":   return { title: "Recycled / greywater share", hero: <HeroValue value="22" unit="%" delta={6.0} goodDirection="up" />, body: <WaterRecycledDrilldown /> };
     case "water-leaks":      return { title: "Leak alerts", hero: <HeroValue value="2" context="active alerts" />, body: <WaterLeaksDrilldown /> };
-    case "waste-intensity":  return { title: "Waste / ORN", hero: <HeroValue value="1.8" unit="kg/ORN" delta={-2.4} />, body: <WasteIntensityDrilldown /> };
+    case "waste-intensity":  return { title: "Waste / ORN", hero: <HeroValue value="11.78" unit="kg/ORN" delta={-2.4} />, body: <WasteIntensityDrilldown /> };
     case "diversion":        return { title: "Diversion rate", hero: <HeroValue value="64" unit="%" delta={5.1} goodDirection="up" />, body: <WasteDiversionDrilldown /> };
     case "food-waste":       return { title: "Food waste per cover", hero: <HeroValue value="82" unit="g" delta={8.6} />, body: <WasteFoodDrilldown /> };
-    case "carbon-intensity": return { title: "Carbon intensity", hero: <HeroValue value="0.041" unit="tCO₂e/ORN" delta={-7.2} />, body: <CarbonIntensityDrilldown /> };
-    case "scope-1":          return { title: "Scope 1 — direct emissions", hero: <HeroValue value="1,820" unit="tCO₂e" delta={-3.1} />, body: <ScopeDrilldown scope={1} /> };
-    case "scope-2":          return { title: "Scope 2 — purchased energy", hero: <HeroValue value="4,910" unit="tCO₂e" delta={-12.1} />, body: <ScopeDrilldown scope={2} /> };
-    case "scope-3":          return { title: "Scope 3 — value chain", hero: <HeroValue value="22,640" unit="tCO₂e" delta={-2.2} />, body: <ScopeDrilldown scope={3} /> };
+    case "carbon-intensity": return { title: "Carbon intensity", hero: <HeroValue value="0.025" unit="tCO₂e/ORN" delta={-7.2} />, body: <CarbonIntensityDrilldown /> };
+    case "scope-1":          return { title: "Scope 1 — direct emissions", hero: <HeroValue value="3,428" unit="tCO₂e" delta={-3.1} />, body: <ScopeDrilldown scope={1} /> };
+    case "scope-2":          return { title: "Scope 2 — purchased energy", hero: <HeroValue value="14,569" unit="tCO₂e" delta={-12.1} />, body: <ScopeDrilldown scope={2} /> };
+    case "scope-3":          return { title: "Scope 3 — value chain", hero: <HeroValue value="24,853" unit="tCO₂e" delta={-2.2} />, body: <ScopeDrilldown scope={3} /> };
     case "headcount":        return { title: "Headcount", hero: <HeroValue value="3,240" delta={4.1} goodDirection="up" />, body: <HeadcountDrilldown /> };
     case "diversity":        return { title: "Female leadership", hero: <HeroValue value="42" unit="%" delta={3.5} goodDirection="up" />, body: <DiversityDrilldown /> };
     case "training":         return { title: "Training hours per FTE", hero: <HeroValue value="18" delta={2.0} goodDirection="up" />, body: <TrainingDrilldown /> };
@@ -272,9 +272,9 @@ export default function Overview({ pillar }: { pillar: PillarKey }) {
                 </tr>
               </thead>
               <tbody>
-                <tr><td className="table-td font-medium">Energy intensity (kWh/ORN)</td><td className="table-td">2022</td><td className="table-td">2030</td><td className="table-td">18.5</td><td className="table-td">24.0</td><td className="table-td"><span className="chip bg-warn/10 text-warn border border-warn/25">Amber</span></td></tr>
-                <tr><td className="table-td font-medium">Renewable energy share (%)</td><td className="table-td">2022</td><td className="table-td">2030</td><td className="table-td">100</td><td className="table-td">78</td><td className="table-td"><span className="chip bg-good/10 text-good border border-good/25">Green</span></td></tr>
-                <tr><td className="table-td font-medium">tCO₂e / ORN (SBTi)</td><td className="table-td">2019</td><td className="table-td">2030</td><td className="table-td">0.025</td><td className="table-td">0.041</td><td className="table-td"><span className="chip bg-warn/10 text-warn border border-warn/25">Amber</span></td></tr>
+                <tr><td className="table-td font-medium">Energy intensity (kWh/ORN)</td><td className="table-td">2022</td><td className="table-td">2030</td><td className="table-td">18.5</td><td className="table-td">117.8</td><td className="table-td"><span className="chip bg-warn/10 text-warn border border-warn/25">Amber</span></td></tr>
+                <tr><td className="table-td font-medium">Renewable energy share (%)</td><td className="table-td">2022</td><td className="table-td">2030</td><td className="table-td">100</td><td className="table-td">12</td><td className="table-td"><span className="chip bg-good/10 text-good border border-good/25">Green</span></td></tr>
+                <tr><td className="table-td font-medium">tCO₂e / ORN (SBTi)</td><td className="table-td">2019</td><td className="table-td">2030</td><td className="table-td">0.025</td><td className="table-td">0.025</td><td className="table-td"><span className="chip bg-warn/10 text-warn border border-warn/25">Amber</span></td></tr>
               </tbody>
             </table>
           </div>
@@ -311,9 +311,9 @@ function breakdownFor(pillar: PillarKey): { name: string; value: number }[] {
       return WASTE.streams.map((s) => ({ name: s.name, value: s.value }));
     case "carbon":
       return [
-        { name: "Scope 1", value: 6 },
-        { name: "Scope 2 (market)", value: 17 },
-        { name: "Scope 3", value: 77 },
+        { name: "Scope 1", value: 8 },
+        { name: "Scope 2 (location)", value: 34 },
+        { name: "Scope 3", value: 58 },
       ];
     case "social":
       return SOCIAL.byRole;

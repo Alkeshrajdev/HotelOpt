@@ -13,19 +13,19 @@ type Property = {
 
 /* Sorted best → worst by intensity */
 const PROPERTIES: Property[] = [
-  { name: "The Pavilion London",         rooms: 312, mwh: 218,  intensity: 18.2, perM2:  88, yoy: -8.1,  rag: "green" },
-  { name: "Grand Harbour Lisbon",        rooms: 248, mwh: 194,  intensity: 19.4, perM2:  94, yoy: -5.2,  rag: "green" },
-  { name: "The Montrose Paris",          rooms: 180, mwh: 148,  intensity: 20.1, perM2:  97, yoy: -3.8,  rag: "green" },
-  { name: "Skyline Dubai",               rooms: 520, mwh: 598,  intensity: 22.1, perM2: 105, yoy: -3.4,  rag: "amber" },
-  { name: "Bay View Singapore",          rooms: 410, mwh: 421,  intensity: 23.8, perM2: 110, yoy: -1.2,  rag: "amber" },
-  { name: "Oceanfront Cape Town",        rooms: 168, mwh: 182,  intensity: 26.4, perM2: 118, yoy:  2.1,  rag: "amber" },
-  { name: "Marina Residences Barcelona", rooms: 205, mwh: 228,  intensity: 28.9, perM2: 126, yoy:  1.4,  rag: "red"   },
-  { name: "Peaks Resort Zermatt",        rooms:  94, mwh: 112,  intensity: 32.1, perM2: 138, yoy:  4.2,  rag: "red"   },
-  { name: "Riverside Bangkok",           rooms: 220, mwh: 264,  intensity: 36.8, perM2: 152, yoy:  8.4,  rag: "red"   },
-  { name: "Airport Hotel Dubai",         rooms: 360, mwh: 547,  intensity: 45.2, perM2: 196, yoy:  6.3,  rag: "red"   },
+  { name: "The Pavilion London",         rooms: 312, mwh: 1854,  intensity: 89.3, perM2:  88, yoy: -8.1,  rag: "green" },
+  { name: "Grand Harbour Lisbon",        rooms: 248, mwh: 1650,  intensity: 95.2, perM2:  94, yoy: -5.2,  rag: "green" },
+  { name: "The Montrose Paris",          rooms: 180, mwh: 1259,  intensity: 98.7, perM2:  97, yoy: -3.8,  rag: "green" },
+  { name: "Skyline Dubai",               rooms: 520, mwh: 5086,  intensity: 108.5, perM2: 105, yoy: -3.4,  rag: "amber" },
+  { name: "Bay View Singapore",          rooms: 410, mwh: 3581,  intensity: 116.8, perM2: 110, yoy: -1.2,  rag: "amber" },
+  { name: "Oceanfront Cape Town",        rooms: 168, mwh: 1548,  intensity: 129.6, perM2: 118, yoy:  2.1,  rag: "amber" },
+  { name: "Marina Residences Barcelona", rooms: 205, mwh: 1939,  intensity: 141.8, perM2: 126, yoy:  1.4,  rag: "red"   },
+  { name: "Peaks Resort Zermatt",        rooms:  94, mwh: 953,  intensity: 157.5, perM2: 138, yoy:  4.2,  rag: "red"   },
+  { name: "Riverside Bangkok",           rooms: 220, mwh: 2245,  intensity: 180.6, perM2: 152, yoy:  8.4,  rag: "red"   },
+  { name: "Airport Hotel Dubai",         rooms: 360, mwh: 4652,  intensity: 221.8, perM2: 196, yoy:  6.3,  rag: "red"   },
 ];
 
-const PORTFOLIO_AVG = 24.0; // kWh/ORN
+const PORTFOLIO_AVG = 117.8; // kWh/ORN
 const BEST = PROPERTIES[0].intensity;
 const WORST = PROPERTIES[PROPERTIES.length - 1].intensity;
 

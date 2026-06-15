@@ -13,7 +13,12 @@
 // (Σnumerator / Σdenominator) — never an average of per-hotel ratios.
 // ─────────────────────────────────────────────────────────────────────────────
 
-import { PORTFOLIO_HOTELS } from "./mock";
+import {
+  PORTFOLIO_HOTELS,
+  SCOPE1_BREAKDOWN,
+  SCOPE2_METHODS,
+  PORTFOLIO_SCOPE3_CATEGORIES,
+} from "./mock";
 
 /** The shape any intensity helper needs. PORTFOLIO_HOTELS rows satisfy this. */
 export type HotelMetrics = {
@@ -96,3 +101,67 @@ export const findHotelMetricsByName = (name: string) =>
 /** Format an intensity for display, e.g. `fmtIntensity(86.7, UNIT.carbonOrn)`. */
 export const fmtIntensity = (value: number, unit: string, digits = 1) =>
   `${value.toFixed(digits)} ${unit}`;
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Canonical portfolio spine — the single dataset every headline number derives
+// from. Historically OverviewTab + the Performance hub rendered a separate
+// ~⅛-scale "Scale A" dataset; everything now resolves through PORTFOLIO (totals)
+// and CARBON (GHG-Protocol scope decomposition), which reconcile exactly:
+//   Scope 1 + Scope 2 (location) + Scope 3  ==  Σ PORTFOLIO_HOTELS.carbon_t.
+// ─────────────────────────────────────────────────────────────────────────────
+
+const sumHotels = (pick: (h: (typeof PORTFOLIO_HOTELS)[number]) => number) =>
+  PORTFOLIO_HOTELS.reduce((s, h) => s + pick(h), 0);
+
+/** Canonical portfolio totals (annual, all 10 hotels). */
+export const PORTFOLIO = {
+  orn:            sumHotels((h) => h.orn),               // 715,000
+  gn:             sumHotels((h) => h.gn),                // 992,300
+  energyMwh:      sumHotels((h) => h.energy_mwh),        // 84,200
+  waterM3:        sumHotels((h) => h.water_m3),          // 552,000
+  wasteT:         sumHotels((h) => h.waste_t),           // 8,420
+  utilityCostUsd: sumHotels((h) => h.utility_cost_usd),  // 12,892,000
+} as const;
+
+/** Carbon spine — GHG-Protocol scope decomposition (tCO₂e). Headline = S1+2. */
+const _s1 = SCOPE1_BREAKDOWN.reduce((s, x) => s + x.tco2e, 0);          // 3,428
+const _s2loc = SCOPE2_METHODS.locationBased.tco2e;                      // 14,569
+const _s2mkt = SCOPE2_METHODS.marketBased.tco2e;                        // 12,400
+const _s3 = PORTFOLIO_SCOPE3_CATEGORIES.reduce((s, x) => s + x.tco2e, 0); // 24,853
+
+export const CARBON = {
+  scope1:         _s1,
+  scope2Location: _s2loc,
+  scope2Market:   _s2mkt,
+  scope3:         _s3,
+  /** Headline operational footprint — Scope 1 + 2 (location-based). */
+  s1s2:           _s1 + _s2loc,            // 17,997
+  /** Total incl. value chain — for the "Scope 3 shown separately" context. */
+  total:          _s1 + _s2loc + _s3,      // 42,850
+} as const;
+
+// Portfolio intensities off the canonical spine.
+/** Headline carbon intensity — Scope 1+2 per ORN (kgCO₂e/ORN). */
+export const carbonS12PerOrn = () => (CARBON.s1s2 * 1000) / PORTFOLIO.orn;        // 25.2
+/** Total-footprint carbon intensity per ORN — incl. Scope 3. */
+export const carbonTotalPerOrn = () => (CARBON.total * 1000) / PORTFOLIO.orn;     // 59.9
+export const portfolioEnergyPerOrnTotal = () => (PORTFOLIO.energyMwh * 1000) / PORTFOLIO.orn; // 117.8
+
+/**
+ * Per-hotel scope split. The S1/S2/S3 breakdown only exists at portfolio level,
+ * so Scope 1+2 is allocated to each hotel by its share of portfolio energy
+ * (S1 combustion + S2 electricity both track energy), and Scope 3 is the
+ * residual against the hotel's known total. By construction the hotel totals
+ * and the per-scope sums both reconcile to the portfolio.
+ */
+export const hotelCarbon = (h: { energy_mwh: number; carbon_t: number; orn: number }) => {
+  const s1s2 = CARBON.s1s2 * (h.energy_mwh / PORTFOLIO.energyMwh);
+  const s3 = h.carbon_t - s1s2;
+  return {
+    s1s2,
+    s3,
+    total: h.carbon_t,
+    s1s2PerOrn: (s1s2 * 1000) / h.orn,
+    totalPerOrn: (h.carbon_t * 1000) / h.orn,
+  };
+};

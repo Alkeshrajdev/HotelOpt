@@ -41,18 +41,18 @@ const GENUINE_SAVING_USD = GENUINE_SAVING_MWH * COST_PER_MWH;
 
 /* ─── Monthly intensity ──────────────────────────────────────────────────── */
 const INTENSITY = [
-  { month: "May", ty: 24.0, py: 25.9 },
-  { month: "Jun", ty: 23.3, py: 25.2 },
-  { month: "Jul", ty: 23.8, py: 25.6 },
-  { month: "Aug", ty: 24.1, py: 26.0 },
-  { month: "Sep", ty: 24.2, py: 26.1 },
-  { month: "Oct", ty: 25.2, py: 27.1 },
-  { month: "Nov", ty: 26.0, py: 28.0 },
-  { month: "Dec", ty: 25.2, py: 27.1 },
-  { month: "Jan", ty: 25.3, py: 27.3 },
-  { month: "Feb", ty: 25.4, py: 27.3 },
-  { month: "Mar", ty: 24.8, py: 26.8 },
-  { month: "Apr", ty: 25.0, py: 27.0 },
+  { month: "May", ty: 117.8, py: 127.1 },
+  { month: "Jun", ty: 114.4, py: 123.7 },
+  { month: "Jul", ty: 116.8, py: 125.6 },
+  { month: "Aug", ty: 118.3, py: 127.6 },
+  { month: "Sep", ty: 118.8, py: 128.1 },
+  { month: "Oct", ty: 123.7, py: 133.0 },
+  { month: "Nov", ty: 127.6, py: 137.4 },
+  { month: "Dec", ty: 123.7, py: 133.0 },
+  { month: "Jan", ty: 124.2, py: 134.0 },
+  { month: "Feb", ty: 124.7, py: 134.0 },
+  { month: "Mar", ty: 121.7, py: 131.5 },
+  { month: "Apr", ty: 122.7, py: 132.5 },
 ];
 
 /* ─── Initiatives ────────────────────────────────────────────────────────── */
@@ -211,7 +211,7 @@ export default function EnergyPerformance() {
               <CartesianGrid vertical={false} stroke="#f3f4f6" />
               <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#6b7280" }} axisLine={false} tickLine={false} />
               <YAxis
-                domain={[22, 30]}
+                domain={[108, 147]}
                 tick={{ fontSize: 11, fill: "#6b7280" }}
                 axisLine={false} tickLine={false} width={28}
               />
