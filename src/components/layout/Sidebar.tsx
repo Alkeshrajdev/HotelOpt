@@ -4,6 +4,8 @@ import { Building2, ChevronLeft, ChevronRight } from "lucide-react";
 import { NAV } from "@/lib/nav";
 import type { NavGroup, NavItem, Role } from "@/lib/nav";
 import { useAuth } from "@/lib/auth";
+import { useAccount } from "@/lib/account";
+import { findProperty } from "@/lib/propertiesData";
 import { cn } from "@/lib/utils";
 
 type Props = {
@@ -133,6 +135,10 @@ function NavGroupSection({
 export default function Sidebar({ collapsed, onToggle, mobileOpen = false, onMobileClose }: Props) {
   const { profile } = useAuth();
   const role: Role = profile?.role ?? "maker";
+  const { account, hasModule } = useAccount();
+  const singleHotelName = account.accountType === "single"
+    ? findProperty(account.singleHotelId)?.name ?? "Single property"
+    : null;
 
   return (
     <aside
@@ -168,10 +174,10 @@ export default function Sidebar({ collapsed, onToggle, mobileOpen = false, onMob
         {!collapsed && (
           <div className="px-4 pb-3 space-y-0.5">
             <div className="text-[10px] font-semibold uppercase tracking-[0.1em] text-white/35 mb-1">Client</div>
-            <div className="text-[13px] font-semibold text-white/90 truncate">Acme Hotels</div>
+            <div className="text-[13px] font-semibold text-white/90 truncate">{account.clientName}</div>
             <div className="flex items-center gap-1.5 text-[11px] text-white/45">
               <Building2 size={10} className="shrink-0" />
-              <span className="truncate">All Properties (10)</span>
+              <span className="truncate">{singleHotelName ?? "Portfolio · 10 properties"}</span>
             </div>
           </div>
         )}
@@ -197,10 +203,22 @@ export default function Sidebar({ collapsed, onToggle, mobileOpen = false, onMob
             }
             if (section.type === "group") {
               if (!hasRole(section.roles, role)) return;
+              // Single-hotel accounts have no portfolio rollup — the Portfolio
+              // group collapses to a direct "My Hotel" link to that property.
+              if (section.module === "portfolio" && account.accountType === "single") {
+                const myHotel: NavItem = {
+                  to: `/properties/${account.singleHotelId}`,
+                  label: "My Hotel", icon: Building2, matchPrefix: "/properties",
+                };
+                visible.push({ type: "node", key: "my-hotel", el: <NavItemLink key="my-hotel" item={myHotel} collapsed={collapsed} /> });
+                return;
+              }
+              if (section.module && !hasModule(section.module)) return;
               visible.push({ type: "node", key: section.label, el: <NavGroupSection key={section.label} group={section} collapsed={collapsed} /> });
               return;
             }
             if (!hasRole(section.roles, role)) return;
+            if (section.module && !hasModule(section.module)) return;
             visible.push({ type: "node", key: section.to, el: <NavItemLink key={section.to} item={section} collapsed={collapsed} /> });
           });
 

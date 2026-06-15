@@ -24,6 +24,8 @@ import {
   FolderOpen,
 } from "lucide-react";
 
+import type { ModuleKey } from "./account";
+
 // Must match database.types.ts Enums["user_role"] exactly.
 export type Role = "maker" | "checker" | "property_sm" | "super_admin";
 
@@ -34,6 +36,8 @@ export type NavItem = {
   badge?: string;
   matchPrefix?: string;
   roles?: Role[];
+  /** Account entitlement required to show this item (omit = always available). */
+  module?: ModuleKey;
 };
 
 export type NavGroup = {
@@ -42,6 +46,7 @@ export type NavGroup = {
   icon: LucideIcon;
   matchPrefix?: string;
   roles?: Role[];
+  module?: ModuleKey;
   items: NavItem[];
 };
 
@@ -57,6 +62,7 @@ export const NAV: NavSection[] = [
     icon: FolderOpen,
     matchPrefix: "/portfolio",
     roles: ["super_admin"],
+    module: "portfolio",
     items: [
       { to: "/portfolio/dashboard",               label: "Dashboard",           icon: LayoutDashboard, matchPrefix: "/portfolio/dashboard" },
       { to: "/properties",                        label: "Properties",          icon: Building2 },
@@ -68,7 +74,7 @@ export const NAV: NavSection[] = [
   { type: "divider" },
 
   // ── Performance & Reporting ──────────────────────────────────────────
-  { type: "item", to: "/performance/energy/overview", label: "Performance",    icon: BarChart3,   matchPrefix: "/performance", roles: ["property_sm", "super_admin"] },
+  { type: "item", to: "/performance/energy/overview", label: "Performance",    icon: BarChart3,   matchPrefix: "/performance", roles: ["property_sm", "super_admin"], module: "performance" },
 
   { type: "divider" },
 
@@ -85,6 +91,7 @@ export const NAV: NavSection[] = [
     icon: Activity,
     matchPrefix: "/smart-ops",
     roles: ["property_sm", "super_admin"],
+    module: "smartOps",
     items: [
       { to: "/smart-ops",         label: "Overview",    icon: Activity,    matchPrefix: "/smart-ops" },
       { to: "/smart-ops/energy",  label: "Energy",      icon: Zap },
@@ -99,10 +106,10 @@ export const NAV: NavSection[] = [
   { type: "divider" },
 
   // ── Actions & other ──────────────────────────────────────────────────
-  { type: "item", to: "/actions",                     label: "Actions",        icon: Lightbulb,   badge: "3",  roles: ["property_sm", "super_admin"] },
+  { type: "item", to: "/actions",                     label: "Actions",        icon: Lightbulb,   badge: "3",  roles: ["property_sm", "super_admin"], module: "actions" },
   { type: "item", to: "/reports",                     label: "Reports",        icon: FileText,    roles: ["checker", "property_sm", "super_admin"] },
   { type: "item", to: "/certifications",              label: "Certifications", icon: Award,       roles: ["checker", "property_sm", "super_admin"] },
-  { type: "item", to: "/marketplace",                 label: "Marketplace",    icon: ShoppingBag, roles: ["property_sm", "super_admin"] },
+  { type: "item", to: "/marketplace",                 label: "Marketplace",    icon: ShoppingBag, roles: ["property_sm", "super_admin"], module: "marketplace" },
 
   { type: "divider" },
 
@@ -112,6 +119,7 @@ export const NAV: NavSection[] = [
     label: "Engagement",
     icon: Users,
     roles: ["property_sm", "super_admin"],
+    module: "engagement",
     items: [
       { to: "/supplier-portal",  label: "Supplier Portal",  icon: Truck },
       { to: "/ai-assistant",     label: "AI Assistant",     icon: Bot,   badge: "BETA" },

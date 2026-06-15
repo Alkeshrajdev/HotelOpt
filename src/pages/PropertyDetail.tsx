@@ -49,6 +49,7 @@ import {
 } from "@/lib/normalise";
 import GenuinePerformancePanel from "@/components/properties/GenuinePerformancePanel";
 import { carbonBand } from "@/lib/benchmarks";
+import { useAccount } from "@/lib/account";
 import { cn } from "@/lib/utils";
 
 type TabKey =
@@ -91,16 +92,21 @@ export default function PropertyDetail() {
 
   const metrics = findHotelMetricsByName(property.name);
   const band = metrics ? carbonBand(hotelCarbon(metrics).s1s2PerOrn) : null;
+  const { account } = useAccount();
 
   return (
     <div className="space-y-5">
-      <div className="flex items-center text-[12px] text-ink-500 gap-1.5 mb-1">
-        <Link to="/properties" className="hover:text-brand-700 inline-flex items-center gap-1">
-          <ArrowLeft size={12} /> All properties
-        </Link>
-        <span>/</span>
-        <span>{property.name}</span>
-      </div>
+      {account.accountType === "portfolio" ? (
+        <div className="flex items-center text-[12px] text-ink-500 gap-1.5 mb-1">
+          <Link to="/properties" className="hover:text-brand-700 inline-flex items-center gap-1">
+            <ArrowLeft size={12} /> All properties
+          </Link>
+          <span>/</span>
+          <span>{property.name}</span>
+        </div>
+      ) : (
+        <div className="text-[12px] font-medium text-ink-400 mb-1">My Hotel</div>
+      )}
 
       <PageHeader
         eyebrow={`${property.region} · ${property.country}`}

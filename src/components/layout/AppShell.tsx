@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Outlet } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import Topbar from "./Topbar";
+import EntitlementGuard from "./EntitlementGuard";
 import { TopbarProvider } from "@/lib/topbarContext";
 
 export default function AppShell() {
@@ -20,6 +21,7 @@ export default function AppShell() {
 
   return (
     <TopbarProvider>
+      <EntitlementGuard />
       <div className="flex h-screen w-screen overflow-hidden bg-[#F6F8F7]">
         {/* Mobile backdrop */}
         {mobileOpen && (

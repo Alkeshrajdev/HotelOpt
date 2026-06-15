@@ -11,6 +11,15 @@
 
 Latest commit on `main` (Vercel auto-deploys): Task 1 (ORN normalisation) + Task 2 (carbon-spine / single-dataset reconciliation). `npm run lint` (= `tsc --noEmit`) passes clean; no runtime console errors.
 
+### Session 2026-06-15 (cont.) — Task 10: Account entitlements + single-hotel mode (DONE, verified)
+Solved "where does a 1-hotel client manage their property when Portfolio is hidden?" with a per-account entitlements system provisioned from Admin. Root cause: the Portfolio nav group bundled the multi-hotel rollup WITH the only entry point to property management.
+- **`lib/account.tsx`** (NEW) — `AccountProvider`/`useAccount()`: `accountType` (single/portfolio), `singleHotelId`, per-module flags (`portfolio, smartOps, engagement, performance, marketplace, actions`), persisted to localStorage. Mounted in `main.tsx`.
+- **`nav.ts` + `Sidebar.tsx`** — each section tagged with a `module`; nav filters by **role AND entitlement**. Single-hotel: the Portfolio group collapses to a top-level **"My Hotel"** → that property's `PropertyDetail` (property-centric, choice C). Client header derives from the account.
+- **`EntitlementGuard.tsx`** (NEW, mounted in AppShell) — redirects un-entitled URLs home (single-hotel `/portfolio/*` + `/properties` registry → the property; un-entitled module routes → home). Admin/Billing/core workspace are never module-gated (platform-operator tools).
+- **`admin/Clients.tsx`** — live **"Account provisioning"** card: account-type segmented control + single-hotel property picker + module toggle switches + reset. Writes to AccountContext → **nav reshapes immediately** (this is both the real provisioning mechanism and the single-hotel preview).
+- **`PropertyDetail.tsx`** — hides the "All properties" breadcrumb in single-hotel mode (shows "My Hotel").
+- Verified live: flip Single↔Portfolio reshapes nav with no reload; module toggles show/hide; route guard redirects; persists across refresh; reset restores. tsc clean; no console errors.
+
 ### Session 2026-06-15 (cont.) — Task 9: Audit-ready GHG export (DONE, verified)
 Built a structured, defensible GHG Inventory artifact tied to the canonical carbon spine (was just report-generation UI).
 - **`pages/GhgInventory.tsx`** (NEW) at route **`/reports/ghg-inventory`** — GHG-Protocol metadata (period FY2025, organisational boundary 10 hotels · operational control, base year 2019, GWP IPCC AR6 100-yr, Scope 2 location-headline + market-memo, offsets reported separately), assurance/data-confidence block, full **Scope 1/2/3 inventory table** by source (from `SCOPE1_BREAKDOWN` / `SCOPE2_METHODS` / `PORTFOLIO_SCOPE3_CATEGORIES`) with totals from `CARBON` (S1+2 17,997 · S3 24,853 · total 42,850 · 25.2 kgCO₂e/ORN), **emission-factor provenance** table (source · standard · version), and offsets-separate panel.
