@@ -35,3 +35,17 @@ export function benchmarkStd(metric?: "energy" | "water" | "waste" | "carbon"): 
   if (metric === "water") return ` · water per ${BENCHMARK_SOURCE.waterStd}`;
   return "";
 }
+
+// Carbon cohort thresholds (Scope 1+2 kgCO₂e/ORN), matching the CHSB peers shown
+// on the carbon Benchmarks page. Used to give a property a concrete, sourced
+// standing instead of an opaque 0–100 "sustainability score".
+export const CARBON_COHORT = { topQuartile: 18.24, median: 21.95 } as const;
+
+export type BenchmarkBand = { label: string; tone: "good" | "warn" | "bad" };
+
+/** Where a property's carbon intensity (S1+2 kgCO₂e/ORN) sits vs the CHSB cohort. */
+export function carbonBand(s1s2PerOrn: number): BenchmarkBand {
+  if (s1s2PerOrn <= CARBON_COHORT.topQuartile) return { label: "Top quartile", tone: "good" };
+  if (s1s2PerOrn <= CARBON_COHORT.median) return { label: "Above median", tone: "good" };
+  return { label: "Below median", tone: "warn" };
+}

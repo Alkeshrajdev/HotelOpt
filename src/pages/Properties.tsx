@@ -15,7 +15,7 @@ import Badge from "@/components/ui/Badge";
 import ProgressBar from "@/components/ui/ProgressBar";
 import RowActionsMenu from "@/components/properties/RowActionsMenu";
 import AddPropertyModal from "@/components/properties/AddPropertyModal";
-import InfoHint, { SUSTAINABILITY_SCORE_EXPLAINER } from "@/components/ui/InfoHint";
+import InfoHint from "@/components/ui/InfoHint";
 import {
   CERTIFICATIONS,
   OPERATION_TYPES,
@@ -24,6 +24,8 @@ import {
   type PropertyStatus,
   type RichProperty,
 } from "@/lib/propertiesData";
+import { findHotelMetricsByName, hotelCarbon } from "@/lib/normalise";
+import { carbonBand } from "@/lib/benchmarks";
 import { cn } from "@/lib/utils";
 
 type FilterState = {
@@ -103,9 +105,10 @@ export default function Properties() {
     return {
       total: filtered.length,
       gpReady: filtered.filter((p) => p.gpReady).length,
-      avgScore: Math.round(
-        filtered.reduce((s, p) => s + p.score, 0) / Math.max(1, filtered.length)
-      ),
+      belowMedian: filtered.filter((p) => {
+        const m = findHotelMetricsByName(p.name);
+        return m ? carbonBand(hotelCarbon(m).s1s2PerOrn).tone === "warn" : false;
+      }).length,
       avgCompleteness: Math.round(
         filtered.reduce((s, p) => s + p.dataCompleteness, 0) / Math.max(1, filtered.length)
       ),
@@ -139,7 +142,7 @@ export default function Properties() {
       {/* Summary strip */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
         <SummaryTile label="Total properties" value={String(summary.total)} hint={`${PROPERTIES.length} on platform`} />
-        <SummaryTile label="Average score"    value={String(summary.avgScore)}     hint="0–100 sustainability" info={SUSTAINABILITY_SCORE_EXPLAINER} />
+        <SummaryTile label="At/above CHSB median" value={`${summary.total - summary.belowMedian} / ${summary.total}`} hint="carbon/ORN vs cohort" tone="good" />
         <SummaryTile label="Data completeness" value={`${summary.avgCompleteness}%`} hint="approved records" tone="info" />
         <SummaryTile label="GP ready"          value={`${summary.gpReady} / ${summary.total}`} hint="full baseline + 12 mo data" tone="good" />
       </div>

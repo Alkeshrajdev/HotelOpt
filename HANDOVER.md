@@ -11,6 +11,13 @@
 
 Latest commit on `main` (Vercel auto-deploys): Task 1 (ORN normalisation) + Task 2 (carbon-spine / single-dataset reconciliation). `npm run lint` (= `tsc --noEmit`) passes clean; no runtime console errors.
 
+### Session 2026-06-15 (cont.) — Task 7: Retire opaque Sustainability Score (DONE, verified)
+Replaced the black-box 0–100 "Sustainability score" (a composite the client dislikes) with a concrete, **sourced** benchmark standing.
+- **`lib/benchmarks.ts`** — added `CARBON_COHORT` (S1+2 kgCO₂e/ORN: top quartile 18.24, median 21.95) + `carbonBand(s1s2PerOrn)` → {Top quartile / Above median / Below median}, tied to the CHSB cohort from Task 6.
+- **PropertyDetail hero** — "Sustainability score X/100" → **"Carbon vs benchmark"** band (e.g. Skyline "Below median", Montrose "Top quartile"), via `hotelCarbon()` (normalise.ts) + `carbonBand()`. Removed `SUSTAINABILITY_SCORE_EXPLAINER` usage.
+- **Properties summary** — "Average score (0–100)" → **"At/above CHSB median N/10"** (counts properties with carbon/ORN at/above cohort median).
+- Note: `RichProperty.score` field + `SUSTAINABILITY_SCORE_EXPLAINER` constant are now unused (left in place; safe to delete in a cleanup). Verified: no "/100" anywhere; bands vary per property; tsc clean; no console errors.
+
 ### Session 2026-06-15 (cont.) — Task 6: Sourced benchmarks (DONE, verified)
 Replaced anonymous, unsourced "Peer A/B/C" benchmark bars with cited industry-standard cohort reference points.
 - **`lib/benchmarks.ts`** (NEW) — `BENCHMARK_SOURCE` (Cornell CHSB 2023 · full-service · hot/temperate · n=312; carbon per HCMI v1.2; water per HWMI 2.0; illustrative-cohort disclaimer) + `COHORT_MEDIAN_LABEL`/`COHORT_BEST_LABEL` + `benchmarkStd(metric)`.

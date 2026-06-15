@@ -31,7 +31,7 @@ import { Card, CardHeader } from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import ProgressBar from "@/components/ui/ProgressBar";
 import ReadinessChecklist from "@/components/properties/ReadinessChecklist";
-import InfoHint, { SUSTAINABILITY_SCORE_EXPLAINER } from "@/components/ui/InfoHint";
+import InfoHint from "@/components/ui/InfoHint";
 import { GLOSSARY } from "@/components/ui/Abbr";
 import {
   CERTIFICATIONS,
@@ -45,9 +45,10 @@ import {
 import type { PillarKey } from "@/pages/performance/Shell";
 import {
   findHotelMetricsByName, costPerOrn, carbonPerOrn, energyPerOrn,
-  waterPerGn, occupancyPct, UNIT,
+  waterPerGn, occupancyPct, hotelCarbon, UNIT,
 } from "@/lib/normalise";
 import GenuinePerformancePanel from "@/components/properties/GenuinePerformancePanel";
+import { carbonBand } from "@/lib/benchmarks";
 import { cn } from "@/lib/utils";
 
 type TabKey =
@@ -88,6 +89,9 @@ export default function PropertyDetail() {
   const property = findProperty(propertyId);
   if (!property) return <Navigate to="/properties" replace />;
 
+  const metrics = findHotelMetricsByName(property.name);
+  const band = metrics ? carbonBand(hotelCarbon(metrics).s1s2PerOrn) : null;
+
   return (
     <div className="space-y-5">
       <div className="flex items-center text-[12px] text-ink-500 gap-1.5 mb-1">
@@ -123,7 +127,7 @@ export default function PropertyDetail() {
       {/* Hero strip */}
       <Card>
         <div className="p-6 grid grid-cols-2 md:grid-cols-4 gap-3">
-          <HeroStat label="Sustainability score" value={String(property.score)} suffix="/100" info={SUSTAINABILITY_SCORE_EXPLAINER} tone={property.score >= 75 ? "good" : property.score >= 60 ? "warn" : "bad"} />
+          <HeroStat label="Carbon vs benchmark" value={band ? band.label : "—"} info="Scope 1+2 carbon per occupied room night vs the Cornell CHSB cohort (median 21.9 · top quartile 18.2 kgCO₂e/ORN). A concrete, sourced standing — not a composite score." tone={band ? band.tone : "info"} />
           <HeroStat label="Data completeness"    value={`${property.dataCompleteness}%`} tone={property.dataCompleteness >= 80 ? "good" : property.dataCompleteness >= 60 ? "warn" : "bad"} />
           <HeroStat label="GP readiness"         value={property.gpReady ? "Ready" : "Not yet"} info={GLOSSARY.GP} tone={property.gpReady ? "good" : "warn"} />
           <HeroStat label="Certifications"       value={`${property.certifications.length} active`} tone={property.certStatus === "ready" ? "good" : "info"} />
