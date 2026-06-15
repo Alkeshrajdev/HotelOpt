@@ -4,7 +4,7 @@ import PageHeader from "@/components/ui/PageHeader";
 import { Card, CardHeader } from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import { PROPERTIES } from "@/lib/propertiesData";
-import { gpLeaderboard, GP_UTILITY_META, type GpUtility } from "@/lib/genuinePerformance";
+import { gpLeaderboard, gpPortfolioCost, GP_UTILITY_META, type GpUtility } from "@/lib/genuinePerformance";
 
 const UTILITIES: GpUtility[] = ["energy", "water", "waste", "carbon"];
 const idByName = new Map(PROPERTIES.map((p) => [p.name, p.id]));
@@ -12,6 +12,12 @@ const pct = (v: number) => `${v > 0 ? "+" : ""}${v.toFixed(1)}%`;
 const cell = (v: number | undefined) =>
   v === undefined ? <span className="text-ink-300">—</span>
   : <span className={v <= 0 ? "text-good" : "text-bad"}>{pct(v)}</span>;
+
+export const fmtUsd = (v: number) => {
+  const a = Math.abs(v);
+  const s = a >= 1e6 ? `$${(a / 1e6).toFixed(1)}M` : a >= 1e3 ? `$${Math.round(a / 1e3)}k` : `$${Math.round(a)}`;
+  return v < 0 ? `−${s}` : s;
+};
 
 // Operational events feed GP — it recalculates before/after each to isolate impact.
 const EVENTS = [
@@ -25,6 +31,8 @@ export default function GenuinePortfolio() {
   const improving = rows.filter((r) => !r.worsening).length;
   const worsening = rows.filter((r) => r.worsening).length;
   const avg = rows.reduce((s, r) => s + r.composite, 0) / (rows.length || 1);
+  const cost = gpPortfolioCost();
+  const costByName = new Map(cost.byHotel.map((h) => [h.name, h.netUsd]));
 
   return (
     <div className="space-y-5">
@@ -44,7 +52,7 @@ export default function GenuinePortfolio() {
         <SummaryTile label="Portfolio genuine" value={pct(avg)} tone={avg <= 0 ? "good" : "bad"} icon={<Sparkles size={18} />} hint="avg across hotels & utilities" />
         <SummaryTile label="Improving" value={String(improving)} tone="good" icon={<TrendingDown size={18} />} hint="genuine efficiency gain" />
         <SummaryTile label="Worsening" value={String(worsening)} tone="bad" icon={<TrendingUp size={18} />} hint="used more than expected" />
-        <SummaryTile label="Hotels covered" value={String(rows.length)} tone="info" icon={<Sparkles size={18} />} hint="GP-ready properties" />
+        <SummaryTile label="Savings opportunity" value={fmtUsd(cost.leakageUsd)} tone="bad" icon={<TrendingUp size={18} />} hint="recoverable genuine overspend / yr" />
       </div>
 
       {/* Leaderboard */}
@@ -57,6 +65,7 @@ export default function GenuinePortfolio() {
                 <th className="table-th">Hotel</th>
                 {UTILITIES.map((u) => <th key={u} className="table-th text-right">{GP_UTILITY_META[u].label}</th>)}
                 <th className="table-th text-right">Composite</th>
+                <th className="table-th text-right">$ Impact / yr</th>
                 <th className="table-th">Status</th>
               </tr>
             </thead>
@@ -70,6 +79,9 @@ export default function GenuinePortfolio() {
                     </td>
                     {UTILITIES.map((u) => <td key={u} className="table-td text-right tabular-nums">{cell(r.byUtility[u])}</td>)}
                     <td className="table-td text-right tabular-nums font-semibold">{cell(r.composite)}</td>
+                    <td className="table-td text-right tabular-nums font-semibold">
+                      {(() => { const v = costByName.get(r.name) ?? 0; return <span className={v > 0 ? "text-bad" : "text-good"}>{fmtUsd(v)}</span>; })()}
+                    </td>
                     <td className="table-td">
                       <Badge tone={r.worsening ? "bad" : "good"}>{r.worsening ? "Worsening" : "Improving"}</Badge>
                     </td>

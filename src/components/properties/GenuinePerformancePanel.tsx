@@ -4,10 +4,8 @@ import { Card, CardHeader } from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import RawVsGPChart from "@/components/charts/RawVsGPChart";
 import {
-  gpAll, gpResult, gpMonthly, GP_UTILITY_META, type GpUtility,
+  gpAll, gpResult, gpMonthly, gpCostImpact, GP_UTILITY_META, type GpUtility,
 } from "@/lib/genuinePerformance";
-
-const UTILITIES: GpUtility[] = ["energy", "water", "waste", "carbon"];
 
 const fmt = (v: number, u: GpUtility) =>
   u === "waste"
@@ -15,6 +13,11 @@ const fmt = (v: number, u: GpUtility) =>
     : Math.round(v).toLocaleString("en-US");
 
 const pct = (v: number) => `${v > 0 ? "+" : ""}${v.toFixed(1)}%`;
+const fmtUsd = (v: number) => {
+  const a = Math.abs(v);
+  const s = a >= 1e6 ? `$${(a / 1e6).toFixed(1)}M` : a >= 1e3 ? `$${Math.round(a / 1e3)}k` : `$${Math.round(a)}`;
+  return v < 0 ? `−${s}` : s;
+};
 
 /**
  * Concrete Measured → Expected → Genuine view — the property's own-history
@@ -29,6 +32,8 @@ export default function GenuinePerformancePanel({ propertyName }: { propertyName
 
   const meta = GP_UTILITY_META[utility];
   const monthly = gpMonthly(propertyName, utility);
+  const cost = gpCostImpact(propertyName);
+  const costByUtil = new Map(cost.byUtility.map((c) => [c.utility, c.impactUsd]));
   const drivers = r.decomposition.filter((d) => d.key !== "genuine");
   const genuine = r.decomposition.find((d) => d.key === "genuine")!;
   const better = r.genuinePct < r.rawPct; // genuine improvement exceeds the raw
@@ -63,6 +68,7 @@ export default function GenuinePerformancePanel({ propertyName }: { propertyName
                 <th className="table-th text-right">Expected</th>
                 <th className="table-th text-right">Raw vs PY</th>
                 <th className="table-th text-right">Genuine</th>
+                <th className="table-th text-right">$ / yr</th>
               </tr>
             </thead>
             <tbody>
@@ -82,14 +88,25 @@ export default function GenuinePerformancePanel({ propertyName }: { propertyName
                     <td className="table-td text-right tabular-nums font-semibold">
                       <span className={row.genuinePct <= 0 ? "text-good" : "text-bad"}>{pct(row.genuinePct)}</span>
                     </td>
+                    <td className="table-td text-right tabular-nums">
+                      {costByUtil.has(row.utility)
+                        ? <span className={costByUtil.get(row.utility)! > 0 ? "text-bad" : "text-good"}>{fmtUsd(costByUtil.get(row.utility)!)}</span>
+                        : <span className="text-ink-300">—</span>}
+                    </td>
                   </tr>
                 );
               })}
             </tbody>
           </table>
         </div>
-        <div className="px-5 py-2.5 text-[11px] text-ink-400 border-t border-ink-100">
-          Genuine &lt; 0 = used less than the drivers predicted (real efficiency gain). Click a row to inspect.
+        <div className="px-5 py-2.5 text-[11px] border-t border-ink-100 flex flex-wrap items-center justify-between gap-2">
+          <span className="text-ink-400">Genuine &lt; 0 = used less than the drivers predicted. Click a row to inspect.</span>
+          <span className="text-ink-600 font-medium">
+            Net genuine $ impact:{" "}
+            <span className={cost.netUsd > 0 ? "text-bad" : "text-good"}>
+              {cost.netUsd > 0 ? `${fmtUsd(cost.netUsd)} leaking/yr` : `${fmtUsd(Math.abs(cost.netUsd))} saved/yr`}
+            </span>
+          </span>
         </div>
       </Card>
 

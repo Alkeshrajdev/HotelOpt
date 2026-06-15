@@ -204,4 +204,50 @@ export function gpWorseningCount(): number {
   return gpLeaderboard().filter((r) => r.worsening).length;
 }
 
+// ── Cost leakage — monetised genuine over/under-spend ────────────────────────
+// Leakage $ = genuine overspend volume × unit cost. A hotel using MORE than its
+// drivers predict is leaking money; the gap is the addressable savings
+// opportunity. Rates match the canonical PORTFOLIO_HOTELS.utility_cost_usd
+// (Task 1): electricity $120/MWh, water $2/m³, waste $200/t. Carbon is excluded
+// (it's an emission, not a separate bill — counting it would double the energy $).
+const COST_RATE: Partial<Record<GpUtility, number>> = { energy: 120, water: 2, waste: 200 };
+
+export type GpCostItem = { utility: GpUtility; overspendVol: number; impactUsd: number };
+export type GpCostImpact = {
+  byUtility: GpCostItem[];
+  netUsd: number;     // leakage − savings (positive = net overspend)
+  leakageUsd: number; // sum of overspend (the recoverable opportunity)
+  savingUsd: number;  // sum of underspend already achieved
+};
+
+/** Per-property cost impact of genuine over/under-spend, across energy/water/waste. */
+export function gpCostImpact(propertyName: string): GpCostImpact {
+  const byUtility: GpCostItem[] = [];
+  let net = 0, leakage = 0, saving = 0;
+  for (const u of ["energy", "water", "waste"] as GpUtility[]) {
+    const rate = COST_RATE[u];
+    const r = gpResult(propertyName, u);
+    if (!r || rate === undefined) continue;
+    const overspendVol = r.measured - r.expected; // + = used more than expected
+    const impactUsd = overspendVol * rate;
+    byUtility.push({ utility: u, overspendVol, impactUsd });
+    net += impactUsd;
+    if (impactUsd > 0) leakage += impactUsd; else saving += -impactUsd;
+  }
+  return { byUtility, netUsd: net, leakageUsd: leakage, savingUsd: saving };
+}
+
+/** Portfolio roll-up of cost leakage / savings opportunity. */
+export function gpPortfolioCost() {
+  let leakageUsd = 0, savingUsd = 0, netUsd = 0;
+  const byHotel = PORTFOLIO_HOTELS.map((h) => {
+    const c = gpCostImpact(h.name);
+    leakageUsd += c.leakageUsd;
+    savingUsd += c.savingUsd;
+    netUsd += c.netUsd;
+    return { name: h.name, ...c };
+  });
+  return { byHotel, leakageUsd, savingUsd, netUsd };
+}
+
 export { SENSITIVITY };

@@ -11,6 +11,13 @@
 
 Latest commit on `main` (Vercel auto-deploys): Task 1 (ORN normalisation) + Task 2 (carbon-spine / single-dataset reconciliation). `npm run lint` (= `tsc --noEmit`) passes clean; no runtime console errors.
 
+### Session 2026-06-15 (cont.) — Task 5: Cost leakage / savings (DONE, verified)
+Monetised the Genuine Performance engine — **cost leakage = genuine overspend × unit cost**. A hotel using more than its drivers predict is leaking money; the gap is the recoverable savings opportunity.
+- **`lib/genuinePerformance.ts`** — added `gpCostImpact(property)` (per energy/water/waste: overspend volume × rate → $ leakage/saving) + `gpPortfolioCost()`. Rates match the canonical `utility_cost_usd` (Task 1): electricity $120/MWh, water $2/m³, waste $200/t. Carbon excluded (emission, not a bill).
+- **GenuinePortfolio (`/genuine-performance`)** — new **"$ Impact / yr"** leaderboard column (leakage red / savings green) + **"Savings opportunity" $102k** summary tile (= sum of overspend across the 3 worsening hotels: Airport $64k, Marina $30k, Peaks ~$8k).
+- **PropertyDetail GP panel** — `$ / yr` column per utility + footer "Net genuine $ impact: $X leaking/saved per yr" (e.g. Marina $30k leaking, Skyline −$243k saved).
+- Verified: portfolio $102k ties to per-hotel + per-utility; tsc clean; no console errors.
+
 ### Session 2026-06-15 (cont.) — Task 4: Genuine Performance (DONE, verified)
 Replaced the opaque, orphaned "GP Index (base 100)" with a concrete, defensible, **property-level** Measured→Expected→Genuine model. **Decisions:** concrete model leads (index dropped); all drivers (weather CDD/HDD + occupancy ORN + activity covers/laundry); GP is property-level.
 - **`lib/genuinePerformance.ts`** (NEW) — engine: `Expected = baseline × (base + weather·CDD-ratio + occupancy·ORN-ratio + activity·covers-ratio)`, `Genuine = (Measured−Expected)/Expected`. Decomposition reconciles to raw (`raw% = weatherΔ + occΔ + actΔ + genuineΔ`). Derived per-hotel from PORTFOLIO_HOTELS + documented `SENSITIVITY` shares + per-hotel `DRIVERS` ratios. Helpers: `gpResult`/`gpAll`/`gpMonthly`/`gpLeaderboard`/`gpWorseningCount`.
