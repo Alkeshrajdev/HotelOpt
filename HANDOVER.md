@@ -9,7 +9,15 @@
 
 ## Current status (updated 2026-06-22)
 
-Latest commit on `main` (Vercel auto-deploys). `npm run lint` (= `tsc --noEmit`) passes clean; no runtime console errors. **Data Readiness rework + Actions & Measures overhaul both DONE (this session). Next suggested task = Admin Settings build-out (Subscriptions / White-label branding), or the optional Data-Readiness portfolio roll-up below.**
+Latest commit on `main` (Vercel auto-deploys). `npm run lint` (= `tsc --noEmit`) passes clean; no runtime console errors. **Data Readiness rework + Actions & Measures overhaul + property-page declutter all DONE (this session). Next suggested task = Admin Settings build-out (Subscriptions / White-label branding).**
+
+### Session 2026-06-22 (cont.) — Declutter the property/My Hotel page (DONE, verified)
+The property page is a setup/config hub, so the two **analysis** tabs were removed and their per-property detail relocated to where each already lives (client request — "not required here, it's already in a different section").
+- **`PropertyDetail.tsx`** — removed the **Data Readiness** and **Genuine Performance** tabs (and their bodies + now-dead helpers `DataReadinessTab`/`GPSetupTab`/`PILLAR_READINESS`/`DimBar`/`Stat`/`YearTile` + unused imports). Property tabs are now Overview · Configuration · Users · Certifications · QR Points · Audit History. Baseline year still shows in Overview ("GP baseline") + SetupHealthCard; old `?tab=gp` / `?tab=data-readiness` deep-links fall back to Overview.
+- **Genuine Performance relocation** — `performance/GenuinePortfolio.tsx` (`/genuine-performance`) leaderboard rows were a link into the property GP tab; now they **drill in within the section** — click a hotel → an inline `GenuinePerformancePanel` (Measured→Expected→Genuine + decomposition) with a "Property config" link. `GenuinePerformancePanel.tsx` is now consumed here.
+- **Anomaly-detection relocation** — extracted the anomalies UI into **`components/review/AnomaliesPanel.tsx`** and rendered it in **Review & Approval → Capture Status** (under the monthly matrix), so the per-property monthly tracker + anomaly review now live together in one place. The old `components/properties/DataReadinessPanel.tsx` was deleted (matrix already exists in Capture Status; anomalies moved).
+- **`RowActionsMenu.tsx`** — the "Configure baseline / GP" row action now points at `?tab=configuration` (was `?tab=gp`).
+- Verified live: property page shows 6 tabs (no analysis tabs); GP section drill-in renders per-hotel detail; Capture Status shows the anomaly panel (acknowledge/remind intact). tsc clean; no console errors.
 
 ### Session 2026-06-22 (cont.) — Actions & Measures → action control centre (DONE, verified)
 Reworked the page per the client brief: it mixed reduction measures, AI recs, market instruments, offsets, approval workflow and verified savings without enough separation. Now a typed control centre.

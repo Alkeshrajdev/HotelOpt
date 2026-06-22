@@ -77,6 +77,7 @@ import {
 import { PORTFOLIO_HOTELS } from "@/lib/mock";
 import ReminderModal, { type ReminderGroup } from "@/components/review/ReminderModal";
 import CaptureStatusChip from "@/components/review/CaptureStatusChip";
+import AnomaliesPanel from "@/components/review/AnomaliesPanel";
 import { cn } from "@/lib/utils";
 
 type DetailTab = "details" | "evidence" | "comments" | "ai-ocr" | "audit";
@@ -728,6 +729,9 @@ function CaptureStatusTab() {
           </table>
         </div>
       </div>
+
+      {/* Driver-normalised anomaly detection for the selected property */}
+      <AnomaliesPanel propertyName={property} />
 
       {reminderOpen && (
         <ReminderModal

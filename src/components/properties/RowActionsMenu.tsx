@@ -77,7 +77,7 @@ export default function RowActionsMenu({
       key: "gp",
       icon: Sparkles,
       label: "Configure baseline / GP",
-      onClick: () => navigate(`/properties/${propertyId}?tab=gp`),
+      onClick: () => navigate(`/properties/${propertyId}?tab=configuration`),
     },
     {
       key: "cert",

@@ -21,7 +21,6 @@ import {
   Recycle,
   Settings,
   ShieldCheck,
-  Sparkles,
   Users,
   Zap,
 } from "lucide-react";
@@ -30,7 +29,6 @@ import PageHeader from "@/components/ui/PageHeader";
 import { Card, CardHeader } from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import ProgressBar from "@/components/ui/ProgressBar";
-import ReadinessChecklist from "@/components/properties/ReadinessChecklist";
 import InfoHint from "@/components/ui/InfoHint";
 import { GLOSSARY } from "@/components/ui/Abbr";
 import {
@@ -43,8 +41,6 @@ import {
   type RichProperty,
 } from "@/lib/propertiesData";
 import type { PillarKey } from "@/pages/performance/Shell";
-import GenuinePerformancePanel from "@/components/properties/GenuinePerformancePanel";
-import DataReadinessPanel from "@/components/properties/DataReadinessPanel";
 import { useAccount } from "@/lib/account";
 import { cn } from "@/lib/utils";
 
@@ -52,8 +48,6 @@ type TabKey =
   | "overview"
   | "configuration"
   | "users"
-  | "data-readiness"
-  | "gp"
   | "certifications"
   | "qr"
   | "history";
@@ -62,8 +56,6 @@ const TABS: { key: TabKey; label: string; icon: any }[] = [
   { key: "overview",       label: "Overview",        icon: Building2 },
   { key: "configuration",  label: "Configuration",   icon: Settings },
   { key: "users",          label: "Users",           icon: Users },
-  { key: "data-readiness", label: "Data Readiness",  icon: BarChart3 },
-  { key: "gp",             label: "Genuine Performance", icon: Sparkles },
   { key: "certifications", label: "Certifications",  icon: ShieldCheck },
   { key: "qr",             label: "QR Points",       icon: QrCode },
   { key: "history",        label: "Audit History",   icon: History },
@@ -165,8 +157,6 @@ export default function PropertyDetail() {
       {tab === "overview"        && <OverviewTab       property={property} />}
       {tab === "configuration"   && <ConfigurationTab  property={property} onEdit={() => setEditOpen(true)} />}
       {tab === "users"           && <UsersTab          property={property} />}
-      {tab === "data-readiness"  && <DataReadinessTab  property={property} />}
-      {tab === "gp"              && <GPSetupTab        property={property} />}
       {tab === "certifications"  && <CertificationsTab property={property} />}
       {tab === "qr"              && <QrPointsTab       property={property} />}
       {tab === "history"         && <AuditHistoryTab   property={property} />}
@@ -392,174 +382,6 @@ function UsersTab({ property }: { property: RichProperty }) {
           </table>
         </div>
       </Card>
-    </div>
-  );
-}
-
-/* ============================================================== */
-/* TAB 4 — Data Readiness (all 6 pillars, 4 dimensions)          */
-/* ============================================================== */
-
-const PILLAR_READINESS: Record<PillarKey, { completeness: number; timeliness: number; evidenceMatch: number; approvalRate: number }> = {
-  energy:     { completeness: 96, timeliness: 88, evidenceMatch: 91, approvalRate: 94 },
-  water:      { completeness: 89, timeliness: 82, evidenceMatch: 84, approvalRate: 90 },
-  waste:      { completeness: 78, timeliness: 74, evidenceMatch: 70, approvalRate: 82 },
-  carbon:     { completeness: 72, timeliness: 65, evidenceMatch: 68, approvalRate: 76 },
-  social:     { completeness: 60, timeliness: 55, evidenceMatch: 52, approvalRate: 64 },
-  governance: { completeness: 85, timeliness: 80, evidenceMatch: 88, approvalRate: 92 },
-};
-
-function DimBar({ label, value }: { label: string; value: number }) {
-  const tone = value >= 80 ? "bg-good" : value >= 60 ? "bg-warn" : "bg-bad";
-  const textTone = value >= 80 ? "text-good" : value >= 60 ? "text-warn" : "text-bad";
-  return (
-    <div className="flex items-center gap-2 text-[11px]">
-      <span className="w-28 text-ink-500 shrink-0">{label}</span>
-      <div className="flex-1 h-1.5 bg-ink-100 rounded-full overflow-hidden">
-        <div className={cn("h-full rounded-full", tone)} style={{ width: `${value}%` }} />
-      </div>
-      <span className={cn("w-8 text-right font-semibold tabular-nums", textTone)}>{value}%</span>
-    </div>
-  );
-}
-
-function DataReadinessTab({ property }: { property: RichProperty }) {
-  const bias = property.dataCompleteness;
-  const pillars: PillarKey[] = ["energy", "water", "waste", "carbon", "social", "governance"];
-
-  return (
-    <div className="space-y-5">
-      {/* Primary — monthly tracker + anomaly detection */}
-      <DataReadinessPanel propertyName={property.name} />
-
-      {/* Secondary — readiness scores summary */}
-      <div className="pt-1">
-        <h3 className="text-[13px] font-semibold text-ink-700 mb-2">Readiness scores <span className="font-normal text-ink-400">· pillar coverage, timeliness, evidence &amp; approval</span></h3>
-      </div>
-
-      {/* 6-pillar grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-        {pillars.map((p) => {
-          const base = PILLAR_READINESS[p];
-          const scale = bias / 96; // normalize to this property's overall completeness
-          const d = {
-            completeness:  Math.min(100, Math.round(base.completeness  * scale)),
-            timeliness:    Math.min(100, Math.round(base.timeliness    * scale)),
-            evidenceMatch: Math.min(100, Math.round(base.evidenceMatch * scale)),
-            approvalRate:  Math.min(100, Math.round(base.approvalRate  * scale)),
-          };
-          const enabled = property.enabledPillars.includes(p);
-          const overallTone = d.completeness >= 80 ? "good" : d.completeness >= 60 ? "warn" : "bad";
-          return (
-            <Card key={p} className={cn(!enabled && "opacity-50")}>
-              <div className="px-4 pt-4 pb-2 flex items-center justify-between">
-                <span className="text-sm font-semibold text-ink-900 capitalize">{p}</span>
-                <div className="flex items-center gap-2">
-                  {!enabled && <Badge tone="neutral">Disabled</Badge>}
-                  <Badge tone={overallTone}>{d.completeness}%</Badge>
-                </div>
-              </div>
-              <div className="px-4 pb-4 space-y-1.5">
-                <DimBar label="Completeness"  value={d.completeness} />
-                <DimBar label="Timeliness"    value={d.timeliness} />
-                <DimBar label="Evidence match" value={d.evidenceMatch} />
-                <DimBar label="Approval rate" value={d.approvalRate} />
-              </div>
-            </Card>
-          );
-        })}
-      </div>
-
-      {/* Additional readiness sections */}
-      <div className="grid grid-cols-12 gap-4">
-        <Card className="col-span-12 md:col-span-4">
-          <CardHeader title="Certification evidence readiness" />
-          <div className="p-4 space-y-2 text-sm">
-            <Stat label="GSTC"        value="82%" tone={82 >= 80 ? "good" : "warn"} />
-            <Stat label="Green Globe" value="78%" tone="warn" />
-            <Stat label="Travelife"   value="91%" tone="good" />
-          </div>
-        </Card>
-        <Card className="col-span-12 md:col-span-4">
-          <CardHeader title="Supplier data readiness" />
-          <div className="p-4 space-y-2 text-sm">
-            <Stat label="Invited"             value="12 suppliers" />
-            <Stat label="Responded"           value="8 of 12 (67%)" tone="warn" />
-            <Stat label="Specific EFs"        value="6 of 12 (50%)" tone="warn" />
-            <Stat label="High-impact pending" value="3" tone="bad" />
-          </div>
-        </Card>
-        <Card className="col-span-12 md:col-span-4">
-          <CardHeader title="Public page readiness" />
-          <div className="p-4 space-y-2 text-sm">
-            <Stat label="Page status"    value={property.gpReady ? "Live" : "Draft"} tone={property.gpReady ? "good" : "warn"} />
-            <Stat label="Guest metrics"  value="3 of 4 populated" tone="warn" />
-            <Stat label="QR points live" value="4 active" tone="good" />
-            <Stat label="Last updated"   value="2 days ago" />
-          </div>
-        </Card>
-      </div>
-
-    </div>
-  );
-}
-
-/* ============================================================== */
-/* TAB 5 — GP Setup                                               */
-/* ============================================================== */
-
-function GPSetupTab({ property }: { property: RichProperty }) {
-  const baselineComplete = property.baselineYear < new Date().getFullYear();
-  return (
-    <div className="space-y-5">
-      {property.gpReady ? (
-        <GenuinePerformancePanel propertyName={property.name} />
-      ) : (
-        <div className="rounded-xl bg-warn/10 border border-warn/25 p-3 text-[13px] text-ink-700">
-          Genuine Performance results appear once the baseline below is complete. Setup status:
-        </div>
-      )}
-
-      <div className="grid grid-cols-12 gap-4">
-      <Card className="col-span-12 md:col-span-7">
-        <CardHeader title="GP readiness checklist" hint="Genuine Performance requires a complete baseline year of approved data" />
-        <div className="p-6">
-          <ReadinessChecklist
-            items={[
-              { label: "Baseline year selected",      state: "ready",   hint: `Currently ${property.baselineYear}` },
-              { label: "12 months of approved data",  state: baselineComplete ? "ready" : "partial", hint: baselineComplete ? "Full baseline year approved" : "7 of 12 months approved" },
-              { label: "Occupancy data",              state: "ready",   hint: "Opera Cloud PMS connected" },
-              { label: "Weather (CDD/HDD)",           state: "ready",   hint: "Open-Meteo · daily by GPS" },
-              { label: "Operational events log",      state: property.gpReady ? "ready" : "partial", hint: property.gpReady ? "4 events logged" : "Log empty — add at least one major event" },
-            ]}
-          />
-        </div>
-      </Card>
-
-      <Card className="col-span-12 md:col-span-5">
-        <CardHeader title="Comparison readiness" hint="Drives external benchmark pool eligibility" />
-        <div className="p-6">
-          <ReadinessChecklist
-            items={[
-              { label: "Star rating",       state: "ready",  hint: `${property.starRating}★` },
-              { label: "Operation type",    state: "ready",  hint: property.operationType },
-              { label: "Room / GFA size",   state: "ready",  hint: `${property.rooms} rooms · ${property.gfa.toLocaleString()} m²` },
-              { label: "Climate zone (GPS)", state: "ready", hint: "Auto-classified from latitude" },
-              { label: "Pool assignment",   state: property.poolEligible ? "ready" : "missing", hint: property.poolEligible ? "Direct SaaS global pool" : "Awaiting baseline completion" },
-            ]}
-          />
-        </div>
-      </Card>
-
-      <Card className="col-span-12">
-        <CardHeader title="Baseline year history" hint="Changing baseline is audit-logged" />
-        <div className="p-6 grid grid-cols-3 gap-3 text-sm">
-          <YearTile year={property.baselineYear} active label="Current baseline" />
-          <YearTile year={property.baselineYear - 1} label="Previous" />
-          <YearTile year={property.baselineYear - 2} label="Pre-baseline" />
-        </div>
-      </Card>
-      </div>
     </div>
   );
 }
@@ -1104,65 +926,6 @@ function Field({ label, value }: { label: string; value: string }) {
     <div className="flex items-center justify-between gap-3 px-3 py-2.5 text-sm">
       <span className="text-ink-500">{label}</span>
       <span className="text-ink-900 font-medium text-right truncate max-w-[60%]">{value}</span>
-    </div>
-  );
-}
-
-function Stat({
-  label,
-  value,
-  tone = "neutral",
-}: {
-  label: string;
-  value: string;
-  tone?: "neutral" | "good" | "warn" | "bad";
-}) {
-  return (
-    <div className="flex items-center justify-between rounded-lg border border-ink-200 px-3 py-2">
-      <span className="text-ink-700">{label}</span>
-      <span
-        className={cn(
-          "font-semibold",
-          tone === "warn"
-            ? "text-warn"
-            : tone === "bad"
-              ? "text-bad"
-              : tone === "good"
-                ? "text-good"
-                : "text-ink-900"
-        )}
-      >
-        {value}
-      </span>
-    </div>
-  );
-}
-
-function YearTile({
-  year,
-  label,
-  active,
-}: {
-  year: number;
-  label: string;
-  active?: boolean;
-}) {
-  return (
-    <div
-      className={cn(
-        "rounded-xl border p-4 text-center",
-        active ? "border-brand-500 bg-brand-50 ring-1 ring-brand-500" : "border-ink-200 bg-white"
-      )}
-    >
-      <div className="text-[11px] uppercase font-semibold tracking-wide text-ink-500">
-        {label}
-      </div>
-      <div className="text-2xl font-extrabold text-ink-900 mt-1">{year}</div>
-      {active && (
-        <Badge tone="brand" className="mt-2">
-          Active baseline
-        </Badge>
-      )}
     </div>
   );
 }

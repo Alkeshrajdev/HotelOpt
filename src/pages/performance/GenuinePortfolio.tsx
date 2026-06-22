@@ -1,10 +1,13 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Info, Plus, Sparkles, TrendingDown, TrendingUp } from "lucide-react";
+import { ChevronRight, Info, Plus, Settings, Sparkles, TrendingDown, TrendingUp, X } from "lucide-react";
 import PageHeader from "@/components/ui/PageHeader";
 import { Card, CardHeader } from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
+import GenuinePerformancePanel from "@/components/properties/GenuinePerformancePanel";
 import { PROPERTIES } from "@/lib/propertiesData";
 import { gpLeaderboard, gpPortfolioCost, GP_UTILITY_META, type GpUtility } from "@/lib/genuinePerformance";
+import { cn } from "@/lib/utils";
 
 const UTILITIES: GpUtility[] = ["energy", "water", "waste", "carbon"];
 const idByName = new Map(PROPERTIES.map((p) => [p.name, p.id]));
@@ -27,6 +30,7 @@ const EVENTS = [
 ];
 
 export default function GenuinePortfolio() {
+  const [selected, setSelected] = useState<string | null>(null);
   const rows = gpLeaderboard();
   const improving = rows.filter((r) => !r.worsening).length;
   const worsening = rows.filter((r) => r.worsening).length;
@@ -57,7 +61,7 @@ export default function GenuinePortfolio() {
 
       {/* Leaderboard */}
       <Card>
-        <CardHeader title="Genuine improvement by hotel" hint="Best (most negative) first · click a hotel to drill in" />
+        <CardHeader title="Genuine improvement by hotel" hint="Best (most negative) first · click a hotel to drill into its Measured → Expected → Genuine detail" />
         <div className="overflow-x-auto">
           <table className="min-w-full text-sm">
             <thead>
@@ -71,11 +75,18 @@ export default function GenuinePortfolio() {
             </thead>
             <tbody>
               {rows.map((r) => {
-                const id = idByName.get(r.name);
+                const isSel = selected === r.name;
                 return (
-                  <tr key={r.name} className="border-t border-ink-100 hover:bg-ink-50">
+                  <tr
+                    key={r.name}
+                    onClick={() => setSelected(isSel ? null : r.name)}
+                    className={cn("border-t border-ink-100 cursor-pointer", isSel ? "bg-brand-50" : "hover:bg-ink-50")}
+                  >
                     <td className="table-td font-medium">
-                      {id ? <Link to={`/properties/${id}?tab=gp`} className="text-brand-700 hover:underline">{r.name}</Link> : r.name}
+                      <span className="inline-flex items-center gap-1 text-brand-700">
+                        <ChevronRight size={13} className={cn("transition-transform", isSel && "rotate-90")} />
+                        {r.name}
+                      </span>
                     </td>
                     {UTILITIES.map((u) => <td key={u} className="table-td text-right tabular-nums">{cell(r.byUtility[u])}</td>)}
                     <td className="table-td text-right tabular-nums font-semibold">{cell(r.composite)}</td>
@@ -92,6 +103,32 @@ export default function GenuinePortfolio() {
           </table>
         </div>
       </Card>
+
+      {/* Per-hotel drill-in (relocated here from the property page) */}
+      {selected && (() => {
+        const id = idByName.get(selected);
+        return (
+          <Card>
+            <CardHeader
+              title={`Genuine Performance — ${selected}`}
+              hint="Measured → Expected → Genuine, with driver decomposition"
+              right={
+                <div className="flex items-center gap-2">
+                  {id && (
+                    <Link to={`/properties/${id}?tab=configuration`} className="btn-secondary text-[12px] h-8">
+                      <Settings size={13} /> Property config
+                    </Link>
+                  )}
+                  <button onClick={() => setSelected(null)} className="btn-ghost h-8 px-2" title="Close"><X size={14} /></button>
+                </div>
+              }
+            />
+            <div className="p-5">
+              <GenuinePerformancePanel propertyName={selected} />
+            </div>
+          </Card>
+        );
+      })()}
 
       {/* Operational events log */}
       <Card>
