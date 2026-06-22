@@ -202,9 +202,11 @@ export default function Sidebar({ collapsed, onToggle, mobileOpen = false, onMob
               return;
             }
             if (section.type === "group") {
-              if (!hasRole(section.roles, role)) return;
               // Single-hotel accounts have no portfolio rollup — the Portfolio
               // group collapses to a direct "My Hotel" link to that property.
+              // This runs BEFORE the role gate so a single-property user who
+              // isn't super_admin (e.g. property_sm) still gets a route to their
+              // own property instead of no sidebar link at all.
               if (section.module === "portfolio" && account.accountType === "single") {
                 const myHotel: NavItem = {
                   to: `/properties/${account.singleHotelId}`,
@@ -213,6 +215,7 @@ export default function Sidebar({ collapsed, onToggle, mobileOpen = false, onMob
                 visible.push({ type: "node", key: "my-hotel", el: <NavItemLink key="my-hotel" item={myHotel} collapsed={collapsed} /> });
                 return;
               }
+              if (!hasRole(section.roles, role)) return;
               if (section.module && !hasModule(section.module)) return;
               visible.push({ type: "node", key: section.label, el: <NavGroupSection key={section.label} group={section} collapsed={collapsed} /> });
               return;

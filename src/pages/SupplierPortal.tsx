@@ -954,7 +954,7 @@ function ConfidentialityCallout() {
     <div className="rounded-xl border border-brand-200 bg-brand-50/40 p-4 flex items-start gap-3">
       <ShieldAlert size={18} className="text-brand-700 mt-0.5" />
       <div className="text-[13px] text-brand-900">
-        <strong>Confidentiality boundary.</strong> Supplier generic profile and product sustainability data may be reused only where the supplier approves reuse. Client-specific pricing, contract terms, purchase values, volumes, and relationship data remain tenant-specific and are <strong>never visible to other clients</strong> on the platform ().
+        <strong>Confidentiality boundary.</strong> Supplier generic profile and product sustainability data may be reused only where the supplier approves reuse. Client-specific pricing, contract terms, purchase values, volumes, and relationship data remain tenant-specific and are <strong>never visible to other clients</strong> on the platform.
         <div className="mt-1 text-[12px] inline-flex items-center gap-2">
           <Building2 size={12} /> Supplier serves 12 clients · No cross-client data leakage.
           <button className="underline font-semibold inline-flex items-center gap-1"><History size={11} /> Reuse history</button>

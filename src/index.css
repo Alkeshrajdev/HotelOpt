@@ -79,6 +79,20 @@
   h1.page-title {
     @apply text-page-title text-ink-900;
   }
+
+  /* Visible keyboard focus across every interactive element (WCAG 2.4.7).
+     Inputs keep their own focus ring (.input); this covers buttons, links,
+     nav items, tabs, and any element reached by keyboard. Mouse clicks don't
+     trigger :focus-visible, so it stays invisible for pointer users. */
+  :focus-visible {
+    outline: 2px solid rgb(var(--brand-500));
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+  /* Lighter ring on the dark emerald sidebar for contrast. */
+  .sidebar-shell :focus-visible {
+    outline-color: #6FE0A6;
+  }
 }
 
 @layer components {

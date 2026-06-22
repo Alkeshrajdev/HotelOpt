@@ -422,7 +422,7 @@ export default function SmartOpsOverview() {
             right={
               <button
                 className="text-[11px] text-brand-600 hover:text-brand-800 flex items-center gap-0.5 font-medium"
-                onClick={() => navigate("/smart-ops/actions")}
+                onClick={() => navigate("/actions")}
               >
                 View all <ChevronRight size={12} />
               </button>
@@ -458,7 +458,7 @@ export default function SmartOpsOverview() {
               right={
                 <button
                   className="text-[11px] text-brand-600 hover:text-brand-800 flex items-center gap-0.5 font-medium"
-                  onClick={() => navigate("/smart-ops/sensors")}
+                  onClick={() => navigate("/smart-ops/assets")}
                 >
                   Details <ChevronRight size={12} />
                 </button>

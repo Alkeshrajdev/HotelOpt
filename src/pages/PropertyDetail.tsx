@@ -611,13 +611,20 @@ function AuditHistoryTab({ property }: { property: RichProperty }) {
 /* ============================================================== */
 
 function SetupHealthCard({ property }: { property: RichProperty }) {
+  // Derive counts per property rather than hardcoding, so a different property
+  // shows its own users / cert gaps / QR points.
+  const userCount = getAssignedUsers(property.id).length;
+  const qrCount = getQrPoints(property.id).length;
+  const certData = PROPERTY_CERT_READINESS[property.id] ?? {};
+  const certGaps = property.certifications.reduce((n, k) => n + (certData[k]?.gapCount ?? 0), 0);
+
   const items = [
     { label: "Master data",      value: property.country && property.rooms ? "Complete" : "Incomplete",     tone: property.country && property.rooms ? "good" : "bad" as const },
-    { label: "Users assigned",   value: "5 users",                                                           tone: "good" as const },
+    { label: "Users assigned",   value: `${userCount} user${userCount === 1 ? "" : "s"}`,                   tone: userCount > 0 ? "good" : "warn" as const },
     { label: "Data readiness",   value: `${property.dataCompleteness}%`,                                     tone: property.dataCompleteness >= 80 ? "good" : "warn" as const },
     { label: "GP setup",         value: property.gpReady ? "Ready" : "Not ready",                           tone: property.gpReady ? "good" : "warn" as const },
-    { label: "Cert. gaps",       value: `${property.certifications.length > 0 ? "12 gaps" : "N/A"}`,       tone: "warn" as const },
-    { label: "QR points",        value: "4 active",                                                          tone: "good" as const },
+    { label: "Cert. gaps",       value: property.certifications.length > 0 ? `${certGaps} gap${certGaps === 1 ? "" : "s"}` : "N/A", tone: certGaps > 0 ? "warn" : "good" as const },
+    { label: "QR points",        value: `${qrCount} active`,                                                 tone: qrCount > 0 ? "good" : "warn" as const },
     { label: "Public page",      value: property.gpReady ? "Live" : "Draft",                                tone: property.gpReady ? "good" : "warn" as const },
     { label: "Billing / licence", value: "Active",                                                           tone: "good" as const },
   ];

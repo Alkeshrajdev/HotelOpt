@@ -325,7 +325,7 @@ export default function AIAssistant() {
       <div className="rounded-xl bg-warn/10 border border-warn/25 p-3 flex items-start gap-2.5">
         <Bot size={16} className="text-warn mt-0.5 shrink-0" />
         <div className="text-[13px] text-warn">
-          <strong>Refusal state.</strong> If your question isn't covered by the curated knowledge base, the assistant will refuse to answer and offer to escalate to a human expert  to see how that looks. Try asking <em>"What's our stock price?"</em> to see how that looks.
+          <strong>Refusal state.</strong> If your question isn't covered by the curated knowledge base, the assistant will refuse to answer and offer to escalate to a human expert. Try asking <em>"What's our stock price?"</em> to see how that looks.
         </div>
       </div>
 

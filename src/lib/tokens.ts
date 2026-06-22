@@ -28,12 +28,15 @@ export const tokens = {
     950: "#072A1A",
   },
 
-  /** Six pillar accents. Fixed across white-label deployments. */
+  /** Six pillar accents. Fixed across white-label deployments.
+   *  These MUST match the --pillar-* CSS variables in index.css (which drive the
+   *  Tailwind bg-pillar-* utilities) so a chart series and a pillar chip render
+   *  the same hue. */
   pillar: {
     energy:     "#16A34A", // green
     water:      "#0EA5E9", // blue
-    waste:      "#0D9488", // teal
-    carbon:     "#134E4A", // darker teal / slate-green
+    waste:      "#14B8A6", // teal
+    carbon:     "#0F766E", // deep teal
     social:     "#7C3AED", // purple
     governance: "#EA580C", // orange
   },

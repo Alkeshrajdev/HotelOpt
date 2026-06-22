@@ -3,6 +3,7 @@ import { Outlet } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import Topbar from "./Topbar";
 import EntitlementGuard from "./EntitlementGuard";
+import DemoNotice from "@/components/ui/DemoNotice";
 import { TopbarProvider } from "@/lib/topbarContext";
 
 export default function AppShell() {
@@ -39,6 +40,7 @@ export default function AppShell() {
         />
         <div className="flex-1 flex flex-col min-w-0">
           <Topbar onMenu={() => setMobileOpen(true)} />
+          <DemoNotice />
           <main className="flex-1 overflow-y-auto">
             <div className="px-4 sm:px-6 py-5 max-w-[1600px] mx-auto">
               <Outlet />

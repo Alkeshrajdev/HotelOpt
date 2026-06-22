@@ -9,7 +9,21 @@
 
 ## Current status (updated 2026-06-22)
 
-Latest commit on `main` (Vercel auto-deploys). `npm run lint` (= `tsc --noEmit`) passes clean; no runtime console errors. **Data Readiness rework + Actions & Measures overhaul + property-page declutter all DONE (this session). Next suggested task = Admin Settings build-out (Subscriptions / White-label branding).**
+Latest commit on `main` (Vercel auto-deploys). `npm run lint` (= `tsc --noEmit`) passes clean; no runtime console errors. **This session: Data Readiness rework, Actions overhaul, property-page declutter, a 21-agent platform UX review, and the review's quick-wins batch — all DONE. Next = the review's two structural PRs (A: one hotel roster + canonical metrics; B: shared client store + wire the top CTAs), or Admin Settings build-out.**
+
+### Session 2026-06-22 (cont.) — Platform UX review + quick-wins batch (DONE, verified)
+Ran a 21-reviewer design/UX + power-user review (cross-cutting dimensions · surface reviews · persona journeys · adversarial synthesis → 202 raw findings, 24 prioritised). **Verdict:** best-in-class analytical core (GP engine, 3-bucket savings honesty, GHG rigor, Alerts Centre) held back by three systemic P0s — (1) unreconciled parallel datasets (same fact differs across pages; Skyline Dubai is simultaneously Dubai/APAC, EMEA and "Bali, Indonesia" with 240 vs 420 rooms; reporting says 8 hotels vs canonical 10), (2) the "act" half of the loop is largely non-functional (dead CTAs; two convert-to-action engines; DataCapture breaks in demo mode), (3) no shared client-state store so mutations evaporate on navigation. Full prioritised list + impact/effort matrix delivered in chat.
+
+**Quick-wins batch shipped (verified live, tsc clean):**
+- **a11y:** global `:focus-visible` ring in `index.css` (dark-sidebar variant) — restores keyboard focus app-wide (WCAG 2.4.7).
+- **single-hotel nav bug:** `Sidebar.tsx` ran the role gate before the My Hotel substitution, so a `property_sm` got no sidebar route to their property. Moved the substitution above the gate.
+- **property_sm resubmit bug:** `ReviewApproval.tsx` `MakerResponsePanel` was hard-gated to `role==='maker'`, so a single-property SM could never answer a query on her own record. Now `maker || property_sm`.
+- **derived counts:** `PropertyDetail` SetupHealthCard users/cert-gaps/QR were hardcoded (5/12/4) regardless of property — now derived via `getAssignedUsers`/`PROPERTY_CERT_READINESS`/`getQrPoints`. ReviewApproval header subtitle derived from `summary` (note: PageHeader still doesn't render subtitles, so this is hygiene).
+- **token drift:** `tokens.ts` pillar waste/carbon hex (#0D9488/#134E4A) disagreed with `index.css` (#14B8A6/#0F766E), so a chart series and a chip rendered different hues. Aligned `tokens.ts` to the CSS vars.
+- **PageHeader eyebrow:** now rendered as a compact uppercase context label (subtitles still suppressed for density) — restores the only breadcrumb on smart-ops sub-pages.
+- **DemoNotice mounted** in `AppShell` (it self-gates on demo session; demo is the default) — the honest "sample data only" banner finally ships.
+- **dead links / microcopy:** SmartOpsOverview "View all"→`/actions` and "Details"→`/smart-ops/assets` (both were 404s); Certifications gap "Fix" `<a onClick=preventDefault>`→`<Link>`; fixed garbled AIAssistant refusal banner (dup phrase) + Supplier ConfidentialityCallout stray "()".
+- **Deferred from quick wins:** `cn()`+`tailwind-merge` (dep not installed — skipped to avoid a network install + app-wide behavior change); making clickable rows keyboard-operable (`role`/`tabIndex`) folded into the P1 a11y pass.
 
 ### Session 2026-06-22 (cont.) — Declutter the property/My Hotel page (DONE, verified)
 The property page is a setup/config hub, so the two **analysis** tabs were removed and their per-property detail relocated to where each already lives (client request — "not required here, it's already in a different section").

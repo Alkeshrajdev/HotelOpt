@@ -379,13 +379,12 @@ export default function Certifications() {
                         </div>
                         <div className="text-[11px] text-ink-500 mt-1">{g.blocker}</div>
                       </div>
-                      <a
-                        href={g.link}
-                        onClick={(e) => e.preventDefault()}
+                      <Link
+                        to={g.link}
                         className="btn-ghost h-6 px-2 text-[10px] text-brand-700 flex items-center gap-1 shrink-0 whitespace-nowrap"
                       >
                         <Link2 size={10} /> Fix
-                      </a>
+                      </Link>
                     </div>
                     <div className="text-[10px] text-ink-400 mt-1">Pillar: {g.pillar}</div>
                   </li>

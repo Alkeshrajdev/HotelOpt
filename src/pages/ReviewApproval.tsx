@@ -268,7 +268,7 @@ export default function ReviewApproval() {
       <PageHeader
         eyebrow="Approval queue"
         title="Review & Approval"
-        subtitle="24 records are waiting for your decision — 6 are overdue. Anomaly-flagged records surface first. Approve, query, or reject with a mandatory comment. Nothing appears in reports until you approve it."
+        subtitle={`${summary.pending} record${summary.pending === 1 ? "" : "s"} waiting for your decision — ${summary.overdue} overdue. Anomaly-flagged records surface first. Approve, query, or reject with a mandatory comment. Nothing appears in reports until you approve it.`}
         actions={
           <RolePicker
             role={role}
@@ -1103,8 +1103,10 @@ function DetailsTab({
         </div>
       )}
 
-      {/* Maker response UI — shown when role=maker and record is queried with unanswered round */}
-      {role === "maker" && record.status === "queried" &&
+      {/* Maker response UI — shown to the record's submitter when it's queried.
+          A single-property SM is both submitter and reviewer, so property_sm
+          must also be able to answer a query on their own data (not just maker). */}
+      {(role === "maker" || role === "property_sm") && record.status === "queried" &&
         record.queryRounds.some((qr) => !qr.resolved && !qr.response) && (
         <MakerResponsePanel record={record} onResubmit={onResubmit} />
       )}
