@@ -9,7 +9,15 @@
 
 ## Current status (updated 2026-06-22)
 
-Latest commit on `main` (Vercel auto-deploys). `npm run lint` (= `tsc --noEmit`) passes clean; no runtime console errors. **This session: Data Readiness rework, Actions overhaul, property-page declutter, a 21-agent platform UX review, the quick-wins batch, and PR A (roster reconciliation) — all DONE. Next = PR A-2 (metric reconciliation) then PR B (shared client store + wire the top CTAs).**
+Latest commit on `main` (Vercel auto-deploys). `npm run lint` (= `tsc --noEmit`) passes clean; no runtime console errors. **Client steered toward front-end design + flow (not functional wiring), so PR B / PR A-2 are deprioritised. This session also shipped the Navigation & flow pass (part 1). Next front-end work = visual-consistency pass (Smart Ops token sweep + adopt the new Tabs primitive + chart colour semantics), then responsive/mobile pass; plus nav/flow part 2 (section anchors on long pages, insight→action links).**
+
+### Session 2026-06-23 — Navigation & flow pass, part 1 (DONE, verified)
+Front-end IA/flow rework (no functional wiring — the client's focus is design + flow).
+- **Shared `Tabs` primitive** — `components/ui/Tabs.tsx` (NEW): accessible (role=tablist/tab + aria-selected, real focusable buttons so the global :focus-visible ring shows), with `underline` + `segmented` variants. Replaces the 4 hand-rolled tab treatments that had drifted apart.
+- **Performance hub double-tab → two clean rows.** `performance/Shell.tsx` had THREE stacked rows (H1 title + pillar tab strip + view pill row). Now a **segmented pillar selector** (doubles as the page identity — the redundant "Energy Dashboard" H1 is gone) over a single **underline view-tab row**, both via the shared `Tabs`, plus the pillar description for orientation. Verified clean at desktop + 375px (pillars wrap, views scroll).
+- **Restored orphaned views + fixed broken deep-links.** The Shell imported `External/Internal/CarbonInventory/DataQuality/Evidence/Overview` but rendered none of them, and `PILLAR_VIEWS` listed only 4 views — so `/external-comparison` and `/carbon-inventory` (both deep-linked from `actionsData.ts` triggerLinks) silently **redirected to overview**. Added **External Comparison** (energy/water/waste/carbon) and **Carbon Inventory** (carbon) back to `PILLAR_VIEWS` and rendered them; removed the truly-dead imports. Repointed the dead `/internal-comparison` flat route → `/performance/energy/by-property` (the league view stays out of the tab row to avoid bloat; its data was fixed in PR A but `internal-comparison` is still not a tab).
+- **Genuine Performance reachable.** Added a **"Genuine Performance"** sidebar item (→`/genuine-performance`, the working `GenuinePortfolio`), Performance group, `module: performance`. It was previously reachable only via deep links.
+- tsc clean; verified live (2 tablists, External + Carbon Inventory render at their routes, GP sidebar link works, mobile OK, no console errors).
 
 ### Session 2026-06-22 (cont.) — PR A: roster / identity reconciliation (DONE, verified)
 The review's #1 trust-killer: the same hotel had different identities across pages. Fixed the unambiguous roster/identity/count issues (metric-number reconciliation deferred to PR A-2).

@@ -15,6 +15,7 @@ import {
   CreditCard,
   ShoppingBag,
   Zap,
+  Sparkles,
   Droplets,
   Wind,
   Cpu,
@@ -75,6 +76,7 @@ export const NAV: NavSection[] = [
 
   // ── Performance & Reporting ──────────────────────────────────────────
   { type: "item", to: "/performance/energy/overview", label: "Performance",    icon: BarChart3,   matchPrefix: "/performance", roles: ["property_sm", "super_admin"], module: "performance" },
+  { type: "item", to: "/genuine-performance",         label: "Genuine Performance", icon: Sparkles, matchPrefix: "/genuine-performance", roles: ["property_sm", "super_admin"], module: "performance" },
 
   { type: "divider" },
 

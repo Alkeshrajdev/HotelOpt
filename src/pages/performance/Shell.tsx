@@ -1,28 +1,21 @@
 import {
   Navigate,
-  NavLink,
   useNavigate,
   useParams,
 } from "react-router-dom";
 import {
   Cloud,
   Droplet,
-  Recycle,
   ShieldCheck,
   Trash2,
   Users as UsersIcon,
   Zap,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import PageHeader from "@/components/ui/PageHeader";
-import { cn } from "@/lib/utils";
+import Tabs, { type TabItem } from "@/components/ui/Tabs";
 
-import OverviewView from "./Overview";
-import InternalView from "./Internal";
 import ExternalView from "./External";
 import CarbonInventoryView from "./CarbonInventory";
-import DataQualityView from "./DataQuality";
-import EvidenceView from "./Evidence";
 import EnergyOverviewView from "./EnergyOverview";
 import EnergyPerformanceView from "./EnergyPerformance";
 import EnergyByPropertyView from "./EnergyByProperty";
@@ -78,10 +71,10 @@ const VIEW_LABEL: Record<ViewKey, string> = {
 };
 
 const PILLAR_VIEWS: Record<PillarKey, ViewKey[]> = {
-  energy:     ["overview", "performance", "by-property", "benchmarks"],
-  water:      ["overview", "performance", "by-property", "benchmarks"],
-  waste:      ["overview", "performance", "by-property", "benchmarks"],
-  carbon:     ["overview", "performance", "by-property", "benchmarks"],
+  energy:     ["overview", "performance", "by-property", "benchmarks", "external-comparison"],
+  water:      ["overview", "performance", "by-property", "benchmarks", "external-comparison"],
+  waste:      ["overview", "performance", "by-property", "benchmarks", "external-comparison"],
+  carbon:     ["overview", "performance", "by-property", "benchmarks", "external-comparison", "carbon-inventory"],
   social:     ["overview"],
   governance: ["overview"],
 };
@@ -159,45 +152,34 @@ export default function PerformanceShell() {
   }
   const view: ViewKey = viewParam;
 
+  // Pillar selector doubles as the page identity (no redundant "Energy Dashboard"
+  // H1 above it). Views sit on one underline row below — two rows, not three.
+  const pillarItems: TabItem[] = PILLAR_DEFS.map((p) => ({
+    key: p.key, label: p.label, icon: p.icon, activeColor: p.activeColor,
+  }));
+  const viewItems: TabItem[] = allowedViews.map((v) => ({ key: v, label: VIEW_LABEL[v] }));
+
   return (
-    <div className="space-y-5">
-      <PageHeader title={PILLAR_TITLE[pillar]} />
-
-      {/* Pillar tab strip */}
-      <div className="flex items-center gap-1 border-b border-ink-200 overflow-x-auto -mt-2">
-        {PILLAR_DEFS.map((p) => {
-          const Icon = p.icon;
-          const isActive = p.key === pillar;
-          return (
-            <NavLink
-              key={p.key}
-              to={`/performance/${p.key}/overview`}
-              className={cn(
-                "inline-flex items-center gap-2 px-4 py-3 text-sm font-medium transition-colors -mb-px border-b-2",
-                isActive
-                  ? "text-ink-900 border-brand-700"
-                  : "text-ink-500 hover:text-ink-900 border-transparent"
-              )}
-            >
-              <Icon size={16} className={isActive ? p.activeColor : "text-ink-400"} />
-              {p.label}
-            </NavLink>
-          );
-        })}
+    <div className="space-y-4">
+      <div className="space-y-2">
+        <div className="text-[11px] uppercase tracking-[0.06em] font-semibold text-ink-400">Performance</div>
+        <Tabs
+          variant="segmented"
+          ariaLabel="Performance pillar"
+          items={pillarItems}
+          value={pillar}
+          onChange={(k) => navigate(`/performance/${k}/overview`)}
+        />
+        <p className="text-[13px] text-ink-500 max-w-3xl leading-snug">{PILLAR_DESCRIPTIONS[pillar]}</p>
       </div>
 
-      {/* View pill row — filtered per pillar */}
-      <div className="inline-flex flex-wrap items-center gap-1 bg-ink-100 p-1 rounded-xl">
-        {allowedViews.map((v) => (
-          <button
-            key={v}
-            onClick={() => navigate(`/performance/${pillar}/${v}`)}
-            className={cn("tab", v === view && "tab-active")}
-          >
-            {VIEW_LABEL[v]}
-          </button>
-        ))}
-      </div>
+      <Tabs
+        variant="underline"
+        ariaLabel={`${PILLAR_TITLE[pillar]} views`}
+        items={viewItems}
+        value={view}
+        onChange={(v) => navigate(`/performance/${pillar}/${v}`)}
+      />
 
       {/* View body */}
       {view === "overview" && pillar === "energy"     && <EnergyOverviewView />}
@@ -213,6 +195,10 @@ export default function PerformanceShell() {
 
       {view === "benchmarks" && pillar === "energy"   && <EnergyBenchmarksView />}
       {view === "benchmarks" && (pillar === "water" || pillar === "waste" || pillar === "carbon") && <PillarBenchmarksView pillar={pillar} />}
+
+      {/* Restored views (were orphaned: in routes/deep-links but cut from the nav) */}
+      {view === "external-comparison" && <ExternalView pillar={pillar} />}
+      {view === "carbon-inventory" && pillar === "carbon" && <CarbonInventoryView />}
 
     </div>
   );
