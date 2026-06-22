@@ -34,6 +34,7 @@ import {
   Zap,
 } from "lucide-react";
 import PageHeader from "@/components/ui/PageHeader";
+import { PORTFOLIO_HOTELS } from "@/lib/mock";
 import { Card, CardHeader } from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import ProgressBar from "@/components/ui/ProgressBar";
@@ -602,7 +603,7 @@ function NewActionModal({ open, onClose }: { open: boolean; onClose: () => void 
               <span className="text-[12px] font-medium text-ink-600">Property <span className="text-bad">*</span></span>
               <select className="input mt-1" value={form.property} onChange={(e) => set("property", e.target.value)}>
                 <option value="">— Select —</option>
-                {["Skyline Dubai", "Peaks Resort Zermatt", "Oceanfront Cape Town", "The Pavilion London", "Marina Residences Barcelona", "Portfolio"].map((p) => (
+                {[...PORTFOLIO_HOTELS.map((h) => h.name), "Portfolio"].map((p) => (
                   <option key={p} value={p}>{p}</option>
                 ))}
               </select>

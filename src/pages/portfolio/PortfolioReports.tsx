@@ -249,7 +249,7 @@ function GenerateReportTab() {
           <h3 className="font-semibold text-ink-900">Select reporting scope</h3>
           <div className="grid grid-cols-2 gap-3">
             {[
-              { val: "all",    label: "Entire portfolio", sub: "All 8 active hotels" },
+              { val: "all",    label: "Entire portfolio", sub: "All 10 hotels" },
               { val: "group",  label: "By group",         sub: "Select one or more groups" },
               { val: "single", label: "Single hotel",     sub: "One property" },
               { val: "custom", label: "Custom selection", sub: "Choose specific hotels" },
@@ -389,7 +389,7 @@ function GenerateReportTab() {
           </div>
           <div className="rounded-xl bg-ink-50 border border-ink-100 px-4 py-3 text-[12px] text-ink-600 space-y-1">
             <div className="flex gap-4">
-              <span><strong>Scope:</strong> {scope === "all" ? "Entire portfolio (8 hotels)" : scope}</span>
+              <span><strong>Scope:</strong> {scope === "all" ? "Entire portfolio (10 hotels)" : scope}</span>
               <span><strong>Period:</strong> {period}</span>
             </div>
             <div className="flex gap-4">

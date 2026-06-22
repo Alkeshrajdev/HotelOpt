@@ -570,7 +570,7 @@ export default function SmartOpsOverview() {
           <div className="mt-3 pt-3 border-t border-ink-100 flex items-center gap-2">
             <Cpu size={12} className="text-ink-400" />
             <p className="text-[11px] text-ink-400">
-              Dubai Marina Hotel · 320 rooms · Data as of 06 May 2026, 10:30 GST
+              Skyline Dubai · 320 rooms · Data as of 06 May 2026, 10:30 GST
             </p>
           </div>
         </div>

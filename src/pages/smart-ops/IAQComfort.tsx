@@ -501,7 +501,7 @@ function ZoneMapTab() {
             <div className="p-4 pb-3 border-b border-neutral-100">
               <div className="flex items-start justify-between gap-2">
                 <div>
-                  <p className="text-[10px] text-neutral-400 mb-1">Dubai Marina Hotel · {z.floor} · {z.zone}</p>
+                  <p className="text-[10px] text-neutral-400 mb-1">Skyline Dubai · {z.floor} · {z.zone}</p>
                   <div className="flex items-center gap-2">
                     <StatusDot status={z.status} />
                     <p className="text-sm font-semibold text-neutral-800">{z.zone}</p>

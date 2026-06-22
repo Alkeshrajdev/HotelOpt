@@ -1020,7 +1020,7 @@ export default function WaterManagement() {
         <PageHeader
           eyebrow="Smart Operations · Water"
           title="Water Management"
-          subtitle="Consumption, meter data, water balance, and leak detection · Dubai Marina Hotel"
+          subtitle="Consumption, meter data, water balance, and leak detection · Skyline Dubai"
         />
 
         {/* tab navigation */}

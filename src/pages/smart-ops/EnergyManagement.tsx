@@ -1447,7 +1447,7 @@ export default function EnergyManagement() {
       <PageHeader
         eyebrow="Smart Operations · Energy"
         title="Energy Management"
-        subtitle="Electricity consumption, meter data, energy balance, and asset efficiency · Dubai Marina Hotel"
+        subtitle="Electricity consumption, meter data, energy balance, and asset efficiency · Skyline Dubai"
         actions={
           <div className="flex items-center gap-2">
             <Badge tone="info">May 2026</Badge>

@@ -1545,7 +1545,7 @@ export default function AssetPerformance() {
         <PageHeader
           eyebrow="Smart Operations · Assets"
           title="Asset Performance"
-          subtitle="Asset registry, health monitoring, fault detection, and maintenance · Dubai Marina Hotel"
+          subtitle="Asset registry, health monitoring, fault detection, and maintenance · Skyline Dubai"
           actions={
             <div className="flex items-center gap-2">
               {totalAlerts > 0 && (

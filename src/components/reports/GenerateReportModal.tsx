@@ -217,7 +217,7 @@ export default function GenerateReportModal({
         <Section title="Scope" hint="Which properties does this report cover?">
           <div className="grid grid-cols-3 gap-3">
             <ChoiceTile active={form.scope === "portfolio"} onClick={() => set("scope", "portfolio")}
-              icon={<Layers size={18} />} title="Entire portfolio" hint="All 8 properties under this client" />
+              icon={<Layers size={18} />} title="Entire portfolio" hint="All 10 properties under this client" />
             <ChoiceTile active={form.scope === "group"} onClick={() => set("scope", "group")}
               icon={<Building2 size={18} />} title="Property group" hint="Region or brand subset" />
             <ChoiceTile active={form.scope === "property"} onClick={() => set("scope", "property")}

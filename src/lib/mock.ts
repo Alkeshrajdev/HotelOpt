@@ -100,21 +100,11 @@ export const ENERGY_DATA_QUALITY = [
   { name: "Certification Evidence Match", value: 74 },
 ];
 
-export const TOP_PROPERTIES = [
-  { property: "Skyline Dubai",  location: "Bali, Indonesia",       score: 92, reason: "Solar PV at 78% of demand, zero-landfill waste programme" },
-  { property: "Peaks Resort Zermatt",    location: "Whistler, Canada",      score: 88, reason: "LED retrofit complete, greywater reuse saving 31% water" },
-  { property: "Oceanfront Cape Town",     location: "Melbourne, Australia",  score: 85, reason: "Green Globe certified, highest guest engagement score" },
-  { property: "The Pavilion London", location: "Copenhagen, Denmark",   score: 84, reason: "District heating connection, strong governance score" },
-  { property: "Marina Residences Barcelona", location: "Phuket, Thailand",      score: 82, reason: "Top 10% for carbon intensity vs. APAC peer resorts" },
-];
-
-export const NEEDS_ATTENTION = [
-  { property: "Airport Hotel Dubai",   location: "Dubai, UAE",           score: 45, reason: "Diesel backup running 18% of hours — Scope 1 spike" },
-  { property: "Grand Harbour Lisbon",     location: "Istanbul, Turkey",     score: 47, reason: "Water sub-metering incomplete, 3 months estimated data" },
-  { property: "Riverside Bangkok",    location: "Manila, Philippines",  score: 49, reason: "F&B waste missing Q3, certification evidence overdue" },
-  { property: "Coastal Inn",     location: "Doha, Qatar",          score: 50, reason: "Cooling load 40% above regional peer benchmark" },
-  { property: "Riverside Hotel", location: "Bangkok, Thailand",    score: 42, reason: "Lowest in portfolio — onboarding incomplete, 6 blockers" },
-];
+// NOTE: the former TOP_PROPERTIES / NEEDS_ATTENTION arrays were removed — they
+// were unused and carried fabricated identities (e.g. "Skyline Dubai" located in
+// "Bali, Indonesia") that contradicted the canonical roster. Any "top / needs
+// attention" surface should derive from PORTFOLIO_HOTELS + the canonical
+// propertiesData registry instead.
 
 export const AI_INSIGHTS = [
   {
@@ -154,15 +144,21 @@ export const ENERGY_BENCHMARK = {
   ],
 };
 
+// Thin roster mirror for the Internal-comparison league. Identity (name · region ·
+// rooms) is kept consistent with the canonical PORTFOLIO_HOTELS / propertiesData
+// registry — all 10 hotels, correct regions (EMEA 7 · APAC 2 · Africa 1) and room
+// counts. (The legacy 0–100 `score` is its own concept, reconciled separately.)
 export const PROPERTIES = [
-  { id: "P-001", name: "Skyline Dubai", region: "APAC", brand: "Hotel Optimizer", rooms: 240, gfa: 18500, status: "Active", score: 92 },
-  { id: "P-002", name: "Peaks Resort Zermatt", region: "Americas", brand: "Hotel Optimizer", rooms: 180, gfa: 14200, status: "Active", score: 88 },
-  { id: "P-003", name: "Oceanfront Cape Town", region: "APAC", brand: "Hotel Optimizer", rooms: 320, gfa: 22500, status: "Active", score: 85 },
-  { id: "P-004", name: "The Pavilion London", region: "EMEA", brand: "Hotel Optimizer", rooms: 410, gfa: 28800, status: "Active", score: 84 },
-  { id: "P-005", name: "Marina Residences Barcelona", region: "APAC", brand: "Hotel Optimizer", rooms: 290, gfa: 20100, status: "Active", score: 82 },
-  { id: "P-006", name: "Airport Hotel Dubai", region: "EMEA", brand: "Hotel Optimizer", rooms: 360, gfa: 24600, status: "Onboarding", score: 45 },
-  { id: "P-007", name: "Grand Harbour Lisbon", region: "EMEA", brand: "Hotel Optimizer", rooms: 280, gfa: 20800, status: "Active", score: 47 },
-  { id: "P-008", name: "Riverside Bangkok", region: "APAC", brand: "Hotel Optimizer", rooms: 220, gfa: 16400, status: "Active", score: 49 },
+  { id: "P-001", name: "Skyline Dubai",               region: "EMEA",   brand: "Hotel Optimizer", rooms: 420, gfa: 18500, status: "Active",     score: 92 },
+  { id: "P-002", name: "Peaks Resort Zermatt",        region: "EMEA",   brand: "Hotel Optimizer", rooms: 95,  gfa: 14200, status: "Active",     score: 88 },
+  { id: "P-003", name: "Oceanfront Cape Town",        region: "Africa", brand: "Hotel Optimizer", rooms: 210, gfa: 22500, status: "Active",     score: 85 },
+  { id: "P-004", name: "The Pavilion London",         region: "EMEA",   brand: "Hotel Optimizer", rooms: 312, gfa: 28800, status: "Active",     score: 84 },
+  { id: "P-005", name: "Marina Residences Barcelona", region: "EMEA",   brand: "Hotel Optimizer", rooms: 260, gfa: 20100, status: "Active",     score: 82 },
+  { id: "P-006", name: "Airport Hotel Dubai",         region: "EMEA",   brand: "Hotel Optimizer", rooms: 380, gfa: 24600, status: "Onboarding", score: 45 },
+  { id: "P-007", name: "Grand Harbour Lisbon",        region: "EMEA",   brand: "Hotel Optimizer", rooms: 280, gfa: 20800, status: "Active",     score: 47 },
+  { id: "P-008", name: "Riverside Bangkok",           region: "APAC",   brand: "Hotel Optimizer", rooms: 180, gfa: 16400, status: "Onboarding", score: 49 },
+  { id: "P-009", name: "Bay View Singapore",          region: "APAC",   brand: "Hotel Optimizer", rooms: 350, gfa: 26000, status: "Active",     score: 72 },
+  { id: "P-010", name: "The Montrose Paris",          region: "EMEA",   brand: "Hotel Optimizer", rooms: 165, gfa: 12000, status: "Active",     score: 90 },
 ];
 
 export const REVIEW_QUEUE = [
