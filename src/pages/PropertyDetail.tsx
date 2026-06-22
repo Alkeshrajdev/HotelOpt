@@ -43,12 +43,7 @@ import {
   type RichProperty,
 } from "@/lib/propertiesData";
 import type { PillarKey } from "@/pages/performance/Shell";
-import {
-  findHotelMetricsByName, costPerOrn, carbonPerOrn, energyPerOrn,
-  waterPerGn, occupancyPct, hotelCarbon, UNIT,
-} from "@/lib/normalise";
 import GenuinePerformancePanel from "@/components/properties/GenuinePerformancePanel";
-import { carbonBand } from "@/lib/benchmarks";
 import { useAccount } from "@/lib/account";
 import { cn } from "@/lib/utils";
 
@@ -90,9 +85,8 @@ export default function PropertyDetail() {
   const property = findProperty(propertyId);
   if (!property) return <Navigate to="/properties" replace />;
 
-  const metrics = findHotelMetricsByName(property.name);
-  const band = metrics ? carbonBand(hotelCarbon(metrics).s1s2PerOrn) : null;
   const { account } = useAccount();
+  const setupReady = property.dataCompleteness >= 80 && property.gpReady;
 
   return (
     <div className="space-y-5">
@@ -130,40 +124,15 @@ export default function PropertyDetail() {
         }
       />
 
-      {/* Hero strip */}
+      {/* Hero strip — setup & readiness (this page is a configuration hub) */}
       <Card>
         <div className="p-6 grid grid-cols-2 md:grid-cols-4 gap-3">
-          <HeroStat label="Carbon vs benchmark" value={band ? band.label : "—"} info="Scope 1+2 carbon per occupied room night vs the Cornell CHSB cohort (median 21.9 · top quartile 18.2 kgCO₂e/ORN). A concrete, sourced standing — not a composite score." tone={band ? band.tone : "info"} />
-          <HeroStat label="Data completeness"    value={`${property.dataCompleteness}%`} tone={property.dataCompleteness >= 80 ? "good" : property.dataCompleteness >= 60 ? "warn" : "bad"} />
-          <HeroStat label="GP readiness"         value={property.gpReady ? "Ready" : "Not yet"} info={GLOSSARY.GP} tone={property.gpReady ? "good" : "warn"} />
-          <HeroStat label="Certifications"       value={`${property.certifications.length} active`} tone={property.certStatus === "ready" ? "good" : "info"} />
+          <HeroStat label="Setup status"      value={setupReady ? "Ready" : "In progress"} info="Master data, baseline year, users and evidence complete enough to start reporting." tone={setupReady ? "good" : "warn"} />
+          <HeroStat label="Data completeness" value={`${property.dataCompleteness}%`} tone={property.dataCompleteness >= 80 ? "good" : property.dataCompleteness >= 60 ? "warn" : "bad"} />
+          <HeroStat label="GP readiness"      value={property.gpReady ? "Ready" : "Not yet"} info={GLOSSARY.GP} tone={property.gpReady ? "good" : "warn"} />
+          <HeroStat label="Certifications"    value={`${property.certifications.length} active`} tone={property.certStatus === "ready" ? "good" : "info"} />
         </div>
       </Card>
-
-      {/* Normalised performance — per ORN (canonical), water per guest-night */}
-      {(() => {
-        const m = findHotelMetricsByName(property.name);
-        if (!m) return null;
-        const occ = occupancyPct(m);
-        return (
-          <Card>
-            <div className="px-5 pt-4 text-[12px] text-ink-500">
-              Normalised performance — energy, carbon &amp; cost per{" "}
-              <span className="font-semibold text-ink-700">occupied room night (ORN)</span>, the
-              canonical denominator. Water is shown per guest-night (benchmark basis).
-              {!Number.isNaN(occ) && (
-                <span> · Occupancy <span className="font-semibold text-ink-700">{occ.toFixed(0)}%</span></span>
-              )}
-            </div>
-            <div className="p-5 pt-3 grid grid-cols-2 md:grid-cols-4 gap-3">
-              <HeroStat label="Cost / ORN"   value={`$${costPerOrn(m).toFixed(1)}`} tone="info" info="Total utility cost ÷ occupied room nights." />
-              <HeroStat label="Carbon / ORN" value={carbonPerOrn(m).toFixed(1)} suffix={UNIT.carbonOrn} tone="info" />
-              <HeroStat label="Energy / ORN" value={energyPerOrn(m).toFixed(0)} suffix={UNIT.energyOrn} tone="info" />
-              <HeroStat label="Water / GN"   value={waterPerGn(m).toFixed(0)} suffix={UNIT.waterGn} tone="info" info="Litres per guest-night — the hotel water benchmark basis (not per ORN)." />
-            </div>
-          </Card>
-        );
-      })()}
 
       {/* Setup Health summary card */}
       <SetupHealthCard property={property} />
