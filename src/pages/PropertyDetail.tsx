@@ -44,6 +44,7 @@ import {
 } from "@/lib/propertiesData";
 import type { PillarKey } from "@/pages/performance/Shell";
 import GenuinePerformancePanel from "@/components/properties/GenuinePerformancePanel";
+import DataReadinessPanel from "@/components/properties/DataReadinessPanel";
 import { useAccount } from "@/lib/account";
 import { cn } from "@/lib/utils";
 
@@ -427,7 +428,15 @@ function DataReadinessTab({ property }: { property: RichProperty }) {
   const pillars: PillarKey[] = ["energy", "water", "waste", "carbon", "social", "governance"];
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
+      {/* Primary — monthly tracker + anomaly detection */}
+      <DataReadinessPanel propertyName={property.name} />
+
+      {/* Secondary — readiness scores summary */}
+      <div className="pt-1">
+        <h3 className="text-[13px] font-semibold text-ink-700 mb-2">Readiness scores <span className="font-normal text-ink-400">· pillar coverage, timeliness, evidence &amp; approval</span></h3>
+      </div>
+
       {/* 6-pillar grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
         {pillars.map((p) => {
@@ -491,23 +500,6 @@ function DataReadinessTab({ property }: { property: RichProperty }) {
         </Card>
       </div>
 
-      <Card>
-        <CardHeader title="Outstanding meters &amp; sources" />
-        <ul className="p-6 space-y-2 text-sm">
-          <li className="flex items-center justify-between rounded-lg border border-ink-200 p-3">
-            <span>Electricity sub-meter — Pool plant room</span>
-            <Badge tone="warn">No reading in 14 days</Badge>
-          </li>
-          <li className="flex items-center justify-between rounded-lg border border-ink-200 p-3">
-            <span>Diesel logbook — Standby generator</span>
-            <Badge tone="warn">3 entries pending</Badge>
-          </li>
-          <li className="flex items-center justify-between rounded-lg border border-ink-200 p-3">
-            <span>QR — Hazardous waste (south gate)</span>
-            <Badge tone="bad">Inactive</Badge>
-          </li>
-        </ul>
-      </Card>
     </div>
   );
 }

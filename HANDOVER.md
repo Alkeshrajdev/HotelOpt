@@ -7,9 +7,18 @@
 
 ---
 
-## Current status (updated 2026-06-15)
+## Current status (updated 2026-06-22)
 
-Latest commit on `main` (`34dda85`, Vercel auto-deploys). `npm run lint` (= `tsc --noEmit`) passes clean; no runtime console errors. **Next task = Data Readiness rework (see the dedicated section below).**
+Latest commit on `main` (Vercel auto-deploys). `npm run lint` (= `tsc --noEmit`) passes clean; no runtime console errors. **Data Readiness rework is DONE (this session). Next suggested task = Admin Settings build-out — start with Subscriptions or White-label branding (see the Admin Settings section), or the optional Data-Readiness portfolio roll-up below.**
+
+### Session 2026-06-22 — Data Readiness: monthly tracking + anomaly detection (DONE, verified)
+Replaced the static 6-pillar snapshot with a real monthly tracker + driver-normalised anomaly detection, and made it the single source of truth shared with ReviewApproval's Capture Status tab.
+- **`lib/dataReadiness.ts`** (NEW) — the canonical monthly-status model. Per (property, dataType) it generates a deterministic **24-month** series `{ month, status, value }` (seeded hash, no Math.random/Date) from `PORTFOLIO_HOTELS` + GP drivers; the UI windows to the last 12. 14 data types grouped by pillar (Electricity, District cooling, Natural gas, Diesel, Water, 4 waste streams, Refrigerant, Occupancy/ORN, F&B covers, Headcount, Training). Climate sets gate fuel applicability (N/A). Responsible contacts derived per hotel+role (deterministic name pool). `detectAnomalies()` flags monthly values vs a **driver-normalised expected** (degree-days · occupancy · activity, reusing GP `SENSITIVITY`), with MoM & YoY as supporting context; severity >±15% warn / >±30% critical. **Key design point:** a flagged anomaly is the *residual after* weather/occupancy are normalised out, so it's genuine by construction — the hint says what to physically check; the season note is context only (no false "driver-explained" labels). Summary + portfolio roll-up helpers (`readinessSummary`, `portfolioReadiness`, `portfolioAnomalyCount`).
+- **`components/properties/DataReadinessPanel.tsx`** (NEW) — primary content of the property **Data Readiness** tab. Summary tiles (months tracked · coverage % · missing · open anomalies/critical); 12-month coverage matrix grouped by pillar with status chips, anomaly dots, per-row sparkline (anomalies highlighted), per-row + per-month coverage %; pillar filter + "approved only" lens + "Chase missing" bulk reminder. Anomalies panel: expected vs actual, deviation %, MoM/YoY, investigation hint, **acknowledge with reason code → audit trail**, remind owner. Click a populated cell → record modal; missing cell → reminder. The old 6-pillar readiness scores are kept as a **secondary** summary below. Dropped the stale hardcoded "Outstanding meters" card.
+- **`components/review/ReminderModal.tsx`** + **`CaptureStatusChip.tsx`** (NEW, extracted) — the Task-11 ReminderModal and the status chip are now shared components (status chip gains the `submitted` state).
+- **ReviewApproval consolidation** — `CaptureStatusTab` now consumes `lib/dataReadiness.ts` (all **10 canonical hotels** via `PORTFOLIO_HOTELS`, rolling 12 months, per-row/per-month coverage footer), deleting the local `STATUS_MOCK` (which covered only 3 stale-named properties — "Blue Horizon"/"Palm Residences" didn't exist in the canonical set). The two pages now share one model and identical responsible contacts.
+- Verified live: property tab (Skyline 76% coverage · 8 missing · 6 anomalies/3 critical), acknowledge drops open count + writes audit trail, Capture Status renders 14 data types × 12 months with N/A + coverage footer, contacts match across both pages. tsc clean; no console errors.
+- **Optional follow-ups:** wire `portfolioAnomalyCount()`/`portfolioReadiness()` into the dashboard "Needs attention" panel; a portfolio roll-up surface (which properties/months are missing). Anomaly generation is illustrative (seeded) — swap for real submissions when the backend lands.
 
 ### Session 2026-06-15 (cont.) — Task 12: Property page → pure setup/config hub (DONE, verified)
 The property page (incl. single-hotel "My Hotel") still read as a performance page. Removed the always-visible **"Normalised performance"** card (cost/carbon/energy per ORN) and the **"Carbon vs benchmark"** hero stat from `PropertyDetail.tsx`; reframed the hero to setup/readiness (**Setup status · Data completeness · GP readiness · Certifications**). Performance still lives in the Performance module + the property's Genuine Performance tab. The property is now a clean configuration hub (hero → Setup Health → config tabs). Note: the property still has a "Genuine Performance" tab (opt-in); flag if it should move fully into the Performance module.
@@ -134,7 +143,9 @@ Three review passes were completed: a **data-consistency / substance** review, a
 
 ---
 
-## ▶ NEXT TASK — Data Readiness: monthly tracking + anomaly detection
+## ✅ DONE (2026-06-22) — Data Readiness: monthly tracking + anomaly detection
+
+Implemented as described below — see the **Session 2026-06-22** entry near the top for what shipped. The original build plan is retained here for reference / future extension (portfolio roll-up, backend wiring).
 
 **Why:** The current Data Readiness tab (`PropertyDetail.tsx` `DataReadinessTab`) is a static *snapshot* — a 6-pillar grid of % scores (completeness / timeliness / evidence-match / approval), plus certification / supplier / public-page readiness cards and a short "outstanding meters" list. It does **not** show month-by-month coverage and has **no anomaly detection**. Make it practical: a real monthly data tracker + abnormal-value detection.
 
