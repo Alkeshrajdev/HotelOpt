@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { Download } from "lucide-react";
 import PageHeader from "@/components/ui/PageHeader";
+import Tabs from "@/components/ui/Tabs";
 import OverviewTab from "./dashboard/OverviewTab";
 import EnvironmentTab from "./dashboard/EnvironmentTab";
 import TargetsTab from "./dashboard/TargetsTab";
 import HotelsTab from "./dashboard/HotelsTab";
 import SocialGovernanceTab from "./dashboard/SocialGovernanceTab";
-import { cn } from "@/lib/utils";
 
 const TABS = [
   { key: "overview",     label: "Overview" },
@@ -32,22 +32,13 @@ export default function Dashboard() {
         }
       />
 
-      <div className="flex gap-0.5 border-b border-ink-100 overflow-x-auto mt-6 -mx-1">
-        {TABS.map((t) => (
-          <button
-            key={t.key}
-            onClick={() => setTab(t.key)}
-            className={cn(
-              "px-4 py-2.5 text-[13px] font-medium border-b-2 -mb-px whitespace-nowrap transition-colors",
-              tab === t.key
-                ? "border-brand-600 text-brand-700"
-                : "border-transparent text-ink-500 hover:text-ink-800 hover:border-ink-200"
-            )}
-          >
-            {t.label}
-          </button>
-        ))}
-      </div>
+      <Tabs
+        className="mt-6"
+        ariaLabel="Dashboard sections"
+        items={TABS.map((t) => ({ key: t.key, label: t.label }))}
+        value={tab}
+        onChange={(k) => setTab(k as TabKey)}
+      />
 
       <div className="mt-6">
         {tab === "overview"    && <OverviewTab onNavigate={(t) => setTab(t as TabKey)} />}
