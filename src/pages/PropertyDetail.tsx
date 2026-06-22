@@ -29,6 +29,7 @@ import PageHeader from "@/components/ui/PageHeader";
 import { Card, CardHeader } from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import ProgressBar from "@/components/ui/ProgressBar";
+import Tabs from "@/components/ui/Tabs";
 import InfoHint from "@/components/ui/InfoHint";
 import { GLOSSARY } from "@/components/ui/Abbr";
 import {
@@ -131,27 +132,13 @@ export default function PropertyDetail() {
       <SetupHealthCard property={property} />
 
       {/* Tabs */}
-      <div className="flex items-center gap-1 border-b border-ink-200 overflow-x-auto -mt-1">
-        {TABS.map((t) => {
-          const Icon = t.icon;
-          const isActive = t.key === tab;
-          return (
-            <button
-              key={t.key}
-              onClick={() => setTab(t.key)}
-              className={cn(
-                "inline-flex items-center gap-2 px-4 py-3 text-sm font-medium transition-colors -mb-px border-b-2",
-                isActive
-                  ? "text-ink-900 border-brand-700"
-                  : "text-ink-500 hover:text-ink-900 border-transparent"
-              )}
-            >
-              <Icon size={14} className={isActive ? "text-brand-700" : "text-ink-400"} />
-              {t.label}
-            </button>
-          );
-        })}
-      </div>
+      <Tabs
+        className="-mt-1"
+        ariaLabel="Property sections"
+        items={TABS.map((t) => ({ key: t.key, label: t.label, icon: t.icon }))}
+        value={tab}
+        onChange={(k) => setTab(k as TabKey)}
+      />
 
       {/* Tab body */}
       {tab === "overview"        && <OverviewTab       property={property} />}

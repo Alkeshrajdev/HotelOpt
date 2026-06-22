@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
-import { ArrowDownRight, ArrowUpRight, CheckCircle2, Mail, ShieldCheck } from "lucide-react";
+import { Link } from "react-router-dom";
+import { ArrowDownRight, ArrowUpRight, CheckCircle2, Mail, Plus, ShieldCheck } from "lucide-react";
 import { Card, CardHeader } from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import ReminderModal, { type ReminderGroup } from "@/components/review/ReminderModal";
@@ -127,9 +128,21 @@ function AnomalyCard({
               <button onClick={() => setAckOpen(false)} className="btn-secondary text-[11px] h-7">Cancel</button>
             </div>
           ) : (
-            <div className="mt-2 flex items-center gap-2">
+            <div className="mt-2 flex items-center gap-2 flex-wrap">
               <button onClick={() => setAckOpen(true)} className="btn-secondary text-[11px] h-7"><ShieldCheck size={12} /> Acknowledge</button>
               <button onClick={onRemind} className="btn-secondary text-[11px] h-7"><Mail size={12} /> Remind owner</button>
+              {(() => {
+                const pillarParam = ["Energy", "Water", "Waste", "Carbon", "Social"].includes(a.pillar) ? a.pillar.toLowerCase() : "";
+                const title = `Investigate ${a.dataType} anomaly (${a.monthLabel}) — ${a.property}`;
+                return (
+                  <Link
+                    to={`/actions?new=1&property=${encodeURIComponent(a.property)}&pillar=${pillarParam}&title=${encodeURIComponent(title)}`}
+                    className="btn-secondary text-[11px] h-7"
+                  >
+                    <Plus size={12} /> Create action
+                  </Link>
+                );
+              })()}
             </div>
           )}
         </div>

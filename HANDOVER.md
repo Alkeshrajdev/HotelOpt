@@ -11,6 +11,12 @@
 
 Latest commit on `main` (Vercel auto-deploys). `npm run lint` (= `tsc --noEmit`) passes clean; no runtime console errors. **Client steered toward front-end design + flow (not functional wiring), so PR B / PR A-2 are deprioritised. This session also shipped the Navigation & flow pass (part 1). Next front-end work = visual-consistency pass (Smart Ops token sweep + adopt the new Tabs primitive + chart colour semantics), then responsive/mobile pass; plus nav/flow part 2 (section anchors on long pages, insight→action links).**
 
+### Session 2026-06-23 (cont.) — Navigation & flow pass, part 2 (DONE, verified)
+- **Insight → action flow.** The scan→decide→act loop now connects (front-end navigation only — no persistence). `Actions` reads `?new=1&property=…&pillar=…&title=…` and opens the New-action modal **pre-filled** (`NewActionModal` gained an `initial` prop, seeds on open; the param is cleared on close). Added **"Create action"** affordances on the two key insight surfaces: the **GP leaderboard** worsening rows (`GenuinePortfolio` — passes the property + the hotel's *worst* utility as pillar) and the **anomaly cards** (`components/review/AnomaliesPanel` — passes property + pillar + a descriptive title). Verified: GP shows 3 create-action links with correct params; the modal opens pre-filled (title/pillar/property).
+- **Tab-strip consistency.** Migrated the prominent hand-rolled `border-b-2` tab strips to the shared `Tabs` primitive: `PropertyDetail` (6 property sections) and `ReviewApproval` (Approval Queue / Capture Status / Platform Review). Both now share the accessible primitive + the global focus ring.
+- **Remaining in this pass:** section anchors / sticky sub-nav on the long scroll pages (Environment dashboard tab, Smart Ops) — lower priority; not yet done. Migrating the *remaining* tab strips (Dashboard, Smart Ops) to `Tabs` also pending (bleeds into the visual-consistency pass).
+- tsc clean; verified live (pre-fill, GP/anomaly links, both migrated tab strips render + switch, no console errors).
+
 ### Session 2026-06-23 — Navigation & flow pass, part 1 (DONE, verified)
 Front-end IA/flow rework (no functional wiring — the client's focus is design + flow).
 - **Shared `Tabs` primitive** — `components/ui/Tabs.tsx` (NEW): accessible (role=tablist/tab + aria-selected, real focusable buttons so the global :focus-visible ring shows), with `underline` + `segmented` variants. Replaces the 4 hand-rolled tab treatments that had drifted apart.

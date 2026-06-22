@@ -1,5 +1,5 @@
-import { useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import {
   Activity,
   AlertTriangle,
@@ -113,6 +113,28 @@ export default function Actions() {
   const [pillarFilter, setPillarFilter] = useState<"all" | Pillar>("all");
   const [sourceFilter, setSourceFilter] = useState<"all" | Source>("all");
   const [newOpen, setNewOpen] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  // Insight → action: a "Create action" link from a worsening hotel / anomaly /
+  // cert gap lands here as /actions?new=1&property=…&pillar=…&title=… and opens
+  // the New-action modal pre-filled. Front-end flow only — no persistence.
+  const newSeed = useMemo(() => {
+    if (searchParams.get("new") !== "1") return null;
+    return {
+      property: searchParams.get("property") ?? "",
+      pillar: (searchParams.get("pillar") as Pillar) || "",
+      title: searchParams.get("title") ?? "",
+    };
+  }, [searchParams]);
+  useEffect(() => { if (newSeed) setNewOpen(true); }, [newSeed]);
+
+  function closeNew() {
+    setNewOpen(false);
+    if (searchParams.get("new")) {
+      ["new", "property", "pillar", "title"].forEach((k) => searchParams.delete(k));
+      setSearchParams(searchParams, { replace: true });
+    }
+  }
 
   const all = useMemo(() => [...ACTIONS, ...extra], [extra]);
   const reduction = all.filter((a) => !isMarketInstrument(a));
@@ -299,7 +321,7 @@ export default function Actions() {
         </>
       )}
 
-      <NewActionModal open={newOpen} onClose={() => setNewOpen(false)} />
+      <NewActionModal open={newOpen} onClose={closeNew} initial={newSeed} />
     </div>
   );
 }
@@ -544,11 +566,18 @@ const EMPTY_FORM: NewActionForm = {
   title: "", actionType: "", pillar: "", property: "", owner: "", dueDate: "", priority: "", savingValue: "", savingUnit: "tCO₂e/yr",
 };
 
-function NewActionModal({ open, onClose }: { open: boolean; onClose: () => void }) {
+function NewActionModal({ open, onClose, initial }: { open: boolean; onClose: () => void; initial?: Partial<NewActionForm> | null }) {
   const [form, setForm] = useState<NewActionForm>(EMPTY_FORM);
   const [submitted, setSubmitted] = useState(false);
   const set = <K extends keyof NewActionForm>(k: K, v: NewActionForm[K]) => setForm((f) => ({ ...f, [k]: v }));
   const canSubmit = form.title && form.actionType && form.pillar && form.property && form.owner && form.priority;
+
+  // Seed the form each time the modal opens (empty for a manual "New action",
+  // pre-filled when opened from an insight link).
+  useEffect(() => {
+    if (open) { setForm({ ...EMPTY_FORM, ...(initial ?? {}) }); setSubmitted(false); }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
 
   function handleClose() { setForm(EMPTY_FORM); setSubmitted(false); onClose(); }
 

@@ -51,6 +51,7 @@ import {
 } from "lucide-react";
 import PageHeader from "@/components/ui/PageHeader";
 import { Card, CardHeader } from "@/components/ui/Card";
+import Tabs from "@/components/ui/Tabs";
 import Badge from "@/components/ui/Badge";
 import EmptyState from "@/components/ui/EmptyState";
 import CommentDialog, { type CommentAction } from "@/components/review/CommentDialog";
@@ -282,22 +283,17 @@ export default function ReviewApproval() {
       />
 
       {/* Page-level tab strip */}
-      <div className="flex gap-0.5 border-b border-ink-100 -mt-1">
-        {([["queue", "Approval Queue"], ["status", "Capture Status"], ...(account.platformReview ? [["platform", "Platform Review"]] : [])] as [PageTab, string][]).map(([key, label]) => (
-          <button
-            key={key}
-            onClick={() => setPageTab(key)}
-            className={cn(
-              "px-4 py-2.5 text-[13px] font-medium border-b-2 -mb-px whitespace-nowrap transition-colors",
-              pageTab === key
-                ? "border-brand-600 text-brand-700"
-                : "border-transparent text-ink-500 hover:text-ink-800 hover:border-ink-200"
-            )}
-          >
-            {label}
-          </button>
-        ))}
-      </div>
+      <Tabs
+        className="-mt-1"
+        ariaLabel="Review & approval sections"
+        items={[
+          { key: "queue", label: "Approval Queue" },
+          { key: "status", label: "Capture Status" },
+          ...(account.platformReview ? [{ key: "platform", label: "Platform Review" }] : []),
+        ]}
+        value={pageTab}
+        onChange={(k) => setPageTab(k as PageTab)}
+      />
 
       {pageTab === "status" && <CaptureStatusTab />}
 

@@ -94,7 +94,24 @@ export default function GenuinePortfolio() {
                       {(() => { const v = costByName.get(r.name) ?? 0; return <span className={v > 0 ? "text-bad" : "text-good"}>{fmtUsd(v)}</span>; })()}
                     </td>
                     <td className="table-td">
-                      <Badge tone={r.worsening ? "bad" : "good"}>{r.worsening ? "Worsening" : "Improving"}</Badge>
+                      <div className="flex items-center gap-2">
+                        <Badge tone={r.worsening ? "bad" : "good"}>{r.worsening ? "Worsening" : "Improving"}</Badge>
+                        {r.worsening && (() => {
+                          // worst utility = the one using most above expected
+                          const worst = UTILITIES.filter((u) => r.byUtility[u] != null)
+                            .sort((a, b) => (r.byUtility[b] ?? -99) - (r.byUtility[a] ?? -99))[0] ?? "energy";
+                          const title = `Recover genuine ${worst} overspend — ${r.name}`;
+                          return (
+                            <Link
+                              to={`/actions?new=1&property=${encodeURIComponent(r.name)}&pillar=${worst}&title=${encodeURIComponent(title)}`}
+                              onClick={(e) => e.stopPropagation()}
+                              className="text-[11px] font-medium text-brand-700 hover:underline inline-flex items-center gap-0.5 whitespace-nowrap"
+                            >
+                              <Plus size={11} /> Create action
+                            </Link>
+                          );
+                        })()}
+                      </div>
                     </td>
                   </tr>
                 );
