@@ -9,7 +9,10 @@
 
 ## Current status (updated 2026-06-15)
 
-Latest commit on `main` (Vercel auto-deploys): Task 1 (ORN normalisation) + Task 2 (carbon-spine / single-dataset reconciliation). `npm run lint` (= `tsc --noEmit`) passes clean; no runtime console errors.
+Latest commit on `main` (`34dda85`, Vercel auto-deploys). `npm run lint` (= `tsc --noEmit`) passes clean; no runtime console errors. **Next task = Data Readiness rework (see the dedicated section below).**
+
+### Session 2026-06-15 (cont.) — Task 12: Property page → pure setup/config hub (DONE, verified)
+The property page (incl. single-hotel "My Hotel") still read as a performance page. Removed the always-visible **"Normalised performance"** card (cost/carbon/energy per ORN) and the **"Carbon vs benchmark"** hero stat from `PropertyDetail.tsx`; reframed the hero to setup/readiness (**Setup status · Data completeness · GP readiness · Certifications**). Performance still lives in the Performance module + the property's Genuine Performance tab. The property is now a clean configuration hub (hero → Setup Health → config tabs). Note: the property still has a "Genuine Performance" tab (opt-in); flag if it should move fully into the Performance module.
 
 ### Session 2026-06-15 (cont.) — Task 11: Admin/ops batch — billing, report tracker, reminders, 2-layer QC (DONE, verified)
 Four features, each committed separately:
@@ -128,6 +131,28 @@ Three review passes were completed: a **data-consistency / substance** review, a
     - **Reporting Readiness › Generate Report** (`PortfolioReports`) — wizard widened `max-w-2xl`→`max-w-4xl`. The other tabs' tables (8–10 cols) already fill the width.
 
 **Consciously deferred** (structural/subjective, not "polish"): Performance double-tab rework; section anchors on long pages; period-control vocabulary alignment; AI Assistant 1024–1280 tightness; Guest Engagement property picker. Also still slightly airy by design: the small 3–4 KPI/stat summary rows (standard dashboard pattern — tighten only if the client asks). See the design-review notes for rationale.
+
+---
+
+## ▶ NEXT TASK — Data Readiness: monthly tracking + anomaly detection
+
+**Why:** The current Data Readiness tab (`PropertyDetail.tsx` `DataReadinessTab`) is a static *snapshot* — a 6-pillar grid of % scores (completeness / timeliness / evidence-match / approval), plus certification / supplier / public-page readiness cards and a short "outstanding meters" list. It does **not** show month-by-month coverage and has **no anomaly detection**. Make it practical: a real monthly data tracker + abnormal-value detection.
+
+**Build plan:**
+
+1. **Monthly coverage matrix (centrepiece).** Rows = data types / meters (Electricity, District cooling, Natural gas, Diesel, Water, each Waste stream, Refrigerant, Occupancy/ORN, F&B covers…), grouped by pillar. Columns = rolling last 12 months. Cells = status chip: **Approved / Submitted (pending) / Draft / Missing / N/A**. Per-month completeness % footer and per-row coverage %. Filter by pillar + "approved only". Click a populated cell → the record; click a Missing cell → quick "remind responsible".
+   - **Reuse** the Capture-Status grid already in `ReviewApproval.tsx` (`STATUS_MOCK`, responsible person/email per data type) — ideally consolidate so one monthly-status model drives both the Capture Status tab and this matrix (avoid two sources of truth).
+   - Reuse the **ReminderModal** built in Task 11 for the "remind" action (recipients prefilled from the responsible person).
+
+2. **Anomaly detection.** Per data type/meter per month, flag spikes/drops vs (a) prior month, (b) same month last year, and (c) a **driver-normalised expected** value — reuse the GP engine's normalisation (`lib/genuinePerformance.ts` SENSITIVITY/DRIVERS: degree-days, ORN, covers) so a hot month or a fuller hotel isn't falsely flagged. Severity by deviation: e.g. >±15% = warn, >±30% = bad. Show **expected vs actual + % deviation + likely driver** (weather/occupancy/event vs genuine anomaly). Per-row 12-month sparkline with anomalous points highlighted. An "Anomalies" panel listing flagged month/data-type → drill to record, acknowledge/explain (reason code → audit trail), or log an operational event (which GP already accounts for).
+
+3. **Workflow / actions.** Summary tiles (months tracked · % coverage · missing count · open anomalies). "Chase all missing this month" (bulk reminder). Acknowledge/resolve anomalies. Keep the existing readiness scores as a secondary summary.
+
+4. **Data model.** New `lib/dataReadiness.ts` (or extend `reviewMock.ts`): a monthly series per (property, dataType) `{ month, value, status, responsible }` + a `detectAnomalies()` helper (MoM / YoY / driver-normalised). Wire to `PORTFOLIO_HOTELS` + GP drivers for the "expected" baseline.
+
+5. **Surfaces.** Primary: the property **Data Readiness** tab (per-property matrix + anomalies). Optional portfolio roll-up (which properties/months are missing, portfolio anomaly count) — could feed the dashboard "Needs attention" (already shows "Missing meter data"). **Keep distinct from Smart Ops AlertsCentre** (that's real-time asset/BMS anomalies; this is monthly *submission/bill-level* tracking + anomaly review).
+
+**Decisions to confirm when starting:** anomaly basis (MoM + YoY + driver-normalised — recommended — vs simple thresholds); whether to consolidate the monthly-status model with ReviewApproval Capture Status (recommended); portfolio roll-up scope.
 
 ---
 
