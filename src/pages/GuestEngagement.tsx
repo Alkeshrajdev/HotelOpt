@@ -3,11 +3,12 @@ import { Link } from "react-router-dom";
 import {
   AlertTriangle,
   ArrowDown,
+  ArrowRight,
   ArrowUp,
   Award,
-  BarChart2,
   CheckCircle2,
   Clock,
+  Droplet,
   Eye,
   EyeOff,
   ExternalLink,
@@ -16,12 +17,14 @@ import {
   Languages,
   Leaf,
   Lock,
+  LogIn,
+  LogOut,
   Mail,
   MessageSquare,
-  Minus,
   Plus,
   PowerOff,
   QrCode,
+  Recycle,
   Send,
   Share2,
   ShieldCheck,
@@ -30,21 +33,28 @@ import {
   Star,
   Sun,
   Trash2,
+  TrendingUp,
+  Users,
   X,
+  Zap,
 } from "lucide-react";
 import PageHeader from "@/components/ui/PageHeader";
 import { Card, CardHeader } from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import Modal from "@/components/ui/Modal";
+import Tabs from "@/components/ui/Tabs";
 import StatusPipeline from "@/components/shared/StatusPipeline";
-import { GUEST_PAGE_METRICS } from "@/lib/mock";
+import { PORTFOLIO_HOTELS } from "@/lib/mock";
 import { cn } from "@/lib/utils";
+
+const PROPERTY_NAMES = PORTFOLIO_HOTELS.map((h) => h.name);
+const slug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 
 /* ------------------------------------------------------------------ */
 /* Types                                                                */
 /* ------------------------------------------------------------------ */
 
-type Tab = "public" | "campaigns" | "surveys" | "ecopoints";
+type Tab = "overview" | "public" | "campaigns" | "surveys" | "ecopoints";
 
 type PublishStatus = "draft" | "pending" | "live" | "disabled";
 const STATUS_LABEL: Record<PublishStatus, string> = { draft: "Draft", pending: "Pending approval", live: "Live", disabled: "Disabled" };
@@ -144,43 +154,48 @@ const NPS_SCORE = 42;
 /* ------------------------------------------------------------------ */
 
 export default function GuestEngagement() {
-  const [tab, setTab] = useState<Tab>("public");
+  const [tab, setTab] = useState<Tab>("overview");
+  const [property, setProperty] = useState(PROPERTY_NAMES[0] ?? "Skyline Dubai");
 
   return (
     <div className="space-y-5">
       <PageHeader
         eyebrow="Guest experience"
         title="Guest Engagement"
-        subtitle="Public sustainability page, guest campaigns, eco-points, and per-stay carbon footprints visible to guests."
         actions={
           <>
+            {/* Property selector — scopes the page to one hotel */}
+            <select
+              className="h-9 px-3 rounded-lg border border-ink-200 bg-white text-[13px] font-medium text-ink-900 max-w-[200px]"
+              value={property}
+              onChange={(e) => setProperty(e.target.value)}
+              aria-label="Property"
+            >
+              {PROPERTY_NAMES.map((p) => <option key={p} value={p}>{p}</option>)}
+            </select>
             <button className="btn-secondary"><QrCode size={14} /> Print lobby QR</button>
-            <button className="btn-primary"><ExternalLink size={14} /> Open public page</button>
+            <button className="btn-primary" onClick={() => setTab("public")}><ExternalLink size={14} /> Open public page</button>
           </>
         }
       />
 
-      {/* Tabs */}
-      <div className="flex gap-1 border-b border-ink-200 pb-0">
-        {([
-          ["public",    "Public page"],
-          ["campaigns", "Campaigns"],
-          ["surveys",   "Surveys & Feedback"],
-          ["ecopoints", "Eco-points"],
-        ] as [Tab, string][]).map(([key, label]) => (
-          <button
-            key={key}
-            onClick={() => setTab(key)}
-            className={cn("tab text-[13px] pb-3 px-4", tab === key && "tab-active")}
-          >
-            {label}
-          </button>
-        ))}
-      </div>
+      <Tabs
+        ariaLabel="Guest engagement sections"
+        items={[
+          { key: "overview", label: "Overview" },
+          { key: "public", label: "Public page" },
+          { key: "campaigns", label: "Campaigns" },
+          { key: "surveys", label: "Surveys & Feedback" },
+          { key: "ecopoints", label: "Eco-points" },
+        ]}
+        value={tab}
+        onChange={(k) => setTab(k as Tab)}
+      />
 
-      {tab === "public"    && <PublicPageTab />}
-      {tab === "campaigns" && <CampaignsTab />}
-      {tab === "surveys"   && <SurveysTab />}
+      {tab === "overview"  && <OverviewTab property={property} onJump={setTab} />}
+      {tab === "public"    && <PublicPageTab property={property} />}
+      {tab === "campaigns" && <CampaignsTab property={property} />}
+      {tab === "surveys"   && <SurveysTab property={property} />}
       {tab === "ecopoints" && <EcoPointsTab />}
     </div>
   );
@@ -190,10 +205,12 @@ export default function GuestEngagement() {
 /* Tab 1 — Public page (existing content)                              */
 /* ================================================================== */
 
-function PublicPageTab() {
+function PublicPageTab({ property }: { property: string }) {
   const [status, setStatus]   = useState<PublishStatus>("live");
   const [metrics, setMetrics] = useState<PublicMetric[]>(METRIC_REGISTRY);
   const [language, setLanguage] = useState("en");
+  const region = PORTFOLIO_HOTELS.find((h) => h.name === property)?.region ?? "";
+  const domain = `${slug(property)}.hotel-optimizer.com`;
 
   function toggleMetric(name: string) {
     setMetrics((ms) => ms.map((m) => m.name === name && m.brdSafe ? { ...m, isPublic: !m.isPublic } : m));
@@ -207,7 +224,7 @@ function PublicPageTab() {
             <div className="text-[12px] font-semibold uppercase tracking-[0.06em] text-ink-500 mb-1">Publishing status</div>
             <div className="flex items-center gap-3 flex-wrap">
               <Badge tone={STATUS_TONE[status]}>{STATUS_LABEL[status]}</Badge>
-              <span className="text-sm text-ink-700">Skyline Dubai · skyline-dubai.hotel-optimizer.com</span>
+              <span className="text-sm text-ink-700">{property} · {domain}</span>
             </div>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
@@ -228,7 +245,7 @@ function PublicPageTab() {
 
       <div className="grid grid-cols-12 gap-4">
         <Card className="col-span-12 lg:col-span-7">
-          <CardHeader title="Public sustainability page — Skyline Dubai" hint="Branded · verified · provenance-signed"
+          <CardHeader title={`Public sustainability page — ${property}`} hint="Branded · verified · provenance-signed"
             right={
               <div className="flex items-center gap-2">
                 <span className="text-[11px] text-ink-500 inline-flex items-center gap-1"><Languages size={12} /> Language</span>
@@ -241,7 +258,7 @@ function PublicPageTab() {
           <div className="p-6">
             <div className="rounded-2xl border border-ink-200 overflow-hidden">
               <div className="h-40 bg-gradient-to-br from-brand-700 to-brand-500 text-white p-6 flex flex-col justify-end">
-                <div className="text-[12px] uppercase tracking-wide opacity-90">Skyline Dubai · Dubai</div>
+                <div className="text-[12px] uppercase tracking-wide opacity-90">{property}{region ? ` · ${region}` : ""}</div>
                 <div className="text-2xl font-extrabold">A more sustainable stay</div>
                 <div className="text-sm opacity-90">All metrics independently verified through Hotel Optimizer.</div>
               </div>
@@ -293,7 +310,7 @@ function PublicPageTab() {
       <Card>
         <CardHeader title="Per-stay carbon footprint preview" hint="HCMI-aligned · booking confirmation" right={<Badge tone="info"><Globe size={11} /> PMS-driven</Badge>} />
         <div className="grid grid-cols-3 gap-4 p-5">
-          {[["Dubai · Standard · 2 nights","14.6 kgCO₂e"],["Dubai · Pool villa · 3 nights","38.4 kgCO₂e"],["Dubai · Suite · 5 nights","62.1 kgCO₂e"]].map(([l,v]) => (
+          {[["Standard room · 2 nights","14.6 kgCO₂e"],["Pool villa · 3 nights","38.4 kgCO₂e"],["Suite · 5 nights","62.1 kgCO₂e"]].map(([l,v]) => (
             <div key={l} className="rounded-xl border border-ink-200 p-4 bg-gradient-to-br from-brand-50 to-white">
               <div className="text-[11px] text-ink-500">{l}</div>
               <div className="text-2xl font-extrabold text-brand-800 mt-1">{v}</div>
@@ -510,15 +527,15 @@ function RenewableClaimsPanel() {
 type CampaignForm = { name: string; channel: Channel; property: string; template: string; scheduled: string };
 const CAMPAIGN_INITIAL: CampaignForm = { name: "", channel: "email", property: "Skyline Dubai", template: "eco-stay", scheduled: "" };
 
-function CampaignsTab() {
+function CampaignsTab({ property }: { property: string }) {
   const [campaigns, setCampaigns] = useState<Campaign[]>(CAMPAIGNS);
   const [modalOpen, setModalOpen] = useState(false);
   const [editId, setEditId]       = useState<string | null>(null);
-  const [form, setForm]           = useState<CampaignForm>(CAMPAIGN_INITIAL);
+  const [form, setForm]           = useState<CampaignForm>({ ...CAMPAIGN_INITIAL, property });
 
   function set<K extends keyof CampaignForm>(k: K, v: CampaignForm[K]) { setForm((f) => ({ ...f, [k]: v })); }
 
-  function openNew() { setEditId(null); setForm(CAMPAIGN_INITIAL); setModalOpen(true); }
+  function openNew() { setEditId(null); setForm({ ...CAMPAIGN_INITIAL, property }); setModalOpen(true); }
   function openEdit(c: Campaign) {
     setEditId(c.id);
     setForm({ name: c.name, channel: c.channel, property: c.property, template: "eco-stay", scheduled: c.scheduled });
@@ -605,7 +622,7 @@ function CampaignsTab() {
             <div>
               <label className="block text-[12px] font-medium text-ink-700 mb-1">Property</label>
               <select className="input w-full" value={form.property} onChange={(e) => set("property", e.target.value)}>
-                {["Skyline Dubai","Peaks Resort Zermatt","Marina Residences Barcelona","The Pavilion London","All properties"].map((p) => (
+                {[...PROPERTY_NAMES, "All properties"].map((p) => (
                   <option key={p} value={p}>{p}</option>
                 ))}
               </select>
@@ -641,7 +658,7 @@ function CampaignsTab() {
 /* Tab 3 — Surveys & Feedback                                          */
 /* ================================================================== */
 
-function SurveysTab() {
+function SurveysTab({ property }: { property: string }) {
   const [questions, setQuestions] = useState<SurveyQuestion[]>(INITIAL_QUESTIONS);
   const [adding, setAdding]       = useState<QuestionType | null>(null);
   const [newText, setNewText]     = useState("");
@@ -667,7 +684,7 @@ function SurveysTab() {
       <div className="grid grid-cols-12 gap-4">
         {/* Survey builder */}
         <Card className="col-span-12 lg:col-span-6">
-          <CardHeader title="Survey builder" hint="Active survey — Skyline Dubai" />
+          <CardHeader title="Survey builder" hint={`Active survey — ${property}`} />
           <div className="p-4 space-y-2">
             {questions.map((q, i) => (
               <div key={q.id} className="flex items-center gap-2 rounded-xl border border-ink-200 px-3 py-2.5 bg-white hover:bg-ink-50/40">
@@ -866,6 +883,146 @@ function EcoPointsTab() {
       </Card>
     </div>
   );
+}
+
+/* ================================================================== */
+/* Tab 0 — Overview (pulse · collective impact · journey map)          */
+/* ================================================================== */
+
+// Guest eco-action impact: per-occurrence factors × monthly counts → collective
+// impact. Numbers are illustrative but internally consistent.
+const GUEST_ACTIONS: { label: string; count: number; co2: number; water: number; waste: number; icon: typeof Leaf }[] = [
+  { label: "Towel & linen reuse",  count: 1240, co2: 0.6, water: 45, waste: 0,   icon: Recycle },
+  { label: "Housekeeping opt-out", count: 980,  co2: 0.9, water: 30, waste: 0.1, icon: Sparkles },
+  { label: "EV charging",          count: 320,  co2: 4.2, water: 0,  waste: 0,   icon: Zap },
+  { label: "Plant-based meals",    count: 760,  co2: 1.6, water: 0,  waste: 0,   icon: Leaf },
+  { label: "Survey completed",     count: 184,  co2: 0,   water: 0,  waste: 0,   icon: MessageSquare },
+];
+
+type Touchpoint = { label: string; metric: string; active: boolean };
+const JOURNEY: { stage: string; icon: typeof Leaf; points: Touchpoint[] }[] = [
+  { stage: "Pre-stay", icon: LogIn, points: [
+    { label: "Booking confirmation footprint", metric: "PMS-driven · every booking", active: true },
+    { label: "Pre-arrival eco-tips email",     metric: "48% open rate", active: true },
+  ] },
+  { stage: "In-stay", icon: Smartphone, points: [
+    { label: "In-room QR sustainability page", metric: "2,140 scans / 30d", active: true },
+    { label: "Towel & linen reuse",            metric: "31% opt-in", active: true },
+    { label: "Eco-points program",             metric: "3,484 actions", active: true },
+  ] },
+  { stage: "Post-stay", icon: LogOut, points: [
+    { label: "Checkout carbon summary",  metric: "emailed at checkout", active: true },
+    { label: "Sustainability survey",    metric: "NPS +42 · 184 resp", active: true },
+    { label: "Guest review request",     metric: "not configured", active: false },
+  ] },
+];
+
+function fmtK(n: number): string { return n >= 1000 ? `${(n / 1000).toFixed(1)}k` : String(n); }
+
+function OverviewTab({ property, onJump }: { property: string; onJump: (t: Tab) => void }) {
+  const impact = GUEST_ACTIONS.reduce(
+    (a, x) => ({ co2: a.co2 + x.co2 * x.count, water: a.water + x.water * x.count, waste: a.waste + x.waste * x.count, actions: a.actions + x.count }),
+    { co2: 0, water: 0, waste: 0, actions: 0 }
+  );
+  const reach = CAMPAIGNS.reduce((s, c) => s + c.reach, 0);
+
+  return (
+    <div className="space-y-4">
+      {/* Engagement pulse */}
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
+        <PulseTile label="Public page" value="Live" sub={`${slug(property)}.hotel-optimizer.com`} tone="good" icon={<Globe size={15} />} onClick={() => onJump("public")} />
+        <PulseTile label="Guest reach · 30d" value={fmtK(reach)} sub="across campaigns" tone="info" icon={<Mail size={15} />} onClick={() => onJump("campaigns")} />
+        <PulseTile label="Net Promoter Score" value={`+${NPS_SCORE}`} sub="184 responses" tone={NPS_SCORE >= 50 ? "good" : "warn"} icon={<Star size={15} />} onClick={() => onJump("surveys")} />
+        <PulseTile label="Eco-actions · 30d" value={impact.actions.toLocaleString()} sub="guest actions" tone="info" icon={<Leaf size={15} />} onClick={() => onJump("ecopoints")} />
+        <PulseTile label="QR scans · 30d" value="2,140" sub="in-room + lobby" tone="info" icon={<QrCode size={15} />} />
+      </div>
+
+      {/* Collective guest impact — the star widget */}
+      <Card>
+        <CardHeader
+          title="Collective guest impact"
+          hint={`What guests at ${property} achieved this month through their eco-actions`}
+          right={<button className="btn-secondary text-[12px] h-8"><Share2 size={13} /> Share impact</button>}
+        />
+        <div className="p-5 grid grid-cols-1 lg:grid-cols-3 gap-4">
+          <div className="rounded-2xl bg-gradient-to-br from-brand-700 to-brand-500 text-white p-5 flex flex-col justify-center">
+            <div className="text-[12px] uppercase tracking-wide opacity-90">Together, our guests saved</div>
+            <div className="text-4xl font-extrabold mt-1 tabular-nums">{(impact.co2 / 1000).toFixed(1)} t</div>
+            <div className="text-sm opacity-90">CO₂e avoided this month</div>
+            <div className="mt-3 flex gap-5">
+              <div><div className="font-bold text-lg tabular-nums">{Math.round(impact.water / 1000)} m³</div><div className="opacity-80 text-[11px]">water saved</div></div>
+              <div><div className="font-bold text-lg tabular-nums">{Math.round(impact.waste)} kg</div><div className="opacity-80 text-[11px]">waste diverted</div></div>
+              <div><div className="font-bold text-lg tabular-nums">{impact.actions.toLocaleString()}</div><div className="opacity-80 text-[11px]">guest actions</div></div>
+            </div>
+          </div>
+          <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-2 content-start">
+            {GUEST_ACTIONS.filter((a) => a.co2 > 0 || a.water > 0).map((a) => {
+              const Icon = a.icon;
+              const co2 = a.co2 * a.count;
+              const detail = co2 >= 1 ? `${co2.toFixed(0)} kg CO₂e` : `${Math.round((a.water * a.count) / 1000)} m³ water`;
+              return (
+                <div key={a.label} className="rounded-xl border border-ink-200 p-3 flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-lg bg-brand-50 text-brand-700 grid place-items-center shrink-0"><Icon size={16} /></div>
+                  <div className="min-w-0 flex-1">
+                    <div className="text-[12px] font-semibold text-ink-900 truncate">{a.label}</div>
+                    <div className="text-[11px] text-ink-500">{a.count.toLocaleString()} actions · {detail}</div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+        <div className="px-5 pb-4 text-[11px] text-ink-400 flex items-center gap-1.5">
+          <Users size={11} /> Aggregated from anonymised guest eco-actions · use in marketing and ESG reporting with the "Share impact" pack.
+        </div>
+      </Card>
+
+      {/* Guest journey touchpoint map */}
+      <Card>
+        <CardHeader title="Guest journey — sustainability touchpoints" hint="Where sustainability reaches the guest across the stay, and which touchpoints are live." />
+        <div className="p-5 grid grid-cols-1 md:grid-cols-3 gap-4">
+          {JOURNEY.map((s, si) => {
+            const Icon = s.icon;
+            return (
+              <div key={s.stage}>
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-7 h-7 rounded-lg bg-ink-100 text-ink-600 grid place-items-center"><Icon size={14} /></div>
+                  <div className="text-[13px] font-semibold text-ink-900">{s.stage}</div>
+                  {si < JOURNEY.length - 1 && <ArrowRight size={14} className="text-ink-300 ml-auto hidden md:block" />}
+                </div>
+                <div className="space-y-2">
+                  {s.points.map((p) => (
+                    <div key={p.label} className={cn("rounded-xl border p-3", p.active ? "border-ink-200" : "border-dashed border-ink-300 bg-ink-50/50")}>
+                      <div className="flex items-center gap-2">
+                        {p.active ? <CheckCircle2 size={13} className="text-good shrink-0" /> : <Plus size={13} className="text-ink-400 shrink-0" />}
+                        <span className={cn("text-[12px] font-medium", p.active ? "text-ink-900" : "text-ink-500")}>{p.label}</span>
+                      </div>
+                      <div className="text-[11px] mt-0.5 ml-5">
+                        {p.active ? <span className="text-ink-500">{p.metric}</span> : <span className="text-brand-700 inline-flex items-center gap-0.5">Set up <TrendingUp size={10} /></span>}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </Card>
+    </div>
+  );
+}
+
+function PulseTile({ label, value, sub, tone, icon, onClick }: { label: string; value: string; sub?: string; tone: "good" | "warn" | "info"; icon: React.ReactNode; onClick?: () => void }) {
+  const v = tone === "good" ? "text-good" : tone === "warn" ? "text-amber-700" : "text-ink-900";
+  const inner = (
+    <>
+      <div className="flex items-center justify-between"><span className="text-[11px] text-ink-500">{label}</span><span className="text-ink-300">{icon}</span></div>
+      <div className={cn("text-xl font-bold mt-1 tabular-nums", v)}>{value}</div>
+      {sub && <div className="text-[10px] text-ink-400 truncate">{sub}</div>}
+    </>
+  );
+  if (onClick) return <button onClick={onClick} className="text-left rounded-xl border border-ink-200 bg-white p-3 w-full hover:shadow-card hover:border-brand-200 transition">{inner}</button>;
+  return <div className="rounded-xl border border-ink-200 bg-white p-3">{inner}</div>;
 }
 
 /* ------------------------------------------------------------------ */
