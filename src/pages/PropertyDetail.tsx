@@ -11,16 +11,21 @@ import {
   ChevronRight,
   Cloud,
   Droplet,
+  Database,
   Edit3,
   ExternalLink,
+  Gauge,
   Globe,
   History,
   MapPin,
+  Plus,
   PowerOff,
   QrCode,
   Recycle,
   Settings,
   ShieldCheck,
+  Sun,
+  Trash2,
   Users,
   Zap,
 } from "lucide-react";
@@ -39,6 +44,9 @@ import {
   getAssignedUsers,
   getAttributeHistory,
   getQrPoints,
+  type Meter,
+  type MeterCapture,
+  type MeterType,
   type RichProperty,
 } from "@/lib/propertiesData";
 import type { PillarKey } from "@/pages/performance/Shell";
@@ -230,41 +238,211 @@ function OverviewTab({ property }: { property: RichProperty }) {
 
 function ConfigurationTab({ property, onEdit }: { property: RichProperty; onEdit: () => void }) {
   return (
+    <div className="space-y-4">
+      <Card>
+        <CardHeader
+          title="Configuration"
+          hint="Static property master data. Editing a GP-affecting attribute is logged to the attribute history with effective date and reason."
+          right={<button className="btn-primary" onClick={onEdit}><Edit3 size={14} /> Edit configuration</button>}
+        />
+        <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+          <Section title="Identity & legal">
+            <Field label="Property name" value={property.name} />
+            <Field label="Brand" value={property.brand} />
+            <Field label="Portfolio / client" value={property.client} />
+            <Field label="Legal entity" value={property.legalEntity} />
+            <Field label="Registration no." value={property.registrationNo} />
+            <Field label="Ownership" value={property.ownership} />
+            <Field label="Status" value={property.status} />
+          </Section>
+          <Section title="Location & climate">
+            <Field label="Region" value={property.region} />
+            <Field label="Country" value={property.country} />
+            <Field label="City" value={property.city} />
+            <Field label="Address" value={property.address} />
+            <Field label="GPS" value={`${property.latitude}, ${property.longitude}`} />
+            <Field label="Timezone" value={property.timezone} />
+            <Field label="Currency" value={property.currency} />
+            <Field label="Climate zone" value={property.climateZone} />
+            <Field label="Weather station" value={property.weatherStation} />
+          </Section>
+          <Section title="Facility & capacity">
+            <Field label="Star rating" value={"★".repeat(property.starRating)} />
+            <Field label="Rooms (keys)" value={property.rooms.toLocaleString()} />
+            <Field label="Buildings / floors" value={`${property.buildings} / ${property.floors}`} />
+            <Field label="GFA (m²)" value={property.gfa.toLocaleString()} />
+            <Field label="Conditioned area (m²)" value={property.conditionedArea.toLocaleString()} />
+            <Field label="F&B outlets / kitchens" value={`${property.fbOutlets} / ${property.kitchens}`} />
+            <Field label="F&B covers (annual)" value={property.fbCoversAnnual.toLocaleString()} />
+            <Field label="Meeting & event space (m²)" value={property.meetingSpaceM2.toLocaleString()} />
+            <Field label="Pool / spa" value={`${property.poolCount} / ${property.spaCount}`} />
+            <Field label="Laundry" value={property.laundryType} />
+            <Field label="Parking / EV chargers" value={`${property.parkingSpaces} / ${property.evChargers}`} />
+            <Field label="On-site solar PV" value={property.onSitePvKwp > 0 ? `${property.onSitePvKwp.toLocaleString()} kWp` : "None"} />
+          </Section>
+          <Section title="Operations & reporting">
+            <Field label="Operation type" value={property.operationType.replace("-", " ")} />
+            <Field label="Operating schedule" value={property.operatingSchedule} />
+            <Field label="Building year" value={String(property.buildingYear)} />
+            <Field label="GP baseline year" value={String(property.baselineYear)} />
+            <Field label="Reporting year" value={String(property.reportingYear)} />
+            <Field label="Enabled pillars" value={property.enabledPillars.length === 6 ? "All 6 pillars" : `${property.enabledPillars.length} of 6`} />
+          </Section>
+        </div>
+      </Card>
+
+      <MeterRegistry property={property} />
+
+      <ConfiguredElsewhere />
+    </div>
+  );
+}
+
+/* ── Meters & utility accounts (editable registry) ──────────────────────────── */
+
+const METER_TYPES: MeterType[] = ["Electricity", "Natural gas", "Water", "District cooling", "Diesel (standby)"];
+const METER_ICON: Record<MeterType, any> = {
+  "Electricity": Zap, "Natural gas": Sun, "Water": Droplet, "District cooling": Cloud, "Diesel (standby)": Gauge,
+};
+const EMPTY_METER: Omit<Meter, "id"> = { type: "Electricity", meterId: "", supplier: "", accountNo: "", subMeters: 0, capture: "manual" };
+
+function MeterRegistry({ property }: { property: RichProperty }) {
+  const [meters, setMeters] = useState<Meter[]>(property.meters);
+  const [editing, setEditing] = useState<Meter | null>(null);
+  const [open, setOpen] = useState(false);
+
+  function openNew() { setEditing({ id: "", ...EMPTY_METER }); setOpen(true); }
+  function openEdit(m: Meter) { setEditing({ ...m }); setOpen(true); }
+  function remove(id: string) { setMeters((ms) => ms.filter((m) => m.id !== id)); }
+  function save(m: Meter) {
+    if (m.id) setMeters((ms) => ms.map((x) => (x.id === m.id ? m : x)));
+    else setMeters((ms) => [...ms, { ...m, id: `m-${Date.now()}` }]);
+    setOpen(false);
+  }
+
+  const totalSub = meters.reduce((s, m) => s + m.subMeters, 0);
+  const autoCount = meters.filter((m) => m.capture === "auto").length;
+
+  return (
     <Card>
       <CardHeader
-        title="Configuration"
-        hint="Editing any GP-affecting attribute is logged to the attribute history with effective date and reason."
-        right={<button className="btn-primary" onClick={onEdit}><Edit3 size={14} /> Edit configuration</button>}
+        title="Meters & utility accounts"
+        hint={`${meters.length} meters · ${totalSub} sub-meters · ${autoCount} auto-captured. The Data Capture form validates readings against these meter IDs.`}
+        right={<button className="btn-secondary" onClick={openNew}><Plus size={14} /> Add meter</button>}
       />
-      <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Section title="Identity">
-          <Field label="Property name" value={property.name} />
-          <Field label="Brand" value={property.brand} />
-          <Field label="Portfolio / client" value={property.client} />
-        </Section>
-        <Section title="Location">
-          <Field label="Region" value={property.region} />
-          <Field label="Country" value={property.country} />
-          <Field label="City" value={property.city} />
-          <Field label="Address" value={property.address} />
-          <Field label="GPS" value={`${property.latitude}, ${property.longitude}`} />
-          <Field label="Timezone" value={property.timezone} />
-          <Field label="Currency" value={property.currency} />
-        </Section>
-        <Section title="Physical">
-          <Field label="Star rating" value={"★".repeat(property.starRating)} />
-          <Field label="Rooms" value={property.rooms.toLocaleString()} />
-          <Field label="GFA (m²)" value={property.gfa.toLocaleString()} />
-          <Field label="Building year" value={String(property.buildingYear)} />
-          <Field label="F&B outlets" value={String(property.fbOutlets)} />
-          <Field label="F&B covers" value={property.fbCoversAnnual.toLocaleString()} />
-          <Field label="Laundry" value={property.laundryType} />
-          <Field label="Pool / spa" value={`${property.poolCount} / ${property.spaCount}`} />
-        </Section>
-        <Section title="Operations">
-          <Field label="Operation type" value={property.operationType.replace("-", " ")} />
-          <Field label="Ownership" value={property.ownership} />
-        </Section>
+      <div className="overflow-x-auto">
+        <table className="min-w-full text-sm">
+          <thead>
+            <tr className="bg-ink-50 text-left">
+              <th className="table-th">Type</th>
+              <th className="table-th">Meter ID</th>
+              <th className="table-th">Supplier</th>
+              <th className="table-th">Account no.</th>
+              <th className="table-th text-right">Sub-meters</th>
+              <th className="table-th">Capture</th>
+              <th className="table-th text-right pr-6">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {meters.map((m) => {
+              const Icon = METER_ICON[m.type];
+              return (
+                <tr key={m.id} className="border-t border-ink-100 hover:bg-ink-50/50">
+                  <td className="table-td"><span className="inline-flex items-center gap-2 font-medium text-ink-900"><Icon size={14} className="text-ink-400" /> {m.type}</span></td>
+                  <td className="table-td font-mono text-[12px] text-ink-700">{m.meterId}</td>
+                  <td className="table-td text-ink-700">{m.supplier}</td>
+                  <td className="table-td font-mono text-[12px] text-ink-500">{m.accountNo}</td>
+                  <td className="table-td text-right tabular-nums">{m.subMeters}</td>
+                  <td className="table-td"><Badge tone={m.capture === "auto" ? "good" : "neutral"}>{m.capture === "auto" ? "Auto · API/BMS" : "Manual"}</Badge></td>
+                  <td className="table-td text-right pr-6">
+                    <div className="inline-flex items-center gap-1">
+                      <button className="btn-ghost h-7 px-2 text-[12px] text-brand-700" onClick={() => openEdit(m)}><Edit3 size={12} /></button>
+                      <button className="btn-ghost h-7 px-2 text-[12px] text-ink-400 hover:text-bad" onClick={() => remove(m.id)}><Trash2 size={12} /></button>
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
+            {meters.length === 0 && <tr><td colSpan={7} className="table-td text-center text-ink-400 py-6">No meters registered. Add the property's utility meters so readings can be validated.</td></tr>}
+          </tbody>
+        </table>
+      </div>
+      {editing && <MeterModal open={open} meter={editing} onClose={() => setOpen(false)} onSave={save} />}
+    </Card>
+  );
+}
+
+function MeterModal({ open, meter, onClose, onSave }: { open: boolean; meter: Meter; onClose: () => void; onSave: (m: Meter) => void }) {
+  const [form, setForm] = useState<Meter>(meter);
+  const set = <K extends keyof Meter>(k: K, v: Meter[K]) => setForm((f) => ({ ...f, [k]: v }));
+  const canSave = form.meterId.trim() && form.supplier.trim();
+  return (
+    <Modal open={open} onClose={onClose} title={meter.id ? "Edit meter" : "Add meter"} size="md"
+      footer={<>
+        <button className="btn-secondary" onClick={onClose}>Cancel</button>
+        <button className={cn("btn-primary", !canSave && "opacity-50 cursor-not-allowed")} disabled={!canSave} onClick={() => onSave(form)}>Save meter</button>
+      </>}>
+      <div className="p-5 grid grid-cols-2 gap-3">
+        <label className="block col-span-2">
+          <span className="text-[12px] font-medium text-ink-600">Meter type</span>
+          <select className="input mt-1" value={form.type} onChange={(e) => set("type", e.target.value as MeterType)}>
+            {METER_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
+          </select>
+        </label>
+        <label className="block">
+          <span className="text-[12px] font-medium text-ink-600">Meter ID <span className="text-bad">*</span></span>
+          <input className="input mt-1 font-mono" placeholder="EM-P001-MAIN" value={form.meterId} onChange={(e) => set("meterId", e.target.value)} />
+        </label>
+        <label className="block">
+          <span className="text-[12px] font-medium text-ink-600">Account no.</span>
+          <input className="input mt-1 font-mono" placeholder="AC-…" value={form.accountNo} onChange={(e) => set("accountNo", e.target.value)} />
+        </label>
+        <label className="block">
+          <span className="text-[12px] font-medium text-ink-600">Supplier <span className="text-bad">*</span></span>
+          <input className="input mt-1" placeholder="e.g. DEWA" value={form.supplier} onChange={(e) => set("supplier", e.target.value)} />
+        </label>
+        <label className="block">
+          <span className="text-[12px] font-medium text-ink-600">Sub-meters</span>
+          <input type="number" min={0} className="input mt-1" value={form.subMeters} onChange={(e) => set("subMeters", Number(e.target.value) || 0)} />
+        </label>
+        <label className="block col-span-2">
+          <span className="text-[12px] font-medium text-ink-600">Capture method</span>
+          <select className="input mt-1" value={form.capture} onChange={(e) => set("capture", e.target.value as MeterCapture)}>
+            <option value="auto">Auto · API / BMS</option>
+            <option value="manual">Manual · bill / reading</option>
+          </select>
+        </label>
+      </div>
+    </Modal>
+  );
+}
+
+/* ── "Configured elsewhere" cross-links (avoid duplicating other sections) ──── */
+
+function ConfiguredElsewhere() {
+  const links = [
+    { label: "Targets, baselines & reporting period", where: "Portfolio Setup", to: "/portfolio/setup", icon: BarChart3 },
+    { label: "Reporting frameworks & GHG boundary", where: "Portfolio Setup", to: "/portfolio/setup", icon: ShieldCheck },
+    { label: "Emission factors (grid, fuels, GWP)", where: "Admin · EF Library", to: "/admin/ef-library", icon: Database },
+    { label: "Operational drivers & data sources", where: "Data Capture", to: "/data-capture", icon: Gauge },
+  ];
+  return (
+    <Card>
+      <CardHeader title="Configured elsewhere" hint="These settings affect this property but are managed at the portfolio or platform level." />
+      <div className="p-4 grid grid-cols-1 sm:grid-cols-2 gap-2">
+        {links.map((l) => {
+          const Icon = l.icon;
+          return (
+            <Link key={l.label} to={l.to} className="flex items-center gap-3 rounded-xl border border-ink-200 p-3 hover:border-brand-300 hover:bg-ink-50/50 transition-colors">
+              <div className="w-8 h-8 rounded-lg bg-ink-100 text-ink-600 grid place-items-center shrink-0"><Icon size={15} /></div>
+              <div className="min-w-0 flex-1">
+                <div className="text-[13px] font-medium text-ink-900 truncate">{l.label}</div>
+                <div className="text-[11px] text-ink-500">{l.where}</div>
+              </div>
+              <ChevronRight size={15} className="text-ink-300 shrink-0" />
+            </Link>
+          );
+        })}
       </div>
     </Card>
   );
