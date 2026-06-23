@@ -54,7 +54,7 @@ const slug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(
 /* Types                                                                */
 /* ------------------------------------------------------------------ */
 
-type Tab = "overview" | "public" | "campaigns" | "surveys" | "ecopoints";
+type Tab = "overview" | "public" | "campaigns" | "surveys" | "ecopoints" | "qr";
 
 type PublishStatus = "draft" | "pending" | "live" | "disabled";
 const STATUS_LABEL: Record<PublishStatus, string> = { draft: "Draft", pending: "Pending approval", live: "Live", disabled: "Disabled" };
@@ -149,6 +149,52 @@ const POINTS_LEDGER: PointsEntry[] = [
 
 const NPS_SCORE = 42;
 
+// Eco-points rewards catalogue — what guests redeem points for.
+const REWARDS: { id: string; label: string; cost: number; redeemed: number; icon: typeof Leaf }[] = [
+  { id: "r1", label: "Late checkout (2pm)",          cost: 150, redeemed: 84,  icon: Clock },
+  { id: "r2", label: "$20 spa credit",               cost: 500, redeemed: 23,  icon: Sparkles },
+  { id: "r3", label: "Free EV charging session",     cost: 120, redeemed: 56,  icon: Zap },
+  { id: "r4", label: "Plant a tree in your name",    cost: 100, redeemed: 142, icon: Leaf },
+  { id: "r5", label: "Local experience voucher",     cost: 450, redeemed: 18,  icon: Globe },
+  { id: "r6", label: "Carbon-neutral room upgrade",  cost: 300, redeemed: 31,  icon: Award },
+];
+
+// Active guest challenges (bonus points) + the % of guests completing each.
+const CHALLENGES: { id: string; name: string; desc: string; reward: number; pct: number; icon: typeof Leaf }[] = [
+  { id: "ch1", name: "Zero-waste stay", desc: "Complete 3 eco-actions in one stay", reward: 100, pct: 38, icon: Recycle },
+  { id: "ch2", name: "Green commuter",  desc: "Use EV charging twice",               reward: 80,  pct: 22, icon: Zap },
+  { id: "ch3", name: "Plant-powered",   desc: "Order 3 plant-based meals",           reward: 60,  pct: 41, icon: Leaf },
+];
+
+// Loyalty tiers by lifetime eco-points + guest distribution.
+const TIERS: { name: string; range: string; guests: number; color: string }[] = [
+  { name: "Sprout",    range: "0–199",   guests: 1840, color: "bg-ink-300" },
+  { name: "Green",     range: "200–499", guests: 920,  color: "bg-brand-300" },
+  { name: "Forest",    range: "500–999", guests: 310,  color: "bg-brand-500" },
+  { name: "Evergreen", range: "1000+",   guests: 96,   color: "bg-brand-700" },
+];
+
+// NPS + sentiment over the last 6 months (Surveys trend).
+const NPS_TREND = [
+  { m: "Nov", nps: 28, pos: 54, neu: 32, neg: 14 },
+  { m: "Dec", nps: 31, pos: 57, neu: 30, neg: 13 },
+  { m: "Jan", nps: 30, pos: 56, neu: 31, neg: 13 },
+  { m: "Feb", nps: 36, pos: 61, neu: 27, neg: 12 },
+  { m: "Mar", nps: 39, pos: 64, neu: 26, neg: 10 },
+  { m: "Apr", nps: 42, pos: 66, neu: 25, neg: 9 },
+];
+
+// QR scan points + 8-week scan trend. Per-point scans sum to the pulse total (2,140).
+const QR_POINTS: { id: string; location: string; scans: number; conv: number; dest: string }[] = [
+  { id: "qp1", location: "In-room card",         scans: 980, conv: 34, dest: "Public sustainability page" },
+  { id: "qp2", location: "Lobby standee",        scans: 642, conv: 18, dest: "Public sustainability page" },
+  { id: "qp3", location: "Restaurant menu",      scans: 310, conv: 22, dest: "Plant-based menu + eco-points" },
+  { id: "qp4", location: "Pool bar",             scans: 96,  conv: 9,  dest: "Towel reuse pledge" },
+  { id: "qp5", location: "EV charging station",  scans: 74,  conv: 41, dest: "EV charging eco-points" },
+  { id: "qp6", location: "Spa reception",        scans: 38,  conv: 12, dest: "Spa sustainability info" },
+];
+const QR_TREND = [205, 232, 248, 261, 279, 296, 305, 314]; // weekly scans, last 8 weeks
+
 /* ------------------------------------------------------------------ */
 /* Page                                                                 */
 /* ------------------------------------------------------------------ */
@@ -187,6 +233,7 @@ export default function GuestEngagement() {
           { key: "campaigns", label: "Campaigns" },
           { key: "surveys", label: "Surveys & Feedback" },
           { key: "ecopoints", label: "Eco-points" },
+          { key: "qr", label: "QR Points" },
         ]}
         value={tab}
         onChange={(k) => setTab(k as Tab)}
@@ -197,6 +244,7 @@ export default function GuestEngagement() {
       {tab === "campaigns" && <CampaignsTab property={property} />}
       {tab === "surveys"   && <SurveysTab property={property} />}
       {tab === "ecopoints" && <EcoPointsTab />}
+      {tab === "qr"        && <QrAnalyticsTab property={property} />}
     </div>
   );
 }
@@ -531,6 +579,7 @@ function CampaignsTab({ property }: { property: string }) {
   const [campaigns, setCampaigns] = useState<Campaign[]>(CAMPAIGNS);
   const [modalOpen, setModalOpen] = useState(false);
   const [editId, setEditId]       = useState<string | null>(null);
+  const [detailId, setDetailId]   = useState<string | null>(null);
   const [form, setForm]           = useState<CampaignForm>({ ...CAMPAIGN_INITIAL, property });
 
   function set<K extends keyof CampaignForm>(k: K, v: CampaignForm[K]) { setForm((f) => ({ ...f, [k]: v })); }
@@ -558,7 +607,7 @@ function CampaignsTab({ property }: { property: string }) {
   return (
     <>
       <Card>
-        <CardHeader title="Campaigns" hint="Email · In-room QR · App push" right={<button className="btn-primary" onClick={openNew}><Plus size={14} /> New campaign</button>} />
+        <CardHeader title="Campaigns" hint="Click a campaign to see its performance funnel" right={<button className="btn-primary" onClick={openNew}><Plus size={14} /> New campaign</button>} />
         <div className="overflow-x-auto">
           <table className="min-w-full">
             <thead>
@@ -575,7 +624,7 @@ function CampaignsTab({ property }: { property: string }) {
             </thead>
             <tbody>
               {campaigns.map((c) => (
-                <tr key={c.id} className="hover:bg-ink-50/60">
+                <tr key={c.id} onClick={() => setDetailId(c.id)} className="hover:bg-ink-50/60 cursor-pointer">
                   <td className="table-td font-medium text-ink-900">{c.name}</td>
                   <td className="table-td">
                     <span className="inline-flex items-center gap-1 text-[12px] text-ink-600">
@@ -595,7 +644,7 @@ function CampaignsTab({ property }: { property: string }) {
                   <td className="table-td text-ink-600 text-[12px]">{c.scheduled}</td>
                   <td className="table-td"><Badge tone={CAMP_STATUS_TONE[c.status]} className="capitalize">{c.status}</Badge></td>
                   <td className="table-td text-right pr-6">
-                    <button className="btn-ghost h-7 px-2 text-[12px] text-brand-700" onClick={() => openEdit(c)}>Edit</button>
+                    <button className="btn-ghost h-7 px-2 text-[12px] text-brand-700" onClick={(e) => { e.stopPropagation(); openEdit(c); }}>Edit</button>
                   </td>
                 </tr>
               ))}
@@ -650,7 +699,59 @@ function CampaignsTab({ property }: { property: string }) {
           <button className="btn-primary" onClick={save} disabled={!form.name}>Save campaign</button>
         </div>
       </Modal>
+
+      <CampaignDetailModal campaign={campaigns.find((c) => c.id === detailId) ?? null} onClose={() => setDetailId(null)} />
     </>
+  );
+}
+
+/** Click-through funnel for a campaign: Sent → Delivered → Opened → Clicked →
+ *  Eco-action taken, derived from reach + open rate. */
+function CampaignDetailModal({ campaign: c, onClose }: { campaign: Campaign | null; onClose: () => void }) {
+  if (!c) return null;
+  const sent = c.reach;
+  const steps = [
+    { label: "Sent",             count: sent },
+    { label: "Delivered",        count: Math.round(sent * 0.97) },
+    { label: "Opened",           count: Math.round(sent * (c.openRate / 100)) },
+    { label: "Clicked through",  count: Math.round(sent * (c.openRate / 100) * 0.36) },
+    { label: "Eco-action taken", count: Math.round(sent * (c.openRate / 100) * 0.36 * 0.45) },
+  ];
+  const ofSent = (n: number) => (sent ? Math.round((n / sent) * 100) : 0);
+
+  return (
+    <Modal open onClose={onClose} title={c.name} subtitle={`${CHANNEL_LABEL[c.channel]} · ${c.property} · ${c.scheduled}`} size="md">
+      <div className="p-5 space-y-4">
+        <div className="grid grid-cols-3 gap-3">
+          <Tile label="Reach" value={c.reach.toLocaleString()} tone="info" />
+          <Tile label="Open rate" value={`${c.openRate}%`} tone={c.openRate >= 40 ? "good" : "warn"} />
+          <Tile label="Eco-action rate" value={`${ofSent(steps[4].count)}%`} hint="of sent" tone="good" />
+        </div>
+        <div>
+          <div className="text-[11px] font-semibold text-ink-500 uppercase tracking-wide mb-2">Conversion funnel</div>
+          <div className="space-y-1.5">
+            {steps.map((s, i) => {
+              const pct = ofSent(s.count);
+              const stepConv = i === 0 ? 100 : steps[i - 1].count ? Math.round((s.count / steps[i - 1].count) * 100) : 0;
+              return (
+                <div key={s.label} className="flex items-center gap-3">
+                  <span className="w-28 text-[12px] text-ink-700 shrink-0">{s.label}</span>
+                  <div className="flex-1 h-7 rounded-lg bg-ink-100 overflow-hidden relative">
+                    <div className={cn("h-full rounded-lg", i === steps.length - 1 ? "bg-brand-700" : "bg-brand-400")} style={{ width: `${Math.max(pct, 3)}%` }} />
+                    <span className="absolute inset-y-0 left-2 flex items-center text-[11px] font-semibold text-ink-800">{s.count.toLocaleString()}</span>
+                  </div>
+                  <span className="w-16 text-right text-[11px] text-ink-500 shrink-0 tabular-nums">{pct}%{i > 0 && <span className="text-ink-400"> · {stepConv}%↓</span>}</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+        <div className="rounded-xl bg-brand-50 border border-brand-100 p-3 text-[12px] text-brand-900 flex items-start gap-2">
+          <Leaf size={14} className="text-brand-700 mt-0.5 shrink-0" />
+          {steps[4].count.toLocaleString()} guests took a measurable eco-action from this campaign — feeding the collective-impact total on the Overview.
+        </div>
+      </div>
+    </Modal>
   );
 }
 
@@ -790,6 +891,47 @@ function SurveysTab({ property }: { property: string }) {
         </Card>
       </div>
 
+      {/* NPS & sentiment trend */}
+      <Card>
+        <CardHeader
+          title="NPS & sentiment trend"
+          hint="Last 6 months"
+          right={<Badge tone="good"><TrendingUp size={11} /> +{NPS_TREND[NPS_TREND.length - 1].nps - NPS_TREND[0].nps} pts since Nov</Badge>}
+        />
+        <div className="grid grid-cols-12 gap-4 p-5">
+          {/* NPS line */}
+          <div className="col-span-12 lg:col-span-5">
+            <div className="text-[11px] font-semibold text-ink-500 uppercase tracking-wide mb-1">Net Promoter Score</div>
+            <Trend data={NPS_TREND.map((d) => d.nps)} className="text-good" height={64} />
+            <div className="flex justify-between text-[10px] text-ink-400 mt-1">
+              {NPS_TREND.map((d) => <span key={d.m}>{d.m}</span>)}
+            </div>
+          </div>
+          {/* Sentiment mix per month */}
+          <div className="col-span-12 lg:col-span-7">
+            <div className="text-[11px] font-semibold text-ink-500 uppercase tracking-wide mb-2">Sentiment mix</div>
+            <div className="space-y-1.5">
+              {NPS_TREND.map((d) => (
+                <div key={d.m} className="flex items-center gap-2">
+                  <span className="w-7 text-[10px] text-ink-400 shrink-0">{d.m}</span>
+                  <div className="flex-1 flex h-3.5 rounded-full overflow-hidden">
+                    <div className="bg-good"  style={{ width: `${d.pos}%` }} title={`Positive ${d.pos}%`} />
+                    <div className="bg-ink-300" style={{ width: `${d.neu}%` }} title={`Neutral ${d.neu}%`} />
+                    <div className="bg-bad"   style={{ width: `${d.neg}%` }} title={`Negative ${d.neg}%`} />
+                  </div>
+                  <span className="w-9 text-[10px] text-good font-semibold text-right shrink-0 tabular-nums">{d.pos}%</span>
+                </div>
+              ))}
+            </div>
+            <div className="flex gap-3 mt-2 text-[10px] text-ink-500">
+              <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-good inline-block" /> Positive</span>
+              <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-ink-300 inline-block" /> Neutral</span>
+              <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-bad inline-block" /> Negative</span>
+            </div>
+          </div>
+        </div>
+      </Card>
+
       {/* Verbatim quotes */}
       <Card>
         <CardHeader title="Top verbatim quotes" hint="Sentiment-scored · anonymised · April 2026" />
@@ -845,6 +987,89 @@ function EcoPointsTab() {
         <Tile label="Redemption rate" value={`${Math.round(totalRedeemed / totalIssued * 100)}%`} hint="of issued points" tone="warn" />
       </div>
 
+      {/* Rewards catalogue — what points redeem for */}
+      <Card>
+        <CardHeader title="Rewards catalogue" hint="What guests can redeem their points for" right={<button className="btn-secondary text-[12px] h-8"><Plus size={13} /> Add reward</button>} />
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 p-5">
+          {REWARDS.map((r) => {
+            const Icon = r.icon;
+            return (
+              <div key={r.id} className="rounded-xl border border-ink-200 p-3 flex items-center gap-3 hover:bg-ink-50/60">
+                <div className="w-9 h-9 rounded-lg bg-brand-50 text-brand-700 grid place-items-center shrink-0"><Icon size={16} /></div>
+                <div className="min-w-0 flex-1">
+                  <div className="text-[12px] font-semibold text-ink-900 truncate">{r.label}</div>
+                  <div className="text-[11px] text-ink-500">{r.redeemed} redeemed</div>
+                </div>
+                <div className="text-right shrink-0">
+                  <div className="text-sm font-extrabold text-brand-700 tabular-nums">{r.cost}</div>
+                  <div className="text-[10px] text-ink-400">pts</div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </Card>
+
+      <div className="grid grid-cols-12 gap-4">
+        {/* Active challenges */}
+        <Card className="col-span-12 lg:col-span-7">
+          <CardHeader title="Active challenges" hint="Bonus points for completing eco-streaks" />
+          <div className="p-4 space-y-2">
+            {CHALLENGES.map((c) => {
+              const Icon = c.icon;
+              return (
+                <div key={c.id} className="rounded-xl border border-ink-200 p-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-lg bg-brand-50 text-brand-700 grid place-items-center shrink-0"><Icon size={16} /></div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2">
+                        <span className="text-[13px] font-semibold text-ink-900">{c.name}</span>
+                        <Badge tone="brand">+{c.reward} pts</Badge>
+                      </div>
+                      <div className="text-[11px] text-ink-500">{c.desc}</div>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <div className="text-sm font-bold text-ink-900 tabular-nums">{c.pct}%</div>
+                      <div className="text-[10px] text-ink-400">completing</div>
+                    </div>
+                  </div>
+                  <div className="mt-2 h-1.5 rounded-full bg-ink-100 overflow-hidden">
+                    <div className="h-full rounded-full bg-brand-500" style={{ width: `${c.pct}%` }} />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </Card>
+
+        {/* Loyalty tiers */}
+        <Card className="col-span-12 lg:col-span-5">
+          <CardHeader title="Guest loyalty tiers" hint="By lifetime eco-points" />
+          <div className="p-5">
+            {(() => {
+              const total = TIERS.reduce((s, t) => s + t.guests, 0);
+              return (
+                <>
+                  <div className="flex h-3 rounded-full overflow-hidden mb-3">
+                    {TIERS.map((t) => <div key={t.name} className={t.color} style={{ width: `${(t.guests / total) * 100}%` }} title={`${t.name}: ${t.guests}`} />)}
+                  </div>
+                  <ul className="space-y-2">
+                    {TIERS.map((t) => (
+                      <li key={t.name} className="flex items-center gap-2 text-[12px]">
+                        <span className={cn("w-2.5 h-2.5 rounded-full inline-block shrink-0", t.color)} />
+                        <span className="font-medium text-ink-900">{t.name}</span>
+                        <span className="text-ink-400">{t.range} pts</span>
+                        <span className="ml-auto font-semibold tabular-nums text-ink-700">{t.guests.toLocaleString()}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              );
+            })()}
+          </div>
+        </Card>
+      </div>
+
       {/* Ledger */}
       <Card>
         <CardHeader title="Points ledger" hint="Per-guest entries — anonymised · April 2026" />
@@ -881,6 +1106,65 @@ function EcoPointsTab() {
           </table>
         </div>
       </Card>
+    </div>
+  );
+}
+
+/* ================================================================== */
+/* Tab 5 — QR Points analytics                                         */
+/* ================================================================== */
+
+function QrAnalyticsTab({ property }: { property: string }) {
+  const totalScans = QR_POINTS.reduce((s, p) => s + p.scans, 0);
+  const weightedConv = Math.round(QR_POINTS.reduce((s, p) => s + p.scans * p.conv, 0) / (totalScans || 1));
+  const maxScans = Math.max(...QR_POINTS.map((p) => p.scans));
+
+  return (
+    <div className="space-y-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <Tile label="Scans · 30d" value={totalScans.toLocaleString()} hint="in-room + public points" tone="info" />
+        <Tile label="Scan → action" value={`${weightedConv}%`} hint="led to an eco-action" tone="good" />
+        <Tile label="Active QR points" value={String(QR_POINTS.length)} hint={property} tone="info" />
+        <Tile label="Unique guests" value={`~${(totalScans * 0.8 / 1000).toFixed(1)}k`} hint="est. distinct scanners" tone="info" />
+      </div>
+
+      <div className="grid grid-cols-12 gap-4">
+        {/* Scan trend */}
+        <Card className="col-span-12 lg:col-span-5">
+          <CardHeader title="Scan volume" hint="Last 8 weeks" right={<Badge tone="good"><TrendingUp size={11} /> +{Math.round((QR_TREND[QR_TREND.length - 1] / QR_TREND[0] - 1) * 100)}%</Badge>} />
+          <div className="p-5">
+            <Trend data={QR_TREND} className="text-info" height={80} />
+            <div className="flex justify-between text-[10px] text-ink-400 mt-1">
+              <span>8 wks ago</span><span>this week</span>
+            </div>
+          </div>
+        </Card>
+
+        {/* By point */}
+        <Card className="col-span-12 lg:col-span-7">
+          <CardHeader title="Scans by QR point" hint="Where guests scan, and what converts" right={<button className="btn-secondary text-[12px] h-8"><QrCode size={13} /> Manage points</button>} />
+          <div className="p-4 space-y-2">
+            {QR_POINTS.map((p) => (
+              <div key={p.id} className="rounded-xl border border-ink-200 p-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-ink-100 text-ink-600 grid place-items-center shrink-0"><QrCode size={15} /></div>
+                  <div className="min-w-0 flex-1">
+                    <div className="text-[12px] font-semibold text-ink-900">{p.location}</div>
+                    <div className="text-[11px] text-ink-400 truncate">→ {p.dest}</div>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <div className="text-[13px] font-bold text-ink-900 tabular-nums">{p.scans.toLocaleString()}</div>
+                    <div className={cn("text-[10px] font-semibold", p.conv >= 25 ? "text-good" : p.conv >= 12 ? "text-amber-700" : "text-ink-400")}>{p.conv}% → action</div>
+                  </div>
+                </div>
+                <div className="mt-2 h-1.5 rounded-full bg-ink-100 overflow-hidden">
+                  <div className="h-full rounded-full bg-info" style={{ width: `${(p.scans / maxScans) * 100}%` }} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
+      </div>
     </div>
   );
 }
@@ -1028,6 +1312,21 @@ function PulseTile({ label, value, sub, tone, icon, onClick }: { label: string; 
 /* ------------------------------------------------------------------ */
 /* Shared small components                                              */
 /* ------------------------------------------------------------------ */
+
+/** Lightweight inline area+line trend (no chart lib) — colour via text-* class. */
+function Trend({ data, className = "text-brand-600", height = 44 }: { data: number[]; className?: string; height?: number }) {
+  if (data.length < 2) return null;
+  const max = Math.max(...data), min = Math.min(...data), span = max - min || 1, W = 100, step = W / (data.length - 1);
+  const pts = data.map((v, i) => ({ x: i * step, y: 4 + (height - 8) * (1 - (v - min) / span) }));
+  const line = pts.map((p, i) => `${i ? "L" : "M"}${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(" ");
+  const area = `${line} L${W},${height} L0,${height} Z`;
+  return (
+    <svg viewBox={`0 0 ${W} ${height}`} preserveAspectRatio="none" className={cn("w-full", className)} style={{ height }}>
+      <path d={area} fill="currentColor" opacity={0.1} />
+      <path d={line} fill="none" stroke="currentColor" strokeWidth={1.5} vectorEffect="non-scaling-stroke" />
+    </svg>
+  );
+}
 
 function Tile({ label, value, hint, tone }: { label: string; value: string; hint?: string; tone: "good" | "warn" | "info" | "bad" | "neutral" }) {
   const border = tone === "good" ? "border-good/20" : tone === "warn" ? "border-warn/20" : tone === "bad" ? "border-bad/20" : "border-ink-200";
