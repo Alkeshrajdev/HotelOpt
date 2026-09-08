@@ -7,9 +7,29 @@
 
 ---
 
-## Current status (updated 2026-06-22)
+## Current status (updated 2026-09-08)
 
 Latest commit on `main` (Vercel auto-deploys). `npm run lint` (= `tsc --noEmit`) passes clean; no runtime console errors. **Client steered toward front-end design + flow (not functional wiring), so PR B / PR A-2 are deprioritised. This session also shipped the Navigation & flow pass (part 1). Next front-end work = visual-consistency pass (Smart Ops token sweep + adopt the new Tabs primitive + chart colour semantics), then responsive/mobile pass; plus nav/flow part 2 (section anchors on long pages, insight→action links).**
+
+### Session 2026-09-08 — This front end becomes the product, over v2's database and engine (IN PROGRESS)
+**The decision.** The owner compared this application with `hotel-optimizer-v2` (the platform: 77 migrations, row-level security, a tested calculation engine, a services layer, a seeded demo tenant) and chose THIS front end, exactly as it is. So this repository is the product's front end from now on, and it connects to v2 underneath, one screen at a time. v2's own screens are not carried forward; v2 keeps the database, the engine, the services, the scheduler, mail and the API. Screens not yet connected keep their sample data and say so on every visit.
+
+**How the two repositories relate.**
+- `scripts/sync-core.sh` copies v2's `engine/`, the browser-safe `services/` and `i18n/` into `src/engine`, `src/services`, `src/i18n`. **v2 is the source of truth; never edit those three folders here** — change v2 and re-run the script. Not copied: the Next.js API layer, mail, the scheduler, the model callers (OCR, classification), the PDF renderer and its reports port, the token hashing that needs `node:crypto`, the screen-state stubs, and every test (they stay with the code they test). 192 files; `tsc` is green with v2's `strict` code under this repo's looser settings.
+- The services run in the browser under the reader's own Supabase session, so RLS answers what they may read, exactly as it does for v2's server. Every figure still comes out of the engine already computed and rounded; this front end renders. `src/lib/live/overview.ts` is the pattern: call the v2 loader with `supabaseOverviewPorts(supabase, 'en')`.
+- `src/lib/supabase.ts` now defaults to v2's development project (`boskynpcooccraqzehrq`, the publishable key in source — browser-safe by design, RLS is the protection; `VITE_SUPABASE_URL` / `_ANON_KEY` override it). Demo mode is an explicit choice on the sign-in page, never a fallback.
+
+**Auth (`src/lib/auth.tsx`).** Real sign-in against the platform; the profile from `access.user_profiles`, the grants from `access.user_role_assignments`, the client name from `core.tenants`. The platform's four roles map onto this front end's four: Farnek Admin and Portfolio access → `super_admin`; Property access → `property_sm`; view-only and Audit → `checker`. The map lives in `roleFromAssignments` and nowhere else. Demo accounts (dev project, fictional data): `demo@` / `gm@` / `contributor@` / `admin@` / `verifier@` `hoteloptimizer.app`, password `HotelDemo2026!`.
+
+**Live vs sample (`src/lib/live/mode.tsx`).** `LIVE_ROUTES` lists the connected screens; every other route shows a "Sample data" band to a signed-in reader (`SampleDataNotice`, mounted in `AppShell`). Add a route there in the same change that wires it.
+
+**Connected so far.**
+- **Properties** (`/properties`): the reader's hotels from `core.hotels` + the current `core.hotel_profiles` row + v2's context service (latest month, open months). Fields the platform does not hold are left empty, never borrowed from the sample set. The topbar property selector and the sidebar's client/count come from the same registry (`useProperties`).
+- **Performance → Energy → Overview** (`/performance/energy/overview`): `EnergyOverviewLive.tsx`, over v2's overview service for the selected property — the energy card (intensity, total, change, the engine's verdict) and the twelve-month trend this year vs last. Cost, renewable share and the by-source charts are not on the overview model and are shown as not yet connected rather than filled in. "All Properties" shows the first hotel and says a portfolio total is coming.
+
+**Not verified in a browser against the platform.** The build environment could not reach Supabase, so live sign-in and the two connected screens were checked by typecheck and build only. The Vercel preview for the branch is the first real test; the two risks are RLS on `core.hotel_profiles` / `core.tenants` for a portfolio user (the code shows the error on screen rather than crashing) and the shape of `access.user_role_assignments` for a view-only grant.
+
+**Next, in order.** Portfolio Dashboard (Overview + Hotels tabs) over `services/portfolio` and `services/attention`; Review & Approval's Capture Status over `services/months` and its queue over `services/review`; Data Capture's manual entry over `data.save_resource_record`; Property detail identity over the same registry; then the remaining pillar overviews (water, waste, carbon) which the overview model already carries. The Smart Ops, Guest Engagement, Marketplace and AI Assistant screens have no backing on the platform and stay sample until the owner specifies them.
 
 ### Session 2026-06-23 (cont.) — My Hotel: comprehensive property configuration (DONE, verified)
 Discussed first (the client correctly pushed back that most "real config" belongs elsewhere). **Mapping conclusion:** operational drivers (ORN/occupancy/covers/degree-days) already live in **Data Capture** (`occupancy` data type + Open-Meteo); targets/baselines/reporting-period in **Portfolio Setup**; emission factors in **Admin → EF Library**; data-source integrations in **Data Capture** (`INTEGRATIONS`). So the property page only gained what's genuinely property-specific and owned nowhere else.

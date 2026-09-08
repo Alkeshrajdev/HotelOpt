@@ -32,24 +32,14 @@ import { useAuth } from "@/lib/auth";
 import DashboardFilterBar from "../../pages/dashboard/FilterBar";
 import {
   useTopbar, DATA_BASIS_LABEL, type DataBasis,
-  getTopbarConfig, YEAR_OPTIONS, MONTH_OPTIONS, type OpsGranularity,
+  getTopbarConfig, YEAR_OPTIONS, MONTH_OPTIONS, ALL_PROPERTIES, type OpsGranularity,
 } from "@/lib/topbarContext";
+import { useProperties } from "@/lib/live/properties";
 import { cn } from "@/lib/utils";
 
 /* ── Filter options ────────────────────────────────────────────────────────── */
-const PROPERTY_OPTIONS = [
-  "All Properties (10)",
-  "Skyline Dubai",
-  "Airport Hotel Dubai",
-  "Bay View Singapore",
-  "The Pavilion London",
-  "Grand Harbour Lisbon",
-  "Marina Residences Barcelona",
-  "Oceanfront Cape Town",
-  "The Montrose Paris",
-  "Peaks Resort Zermatt",
-  "Riverside Bangkok",
-];
+// The property list comes from the registry — the platform's hotels when signed in, the
+// sample dataset in the demo — so the selector never names a hotel the reader cannot open.
 
 const REGION_OPTIONS = [
   "All Regions",
@@ -176,6 +166,8 @@ export default function Topbar({ onMenu }: { onMenu?: () => void }) {
   const navigate     = useNavigate();
   const location     = useLocation();
   const cfg          = getTopbarConfig(location.pathname);
+  const { properties: registry } = useProperties();
+  const PROPERTY_OPTIONS = [ALL_PROPERTIES, ...registry.map((p) => p.name)];
   const isDashboard  = location.pathname.startsWith("/portfolio/dashboard") || location.pathname === "/dashboard";
 
   const [menuOpen,        setMenuOpen]        = useState(false);
