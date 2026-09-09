@@ -604,8 +604,22 @@ function CampaignsTab({ property }: { property: string }) {
 
   const CAMP_STATUS_TONE: Record<CampaignStatus, "good" | "neutral" | "info"> = { active: "good", draft: "neutral", completed: "info" };
 
+  const activeCount    = campaigns.filter((c) => c.status === "active").length;
+  const completedCount = campaigns.filter((c) => c.status === "completed").length;
+  const totalReach     = campaigns.reduce((s, c) => s + c.reach, 0);
+  const withReach      = campaigns.filter((c) => c.reach > 0);
+  const avgOpen        = withReach.length ? Math.round(withReach.reduce((s, c) => s + c.openRate, 0) / withReach.length) : 0;
+
   return (
     <>
+      {/* Summary row — mirrors the Overview / Eco-points tile rows so the tabs read as one system */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <Tile label="Active campaigns" value={String(activeCount)} hint={`${campaigns.length} total`} tone="good" />
+        <Tile label="Total reach" value={totalReach.toLocaleString()} hint="guests across campaigns" tone="info" />
+        <Tile label="Avg open rate" value={`${avgOpen}%`} hint="of delivered" tone={avgOpen >= 40 ? "good" : "warn"} />
+        <Tile label="Completed" value={String(completedCount)} hint="campaigns this year" tone="info" />
+      </div>
+
       <Card>
         <CardHeader title="Campaigns" hint="Click a campaign to see its performance funnel" right={<button className="btn-primary" onClick={openNew}><Plus size={14} /> New campaign</button>} />
         <div className="overflow-x-auto">
