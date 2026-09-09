@@ -229,7 +229,7 @@ export default function AIAssistant() {
       <div className="grid grid-cols-12 gap-4 items-start">
         {/* ---- History sidebar ---- */}
         <div className="col-span-12 lg:col-span-3">
-          <Card className="h-[640px] flex flex-col">
+          <Card className="h-[calc(100vh-15rem)] min-h-[520px] flex flex-col">
             <div className="flex items-center justify-between px-4 py-3 border-b border-ink-200">
               <span className="text-[11px] font-bold text-ink-500 uppercase tracking-wide flex items-center gap-1.5">
                 <MessageSquare size={11} /> Threads
@@ -301,7 +301,7 @@ export default function AIAssistant() {
 
         {/* ---- Knowledge base ---- */}
         <div className="col-span-12 lg:col-span-3">
-          <Card className="h-[640px] flex flex-col">
+          <Card className="h-[calc(100vh-15rem)] min-h-[520px] flex flex-col">
             <CardHeader title="Knowledge base" hint="Curated · versioned · audit-logged" />
             <ul className="flex-1 overflow-y-auto p-4 space-y-2 text-sm">
               {KNOWLEDGE_TOPICS.map((k) => (
@@ -398,7 +398,7 @@ function ChatPane({
   const isEmpty = thread.messages.length === 0;
 
   return (
-    <Card className="h-[640px] flex flex-col">
+    <Card className="h-[calc(100vh-15rem)] min-h-[520px] flex flex-col">
       {/* Header */}
       <div className="px-5 py-3 border-b border-ink-200 flex items-center justify-between gap-3 flex-wrap">
         <div className="flex items-center gap-2">
