@@ -339,7 +339,7 @@ function SavingsDetailModal({ saving, open, onClose }: { saving: SavingRecord | 
         </div>
       }
     >
-      <div className="space-y-6">
+      <div className="space-y-5">
         {/* Status timeline */}
         <div>
           <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Verification Timeline</h4>

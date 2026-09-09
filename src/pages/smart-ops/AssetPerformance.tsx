@@ -730,7 +730,7 @@ function AssetDetailModal({ asset, open, onClose }: { asset: Asset | null; open:
         </div>
       }
     >
-      <div className="space-y-6">
+      <div className="space-y-5">
         {/* Identity */}
         <div>
           <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Identity</h4>

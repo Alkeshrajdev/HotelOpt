@@ -140,7 +140,7 @@ const PILLAR_COLOUR: Record<string, string> = {
 function ReportingStatusTab() {
   const blocking = REPORTING_STATUS.filter(r => r.status === "Blocked").length;
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       <p className="text-sm text-ink-500">Consolidated readiness for each reporting framework this cycle. Approved data only.</p>
       <div className="overflow-x-auto">
         <table className="w-full text-[12px]">
@@ -227,7 +227,7 @@ function GenerateReportTab() {
   const steps = ["Scope", "Period", "Format", "Framework", "Readiness", "Preview"];
 
   return (
-    <div className="max-w-4xl">
+    <div>
       {/* Step indicator */}
       <div className="flex items-center gap-1 mb-8">
         {steps.map((s, i) => (

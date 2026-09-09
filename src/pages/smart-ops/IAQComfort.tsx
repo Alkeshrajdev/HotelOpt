@@ -335,7 +335,7 @@ function Co2Bar({ value, max = 1400 }: { value: number; max?: number }) {
 
 function OverviewTab() {
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {/* primary KPIs */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
         <KpiTile
