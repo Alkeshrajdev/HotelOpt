@@ -133,7 +133,7 @@ function HotelsTab() {
       </div>
 
       <div className="overflow-x-auto">
-        <table className="text-[12px]">
+        <table className="w-full text-[12px]">
           <thead>
             <tr className="border-b border-ink-100">
               {["Hotel", "Report Status", "Certification", "Pending", "In Portfolio", ""].map(h => (
@@ -378,7 +378,7 @@ function RulesTab() {
   const [groupingLogic, setGroupingLogic] = useState("Region");
 
   return (
-    <div className="max-w-5xl space-y-6">
+    <div className="space-y-6">
       <div className="grid lg:grid-cols-2 gap-x-6 gap-y-8 items-start">
       {/* Reporting */}
       <section>
@@ -398,12 +398,20 @@ function RulesTab() {
               </select>
             </label>
           </div>
-          <label className="block">
-            <span className="text-[11px] font-medium text-ink-600">Default Period</span>
-            <select className="input mt-1 text-[13px]" value={period} onChange={e => setPeriod(e.target.value)}>
-              {["Calendar Year", "Financial Year (Apr–Mar)", "Rolling 12 Months", "Custom"].map(p => <option key={p}>{p}</option>)}
-            </select>
-          </label>
+          <div className="grid grid-cols-2 gap-3">
+            <label className="block">
+              <span className="text-[11px] font-medium text-ink-600">Default Period</span>
+              <select className="input mt-1 text-[13px]" value={period} onChange={e => setPeriod(e.target.value)}>
+                {["Calendar Year", "Financial Year (Apr–Mar)", "Rolling 12 Months", "Custom"].map(p => <option key={p}>{p}</option>)}
+              </select>
+            </label>
+            <label className="block">
+              <span className="text-[11px] font-medium text-ink-600">Default Grouping</span>
+              <select className="input mt-1 text-[13px]" value={groupingLogic} onChange={e => setGroupingLogic(e.target.value)}>
+                {["Region", "Country", "Brand", "Hotel Type", "Ownership", "Custom Group"].map(o => <option key={o}>{o}</option>)}
+              </select>
+            </label>
+          </div>
         </div>
       </section>
 
@@ -457,19 +465,6 @@ function RulesTab() {
           ))}
         </div>
       </section>
-
-      {/* Grouping */}
-      <section>
-        <h3 className="text-[12px] font-bold uppercase tracking-wider text-ink-400 mb-3">Hotel Grouping</h3>
-        <div className="bg-ink-50 rounded-xl p-4">
-          <label className="block">
-            <span className="text-[11px] font-medium text-ink-600">Default grouping logic for dashboard filters</span>
-            <select className="input mt-1 text-[13px]" value={groupingLogic} onChange={e => setGroupingLogic(e.target.value)}>
-              {["Region", "Country", "Brand", "Hotel Type", "Ownership", "Custom Group"].map(o => <option key={o}>{o}</option>)}
-            </select>
-          </label>
-        </div>
-      </section>
       </div>
 
       <button className="btn-primary">Save Settings</button>
@@ -488,7 +483,7 @@ function EscalationsTab() {
       </div>
 
       <div className="overflow-x-auto">
-        <table className="text-[12px]">
+        <table className="w-full text-[12px]">
           <thead>
             <tr className="border-b border-ink-100">
               {["Escalation Rule", "Trigger Condition", "Level 1 · Delay", "Level 2 · Delay", "Level 3 · Delay", "Active", ""].map(h => (
