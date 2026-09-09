@@ -162,7 +162,7 @@ export default function EnergyBenchmarks() {
             </div>
             <span className="text-[11px] font-semibold uppercase tracking-wide text-ink-400">Opportunity vs best peer</span>
           </div>
-          <div className="text-[2rem] font-extrabold text-brand-700 leading-none tabular-nums">{SAVING_MWH.toLocaleString()} MWh</div>
+          <div className="text-[2rem] font-bold text-brand-700 leading-none tabular-nums">{SAVING_MWH.toLocaleString()} MWh</div>
           <div className="text-[12px] text-ink-500 mt-0.5">if you matched {BEST_PEER.name} ({BEST_PEER.intensity} kWh/ORN)</div>
         </div>
 
@@ -173,7 +173,7 @@ export default function EnergyBenchmarks() {
             </div>
             <span className="text-[11px] font-semibold uppercase tracking-wide text-ink-400">Value of the gap</span>
           </div>
-          <div className="text-[2rem] font-extrabold text-good leading-none tabular-nums">${SAVING_USD.toLocaleString()}</div>
+          <div className="text-[2rem] font-bold text-good leading-none tabular-nums">${SAVING_USD.toLocaleString()}</div>
           <div className="text-[12px] text-ink-500 mt-0.5">
             per year · you rank {youRank} of {PEERS.length} on intensity
           </div>

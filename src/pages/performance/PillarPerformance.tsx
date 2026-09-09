@@ -195,7 +195,7 @@ export default function PillarPerformance({ pillar }: { pillar: "water"|"waste"|
               <div className={cn("w-8 h-8 rounded-lg grid place-items-center shrink-0", t.bg)}>{t.icon}</div>
               <span className="text-[11px] font-semibold uppercase tracking-wide text-ink-400">{t.title}</span>
             </div>
-            <div className={cn("mt-2 text-[1.8rem] font-extrabold leading-none tabular-nums", t.color)}>{t.value}</div>
+            <div className={cn("mt-2 text-[1.8rem] font-bold leading-none tabular-nums", t.color)}>{t.value}</div>
             <div className="text-[12px] text-ink-500 mt-0.5">{t.sub}</div>
           </div>
         ))}

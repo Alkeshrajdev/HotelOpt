@@ -55,7 +55,7 @@ export default function EnergyByProperty() {
         ].map((t) => (
           <div key={t.label} className="card p-5">
             <div className="text-[11px] font-semibold uppercase tracking-wide text-ink-400">{t.label}</div>
-            <div className={cn("text-[1.75rem] font-extrabold leading-none tabular-nums mt-2", t.color)}>
+            <div className={cn("text-[1.75rem] font-bold leading-none tabular-nums mt-2", t.color)}>
               {t.value}
               <span className="text-[13px] font-semibold text-ink-500 ml-1">{t.unit}</span>
             </div>

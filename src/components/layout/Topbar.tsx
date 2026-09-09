@@ -265,7 +265,7 @@ export default function Topbar({ onMenu }: { onMenu?: () => void }) {
 
   return (
     <>
-      <header className="h-16 border-b border-ink-200 bg-white dark-surface flex items-center px-4 sm:px-6 gap-3 sm:gap-4 shrink-0 z-20">
+      <header className="h-16 border-b border-ink-200/70 bg-white/95 backdrop-blur-xl dark-surface flex items-center px-4 sm:px-6 gap-3 sm:gap-4 shrink-0 z-20">
 
         {/* ── Mobile menu toggle (hidden on desktop) ── */}
         <button
@@ -725,7 +725,7 @@ export default function Topbar({ onMenu }: { onMenu?: () => void }) {
             <HelpCircle size={18} />
           </button>
 
-          <div className="hidden sm:block h-6 w-px bg-ink-200" />
+          <div className="hidden sm:block h-6 w-px bg-ink-200/70" />
 
           {/* User menu */}
           <div className="relative" ref={menuRef}>

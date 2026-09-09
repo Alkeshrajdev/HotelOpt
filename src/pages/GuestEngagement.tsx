@@ -307,7 +307,7 @@ function PublicPageTab({ property }: { property: string }) {
             <div className="rounded-2xl border border-ink-200 overflow-hidden">
               <div className="h-40 bg-gradient-to-br from-brand-700 to-brand-500 text-white p-6 flex flex-col justify-end">
                 <div className="text-[12px] uppercase tracking-wide opacity-90">{property}{region ? ` · ${region}` : ""}</div>
-                <div className="text-2xl font-extrabold">A more sustainable stay</div>
+                <div className="text-2xl font-bold">A more sustainable stay</div>
                 <div className="text-sm opacity-90">All metrics independently verified through Hotel Optimizer.</div>
               </div>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3 p-4">
@@ -361,7 +361,7 @@ function PublicPageTab({ property }: { property: string }) {
           {[["Standard room · 2 nights","14.6 kgCO₂e"],["Pool villa · 3 nights","38.4 kgCO₂e"],["Suite · 5 nights","62.1 kgCO₂e"]].map(([l,v]) => (
             <div key={l} className="rounded-xl border border-ink-200 p-4 bg-gradient-to-br from-brand-50 to-white">
               <div className="text-[11px] text-ink-500">{l}</div>
-              <div className="text-2xl font-extrabold text-brand-800 mt-1">{v}</div>
+              <div className="text-2xl font-bold text-brand-800 mt-1">{v}</div>
             </div>
           ))}
         </div>
@@ -604,8 +604,22 @@ function CampaignsTab({ property }: { property: string }) {
 
   const CAMP_STATUS_TONE: Record<CampaignStatus, "good" | "neutral" | "info"> = { active: "good", draft: "neutral", completed: "info" };
 
+  const activeCount    = campaigns.filter((c) => c.status === "active").length;
+  const completedCount = campaigns.filter((c) => c.status === "completed").length;
+  const totalReach     = campaigns.reduce((s, c) => s + c.reach, 0);
+  const withReach      = campaigns.filter((c) => c.reach > 0);
+  const avgOpen        = withReach.length ? Math.round(withReach.reduce((s, c) => s + c.openRate, 0) / withReach.length) : 0;
+
   return (
     <>
+      {/* Summary row — mirrors the Overview / Eco-points tile rows so the tabs read as one system */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <Tile label="Active campaigns" value={String(activeCount)} hint={`${campaigns.length} total`} tone="good" />
+        <Tile label="Total reach" value={totalReach.toLocaleString()} hint="guests across campaigns" tone="info" />
+        <Tile label="Avg open rate" value={`${avgOpen}%`} hint="of delivered" tone={avgOpen >= 40 ? "good" : "warn"} />
+        <Tile label="Completed" value={String(completedCount)} hint="campaigns this year" tone="info" />
+      </div>
+
       <Card>
         <CardHeader title="Campaigns" hint="Click a campaign to see its performance funnel" right={<button className="btn-primary" onClick={openNew}><Plus size={14} /> New campaign</button>} />
         <div className="overflow-x-auto">
@@ -846,7 +860,7 @@ function SurveysTab({ property }: { property: string }) {
             <div>
               <div className="text-[11px] font-semibold text-ink-500 uppercase tracking-wide mb-2">Net Promoter Score</div>
               <div className="flex items-center gap-4">
-                <div className={cn("text-5xl font-extrabold tabular-nums", npsColor)}>+{NPS_SCORE}</div>
+                <div className={cn("text-5xl font-bold tabular-nums", npsColor)}>+{NPS_SCORE}</div>
                 <div className="flex-1">
                   <div className="relative h-4 rounded-full overflow-hidden flex">
                     <div className="bg-bad   flex-1 h-full" style={{ flex: "0 0 33%" }} />
@@ -1231,7 +1245,7 @@ function OverviewTab({ property, onJump }: { property: string; onJump: (t: Tab) 
         <div className="p-5 grid grid-cols-1 lg:grid-cols-3 gap-4">
           <div className="rounded-2xl bg-gradient-to-br from-brand-700 to-brand-500 text-white p-5 flex flex-col justify-center">
             <div className="text-[12px] uppercase tracking-wide opacity-90">Together, our guests saved</div>
-            <div className="text-4xl font-extrabold mt-1 tabular-nums">{(impact.co2 / 1000).toFixed(1)} t</div>
+            <div className="text-4xl font-bold mt-1 tabular-nums">{(impact.co2 / 1000).toFixed(1)} t</div>
             <div className="text-sm opacity-90">CO₂e avoided this month</div>
             <div className="mt-3 flex gap-5">
               <div><div className="font-bold text-lg tabular-nums">{Math.round(impact.water / 1000)} m³</div><div className="opacity-80 text-[11px]">water saved</div></div>
@@ -1334,7 +1348,7 @@ function Tile({ label, value, hint, tone }: { label: string; value: string; hint
   return (
     <div className={cn("rounded-2xl border bg-white p-4", border)}>
       <div className="text-[11px] font-semibold uppercase tracking-[0.06em] text-ink-500">{label}</div>
-      <div className={cn("text-3xl font-extrabold mt-1 tabular-nums", text)}>{value}</div>
+      <div className={cn("text-3xl font-bold mt-1 tabular-nums", text)}>{value}</div>
       {hint && <div className="text-[11px] text-ink-400 mt-0.5">{hint}</div>}
     </div>
   );

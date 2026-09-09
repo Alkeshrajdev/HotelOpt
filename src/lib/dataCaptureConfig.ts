@@ -2,6 +2,7 @@
 // Mirrors BRD §6.1 (input method matrix) and §6.2 (manual entry forms).
 
 import type { LucideIcon } from "lucide-react";
+import { Puzzle } from "lucide-react";
 import {
   Award,
   Building2,
@@ -32,7 +33,8 @@ export type DataTypeKey =
   | "ops-events"
   | "social"
   | "governance"
-  | "cert-evidence";
+  | "cert-evidence"
+  | "custom";
 
 export type FieldType =
   | "text"
@@ -550,6 +552,24 @@ export const DATA_TYPES: DataTypeConfig[] = [
       },
       { key: "criterion", label: "Criterion / clause", type: "text", required: true, help: "e.g. GSTC B6, Travelife 7.4" },
       { key: "title",     label: "Document title",     type: "text", required: true, full: true },
+      COMMON_EVIDENCE,
+      COMMON_NOTES,
+    ],
+  },
+
+  {
+    key: "custom",
+    label: "Custom / Other",
+    description: "Bespoke metrics not covered above — biodiversity, noise, local sourcing, or client-specific KPIs.",
+    icon: Puzzle,
+    iconBg: "bg-ink-100 text-ink-600",
+    pillar: "operations",
+    methods: ["manual"],
+    fields: [
+      { key: "metric", label: "Metric name", type: "text",   required: true, full: true, help: "e.g. Biodiversity survey score, Noise level (dB)" },
+      { key: "value",  label: "Value",       type: "number", required: true },
+      { key: "unit",   label: "Unit",        type: "text",   help: "e.g. score, dB, %, kg" },
+      COMMON_PERIOD,
       COMMON_EVIDENCE,
       COMMON_NOTES,
     ],

@@ -212,7 +212,6 @@ export default function DataCapture() {
   return (
     <div className="space-y-5">
       <PageHeader
-        eyebrow="Enter and submit sustainability data"
         title="Data Capture"
         subtitle="Choose what to capture and how to enter it. All submissions are reviewed by a checker before they appear in dashboards or reports."
       />

@@ -48,8 +48,9 @@ export default {
           "text-muted": "#6FA589",
           heading:      "#4D8A6A",
         },
-        // Page surface (not CSS-var-backed — static warm near-white)
-        page: "#F6F8F7",
+        // Page surface (not CSS-var-backed — static cool near-white; a touch
+        // deeper than the cards so white surfaces read as elevated).
+        page: "#EEF1F1",
         // Neutral scale — CSS-var-backed so dark mode flips automatically.
         ink: {
           900: "rgb(var(--ink-900) / <alpha-value>)",
@@ -79,20 +80,23 @@ export default {
         },
       },
       boxShadow: {
-        card:      "0 1px 2px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(15, 23, 42, 0.04)",
-        "card-lg": "0 1px 2px rgba(15, 23, 42, 0.04), 0 4px 16px rgba(15, 23, 42, 0.05)",
-        pop:       "0 8px 24px rgba(15, 23, 42, 0.08)",
-        "pop-lg":  "0 16px 48px rgba(15, 23, 42, 0.12)",
+        // Soft, layered elevation so surfaces lift off the page (premium-SaaS feel)
+        // without heavy drop shadows.
+        card:      "0 1px 2px rgba(16, 24, 40, 0.04), 0 2px 6px -1px rgba(16, 24, 40, 0.06)",
+        "card-lg": "0 1px 3px rgba(16, 24, 40, 0.05), 0 12px 28px -8px rgba(16, 24, 40, 0.12)",
+        pop:       "0 6px 16px -4px rgba(16, 24, 40, 0.10), 0 12px 32px -8px rgba(16, 24, 40, 0.10)",
+        "pop-lg":  "0 20px 48px -12px rgba(16, 24, 40, 0.18)",
       },
       borderRadius: {
         xl2: "14px",
         xl3: "18px",
       },
       fontSize: {
-        // Page-level title. ~30px / tight tracking.
-        "page-title":    ["1.875rem", { lineHeight: "1.15", letterSpacing: "-0.012em", fontWeight: "800" }],
-        // KPI value — at least 32px bold per BRD §1.3.
-        "kpi":           ["2rem",     { lineHeight: "1",    fontWeight: "800" }],
+        // Page-level title. ~30px / tight tracking. Weight 700 (not 800) + tighter
+        // tracking reads as crafted rather than heavy/default.
+        "page-title":    ["1.875rem", { lineHeight: "1.15", letterSpacing: "-0.021em", fontWeight: "700" }],
+        // KPI value — large, tight, tabular. 700 + negative tracking for a refined feel.
+        "kpi":           ["2rem",     { lineHeight: "1",    letterSpacing: "-0.02em", fontWeight: "700" }],
         // Section heading inside a page zone.
         "section-title": ["1.0625rem", { lineHeight: "1.3", fontWeight: "600" }],
         // Subtitle under a page title.

@@ -1015,19 +1015,19 @@ function HeroStat({
   tone: "good" | "warn" | "bad" | "info";
   info?: string;
 }) {
-  const ring = {
-    good: "border-good/25 bg-good/10/40",
-    warn: "border-warn/25 bg-warn/10",
-    bad:  "border-bad/25 bg-bad/10/40",
-    info: "border-info/25 bg-info/10/40",
+  const accent = {
+    good: "border-l-good",
+    warn: "border-l-warn",
+    bad:  "border-l-bad",
+    info: "border-l-info",
   }[tone];
   return (
-    <div className={cn("rounded-xl border p-4", ring)}>
-      <div className="flex items-center gap-1 text-[11px] uppercase font-semibold tracking-wide text-ink-500">
+    <div className={cn("card card-pad border-l-4", accent)}>
+      <div className="flex items-center gap-1 text-[11px] uppercase font-semibold tracking-[0.06em] text-ink-400">
         {label}
         {info && <InfoHint text={info} />}
       </div>
-      <div className="text-2xl font-bold text-ink-900 mt-1">
+      <div className="text-[26px] leading-none font-bold text-ink-900 mt-1.5 tabular-nums">
         {value}
         {suffix && <span className="text-base font-medium text-ink-500 ml-1">{suffix}</span>}
       </div>

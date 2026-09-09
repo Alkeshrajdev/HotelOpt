@@ -3,7 +3,6 @@ import { Outlet } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import Topbar from "./Topbar";
 import EntitlementGuard from "./EntitlementGuard";
-import DemoNotice from "@/components/ui/DemoNotice";
 import { SampleDataNotice } from "@/lib/live/mode";
 import { TopbarProvider } from "@/lib/topbarContext";
 
@@ -24,7 +23,7 @@ export default function AppShell() {
   return (
     <TopbarProvider>
       <EntitlementGuard />
-      <div className="flex h-screen w-screen overflow-hidden bg-[#F6F8F7]">
+      <div className="flex h-screen w-screen overflow-hidden bg-[#EEF1F1]">
         {/* Mobile backdrop */}
         {mobileOpen && (
           <div
@@ -41,7 +40,6 @@ export default function AppShell() {
         />
         <div className="flex-1 flex flex-col min-w-0">
           <Topbar onMenu={() => setMobileOpen(true)} />
-          <DemoNotice />
           <SampleDataNotice />
           <main className="flex-1 overflow-y-auto">
             <div className="px-4 sm:px-6 py-5 max-w-[1600px] mx-auto">

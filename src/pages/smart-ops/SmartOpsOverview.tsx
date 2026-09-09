@@ -190,7 +190,6 @@ export default function SmartOpsOverview() {
   return (
     <div className="page-container space-y-6">
       <PageHeader
-        eyebrow="Smart Operations"
         title="Smart Operations"
         subtitle="Monitor energy, water, IAQ, and asset performance across hotel operations"
       />
