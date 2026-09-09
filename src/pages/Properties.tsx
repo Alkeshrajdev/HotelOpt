@@ -402,20 +402,20 @@ function SummaryTile({
   info?: string;
   tone?: "neutral" | "good" | "info";
 }) {
-  const ring =
+  const accent =
     tone === "good"
-      ? "border-good/25 bg-good/10/40"
+      ? "border-l-4 border-l-good"
       : tone === "info"
-        ? "border-info/25 bg-info/10/40"
-        : "border-ink-200 bg-white";
+        ? "border-l-4 border-l-info"
+        : "";
   return (
-    <div className={cn("rounded-xl border p-4", ring)}>
-      <div className="flex items-center gap-1 text-[11px] uppercase tracking-wide font-semibold text-ink-500">
+    <div className={cn("card card-pad", accent)}>
+      <div className="flex items-center gap-1 text-[11px] uppercase tracking-[0.06em] font-semibold text-ink-400">
         {label}
         {info && <InfoHint text={info} />}
       </div>
-      <div className="text-2xl font-bold text-ink-900 mt-0.5">{value}</div>
-      {hint && <div className="text-[11px] text-ink-500">{hint}</div>}
+      <div className="text-[26px] leading-none font-bold text-ink-900 mt-1.5 tabular-nums">{value}</div>
+      {hint && <div className="text-[12px] text-ink-500 mt-1">{hint}</div>}
     </div>
   );
 }

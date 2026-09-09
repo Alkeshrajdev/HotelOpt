@@ -113,13 +113,13 @@
   /* ----- Card hierarchy (BRD §1.2) ----- */
   /* Level 1 — Primary KPIs and urgent insights. Stronger shadow, 1.5rem padding. */
   .card-level-1 {
-    @apply bg-white border border-ink-200 rounded-xl2 p-6;
-    box-shadow: 0 2px 4px rgba(15, 23, 42, 0.06), 0 8px 24px rgba(15, 23, 42, 0.08);
+    @apply bg-white border border-ink-200/70 rounded-xl2 p-6;
+    box-shadow: 0 1px 2px rgba(16, 24, 40, 0.05), 0 12px 28px -8px rgba(16, 24, 40, 0.12);
   }
   /* Level 1 with a pillar-coloured left accent bar (border-l colour set inline). */
   .card-level-1-accent {
-    @apply bg-white border border-ink-200 rounded-xl2 p-6 border-l-4;
-    box-shadow: 0 2px 4px rgba(15, 23, 42, 0.06), 0 8px 24px rgba(15, 23, 42, 0.08);
+    @apply bg-white border border-ink-200/70 rounded-xl2 p-6 border-l-4;
+    box-shadow: 0 1px 2px rgba(16, 24, 40, 0.05), 0 12px 28px -8px rgba(16, 24, 40, 0.12);
   }
   /* Level 2 — Standard: trend charts, comparison tables, six-pillar grids. */
   .card-level-2 {
@@ -230,10 +230,10 @@
 
   /* ----- Tables ----- */
   .table-th {
-    @apply text-left text-[11px] uppercase tracking-wide font-semibold text-ink-500 px-4 py-2.5;
+    @apply text-left text-[11px] uppercase tracking-wide font-semibold text-ink-400 px-4 py-2.5;
   }
   .table-td {
-    @apply px-4 py-3.5 text-sm text-ink-700 border-t border-ink-200;
+    @apply px-4 py-3.5 text-sm text-ink-700 border-t border-ink-100;
   }
 }
 

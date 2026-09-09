@@ -751,12 +751,12 @@ function CertCertificatePanel() {
 function SummaryTile({ label, value, hint, tone }: {
   label: string; value: string; hint?: string; tone: "brand" | "good" | "warn" | "bad";
 }) {
-  const ring = { brand: "border-brand-200 bg-brand-50/40", good: "border-good/25 bg-good/10", warn: "border-warn/25 bg-warn/10", bad: "border-bad/25 bg-bad/10" }[tone];
+  const accent = { brand: "border-l-brand-500", good: "border-l-good", warn: "border-l-warn", bad: "border-l-bad" }[tone];
   return (
-    <div className={cn("rounded-xl border p-4", ring)}>
-      <div className="text-[11px] uppercase tracking-wide font-semibold text-ink-500">{label}</div>
-      <div className="text-2xl font-bold text-ink-900 mt-0.5">{value}</div>
-      {hint && <div className="text-[11px] text-ink-500">{hint}</div>}
+    <div className={cn("card card-pad border-l-4", accent)}>
+      <div className="text-[11px] uppercase tracking-[0.06em] font-semibold text-ink-400">{label}</div>
+      <div className="text-[26px] leading-none font-bold text-ink-900 mt-1.5 tabular-nums">{value}</div>
+      {hint && <div className="text-[12px] text-ink-500 mt-1">{hint}</div>}
     </div>
   );
 }

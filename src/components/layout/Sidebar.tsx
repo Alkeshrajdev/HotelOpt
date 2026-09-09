@@ -248,18 +248,9 @@ export default function Sidebar({ collapsed, onToggle, mobileOpen = false, onMob
       </nav>
 
       {/* ── Footer ── */}
-      {!collapsed && (
-        <div className="mx-3 mb-3 rounded-xl bg-white/5 border border-white/8 px-3 py-2.5">
-          <div className="text-[11px] font-semibold text-white/70">Making every stay sustainable</div>
-          <div className="text-[10px] text-white/35 mt-0.5 leading-snug">
-            Smart data · Better decisions · Greener hospitality
-          </div>
-        </div>
-      )}
-
       <button
         onClick={onToggle}
-        className="m-3 mt-0 nav-item justify-start hidden lg:flex"
+        className="m-3 nav-item justify-start hidden lg:flex text-white/50 hover:text-white/80"
         aria-label="Collapse sidebar"
       >
         <ChevronLeft
