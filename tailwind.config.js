@@ -92,10 +92,11 @@ export default {
         xl3: "18px",
       },
       fontSize: {
-        // Page-level title. ~30px / tight tracking.
-        "page-title":    ["1.875rem", { lineHeight: "1.15", letterSpacing: "-0.012em", fontWeight: "800" }],
-        // KPI value — at least 32px bold per BRD §1.3.
-        "kpi":           ["2rem",     { lineHeight: "1",    fontWeight: "800" }],
+        // Page-level title. ~30px / tight tracking. Weight 700 (not 800) + tighter
+        // tracking reads as crafted rather than heavy/default.
+        "page-title":    ["1.875rem", { lineHeight: "1.15", letterSpacing: "-0.021em", fontWeight: "700" }],
+        // KPI value — large, tight, tabular. 700 + negative tracking for a refined feel.
+        "kpi":           ["2rem",     { lineHeight: "1",    letterSpacing: "-0.02em", fontWeight: "700" }],
         // Section heading inside a page zone.
         "section-title": ["1.0625rem", { lineHeight: "1.3", fontWeight: "600" }],
         // Subtitle under a page title.

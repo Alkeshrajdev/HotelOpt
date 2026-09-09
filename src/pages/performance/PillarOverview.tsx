@@ -185,7 +185,7 @@ function SourceChart({ source, data, unit }: { source: Source; data: MonthRow[];
       <div className="flex items-start justify-between">
         <div>
           <div className="text-[12px] font-semibold text-ink-700">{source.fullLabel}</div>
-          <div className="text-[1.5rem] font-extrabold tabular-nums text-ink-900 leading-tight mt-0.5">
+          <div className="text-[1.5rem] font-bold tabular-nums text-ink-900 leading-tight mt-0.5">
             {annualTY.toLocaleString()}<span className="text-[11px] font-semibold text-ink-400 ml-1">{unit}</span>
           </div>
         </div>

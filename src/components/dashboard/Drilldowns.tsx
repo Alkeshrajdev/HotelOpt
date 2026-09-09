@@ -29,7 +29,7 @@ export function HeroValue({
     showDelta && (goodDirection === "down" ? delta! < 0 : delta! > 0);
   return (
     <div className="flex items-end gap-3 flex-wrap">
-      <div className="text-[34px] leading-none font-extrabold text-ink-900 tabular-nums">
+      <div className="text-[34px] leading-none font-bold text-ink-900 tabular-nums">
         {value}
         {unit && (
           <span className="text-[14px] font-medium text-ink-500 ml-1">

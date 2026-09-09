@@ -140,7 +140,7 @@ export default function EnergyPerformance() {
             <div className="w-8 h-8 rounded-lg bg-good/10 grid place-items-center shrink-0"><TrendingDown size={15} className="text-good" /></div>
             <span className="text-[11px] font-semibold uppercase tracking-wide text-ink-400">Genuine saving</span>
           </div>
-          <div className="mt-2 text-[2rem] font-extrabold text-good leading-none tabular-nums">440 MWh</div>
+          <div className="mt-2 text-[2rem] font-bold text-good leading-none tabular-nums">440 MWh</div>
           <div className="text-[12px] text-ink-500 mt-0.5">−13.4% after adjusting for external factors</div>
         </div>
 
@@ -149,7 +149,7 @@ export default function EnergyPerformance() {
             <div className="w-8 h-8 rounded-lg bg-good/10 grid place-items-center shrink-0"><DollarSign size={15} className="text-good" /></div>
             <span className="text-[11px] font-semibold uppercase tracking-wide text-ink-400">Financial impact</span>
           </div>
-          <div className="mt-2 text-[2rem] font-extrabold text-good leading-none tabular-nums">${GENUINE_SAVING_USD.toLocaleString()}</div>
+          <div className="mt-2 text-[2rem] font-bold text-good leading-none tabular-nums">${GENUINE_SAVING_USD.toLocaleString()}</div>
           <div className="text-[12px] text-ink-500 mt-0.5">saved · at avg ${COST_PER_MWH} / MWh</div>
         </div>
 
@@ -158,7 +158,7 @@ export default function EnergyPerformance() {
             <div className="w-8 h-8 rounded-lg bg-ink-100 grid place-items-center shrink-0"><TrendingUp size={15} className="text-ink-500" /></div>
             <span className="text-[11px] font-semibold uppercase tracking-wide text-ink-400">Adjusted baseline</span>
           </div>
-          <div className="mt-2 text-[2rem] font-extrabold text-ink-800 leading-none tabular-nums">3,280 MWh</div>
+          <div className="mt-2 text-[2rem] font-bold text-ink-800 leading-none tabular-nums">3,280 MWh</div>
           <div className="text-[12px] text-ink-500 mt-0.5">what you would have used with no improvement</div>
         </div>
       </div>

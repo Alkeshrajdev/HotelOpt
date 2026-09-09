@@ -437,7 +437,7 @@ function CertificationTab() {
           { label: "At Risk / Expired", count: atRisk, colour: "text-bad" },
         ].map(s => (
           <div key={s.label} className="rounded-xl border border-ink-100 bg-white p-3 text-center">
-            <div className={cn("text-2xl font-extrabold", s.colour)}>{s.count}</div>
+            <div className={cn("text-2xl font-bold", s.colour)}>{s.count}</div>
             <div className="text-[11px] text-ink-500 mt-0.5">{s.label}</div>
           </div>
         ))}

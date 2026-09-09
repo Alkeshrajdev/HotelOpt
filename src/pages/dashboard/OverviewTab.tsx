@@ -391,7 +391,7 @@ export default function OverviewTab({ onNavigate }: Props) {
                   </div>
                 </div>
                 <div className={cn(
-                  "text-[1.85rem] font-extrabold tabular-nums mt-2.5 leading-none tracking-tight",
+                  "text-[1.85rem] font-bold tabular-nums mt-2.5 leading-none tracking-tight",
                   t.highlight ? "text-good" : "text-ink-900"
                 )}>
                   {t.value}
@@ -672,7 +672,7 @@ export default function OverviewTab({ onNavigate }: Props) {
 
                 {/* Value */}
                 <div>
-                  <span className="text-[2rem] font-extrabold tabular-nums text-ink-900 leading-none">{t.value}</span>
+                  <span className="text-[2rem] font-bold tabular-nums text-ink-900 leading-none tracking-tight">{t.value}</span>
                   <span className="text-[12px] text-ink-400 ml-1.5">{t.unit}</span>
                 </div>
 

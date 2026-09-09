@@ -121,7 +121,7 @@ function HotelsTab() {
           { label: "Cert gaps",     val: certGaps, colour: certGaps > 0 ? "text-warn" : "text-good" },
         ].map(s => (
           <div key={s.label} className="rounded-xl border border-ink-100 bg-ink-50 p-3 text-center">
-            <div className={cn("text-2xl font-extrabold", s.colour)}>{s.val}</div>
+            <div className={cn("text-2xl font-bold", s.colour)}>{s.val}</div>
             <div className="text-[11px] text-ink-500 mt-0.5">{s.label}</div>
           </div>
         ))}
