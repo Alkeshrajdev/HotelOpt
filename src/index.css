@@ -70,7 +70,7 @@
 @layer base {
   html, body, #root { height: 100%; }
   body {
-    background: #F6F8F7;
+    background: #EEF1F1;
     @apply text-ink-900 font-sans antialiased;
     font-feature-settings: "cv11", "ss01";
   }
@@ -98,10 +98,10 @@
 @layer components {
   /* ----- Cards (base) ----- */
   .card {
-    @apply bg-white border border-ink-200 rounded-xl2 shadow-card;
+    @apply bg-white border border-ink-200/70 rounded-xl2 shadow-card;
   }
   .card-lg {
-    @apply bg-white border border-ink-200 rounded-xl3 shadow-card-lg;
+    @apply bg-white border border-ink-200/70 rounded-xl3 shadow-card-lg;
   }
   .card-pad {
     @apply p-6;
@@ -156,7 +156,10 @@
   /* ----- Sidebar (dark emerald) ----- */
   .sidebar-shell {
     @apply flex flex-col shrink-0 transition-[width] duration-200 ease-out;
-    background: var(--sidebar-bg, #062A1C);
+    /* Base fill (white-label overridable) + a top-lit translucent sheen that
+       gives the panel depth over any base colour. */
+    background-color: var(--sidebar-bg, #06291B);
+    background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.035) 0%, rgba(255, 255, 255, 0) 22%, rgba(0, 0, 0, 0.12) 100%);
     color: var(--sidebar-text, #A7D5BC);
     border-right: 1px solid var(--sidebar-border, #0E3D28);
   }
@@ -164,17 +167,18 @@
     border-color: var(--sidebar-border, #0F4528);
   }
   .nav-item {
-    @apply flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors;
+    @apply flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] font-medium transition-colors duration-100;
     color: var(--sidebar-text, #A7D5BC);
   }
   .nav-item:hover {
-    background: var(--sidebar-bg-hover, #0E3A26);
+    background: var(--sidebar-bg-hover, rgba(255, 255, 255, 0.06));
     color: #FFFFFF;
   }
   .nav-item-active {
-    @apply shadow-sm;
     background: var(--sidebar-bg-active, #0F6A3C);
     color: #FFFFFF;
+    /* Inner top highlight + soft drop = a gently raised, "current" pill. */
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 1px 2px rgba(0, 0, 0, 0.28);
   }
   .nav-item-active:hover {
     background: var(--sidebar-bg-active, #0F6A3C);
@@ -196,10 +200,12 @@
            transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
   }
   .btn-primary {
-    @apply btn bg-brand-700 text-white hover:bg-brand-800;
+    @apply btn bg-brand-700 text-white hover:bg-brand-800 active:scale-[0.98];
+    box-shadow: 0 1px 2px rgba(16, 24, 40, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.08);
   }
   .btn-secondary {
-    @apply btn bg-white border border-ink-200 text-ink-700 hover:bg-ink-100;
+    @apply btn bg-white border border-ink-200 text-ink-700 hover:bg-ink-50 hover:border-ink-300 active:scale-[0.98];
+    box-shadow: 0 1px 2px rgba(16, 24, 40, 0.05);
   }
   .btn-ghost {
     @apply btn text-ink-600 hover:bg-ink-100;

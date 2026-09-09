@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import {
   Zap, Droplet, Cloud, Recycle,
   DollarSign, TrendingDown, ArrowRight,
+  ArrowDownRight, ArrowUpRight, ChevronRight,
 } from "lucide-react";
 import {
   ComposedChart, Bar, Line, XAxis, YAxis, Tooltip,
@@ -170,6 +171,18 @@ const SNAP_TILES: SnapTile[] = [
   },
 ];
 
+// Top-accent colour for a snapshot tile, derived from its icon colour family.
+function snapAccent(iconBg: string): string {
+  if (iconBg.includes("pillar-energy")) return "bg-pillar-energy";
+  if (iconBg.includes("pillar-water"))  return "bg-pillar-water";
+  if (iconBg.includes("pillar-carbon")) return "bg-pillar-carbon";
+  if (iconBg.includes("pillar-waste"))  return "bg-pillar-waste";
+  if (iconBg.includes("good"))          return "bg-good";
+  return "bg-ink-300";
+}
+const isPctDelta = (d: string) => d.includes("%") || d.includes("pp");
+const isNegDelta = (d: string) => d.trimStart().startsWith("−") || d.trimStart().startsWith("-");
+
 /* ─── Efficiency tiles ────────────────────────────────────────────────────── */
 type EffTile = {
   icon:     React.ElementType;
@@ -307,9 +320,9 @@ function SectionLabel({ title, action, onClick }: { title: string; action?: stri
 function NeedsAttention() {
   if (!ACTION_CENTRE.length) return null;
   const toneText = (s: string) =>
-    s === "bad" ? "text-bad" : s === "warn" ? "text-warn" : "text-info";
-  const toneBorder = (s: string) =>
-    s === "bad" ? "border-bad/30" : s === "warn" ? "border-warn/30" : "border-info/30";
+    s === "bad" ? "text-bad" : s === "warn" ? "text-amber-700" : "text-info";
+  const toneChip = (s: string) =>
+    s === "bad" ? "bg-bad/10 text-bad" : s === "warn" ? "bg-warn/15 text-amber-700" : "bg-info/10 text-info";
   return (
     <div>
       <SectionLabel title="Needs attention" />
@@ -318,15 +331,13 @@ function NeedsAttention() {
           <Link
             key={it.label}
             to={it.href}
-            className={cn(
-              "card p-3 flex items-center gap-3 hover:shadow-md transition-shadow",
-              toneBorder(it.severity)
-            )}
+            className="group card p-3 flex items-center gap-3 hover:shadow-card-lg hover:-translate-y-px transition-all duration-150"
           >
-            <div className={cn("text-2xl font-bold tabular-nums leading-none shrink-0", toneText(it.severity))}>
+            <div className={cn("w-9 h-9 rounded-lg grid place-items-center shrink-0 text-[15px] font-bold tabular-nums leading-none", toneChip(it.severity))}>
               {it.count}
             </div>
-            <div className="text-[11px] text-ink-600 leading-tight">{it.label}</div>
+            <div className="min-w-0 flex-1 text-[11.5px] font-medium text-ink-700 leading-tight">{it.label}</div>
+            <ChevronRight size={14} className={cn("shrink-0 transition-all group-hover:translate-x-0.5", toneText(it.severity), "opacity-40 group-hover:opacity-100")} />
           </Link>
         ))}
       </div>
@@ -361,29 +372,43 @@ export default function OverviewTab({ onNavigate }: Props) {
         <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-7 gap-4">
           {SNAP_TILES.map((t) => {
             const Icon = t.icon;
+            const pct = isPctDelta(t.delta);
+            const neg = isNegDelta(t.delta);
             return (
               <div
                 key={t.label}
                 className={cn(
-                  "card p-4 flex flex-col",
-                  t.highlight && "border-good/30 bg-good/3"
+                  "group relative overflow-hidden rounded-xl2 border bg-white p-4 shadow-card transition-all duration-150 hover:shadow-card-lg hover:-translate-y-px",
+                  t.highlight ? "border-good/40 ring-1 ring-good/10" : "border-ink-200/70"
                 )}
               >
+                {/* colour accent bar keys the tile to its metric */}
+                <span className={cn("absolute inset-x-0 top-0 h-[3px]", snapAccent(t.iconBg))} />
                 <div className="flex items-center justify-between gap-2">
-                  <div className="text-[11px] font-semibold uppercase tracking-[0.06em] text-ink-500 leading-snug">{t.label}</div>
+                  <div className="text-[10.5px] font-semibold uppercase tracking-[0.07em] text-ink-500 leading-snug">{t.label}</div>
                   <div className={cn("w-8 h-8 rounded-lg grid place-items-center shrink-0", t.iconBg)}>
                     <Icon size={15} />
                   </div>
                 </div>
                 <div className={cn(
-                  "text-[1.7rem] font-extrabold tabular-nums mt-2 leading-none",
+                  "text-[1.85rem] font-extrabold tabular-nums mt-2.5 leading-none tracking-tight",
                   t.highlight ? "text-good" : "text-ink-900"
                 )}>
                   {t.value}
                 </div>
-                <div className="text-[11px] text-ink-400 mt-1">{t.unit}</div>
-                <div className={cn("text-[11px] font-semibold mt-1.5", t.deltaGood ? "text-good" : "text-bad")}>
-                  {t.delta}
+                <div className="text-[11px] text-ink-400 mt-1 truncate">{t.unit}</div>
+                <div className="mt-3 pt-2.5 border-t border-ink-100 text-[11px]">
+                  {pct ? (
+                    <span className={cn(
+                      "inline-flex items-center gap-0.5 rounded-md px-1.5 py-0.5 font-semibold",
+                      t.deltaGood ? "text-good bg-good/10" : "text-bad bg-bad/10"
+                    )}>
+                      {neg ? <ArrowDownRight size={11} /> : <ArrowUpRight size={11} />}
+                      {t.delta}
+                    </span>
+                  ) : (
+                    <span className={cn("font-medium", t.deltaGood ? "text-good" : "text-ink-500")}>{t.delta}</span>
+                  )}
                 </div>
               </div>
             );

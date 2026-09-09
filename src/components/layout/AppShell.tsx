@@ -23,7 +23,7 @@ export default function AppShell() {
   return (
     <TopbarProvider>
       <EntitlementGuard />
-      <div className="flex h-screen w-screen overflow-hidden bg-[#F6F8F7]">
+      <div className="flex h-screen w-screen overflow-hidden bg-[#EEF1F1]">
         {/* Mobile backdrop */}
         {mobileOpen && (
           <div
