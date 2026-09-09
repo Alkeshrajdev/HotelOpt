@@ -40,7 +40,7 @@ export default function GenuinePortfolio() {
 
   return (
     <div className="space-y-5">
-      <PageHeader title="Genuine Performance — Portfolio" />
+      <PageHeader title="Genuine Performance" />
 
       <div className="rounded-xl bg-brand-50 border border-brand-100 p-3 flex items-start gap-2.5">
         <Sparkles size={16} className="text-brand-700 mt-0.5 shrink-0" />

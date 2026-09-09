@@ -47,37 +47,37 @@ const ADMIN: AdminGroup[] = [
   {
     group: "Tenancy & branding",
     tiles: [
-      { to: "/admin/clients",       label: "Clients & deployments", body: "Client list, deployment type (Direct SaaS / White-label / Sovereign), data isolation, billing entity.", icon: Building2, iconBg: "bg-brand-50 text-brand-700",       live: true },
-      { to: "/admin/branding",      label: "White-label branding",  body: "Logo, colours, custom domain, email identity, report templates, module toggles.",                       icon: Palette,   iconBg: "bg-pillar-social/10 text-pillar-social" },
-      { to: "/admin/users",         label: "Users & roles",          body: "Maker, Checker, Property SM and Super Admin roles, with maker–checker rights assigned per user.", icon: UserCog,  iconBg: "bg-info/10 text-info",          live: true },
+      { to: "/admin/clients",       label: "Clients & deployments", body: "Client list, deployment type (Direct SaaS / White-label / Sovereign), data isolation, billing entity.", icon: Building2, iconBg: "bg-ink-100 text-ink-600",       live: true },
+      { to: "/admin/branding",      label: "White-label branding",  body: "Logo, colours, custom domain, email identity, report templates, module toggles.",                       icon: Palette,   iconBg: "bg-ink-100 text-ink-600" },
+      { to: "/admin/users",         label: "Users & roles",          body: "Maker, Checker, Property SM and Super Admin roles, with maker–checker rights assigned per user.", icon: UserCog,  iconBg: "bg-ink-100 text-ink-600",          live: true },
     ],
   },
   {
     group: "Configuration",
     tiles: [
-      { to: "/admin/property-config", label: "Property configuration", body: "Defaults, GP baseline year per property, enabled pillars, certification programmes.", icon: Layers,    iconBg: "bg-pillar-energy/10 text-pillar-energy" },
-      { to: "/admin/ef-library",      label: "Emission factor library", body: "Versioned EFs by region/year. Audit-logged updates. EEIO + IPCC AR6.",                icon: Database,  iconBg: "bg-lime-50 text-lime-700",       live: true },
-      { to: "/admin/gp-config",       label: "GP configuration",         body: "Composite weights, normalisation parameters, baseline-year rules.",                  icon: Sparkles,  iconBg: "bg-warn/10 text-warn" },
-      { to: "/admin/pools",           label: "Comparable pools",         body: "Pool isolation per client. Filter rules: climate, star rating, size band.",          icon: Globe2,    iconBg: "bg-info/10 text-info",         live: true },
-      { to: "/admin/qr",              label: "QR management",            body: "Print sheets, point assignments, deactivation, scan analytics.",                       icon: Boxes,     iconBg: "bg-pillar-waste/10 text-pillar-waste" },
-      { to: "/admin/measures",        label: "Measure library",          body: "Capex measures with default impact, payback, recommended priority.",                   icon: Lightbulb, iconBg: "bg-warn/10 text-warn" },
+      { to: "/admin/property-config", label: "Property configuration", body: "Defaults, GP baseline year per property, enabled pillars, certification programmes.", icon: Layers,    iconBg: "bg-ink-100 text-ink-600" },
+      { to: "/admin/ef-library",      label: "Emission factor library", body: "Versioned EFs by region/year. Audit-logged updates. EEIO + IPCC AR6.",                icon: Database,  iconBg: "bg-ink-100 text-ink-600",       live: true },
+      { to: "/admin/gp-config",       label: "GP configuration",         body: "Composite weights, normalisation parameters, baseline-year rules.",                  icon: Sparkles,  iconBg: "bg-ink-100 text-ink-600" },
+      { to: "/admin/pools",           label: "Comparable pools",         body: "Pool isolation per client. Filter rules: climate, star rating, size band.",          icon: Globe2,    iconBg: "bg-ink-100 text-ink-600",         live: true },
+      { to: "/admin/qr",              label: "QR management",            body: "Print sheets, point assignments, deactivation, scan analytics.",                       icon: Boxes,     iconBg: "bg-ink-100 text-ink-600" },
+      { to: "/admin/measures",        label: "Measure library",          body: "Capex measures with default impact, payback, recommended priority.",                   icon: Lightbulb, iconBg: "bg-ink-100 text-ink-600" },
     ],
   },
   {
     group: "Knowledge & alerts",
     tiles: [
-      { to: "/admin/knowledge", label: "Knowledge base", body: "Knowledge Curator role only. Versioned articles, recommendation templates, criterion explainers.", icon: BookOpen, iconBg: "bg-brand-50 text-brand-700" },
-      { to: "/admin/alerts",    label: "Alert rules",      body: "Anomaly thresholds, SLA escalations, deadline reminders, integration failures.",                  icon: Bell,     iconBg: "bg-warn/10 text-warn" },
-      { to: "/admin/templates", label: "Report templates", body: "PDF/PPT/XLSX templates per framework. White-label branding overrides.",                            icon: FileText, iconBg: "bg-pillar-social/10 text-pillar-social" },
+      { to: "/admin/knowledge", label: "Knowledge base", body: "Knowledge Curator role only. Versioned articles, recommendation templates, criterion explainers.", icon: BookOpen, iconBg: "bg-ink-100 text-ink-600" },
+      { to: "/admin/alerts",    label: "Alert rules",      body: "Anomaly thresholds, SLA escalations, deadline reminders, integration failures.",                  icon: Bell,     iconBg: "bg-ink-100 text-ink-600" },
+      { to: "/admin/templates", label: "Report templates", body: "PDF/PPT/XLSX templates per framework. White-label branding overrides.",                            icon: FileText, iconBg: "bg-ink-100 text-ink-600" },
     ],
   },
   {
     group: "Connectors & access",
     tiles: [
-      { to: "/admin/integrations", label: "Integrations & API keys", body: "OAuth secrets for QuickBooks/Xero/Workday. BMS receiver tokens. Outbound API consumers.", icon: KeyRound,    iconBg: "bg-pillar-gov/10 text-pillar-gov" },
-      { to: "/admin/security",     label: "Security & access",        body: "SSO, MFA, IP allowlists, session settings, sovereign hosting controls.",                  icon: Lock,        iconBg: "bg-bad/10 text-bad" },
-      { to: "/admin/subscriptions",label: "Subscriptions",             body: "Plans, trials, discounts, white-label licence fees, AI/OCR pass-through costs.",         icon: ReceiptText, iconBg: "bg-pillar-energy/10 text-pillar-energy" },
-      { to: "/admin/audit",        label: "Platform audit log",        body: "Immutable platform-wide audit trail. Filter by user, property, action, time.",          icon: ShieldCheck, iconBg: "bg-ink-100 text-ink-700" },
+      { to: "/admin/integrations", label: "Integrations & API keys", body: "OAuth secrets for QuickBooks/Xero/Workday. BMS receiver tokens. Outbound API consumers.", icon: KeyRound,    iconBg: "bg-ink-100 text-ink-600" },
+      { to: "/admin/security",     label: "Security & access",        body: "SSO, MFA, IP allowlists, session settings, sovereign hosting controls.",                  icon: Lock,        iconBg: "bg-ink-100 text-ink-600" },
+      { to: "/admin/subscriptions",label: "Subscriptions",             body: "Plans, trials, discounts, white-label licence fees, AI/OCR pass-through costs.",         icon: ReceiptText, iconBg: "bg-ink-100 text-ink-600" },
+      { to: "/admin/audit",        label: "Platform audit log",        body: "Immutable platform-wide audit trail. Filter by user, property, action, time.",          icon: ShieldCheck, iconBg: "bg-ink-100 text-ink-600" },
     ],
   },
 ];

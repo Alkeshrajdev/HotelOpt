@@ -241,7 +241,7 @@ export default function Certifications() {
     <div className="space-y-5">
       <PageHeader
         eyebrow="Certification readiness"
-        title="Certifications & Compliance"
+        title="Certifications"
         subtitle="Your next audit is in 45 days. Upload missing evidence and close criteria gaps across active programmes before the deadline. Green Globe evidence pack is 12% short."
         actions={
           <>

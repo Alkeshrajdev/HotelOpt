@@ -217,7 +217,6 @@ export default function AIAssistant() {
   return (
     <div className="space-y-5">
       <PageHeader
-        eyebrow="AI-assisted sustainability guidance"
         title="AI Assistant"
         subtitle="Conversational guidance grounded in a curated knowledge base. AI is assistive, never authoritative — every answer cites sources and never commits data without explicit human approval."
         actions={

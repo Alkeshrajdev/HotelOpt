@@ -35,7 +35,7 @@ export default function AdminShell({
             </div>
           )}
           <h1 className="page-title">{title}</h1>
-          {subtitle && <p className="text-sm text-ink-500 mt-1.5 max-w-2xl">{subtitle}</p>}
+          {/* subtitle intentionally not rendered — headers stay minimal (matches PageHeader) */}
         </div>
         {actions && <div className="flex items-center gap-2">{actions}</div>}
       </div>

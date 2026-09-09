@@ -1132,8 +1132,7 @@ export default function Marketplace() {
     <div className="p-6 space-y-5">
 
       <PageHeader
-        eyebrow="Marketplace"
-        title="Sustainable Products & Services"
+        title="Marketplace"
         subtitle="Discover verified sustainable products and services for your hotel operations · RFQ to suppliers in one click"
         actions={
           rfqItems.length > 0 ? (

@@ -300,7 +300,7 @@ export default function Reports() {
     <div className="space-y-5">
       <PageHeader
         eyebrow="Disclosure & assurance"
-        title="Reports & Disclosure"
+        title="Reports"
         subtitle="5 of 7 frameworks are ready to export. 2 have blocking issues — resolve data gaps before your next disclosure deadline. AI drafts reports; sustainability managers review and finalise before any export."
         actions={
           <>

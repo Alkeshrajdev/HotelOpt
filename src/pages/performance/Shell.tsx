@@ -170,7 +170,6 @@ export default function PerformanceShell() {
           value={pillar}
           onChange={(k) => navigate(`/performance/${k}/overview`)}
         />
-        <p className="text-[13px] text-ink-500 max-w-3xl leading-snug">{PILLAR_DESCRIPTIONS[pillar]}</p>
       </div>
 
       <Tabs
