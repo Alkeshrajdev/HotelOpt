@@ -27,11 +27,25 @@ export const SUPABASE_CONFIGURED = Boolean(url && key);
  * Untyped deliberately. v2's schema is twenty-six schemas deep and its services already
  * know every table they touch; a generated type for one schema would be wrong for the
  * rest. The legacy `lib/api.ts` casts what it reads.
+ *
+ * "Continue as Demo" sets the `ho_demo` flag (see auth.tsx). While it is set the client
+ * must not recover, persist or refresh a stored session — otherwise it retries token
+ * refreshes against a backend the demo never signed in to, hundreds of times a session.
+ * The client is created once per page load, and the sign-in flow already reloads between
+ * the demo and a real sign-in, so reading the flag here is consistent with that model.
  */
+const demoActive = (() => {
+  try {
+    return localStorage.getItem("ho_demo") === "1";
+  } catch {
+    return false;
+  }
+})();
+
 export const supabase = createClient(url, key, {
   auth: {
-    persistSession: true,
-    autoRefreshToken: true,
-    detectSessionInUrl: true,
+    persistSession: !demoActive,
+    autoRefreshToken: !demoActive,
+    detectSessionInUrl: !demoActive,
   },
 });

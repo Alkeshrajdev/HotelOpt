@@ -156,7 +156,7 @@ function DesktopControls() {
         </button>
 
         {propsOpen && (
-          <div className="absolute left-0 top-10 w-64 card shadow-pop z-50 py-1.5 overflow-y-auto max-h-80">
+          <div className="absolute left-0 top-10 w-64 popover z-50 py-1.5 overflow-y-auto max-h-80">
             {/* All properties */}
             <button
               onClick={() => setDashHotelIds("all")}
@@ -253,7 +253,7 @@ function DesktopControls() {
             <ChevronDown size={11} className="text-ink-400" />
           </button>
           {quarterOpen && (
-            <div className="absolute left-0 top-10 w-20 card shadow-pop z-50 py-1">
+            <div className="absolute left-0 top-10 w-20 popover z-50 py-1">
               {QUARTERS.map((q, i) => (
                 <DropdownItem
                   key={q}
@@ -279,7 +279,7 @@ function DesktopControls() {
             <ChevronDown size={11} className="text-ink-400" />
           </button>
           {monthOpen && (
-            <div className="absolute left-0 top-10 w-32 card shadow-pop z-50 py-1 overflow-y-auto max-h-64">
+            <div className="absolute left-0 top-10 w-32 popover z-50 py-1 overflow-y-auto max-h-64">
               {MONTH_OPTIONS.map((m, i) => (
                 <DropdownItem
                   key={m}
@@ -303,7 +303,7 @@ function DesktopControls() {
           <ChevronDown size={11} className="text-ink-400" />
         </button>
         {yearOpen && (
-          <div className="absolute left-0 top-10 w-24 card shadow-pop z-50 py-1 overflow-y-auto max-h-48">
+          <div className="absolute left-0 top-10 w-24 popover z-50 py-1 overflow-y-auto max-h-48">
             {YEAR_OPTIONS.map((y) => (
               <DropdownItem
                 key={y}
@@ -336,7 +336,7 @@ function DesktopControls() {
             <ChevronDown size={11} className="text-ink-400" />
           </button>
           {cmpYearOpen && (
-            <div className="absolute left-0 top-10 w-24 card shadow-pop z-50 py-1 overflow-y-auto max-h-48">
+            <div className="absolute left-0 top-10 w-24 popover z-50 py-1 overflow-y-auto max-h-48">
               {compYears.map((y) => (
                 <DropdownItem
                   key={y}
@@ -479,7 +479,7 @@ function MobileControls() {
       </button>
 
       {open && (
-        <div className="absolute left-0 top-10 w-[300px] card shadow-pop z-50">
+        <div className="absolute left-0 top-10 w-[300px] popover z-50">
           <div className="px-4 py-3 border-b border-ink-200 flex items-center justify-between">
             <span className="text-sm font-semibold text-ink-900">Dashboard Filters</span>
             <button onClick={() => setOpen(false)} className="btn-ghost w-7 h-7 p-0"><X size={13} /></button>

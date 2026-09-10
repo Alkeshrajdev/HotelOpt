@@ -153,6 +153,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (demoChosen()) {
+      // The demo never talks to the platform — stop the client's token-refresh timer so it
+      // does not retry against a backend the demo never signed in to.
+      supabase.auth.stopAutoRefresh();
       setIsDemo(true);
       setSession(DEMO_SESSION);
       setProfile(DEMO_PROFILE);
@@ -201,10 +204,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setProfile(DEMO_PROFILE);
       },
       signOut: async () => {
+        const wasDemo = isDemo || demoChosen();
         try { localStorage.removeItem(DEMO_KEY); } catch { /* ignore */ }
         setIsDemo(false);
         setSession(null);
         setProfile(null);
+        // A demo session was never on the server — nothing to sign out of remotely.
+        if (wasDemo) return;
         await supabase.auth.signOut();
       },
       refreshProfile: () => refresh(session?.user.id),

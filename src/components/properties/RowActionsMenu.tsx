@@ -123,7 +123,7 @@ export default function RowActionsMenu({
       {open && (
         <div
           onClick={(e) => e.stopPropagation()}
-          className="absolute right-0 top-full mt-1 w-72 card overflow-hidden z-20"
+          className="absolute right-0 top-full mt-1 w-72 popover overflow-hidden z-20"
         >
           <ul className="py-1">
             {actions.map((a) => {

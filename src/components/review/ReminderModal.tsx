@@ -36,7 +36,7 @@ export default function ReminderModal({
   if (sent) {
     return (
       <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl shadow-pop max-w-sm w-full p-8 text-center space-y-4">
+        <div className="bg-white rounded-xl3 shadow-pop-lg ring-1 ring-ink-900/[0.06] max-w-sm w-full p-8 text-center space-y-4">
           <div className="w-12 h-12 rounded-full bg-good/10 grid place-items-center mx-auto">
             <CheckCircle2 size={22} className="text-good" />
           </div>
@@ -52,7 +52,7 @@ export default function ReminderModal({
 
   return (
     <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-pop max-w-2xl w-full max-h-[88vh] flex flex-col overflow-hidden">
+      <div className="bg-white rounded-xl3 shadow-pop-lg ring-1 ring-ink-900/[0.06] max-w-2xl w-full max-h-[88vh] flex flex-col overflow-hidden">
         <div className="flex items-center justify-between px-5 py-4 border-b border-ink-200 shrink-0">
           <div>
             <h3 className="font-bold text-ink-900 text-base">Send data reminders</h3>

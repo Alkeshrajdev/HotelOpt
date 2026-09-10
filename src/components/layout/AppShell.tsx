@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { Outlet } from "react-router-dom";
+import RouteFallback from "@/components/ui/RouteFallback";
 import Sidebar from "./Sidebar";
 import Topbar from "./Topbar";
 import EntitlementGuard from "./EntitlementGuard";
@@ -45,7 +46,10 @@ export default function AppShell() {
           <SampleDataNotice />
           <main className="flex-1 overflow-y-auto">
             <div className="px-4 sm:px-6 py-5 max-w-[1600px] mx-auto">
-              <Outlet />
+              {/* Page chunks load here; the shell stays put (see App.tsx). */}
+              <Suspense fallback={<RouteFallback />}>
+                <Outlet />
+              </Suspense>
             </div>
           </main>
         </div>

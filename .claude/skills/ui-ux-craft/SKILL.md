@@ -82,6 +82,14 @@ repo's tokens. When in doubt, the rule wins over the existing code.
 - Modal → short focused task; popover/dropdown → light choice; new page/wizard → multi-step or long
   forms. Never nest modals.
 - One scrim everywhere: `bg-ink-900/50 backdrop-blur-sm` (drawers may use `/40`). Escape closes.
+- Floating layers (menus, dropdowns, popovers, toasts) use `.popover` — white + `shadow-pop` + a
+  6% ink hairline ring — never a bare `card`, or the edge vanishes over white content. Modals
+  and drawers: `rounded-xl3 shadow-pop-lg ring-1 ring-ink-900/[0.06]`.
+
+## 9b. Performance is UX
+- Pages are route-split (`lazy()` in App.tsx) with Suspense inside the shell; new pages must be
+  added the same way. Heavy vendors (recharts) stay out of the initial bundle. Keep the first
+  paint to the shell + one page.
 
 ## 10. Feedback & states (UI is what you can't see)
 - Every interactive element has hover, focus-visible (global), active, disabled. Clickable cards use

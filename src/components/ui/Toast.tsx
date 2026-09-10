@@ -100,9 +100,8 @@ function ToastViewport({
           <div
             key={t.id}
             className={cn(
-              "pointer-events-auto relative overflow-hidden card shadow-pop pl-4 pr-2 py-3 flex items-start gap-3",
-              "animate-[toastin_160ms_ease-out]",
-              cfg.ring
+              "pointer-events-auto relative overflow-hidden popover pl-4 pr-2 py-3 flex items-start gap-3",
+              "animate-[toastin_160ms_ease-out]"
             )}
           >
             <span className={cn("absolute left-0 inset-y-0 w-1", cfg.bar)} aria-hidden />

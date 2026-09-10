@@ -114,6 +114,11 @@
   .card-pad-lg {
     @apply p-7;
   }
+  /* Floating layers — menus, dropdowns, popovers, toasts. White + pop shadow + a
+     hairline ring so the edge stays crisp even when they open over white content. */
+  .popover {
+    @apply bg-white rounded-xl2 shadow-pop ring-1 ring-ink-900/[0.06];
+  }
 
   /* ----- Card hierarchy (BRD §1.2) ----- */
   /* Level 1 — Primary KPIs and urgent insights. Stronger shadow, 1.5rem padding. */
