@@ -115,10 +115,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setProfile(DEMO_PROFILE);
       },
       signOut: async () => {
+        const wasDemo =
+          typeof localStorage !== "undefined" && localStorage.getItem("ho_demo") === "1";
         if (typeof localStorage !== "undefined") localStorage.removeItem("ho_demo");
         setSession(null);
         setProfile(null);
-        if (!supabase) return;
+        // A demo session was never on the server — nothing to sign out of remotely.
+        if (!supabase || wasDemo) return;
         await supabase.auth.signOut();
       },
       refreshProfile: () => loadProfile(session?.user.id),
