@@ -14,4 +14,18 @@ export default defineConfig({
         port: 5173,
         open: true,
     },
+    build: {
+        // Pages are route-split in App.tsx; vendors get stable chunks so they cache
+        // across deploys instead of re-downloading with every app change.
+        rollupOptions: {
+            output: {
+                manualChunks: {
+                    "vendor-react": ["react", "react-dom", "react-router-dom"],
+                    "vendor-charts": ["recharts"],
+                    "vendor-supabase": ["@supabase/supabase-js"],
+                    "vendor-icons": ["lucide-react"],
+                },
+            },
+        },
+    },
 });
