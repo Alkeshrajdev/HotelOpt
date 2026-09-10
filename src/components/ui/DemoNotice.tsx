@@ -1,13 +1,10 @@
 import { useState } from "react";
 import { FlaskConical, X } from "lucide-react";
-import { SUPABASE_CONFIGURED } from "@/lib/supabase";
 import { useAuth } from "@/lib/auth";
 
 export default function DemoNotice({ message }: { message?: string }) {
   const [dismissed, setDismissed] = useState(false);
-  const { session } = useAuth();
-  const isDemoSession = session?.user?.id === "demo";
-  const isDemo = !SUPABASE_CONFIGURED || isDemoSession;
+  const { isDemo } = useAuth();
   if (!isDemo || dismissed) return null;
 
   return (
@@ -16,7 +13,7 @@ export default function DemoNotice({ message }: { message?: string }) {
       <span className="flex-1 leading-snug">
         <span className="font-semibold">Demo mode</span>
         {" — "}
-        {message || "Sample data only. Connect real Supabase credentials to enable live data, approvals, and data capture."}
+        {message || "Sample data only. Sign out and sign in with a platform account to see your hotels."}
       </span>
       <button
         onClick={() => setDismissed(true)}

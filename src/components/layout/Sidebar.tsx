@@ -6,6 +6,7 @@ import type { NavGroup, NavItem, Role } from "@/lib/nav";
 import { useAuth } from "@/lib/auth";
 import { useAccount } from "@/lib/account";
 import { findProperty } from "@/lib/propertiesData";
+import { useProperties } from "@/lib/live/properties";
 import { cn } from "@/lib/utils";
 
 type Props = {
@@ -136,6 +137,8 @@ export default function Sidebar({ collapsed, onToggle, mobileOpen = false, onMob
   const { profile } = useAuth();
   const role: Role = profile?.role ?? "maker";
   const { account, hasModule } = useAccount();
+  const { properties } = useProperties();
+  const clientName = profile?.tenantName ?? account.clientName;
   const singleHotelName = account.accountType === "single"
     ? findProperty(account.singleHotelId)?.name ?? "Single property"
     : null;
@@ -174,10 +177,10 @@ export default function Sidebar({ collapsed, onToggle, mobileOpen = false, onMob
         {!collapsed && (
           <div className="px-4 pb-3 space-y-0.5">
             <div className="text-[10px] font-semibold uppercase tracking-[0.1em] text-white/35 mb-1">Client</div>
-            <div className="text-[13px] font-semibold text-white/90 truncate">{account.clientName}</div>
+            <div className="text-[13px] font-semibold text-white/90 truncate">{clientName}</div>
             <div className="flex items-center gap-1.5 text-[11px] text-white/45">
               <Building2 size={10} className="shrink-0" />
-              <span className="truncate">{singleHotelName ?? "Portfolio · 10 properties"}</span>
+              <span className="truncate">{singleHotelName ?? `Portfolio · ${properties.length} ${properties.length === 1 ? "property" : "properties"}`}</span>
             </div>
           </div>
         )}

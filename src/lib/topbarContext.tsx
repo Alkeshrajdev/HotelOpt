@@ -67,6 +67,9 @@ export function getTopbarConfig(pathname: string): TopbarConfig {
 }
 
 /* ─── Static option lists ────────────────────────────────────────────────── */
+/** The property selector's "everything" choice. The list itself comes from the registry. */
+export const ALL_PROPERTIES = "All Properties";
+
 export const YEAR_OPTIONS = [2022, 2023, 2024, 2025, 2026];
 
 export const MONTH_OPTIONS = [
@@ -130,7 +133,7 @@ export function TopbarProvider({ children }: { children: ReactNode }) {
   const [opsGranularity, setOpsGranularity] = useState<OpsGranularity>("month");
   const [opsCustomStart, setOpsCustomStart] = useState("2026-01-01");
   const [opsCustomEnd,   setOpsCustomEnd]   = useState("2026-05-31");
-  const [property,       setProperty]       = useState("All Properties (10)");
+  const [property,       setProperty]       = useState(ALL_PROPERTIES);
   const [region,         setRegion]         = useState("All Regions");
   const [dataBasis,      setDataBasis]      = useState<DataBasis>("approved");
   const [lastRefreshed]                     = useState(new Date());
@@ -151,7 +154,7 @@ export function TopbarProvider({ children }: { children: ReactNode }) {
   const contextLine = [
     "Acme Hotels",
     region !== "All Regions" ? region : null,
-    property !== "All Properties (10)" ? property : "All Properties",
+    property,
     String(year),
     DATA_BASIS_LABEL[dataBasis],
     `Last refreshed ${hhmm}`,
