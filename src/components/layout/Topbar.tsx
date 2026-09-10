@@ -420,7 +420,7 @@ export default function Topbar({ onMenu }: { onMenu?: () => void }) {
           {/* Period: Smart Ops granularity */}
           {cfg.periodType === "ops" && (
             <>
-              <div className="flex items-center gap-0.5 bg-ink-100 p-1 rounded-xl">
+              <div className="flex items-center gap-0.5 bg-ink-100 p-1 rounded-full">
                 {(["day", "week", "month", "year", "custom"] as OpsGranularity[]).map((g) => (
                   <button
                     key={g}

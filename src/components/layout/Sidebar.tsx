@@ -55,8 +55,8 @@ function NavItemLink({
               className={cn(
                 "ml-auto chip rounded-full text-[10px] font-bold",
                 item.badge === "BETA"
-                  ? "bg-white/12 text-white/60"
-                  : "bg-warn/25 text-warn"
+                  ? "bg-ink-100 text-ink-500"
+                  : "bg-warn/15 text-warn-700"
               )}
             >
               {item.badge}
@@ -113,7 +113,7 @@ function NavGroupSection({
         <ChevronRight
           size={14}
           className={cn(
-            "ml-auto shrink-0 text-white/40 transition-transform duration-200",
+            "ml-auto shrink-0 text-ink-400 transition-transform duration-200",
             open && "rotate-90"
           )}
         />
@@ -157,15 +157,15 @@ export default function Sidebar({ collapsed, onToggle, mobileOpen = false, onMob
         {/* Logo text — styled to match logo typography */}
         <div className={cn("flex items-center gap-2.5", collapsed ? "h-16 justify-center px-2" : "h-16 px-4")}>
           {/* Icon badge — small building mark */}
-          <div className="w-8 h-8 rounded-lg bg-white/12 grid place-items-center shrink-0">
+          <div className="w-8 h-8 rounded-xl bg-brand-700 grid place-items-center shrink-0">
             <Building2 size={15} className="text-white" />
           </div>
           {!collapsed && (
             <div className="leading-none min-w-0">
               {/* "HOTEL" — bold, white, like the logo's primary wordmark */}
-              <div className="text-[15px] font-extrabold text-white tracking-widest uppercase">Hotel</div>
+              <div className="text-[15px] font-bold text-ink-900 tracking-widest uppercase">Hotel</div>
               {/* "OPTIMIZER" — lighter, muted, like the logo's secondary line */}
-              <div className="text-[11px] font-medium text-white/55 tracking-[0.2em] uppercase mt-0.5">Optimizer</div>
+              <div className="text-[11px] font-medium text-ink-500 tracking-[0.2em] uppercase mt-0.5">Optimizer</div>
             </div>
           )}
         </div>
@@ -173,9 +173,9 @@ export default function Sidebar({ collapsed, onToggle, mobileOpen = false, onMob
         {/* Client context */}
         {!collapsed && (
           <div className="px-4 pb-3 space-y-0.5">
-            <div className="text-[10px] font-semibold uppercase tracking-[0.1em] text-white/35 mb-1">Client</div>
-            <div className="text-[13px] font-semibold text-white/90 truncate">{account.clientName}</div>
-            <div className="flex items-center gap-1.5 text-[11px] text-white/45">
+            <div className="text-[10px] font-semibold uppercase tracking-[0.1em] text-ink-400 mb-1">Client</div>
+            <div className="text-[13px] font-semibold text-ink-900 truncate">{account.clientName}</div>
+            <div className="flex items-center gap-1.5 text-[11px] text-ink-500">
               <Building2 size={10} className="shrink-0" />
               <span className="truncate">{singleHotelName ?? "Portfolio · 10 properties"}</span>
             </div>
@@ -241,7 +241,7 @@ export default function Sidebar({ collapsed, onToggle, mobileOpen = false, onMob
 
           return cleaned.map((v) =>
             v.type === "divider"
-              ? collapsed ? null : <div key={`div-${v.idx}`} className="my-1.5 border-t border-white/8" />
+              ? collapsed ? null : <div key={`div-${v.idx}`} className="my-1.5 border-t border-ink-200/70" />
               : <React.Fragment key={v.key}>{v.el}</React.Fragment>
           );
         })()}
@@ -250,7 +250,7 @@ export default function Sidebar({ collapsed, onToggle, mobileOpen = false, onMob
       {/* ── Footer ── */}
       <button
         onClick={onToggle}
-        className="m-3 nav-item justify-start hidden lg:flex text-white/50 hover:text-white/80"
+        className="m-3 nav-item justify-start hidden lg:flex text-ink-500 hover:text-ink-800"
         aria-label="Collapse sidebar"
       >
         <ChevronLeft

@@ -24,7 +24,7 @@ export default function AppShell() {
     <ToastProvider>
     <TopbarProvider>
       <EntitlementGuard />
-      <div className="flex h-screen w-screen overflow-hidden bg-[#EEF1F1]">
+      <div className="flex h-screen w-screen overflow-hidden bg-[#ECEEF3]">
         {/* Mobile backdrop */}
         {mobileOpen && (
           <div

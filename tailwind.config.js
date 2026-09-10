@@ -15,7 +15,7 @@ export default {
     extend: {
       fontFamily: {
         sans: [
-          "Inter",
+          "Plus Jakarta Sans",
           "ui-sans-serif",
           "system-ui",
           "-apple-system",
@@ -38,19 +38,19 @@ export default {
           900: "rgb(var(--brand-900) / <alpha-value>)",
           950: "rgb(var(--brand-950) / <alpha-value>)",
         },
-        // Sidebar palette — dark emerald, white-label overridable via CSS vars.
+        // Sidebar palette — light panel, emerald active pill; overridable via CSS vars.
         sidebar: {
-          bg:           "#062A1C",
-          "bg-hover":   "#0D3C28",
+          bg:           "#FFFFFF",
+          "bg-hover":   "#F1F5F9",
           "bg-active":  "#0F6A3C",
-          border:       "#0E3D28",
-          text:         "#A7D5BC",
-          "text-muted": "#6FA589",
-          heading:      "#4D8A6A",
+          border:       "#E2E8F0",
+          text:         "#475569",
+          "text-muted": "#94A3B8",
+          heading:      "#94A3B8",
         },
         // Page surface (not CSS-var-backed — static cool near-white; a touch
         // deeper than the cards so white surfaces read as elevated).
-        page: "#EEF1F1",
+        page: "#ECEEF3",
         // Neutral scale — CSS-var-backed so dark mode flips automatically.
         ink: {
           900: "rgb(var(--ink-900) / <alpha-value>)",
@@ -83,19 +83,19 @@ export default {
       boxShadow: {
         // Soft, layered elevation so surfaces lift off the page (premium-SaaS feel)
         // without heavy drop shadows.
-        card:      "0 1px 2px rgba(16, 24, 40, 0.04), 0 2px 6px -1px rgba(16, 24, 40, 0.06)",
+        card:      "0 1px 2px rgba(16, 24, 40, 0.04), 0 6px 18px -6px rgba(16, 24, 40, 0.10)",
         "card-lg": "0 1px 3px rgba(16, 24, 40, 0.05), 0 12px 28px -8px rgba(16, 24, 40, 0.12)",
         pop:       "0 6px 16px -4px rgba(16, 24, 40, 0.10), 0 12px 32px -8px rgba(16, 24, 40, 0.10)",
         "pop-lg":  "0 20px 48px -12px rgba(16, 24, 40, 0.18)",
       },
       borderRadius: {
-        xl2: "14px",
-        xl3: "18px",
+        xl2: "20px",
+        xl3: "24px",
       },
       fontSize: {
         // Page-level title. ~30px / tight tracking. Weight 700 (not 800) + tighter
         // tracking reads as crafted rather than heavy/default.
-        "page-title":    ["1.875rem", { lineHeight: "1.15", letterSpacing: "-0.021em", fontWeight: "700" }],
+        "page-title":    ["1.875rem", { lineHeight: "1.15", letterSpacing: "-0.021em", fontWeight: "600" }],
         // KPI value — large, tight, tabular. 700 + negative tracking for a refined feel.
         "kpi":           ["2rem",     { lineHeight: "1",    letterSpacing: "-0.02em", fontWeight: "700" }],
         // Secondary stat value (summary tiles, hero stats) — one step below KPI.
