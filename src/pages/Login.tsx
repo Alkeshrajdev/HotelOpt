@@ -35,7 +35,7 @@ export default function Login() {
           <img
             src="/LogoLight.png"
             alt="Hotel Optimizer"
-            className="w-48 rounded-2xl shadow-lg"
+            className="w-48 rounded-2xl shadow-pop"
           />
         </div>
         <div>

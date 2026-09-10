@@ -65,10 +65,11 @@ export default {
           50:  "rgb(var(--ink-50)  / <alpha-value>)",
         },
         // Status semantics — CSS-var-backed so opacity utilities work (bg-good/10 etc).
-        good: "rgb(var(--good) / <alpha-value>)",
-        warn: "rgb(var(--warn) / <alpha-value>)",
-        bad:  "rgb(var(--bad)  / <alpha-value>)",
-        info: "rgb(var(--info) / <alpha-value>)",
+        // DEFAULT = fill/chip shade; 700 = contrast-safe shade for text & icons.
+        good: { DEFAULT: "rgb(var(--good) / <alpha-value>)", 700: "rgb(var(--good-700) / <alpha-value>)" },
+        warn: { DEFAULT: "rgb(var(--warn) / <alpha-value>)", 700: "rgb(var(--warn-700) / <alpha-value>)" },
+        bad:  { DEFAULT: "rgb(var(--bad)  / <alpha-value>)", 700: "rgb(var(--bad-700)  / <alpha-value>)" },
+        info: { DEFAULT: "rgb(var(--info) / <alpha-value>)", 700: "rgb(var(--info-700) / <alpha-value>)" },
         // Pillar accents — CSS-var-backed for opacity utilities.
         pillar: {
           energy: "rgb(var(--pillar-energy) / <alpha-value>)",
@@ -97,6 +98,8 @@ export default {
         "page-title":    ["1.875rem", { lineHeight: "1.15", letterSpacing: "-0.021em", fontWeight: "700" }],
         // KPI value — large, tight, tabular. 700 + negative tracking for a refined feel.
         "kpi":           ["2rem",     { lineHeight: "1",    letterSpacing: "-0.02em", fontWeight: "700" }],
+        // Secondary stat value (summary tiles, hero stats) — one step below KPI.
+        "stat":          ["1.625rem", { lineHeight: "1",    letterSpacing: "-0.02em", fontWeight: "700" }],
         // Section heading inside a page zone.
         "section-title": ["1.0625rem", { lineHeight: "1.3", fontWeight: "600" }],
         // Subtitle under a page title.

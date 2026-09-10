@@ -203,7 +203,7 @@ function ReportTracker({ onRemind }: { onRemind: (name: string) => void }) {
                     {r.periods.map((p) => (
                       <span key={p.label} className="flex flex-col items-center gap-0.5" title={`${p.label}: ${p.status}`}>
                         <span className={cn("w-3.5 h-3.5 rounded-full", TRACK_TONE[p.status])} />
-                        <span className="text-[9px] text-ink-400">{p.label}</span>
+                        <span className="text-[10px] text-ink-400">{p.label}</span>
                       </span>
                     ))}
                   </div>
@@ -257,7 +257,7 @@ function ReminderModal({ open, target, onClose }: { open: boolean; target: strin
               <label className="block text-[12px] font-medium text-ink-700 mb-1">Recipients</label>
               <div className="space-y-1.5 max-h-[200px] overflow-y-auto">
                 {REMINDER_CONTACTS.map((c) => (
-                  <label key={c.id} className={cn("flex items-center gap-2.5 rounded-xl border px-3 py-2 cursor-pointer", selected.includes(c.id) ? "border-brand-300 bg-brand-50/50" : "border-ink-200")}>
+                  <label key={c.id} className={cn("flex items-center gap-2.5 rounded-xl border px-3 py-2 cursor-pointer hover:bg-ink-50", selected.includes(c.id) ? "border-brand-300 bg-brand-50/50" : "border-ink-200")}>
                     <input type="checkbox" checked={selected.includes(c.id)} onChange={() => toggle(c.id)} className="accent-brand-600" />
                     <div className="min-w-0">
                       <div className="text-[13px] font-medium text-ink-900 truncate">{c.name}</div>

@@ -466,7 +466,7 @@ export default function AddPropertyModal({
             </Field>
 
             <Field label="External comparison" full>
-              <label className="flex items-start gap-3 rounded-lg border border-ink-200 p-3 cursor-pointer">
+              <label className="flex items-start gap-3 rounded-lg border border-ink-200 p-3 cursor-pointer hover:bg-ink-50">
                 <input type="checkbox" className="mt-0.5" checked={form.poolEligible} onChange={(e) => set("poolEligible", e.target.checked)} />
                 <div>
                   <div className="text-sm font-medium text-ink-900">Include in the comparable pool</div>

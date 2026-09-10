@@ -389,7 +389,7 @@ function SupplierProfileDrawer({
   return (
     <div className="fixed inset-0 z-40 flex justify-end" onClick={onClose}>
       <div
-        className="relative h-full w-full max-w-md bg-white shadow-2xl flex flex-col border-l border-ink-200"
+        className="relative h-full w-full max-w-md bg-white shadow-pop-lg flex flex-col border-l border-ink-200"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}

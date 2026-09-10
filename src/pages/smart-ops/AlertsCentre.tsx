@@ -440,7 +440,7 @@ export default function AlertsCentre() {
           <div
             key={s}
             className={cn(
-              "flex items-center gap-1.5 px-3 py-1.5 rounded-full border cursor-pointer transition-colors",
+              "flex items-center gap-1.5 px-3 py-1.5 rounded-full border cursor-pointer hover:bg-ink-50 transition-colors",
               s === "Critical" && "bg-bad/10 border-bad/30 hover:bg-bad/20",
               s === "High" && "bg-warn/10 border-warn/30 hover:bg-warn/20",
               s === "Medium" && "bg-info/10 border-info/30 hover:bg-info/20",
@@ -521,7 +521,7 @@ export default function AlertsCentre() {
           <select
             value={severityFilter}
             onChange={(e) => setSeverityFilter(e.target.value)}
-            className="appearance-none pl-3 pr-7 py-1.5 text-[12px] rounded-lg border border-ink-200 bg-white text-ink-700 focus:outline-none focus:ring-2 focus:ring-brand-300 cursor-pointer"
+            className="appearance-none pl-3 pr-7 py-1.5 text-[12px] rounded-lg border border-ink-200 bg-white text-ink-700 focus:outline-none focus:ring-2 focus:ring-brand-300 cursor-pointer hover:border-ink-300"
           >
             <option value="all">All severities</option>
             {SEVERITY_ORDER.map((s) => (
@@ -536,7 +536,7 @@ export default function AlertsCentre() {
           <select
             value={categoryFilter}
             onChange={(e) => setCategoryFilter(e.target.value)}
-            className="appearance-none pl-3 pr-7 py-1.5 text-[12px] rounded-lg border border-ink-200 bg-white text-ink-700 focus:outline-none focus:ring-2 focus:ring-brand-300 cursor-pointer"
+            className="appearance-none pl-3 pr-7 py-1.5 text-[12px] rounded-lg border border-ink-200 bg-white text-ink-700 focus:outline-none focus:ring-2 focus:ring-brand-300 cursor-pointer hover:border-ink-300"
           >
             <option value="all">All categories</option>
             {(["Energy", "Water", "IAQ", "Asset", "Data Quality", "Maintenance"] as AlertCategory[]).map((c) => (
@@ -551,7 +551,7 @@ export default function AlertsCentre() {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="appearance-none pl-3 pr-7 py-1.5 text-[12px] rounded-lg border border-ink-200 bg-white text-ink-700 focus:outline-none focus:ring-2 focus:ring-brand-300 cursor-pointer"
+            className="appearance-none pl-3 pr-7 py-1.5 text-[12px] rounded-lg border border-ink-200 bg-white text-ink-700 focus:outline-none focus:ring-2 focus:ring-brand-300 cursor-pointer hover:border-ink-300"
           >
             <option value="all">All statuses</option>
             {STATUS_FLOW.map((s) => (
@@ -760,7 +760,7 @@ export default function AlertsCentre() {
             <div className="grid grid-cols-2 gap-4">
               <div className="p-4 rounded-xl border border-ink-100 bg-ink-50/50">
                 <p className="text-[11px] font-semibold text-ink-500 uppercase tracking-wide mb-1">Estimated financial impact</p>
-                <p className="text-[22px] font-bold text-ink-900">{selectedAlert.estimatedImpact}</p>
+                <p className="text-xl font-bold text-ink-900">{selectedAlert.estimatedImpact}</p>
                 <p className="text-[12px] text-ink-500 mt-0.5">{selectedAlert.impactUnit}</p>
               </div>
               <div className="p-4 rounded-xl border border-ink-100 bg-ink-50/50">

@@ -675,7 +675,7 @@ function ScopeTag({ scope }: { scope: ScopeCategory }) {
 
 function VerificationBar({ level }: { level: VerificationLevel }) {
   const labels = ["None", "Self-decl.", "Partial", "Audited"];
-  const colours = ["bg-ink-200", "bg-amber-400", "bg-sky-400", "bg-brand-500"];
+  const colours = ["bg-ink-200", "bg-warn", "bg-info", "bg-brand-500"];
   return (
     <div className="flex items-center gap-1.5">
       <div className="flex gap-0.5">
@@ -705,7 +705,7 @@ function ProductCard({
   const CatIcon = CATEGORIES.find((c) => c.id === product.category)?.icon ?? Package;
   return (
     <div
-      className="relative flex flex-col bg-white border border-ink-100 rounded-2xl overflow-hidden hover:border-brand-300 hover:shadow-md transition-all cursor-pointer group"
+      className="relative flex flex-col bg-white border border-ink-100 rounded-2xl overflow-hidden hover:border-brand-300 hover:shadow-pop transition-all cursor-pointer group"
       onClick={onClick}
     >
       {/* Top colour strip */}
@@ -714,12 +714,12 @@ function ProductCard({
       {/* Badges row */}
       <div className="absolute top-4 right-3 flex gap-1 flex-wrap justify-end">
         {product.featured && (
-          <span className="text-[9px] font-bold uppercase tracking-wide bg-brand-50 text-brand-700 border border-brand-200 rounded px-1.5 py-0.5 flex items-center gap-0.5">
+          <span className="text-[10px] font-bold uppercase tracking-wide bg-brand-50 text-brand-700 border border-brand-200 rounded px-1.5 py-0.5 flex items-center gap-0.5">
             <Star size={8} /> Featured
           </span>
         )}
         {product.newBadge && (
-          <span className="text-[9px] font-bold uppercase tracking-wide bg-green-50 text-green-700 border border-green-200 rounded px-1.5 py-0.5">
+          <span className="text-[10px] font-bold uppercase tracking-wide bg-good/10 text-good-700 border border-good/30 rounded px-1.5 py-0.5">
             New
           </span>
         )}
@@ -845,9 +845,9 @@ function ProductDetailModal({
         {/* Claim status callout */}
         <div className={cn(
           "flex items-start gap-3 rounded-xl p-4 border",
-          claimCfg.tone === "good" ? "bg-green-50 border-green-200" :
+          claimCfg.tone === "good" ? "bg-good/10 border-good/30" :
           claimCfg.tone === "brand" ? "bg-brand-50 border-brand-200" :
-          claimCfg.tone === "warn" ? "bg-amber-50 border-amber-200" :
+          claimCfg.tone === "warn" ? "bg-warn/10 border-warn/30" :
           "bg-ink-50 border-ink-200"
         )}>
           <ClaimIcon size={16} className="shrink-0 mt-0.5 text-ink-500" />
@@ -881,7 +881,7 @@ function ProductDetailModal({
             <div className="text-[11px] font-semibold uppercase tracking-wide text-ink-400 mb-2">Certifications</div>
             <div className="flex flex-wrap gap-1.5">
               {product.certifications.map((c) => (
-                <span key={c} className="flex items-center gap-1 text-[11px] bg-green-50 text-green-700 border border-green-200 rounded-full px-2.5 py-1">
+                <span key={c} className="flex items-center gap-1 text-[11px] bg-good/10 text-good-700 border border-good/30 rounded-full px-2.5 py-1">
                   <Award size={10} />
                   {c}
                 </span>
@@ -938,7 +938,7 @@ function ProductDetailModal({
         </div>
 
         {/* Disclaimer */}
-        <div className="rounded-xl bg-amber-50 border border-amber-200 px-4 py-3 text-[11px] text-amber-800">
+        <div className="rounded-xl bg-warn/10 border border-warn/30 px-4 py-3 text-[11px] text-warn-700">
           <div className="font-semibold mb-1">Important notice</div>
           Hotel Optimizer lists products for discovery and evaluation only. We do not endorse, warrant, or guarantee product performance, supplier claims, or certification validity. All claims should be independently verified before procurement. Price ranges are indicative and subject to change. Hotel Optimizer is not party to any purchase contract.
         </div>
@@ -990,7 +990,7 @@ function RFQModal({
       }
     >
       <div className="space-y-4">
-        <div className="rounded-xl bg-sky-50 border border-sky-200 px-4 py-3 text-[12px] text-sky-800">
+        <div className="rounded-xl bg-info/10 border border-info/30 px-4 py-3 text-[12px] text-info-700">
           <div className="font-semibold mb-0.5">How RFQ works</div>
           Your enquiry is forwarded to the supplier's trade team. Responses typically arrive within 2–5 business days. Hotel Optimizer does not negotiate on your behalf.
         </div>
@@ -1036,7 +1036,7 @@ function RFQModal({
           </div>
         ))}
 
-        <div className="rounded-xl bg-amber-50 border border-amber-200 px-4 py-3 text-[11px] text-amber-800">
+        <div className="rounded-xl bg-warn/10 border border-warn/30 px-4 py-3 text-[11px] text-warn-700">
           Hotel Optimizer facilitates introductions only. All contracts, pricing, and delivery terms are agreed directly between your organisation and the supplier. Hotel Optimizer does not take commission or act as an agent.
         </div>
       </div>

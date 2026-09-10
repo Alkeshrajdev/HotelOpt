@@ -268,8 +268,8 @@ function ChartTip({ active, payload, label, metric }: {
       <div className="bg-white border border-ink-200 rounded-xl shadow-pop px-3.5 py-3 text-[12px] min-w-[190px]">
         <div className="font-semibold text-ink-800 mb-2">{label}</div>
         <div className="space-y-0.5">
-          <div className="flex justify-between gap-4"><span className="text-amber-600">Energy</span><span className="font-medium">${eTY}k</span></div>
-          <div className="flex justify-between gap-4"><span className="text-sky-500">Water</span><span className="font-medium">${wTY}k</span></div>
+          <div className="flex justify-between gap-4"><span className="text-warn-700">Energy</span><span className="font-medium">${eTY}k</span></div>
+          <div className="flex justify-between gap-4"><span className="text-info-700">Water</span><span className="font-medium">${wTY}k</span></div>
           <div className="flex justify-between gap-4"><span className="text-violet-600">Waste</span><span className="font-medium">${dTY}k</span></div>
         </div>
         <div className="border-t border-ink-100 mt-1.5 pt-1.5 space-y-0.5">
@@ -320,9 +320,9 @@ function SectionLabel({ title, action, onClick }: { title: string; action?: stri
 function NeedsAttention() {
   if (!ACTION_CENTRE.length) return null;
   const toneText = (s: string) =>
-    s === "bad" ? "text-bad" : s === "warn" ? "text-amber-700" : "text-info";
+    s === "bad" ? "text-bad" : s === "warn" ? "text-warn-700" : "text-info";
   const toneChip = (s: string) =>
-    s === "bad" ? "bg-bad/10 text-bad" : s === "warn" ? "bg-warn/15 text-amber-700" : "bg-info/10 text-info";
+    s === "bad" ? "bg-bad/10 text-bad" : s === "warn" ? "bg-warn/15 text-warn-700" : "bg-info/10 text-info";
   return (
     <div>
       <SectionLabel title="Needs attention" />
@@ -336,7 +336,7 @@ function NeedsAttention() {
             <div className={cn("w-9 h-9 rounded-lg grid place-items-center shrink-0 text-[15px] font-bold tabular-nums leading-none", toneChip(it.severity))}>
               {it.count}
             </div>
-            <div className="min-w-0 flex-1 text-[11.5px] font-medium text-ink-700 leading-tight">{it.label}</div>
+            <div className="min-w-0 flex-1 text-[11px] font-medium text-ink-700 leading-tight">{it.label}</div>
             <ChevronRight size={14} className={cn("shrink-0 transition-all group-hover:translate-x-0.5", toneText(it.severity), "opacity-40 group-hover:opacity-100")} />
           </Link>
         ))}
@@ -385,13 +385,13 @@ export default function OverviewTab({ onNavigate }: Props) {
                 {/* colour accent bar keys the tile to its metric */}
                 <span className={cn("absolute inset-x-0 top-0 h-[3px]", snapAccent(t.iconBg))} />
                 <div className="flex items-center justify-between gap-2">
-                  <div className="text-[10.5px] font-semibold uppercase tracking-[0.07em] text-ink-500 leading-snug">{t.label}</div>
+                  <div className="text-[10px] font-semibold uppercase tracking-[0.07em] text-ink-500 leading-snug">{t.label}</div>
                   <div className={cn("w-8 h-8 rounded-lg grid place-items-center shrink-0", t.iconBg)}>
                     <Icon size={15} />
                   </div>
                 </div>
                 <div className={cn(
-                  "text-[1.85rem] font-bold tabular-nums mt-2.5 leading-none tracking-tight",
+                  "text-kpi font-bold tabular-nums mt-2.5 leading-none tracking-tight",
                   t.highlight ? "text-good" : "text-ink-900"
                 )}>
                   {t.value}
@@ -433,7 +433,7 @@ export default function OverviewTab({ onNavigate }: Props) {
                   className={cn(
                     "px-2.5 h-6 text-[11px] font-medium rounded-md transition-colors capitalize",
                     aggregation === a
-                      ? "bg-white text-ink-900 shadow-sm"
+                      ? "bg-white text-ink-900 shadow-card"
                       : "text-ink-500 hover:text-ink-700"
                   )}
                 >
@@ -454,7 +454,7 @@ export default function OverviewTab({ onNavigate }: Props) {
                   className={cn(
                     "px-2.5 h-6 text-[11px] font-medium rounded-md transition-colors",
                     metric === m.key
-                      ? "bg-white text-ink-900 shadow-sm"
+                      ? "bg-white text-ink-900 shadow-card"
                       : "text-ink-500 hover:text-ink-700"
                   )}
                 >
@@ -510,8 +510,8 @@ export default function OverviewTab({ onNavigate }: Props) {
             <div className="ml-auto flex items-center gap-3 text-[11px] text-ink-500">
               {metric === "combined" && (
                 <>
-                  <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm inline-block bg-amber-500" />Energy</span>
-                  <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm inline-block bg-sky-400" />Water</span>
+                  <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm inline-block bg-warn" />Energy</span>
+                  <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm inline-block bg-info" />Water</span>
                   <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm inline-block bg-violet-600" />Waste</span>
                 </>
               )}
@@ -523,14 +523,14 @@ export default function OverviewTab({ onNavigate }: Props) {
               )}
               {showPYLine && (
                 <span className="flex items-center gap-1.5">
-                  <span className="w-5 border-t-2 border-dashed border-slate-400 inline-block" />
+                  <span className="w-5 border-t-2 border-dashed border-ink-400 inline-block" />
                   {aggregation === "quarterly" ? "Same qtr prior year" : "Prior year"}
                 </span>
               )}
               {metric === "carbon" && (
                 <>
                   <span className="flex items-center gap-1.5"><span className="w-5 border-t-2 border-teal-600 inline-block" />Intensity</span>
-                  <span className="flex items-center gap-1.5"><span className="w-5 border-t-2 border-dashed border-green-600 inline-block" />2030 target</span>
+                  <span className="flex items-center gap-1.5"><span className="w-5 border-t-2 border-dashed border-good inline-block" />2030 target</span>
                 </>
               )}
             </div>
@@ -672,7 +672,7 @@ export default function OverviewTab({ onNavigate }: Props) {
 
                 {/* Value */}
                 <div>
-                  <span className="text-[2rem] font-bold tabular-nums text-ink-900 leading-none tracking-tight">{t.value}</span>
+                  <span className="text-kpi font-bold tabular-nums text-ink-900 leading-none tracking-tight">{t.value}</span>
                   <span className="text-[12px] text-ink-400 ml-1.5">{t.unit}</span>
                 </div>
 

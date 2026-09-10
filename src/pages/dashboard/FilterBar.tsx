@@ -232,7 +232,7 @@ function DesktopControls() {
             className={cn(
               "px-2.5 h-6 text-[12px] font-medium rounded-md transition-colors",
               m === dashMode
-                ? "bg-white text-ink-900 shadow-sm"
+                ? "bg-white text-ink-900 shadow-card"
                 : "text-ink-500 hover:text-ink-700"
             )}
           >
@@ -496,7 +496,7 @@ function MobileControls() {
                     onClick={() => switchModeMobile(m)}
                     className={cn(
                       "px-3 h-7 text-[12px] font-medium rounded-md transition-colors",
-                      m === dashMode ? "bg-white text-ink-900 shadow-sm" : "text-ink-500"
+                      m === dashMode ? "bg-white text-ink-900 shadow-card" : "text-ink-500"
                     )}
                   >
                     {m === "year" ? "Year" : m === "quarter" ? "Qtr" : "Month"}

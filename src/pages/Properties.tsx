@@ -414,7 +414,7 @@ function SummaryTile({
         {label}
         {info && <InfoHint text={info} />}
       </div>
-      <div className="text-[26px] leading-none font-bold text-ink-900 mt-1.5 tabular-nums">{value}</div>
+      <div className="text-stat leading-none font-bold text-ink-900 mt-1.5 tabular-nums">{value}</div>
       {hint && <div className="text-[12px] text-ink-500 mt-1">{hint}</div>}
     </div>
   );

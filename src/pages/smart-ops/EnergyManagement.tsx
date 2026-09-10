@@ -412,11 +412,11 @@ const DAILY_TREND: { label: string; value: number }[] = [
 
 const ENERGY_BY_SYSTEM: { label: string; pct: number; color: string }[] = [
   { label: "HVAC", pct: 58, color: "bg-brand-600" },
-  { label: "Lighting", pct: 14, color: "bg-sky-400" },
-  { label: "Kitchen", pct: 12, color: "bg-amber-400" },
+  { label: "Lighting", pct: 14, color: "bg-info" },
+  { label: "Kitchen", pct: 12, color: "bg-warn" },
   { label: "Laundry", pct: 8, color: "bg-violet-400" },
-  { label: "BOH", pct: 5, color: "bg-slate-400" },
-  { label: "Other", pct: 3, color: "bg-slate-300" },
+  { label: "BOH", pct: 5, color: "bg-ink-400" },
+  { label: "Other", pct: 3, color: "bg-ink-300" },
 ];
 
 // Consumption vs Occupancy — 7 days
@@ -433,13 +433,13 @@ const VS_OCC: { day: string; kwh: number; occ: number }[] = [
 // Energy balance
 const BALANCE_ROWS: { label: string; kwh: number; pct: number | null; color: string; isOffset?: boolean }[] = [
   { label: "HVAC", kwh: 164910, pct: 58.0, color: "bg-brand-600" },
-  { label: "Lighting", kwh: 39830, pct: 14.0, color: "bg-sky-400" },
-  { label: "Kitchen", kwh: 34140, pct: 12.0, color: "bg-amber-400" },
+  { label: "Lighting", kwh: 39830, pct: 14.0, color: "bg-info" },
+  { label: "Kitchen", kwh: 34140, pct: 12.0, color: "bg-warn" },
   { label: "Laundry", kwh: 22760, pct: 8.0, color: "bg-violet-400" },
   { label: "Guest Rooms", kwh: 14225, pct: 5.0, color: "bg-teal-400" },
-  { label: "BOH", kwh: 5690, pct: 2.0, color: "bg-slate-400" },
-  { label: "EV Charging", kwh: 2845, pct: 1.0, color: "bg-green-400" },
-  { label: "Solar Offset", kwh: -18200, pct: null, color: "bg-emerald-500", isOffset: true },
+  { label: "BOH", kwh: 5690, pct: 2.0, color: "bg-ink-400" },
+  { label: "EV Charging", kwh: 2845, pct: 1.0, color: "bg-good" },
+  { label: "Solar Offset", kwh: -18200, pct: null, color: "bg-good", isOffset: true },
 ];
 
 // 24-hour load profile kW values (index 0 = 00:00, index 23 = 23:00)
@@ -487,7 +487,7 @@ function TabBar({
     { id: "assets", label: "Asset Efficiency" },
   ];
   return (
-    <div className="flex gap-1 border-b border-gray-200 mb-6">
+    <div className="flex gap-1 border-b border-ink-200 mb-6">
       {tabs.map((t) => (
         <button
           key={t.id}
@@ -496,7 +496,7 @@ function TabBar({
             "px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors",
             active === t.id
               ? "border-brand-600 text-brand-700"
-              : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+              : "border-transparent text-ink-500 hover:text-ink-700 hover:border-ink-300"
           )}
         >
           {t.label}
@@ -508,8 +508,8 @@ function TabBar({
 
 function DataSourceNote({ text }: { text: string }) {
   return (
-    <div className="flex items-start gap-2 mt-4 p-3 bg-gray-50 rounded-lg border border-gray-200 text-xs text-gray-500">
-      <Info className="w-3.5 h-3.5 mt-0.5 shrink-0 text-gray-400" />
+    <div className="flex items-start gap-2 mt-4 p-3 bg-ink-50 rounded-lg border border-ink-200 text-xs text-ink-500">
+      <Info className="w-3.5 h-3.5 mt-0.5 shrink-0 text-ink-400" />
       <span>{text}</span>
     </div>
   );
@@ -517,7 +517,7 @@ function DataSourceNote({ text }: { text: string }) {
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
-    <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-3">
+    <h3 className="text-xs font-semibold uppercase tracking-wider text-ink-400 mb-3">
       {children}
     </h3>
   );
@@ -543,7 +543,7 @@ function MiniTrend({ values, unit }: { values: number[]; unit: string }) {
                   title={`${v} ${unit}`}
                 />
               </div>
-              <span className="text-[10px] text-gray-400">{days[i]}</span>
+              <span className="text-[10px] text-ink-400">{days[i]}</span>
             </div>
           );
         })}
@@ -564,10 +564,10 @@ function meterStatusBadgeTone(
 }
 
 function StatusIcon({ status }: { status: MeterRow["status"] }) {
-  if (status === "Live") return <Wifi className="w-3.5 h-3.5 text-emerald-500" />;
-  if (status === "Delayed") return <Clock className="w-3.5 h-3.5 text-amber-500" />;
-  if (status === "Offline") return <WifiOff className="w-3.5 h-3.5 text-red-500" />;
-  return <Activity className="w-3.5 h-3.5 text-gray-400" />;
+  if (status === "Live") return <Wifi className="w-3.5 h-3.5 text-good-700" />;
+  if (status === "Delayed") return <Clock className="w-3.5 h-3.5 text-warn-700" />;
+  if (status === "Offline") return <WifiOff className="w-3.5 h-3.5 text-bad-700" />;
+  return <Activity className="w-3.5 h-3.5 text-ink-400" />;
 }
 
 // ─── Tab: Overview ────────────────────────────────────────────────────────────
@@ -592,7 +592,7 @@ function OverviewTab() {
         />
         <KpiTile
           icon={<DollarSign className="w-5 h-5" />}
-          iconBg="bg-amber-50"
+          iconBg="bg-warn/10"
           label="Energy cost"
           value="$38,690"
           delta={-6.8}
@@ -602,7 +602,7 @@ function OverviewTab() {
         />
         <KpiTile
           icon={<BarChart3 className="w-5 h-5" />}
-          iconBg="bg-sky-50"
+          iconBg="bg-info/10"
           label="kWh / occupied room night"
           value="48.3"
           unit="kWh"
@@ -613,7 +613,7 @@ function OverviewTab() {
         />
         <KpiTile
           icon={<Leaf className="w-5 h-5" />}
-          iconBg="bg-emerald-50"
+          iconBg="bg-good/10"
           label="Carbon from energy"
           value="128.0"
           unit="tCO₂e"
@@ -625,7 +625,7 @@ function OverviewTab() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <KpiTile
           icon={<TrendingUp className="w-5 h-5" />}
-          iconBg="bg-red-50"
+          iconBg="bg-bad/10"
           label="Peak demand"
           value="842"
           unit="kW"
@@ -647,7 +647,7 @@ function OverviewTab() {
         />
         <KpiTile
           icon={<Sun className="w-5 h-5" />}
-          iconBg="bg-yellow-50"
+          iconBg="bg-warn/10"
           label="Solar generation"
           value="18,200"
           unit="kWh"
@@ -677,7 +677,7 @@ function OverviewTab() {
               const isPeak = d.value >= 11800;
               return (
                 <div key={i} className="h-full flex flex-col items-center gap-1 flex-1 min-w-0">
-                  <span className="text-[9px] text-gray-400 leading-none">
+                  <span className="text-[10px] text-ink-400 leading-none">
                     {(d.value / 1000).toFixed(1)}k
                   </span>
                   {/* Track fills the column so the bar's % height resolves against a definite size */}
@@ -685,24 +685,24 @@ function OverviewTab() {
                     <div
                       className={cn(
                         "w-full rounded-t-sm transition-all",
-                        isPeak ? "bg-red-400" : "bg-brand-500"
+                        isPeak ? "bg-bad" : "bg-brand-500"
                       )}
                       style={{ height: `${hPct}%` }}
                       title={`${d.label}: ${d.value.toLocaleString()} kWh`}
                     />
                   </div>
-                  <span className="text-[9px] text-gray-400">{d.label}</span>
+                  <span className="text-[10px] text-ink-400">{d.label}</span>
                 </div>
               );
             })}
           </div>
-          <div className="flex items-center gap-4 mt-3 text-xs text-gray-500">
+          <div className="flex items-center gap-4 mt-3 text-xs text-ink-500">
             <div className="flex items-center gap-1">
               <div className="w-3 h-2 rounded-sm bg-brand-500" />
               <span>Normal</span>
             </div>
             <div className="flex items-center gap-1">
-              <div className="w-3 h-2 rounded-sm bg-red-400" />
+              <div className="w-3 h-2 rounded-sm bg-bad" />
               <span>Peak day (&gt;11,800 kWh)</span>
             </div>
           </div>
@@ -714,14 +714,14 @@ function OverviewTab() {
           <div className="mt-3 space-y-2">
             {ENERGY_BY_SYSTEM.map((s) => (
               <div key={s.label} className="flex items-center gap-3">
-                <span className="w-16 text-xs text-gray-600 shrink-0">{s.label}</span>
-                <div className="flex-1 bg-gray-100 rounded-full h-4 overflow-hidden">
+                <span className="w-16 text-xs text-ink-600 shrink-0">{s.label}</span>
+                <div className="flex-1 bg-ink-100 rounded-full h-4 overflow-hidden">
                   <div
                     className={cn("h-full rounded-full transition-all", s.color)}
                     style={{ width: `${s.pct}%` }}
                   />
                 </div>
-                <span className="w-8 text-right text-xs font-medium text-gray-700">
+                <span className="w-8 text-right text-xs font-medium text-ink-700">
                   {s.pct}%
                 </span>
               </div>
@@ -759,25 +759,25 @@ function OverviewTab() {
                     title={`${d.kwh.toLocaleString()} kWh`}
                   />
                   <div
-                    className="w-3 bg-amber-400 rounded-t-sm"
+                    className="w-3 bg-warn rounded-t-sm"
                     style={{ height: `${occH}%` }}
                     title={`${d.occ}% occupancy`}
                   />
                 </div>
-                <span className="text-[10px] text-gray-500 font-medium">{d.day}</span>
-                <span className="text-[9px] text-brand-600">{(d.kwh / 1000).toFixed(1)}k</span>
-                <span className="text-[9px] text-amber-600">{d.occ}%</span>
+                <span className="text-[10px] text-ink-500 font-medium">{d.day}</span>
+                <span className="text-[10px] text-brand-600">{(d.kwh / 1000).toFixed(1)}k</span>
+                <span className="text-[10px] text-warn-700">{d.occ}%</span>
               </div>
             );
           })}
         </div>
-        <div className="flex items-center gap-4 mt-3 text-xs text-gray-500">
+        <div className="flex items-center gap-4 mt-3 text-xs text-ink-500">
           <div className="flex items-center gap-1">
             <div className="w-3 h-2 rounded-sm bg-brand-500" />
             <span>kWh consumed</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-3 h-2 rounded-sm bg-amber-400" />
+            <div className="w-3 h-2 rounded-sm bg-warn" />
             <span>Occupancy %</span>
           </div>
         </div>
@@ -799,9 +799,9 @@ function LiveMetersTab() {
 
   return (
     <div>
-      <div className="overflow-x-auto rounded-xl border border-gray-200">
-        <table className="min-w-full divide-y divide-gray-200 text-sm">
-          <thead className="bg-gray-50">
+      <div className="overflow-x-auto rounded-xl border border-ink-200">
+        <table className="min-w-full divide-y divide-ink-200 text-sm">
+          <thead className="bg-ink-50">
             <tr>
               {[
                 "Meter name",
@@ -816,59 +816,59 @@ function LiveMetersTab() {
               ].map((h) => (
                 <th
                   key={h}
-                  className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap"
+                  className="px-4 py-3 text-left text-xs font-semibold text-ink-500 uppercase tracking-wider whitespace-nowrap"
                 >
                   {h}
                 </th>
               ))}
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-100">
+          <tbody className="bg-white divide-y divide-ink-100">
             {METERS.map((m) => (
               <tr
                 key={m.id}
                 className={cn(
-                  "transition-colors hover:bg-gray-50",
-                  m.status === "Offline" && "bg-red-50 hover:bg-red-100"
+                  "transition-colors hover:bg-ink-50",
+                  m.status === "Offline" && "bg-bad/10 hover:bg-bad/15"
                 )}
               >
-                <td className="px-4 py-3 font-medium text-gray-800 whitespace-nowrap">
+                <td className="px-4 py-3 font-medium text-ink-800 whitespace-nowrap">
                   <div className="flex items-center gap-2">
                     {m.status === "Offline" && (
-                      <AlertTriangle className="w-3.5 h-3.5 text-red-500 shrink-0" />
+                      <AlertTriangle className="w-3.5 h-3.5 text-bad-700 shrink-0" />
                     )}
                     {m.name}
                   </div>
                 </td>
-                <td className="px-4 py-3 text-gray-500 whitespace-nowrap">{m.type}</td>
-                <td className="px-4 py-3 text-gray-500 whitespace-nowrap">{m.location}</td>
-                <td className="px-4 py-3 font-mono font-semibold text-gray-800 whitespace-nowrap">
+                <td className="px-4 py-3 text-ink-500 whitespace-nowrap">{m.type}</td>
+                <td className="px-4 py-3 text-ink-500 whitespace-nowrap">{m.location}</td>
+                <td className="px-4 py-3 font-mono font-semibold text-ink-800 whitespace-nowrap">
                   {m.readingDisplay}
                 </td>
-                <td className="px-4 py-3 text-gray-500 whitespace-nowrap">{m.unit}</td>
+                <td className="px-4 py-3 text-ink-500 whitespace-nowrap">{m.unit}</td>
                 <td className="px-4 py-3 whitespace-nowrap">
                   <div className="flex items-center gap-1.5">
                     <StatusIcon status={m.status} />
                     <Badge tone={meterStatusBadgeTone(m.status)}>{m.status}</Badge>
                   </div>
                 </td>
-                <td className="px-4 py-3 text-gray-500 whitespace-nowrap">{m.lastUpdate}</td>
+                <td className="px-4 py-3 text-ink-500 whitespace-nowrap">{m.lastUpdate}</td>
                 <td className="px-4 py-3 whitespace-nowrap">
                   <div className="flex items-center gap-2">
-                    <div className="w-16 bg-gray-200 rounded-full h-1.5 overflow-hidden">
+                    <div className="w-16 bg-ink-200 rounded-full h-1.5 overflow-hidden">
                       <div
                         className={cn(
                           "h-full rounded-full",
                           m.coverage === 0
-                            ? "bg-red-500"
+                            ? "bg-bad"
                             : m.coverage < 98
-                            ? "bg-amber-400"
-                            : "bg-emerald-500"
+                            ? "bg-warn"
+                            : "bg-good"
                         )}
                         style={{ width: `${m.coverage}%` }}
                       />
                     </div>
-                    <span className="text-xs text-gray-600">{m.coverage}%</span>
+                    <span className="text-xs text-ink-600">{m.coverage}%</span>
                   </div>
                 </td>
                 <td className="px-4 py-3 whitespace-nowrap">
@@ -903,25 +903,25 @@ function LiveMetersTab() {
             <MiniTrend values={selectedMeter.trendValues} unit={selectedMeter.unit} />
 
             <div className="grid grid-cols-2 gap-4">
-              <div className="rounded-lg bg-gray-50 p-4">
-                <p className="text-xs text-gray-500 mb-1">Current reading</p>
-                <p className="text-2xl font-bold text-gray-900 font-mono">
+              <div className="rounded-lg bg-ink-50 p-4">
+                <p className="text-xs text-ink-500 mb-1">Current reading</p>
+                <p className="text-2xl font-bold text-ink-900 font-mono">
                   {selectedMeter.readingDisplay}
                 </p>
-                <p className="text-xs text-gray-400 mt-0.5">{selectedMeter.unit}</p>
+                <p className="text-xs text-ink-400 mt-0.5">{selectedMeter.unit}</p>
               </div>
-              <div className="rounded-lg bg-gray-50 p-4">
-                <p className="text-xs text-gray-500 mb-1">Data completeness</p>
-                <p className="text-2xl font-bold text-gray-900 font-mono">
+              <div className="rounded-lg bg-ink-50 p-4">
+                <p className="text-xs text-ink-500 mb-1">Data completeness</p>
+                <p className="text-2xl font-bold text-ink-900 font-mono">
                   {selectedMeter.coverage}%
                 </p>
-                <p className="text-xs text-gray-400 mt-0.5">Rolling 30 days</p>
+                <p className="text-xs text-ink-400 mt-0.5">Rolling 30 days</p>
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
-                <p className="text-xs text-gray-400 mb-0.5">Status</p>
+                <p className="text-xs text-ink-400 mb-0.5">Status</p>
                 <div className="flex items-center gap-1.5">
                   <StatusIcon status={selectedMeter.status} />
                   <Badge tone={meterStatusBadgeTone(selectedMeter.status)}>
@@ -930,16 +930,16 @@ function LiveMetersTab() {
                 </div>
               </div>
               <div>
-                <p className="text-xs text-gray-400 mb-0.5">Last update</p>
-                <p className="font-medium text-gray-800">{selectedMeter.lastUpdate}</p>
+                <p className="text-xs text-ink-400 mb-0.5">Last update</p>
+                <p className="font-medium text-ink-800">{selectedMeter.lastUpdate}</p>
               </div>
               <div>
-                <p className="text-xs text-gray-400 mb-0.5">Protocol / source</p>
-                <p className="font-medium text-gray-800">{selectedMeter.protocol}</p>
+                <p className="text-xs text-ink-400 mb-0.5">Protocol / source</p>
+                <p className="font-medium text-ink-800">{selectedMeter.protocol}</p>
               </div>
               <div>
-                <p className="text-xs text-gray-400 mb-0.5">Last calibration</p>
-                <p className="font-medium text-gray-800">{selectedMeter.lastCalibration}</p>
+                <p className="text-xs text-ink-400 mb-0.5">Last calibration</p>
+                <p className="font-medium text-ink-800">{selectedMeter.lastCalibration}</p>
               </div>
             </div>
 
@@ -950,9 +950,9 @@ function LiveMetersTab() {
                   {selectedMeter.linkedAlerts.map((a, i) => (
                     <li
                       key={i}
-                      className="flex items-start gap-2 text-sm text-amber-800 bg-amber-50 rounded-lg px-3 py-2 border border-amber-200"
+                      className="flex items-start gap-2 text-sm text-warn-700 bg-warn/10 rounded-lg px-3 py-2 border border-warn/30"
                     >
-                      <AlertTriangle className="w-3.5 h-3.5 mt-0.5 shrink-0 text-amber-500" />
+                      <AlertTriangle className="w-3.5 h-3.5 mt-0.5 shrink-0 text-warn-700" />
                       {a}
                     </li>
                   ))}
@@ -983,20 +983,20 @@ function EnergyBalanceTab() {
       <Card className="p-5">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <p className="text-xs text-gray-500 uppercase tracking-wider font-semibold mb-1">
+            <p className="text-xs text-ink-500 uppercase tracking-wider font-semibold mb-1">
               Main Incomer 01 — Monthly total
             </p>
-            <p className="text-3xl font-bold text-gray-900">
+            <p className="text-3xl font-bold text-ink-900">
               284,500{" "}
-              <span className="text-lg font-normal text-gray-500">kWh</span>
+              <span className="text-lg font-normal text-ink-500">kWh</span>
             </p>
-            <p className="text-xs text-gray-400 mt-1">May 2026 · Level 2 — Meter interval · Updated 2 min ago</p>
+            <p className="text-xs text-ink-400 mt-1">May 2026 · Level 2 — Meter interval · Updated 2 min ago</p>
           </div>
           <div className="text-right">
-            <p className="text-xs text-gray-500 mb-1">Net after solar</p>
-            <p className="text-xl font-bold text-emerald-700">
+            <p className="text-xs text-ink-500 mb-1">Net after solar</p>
+            <p className="text-xl font-bold text-good-700">
               {(netAfterSolar / 1000).toFixed(1)}k{" "}
-              <span className="text-sm font-normal text-gray-500">kWh</span>
+              <span className="text-sm font-normal text-ink-500">kWh</span>
             </p>
           </div>
         </div>
@@ -1025,27 +1025,27 @@ function EnergyBalanceTab() {
                 className={cn(
                   "flex items-center gap-3 px-3 py-2 rounded-lg",
                   r.isOffset
-                    ? "bg-emerald-50 border border-emerald-200"
+                    ? "bg-good/10 border border-good/30"
                     : i % 2 === 0
-                    ? "bg-gray-50"
+                    ? "bg-ink-50"
                     : "bg-white"
                 )}
               >
                 <div className={cn("w-2.5 h-2.5 rounded-sm shrink-0", r.color)} />
-                <span className="w-28 text-sm font-medium text-gray-700 shrink-0">
+                <span className="w-28 text-sm font-medium text-ink-700 shrink-0">
                   {r.label}
                 </span>
-                <div className="flex-1 bg-gray-100 rounded-full h-2 overflow-hidden">
+                <div className="flex-1 bg-ink-100 rounded-full h-2 overflow-hidden">
                   <div
                     className={cn("h-full rounded-full", r.color)}
                     style={{ width: `${Math.min(barPct, 100)}%` }}
                   />
                 </div>
-                <span className="w-24 text-right text-sm font-mono font-semibold text-gray-800">
+                <span className="w-24 text-right text-sm font-mono font-semibold text-ink-800">
                   {r.isOffset ? "–" : ""}
                   {Math.abs(r.kwh).toLocaleString()} kWh
                 </span>
-                <span className="w-12 text-right text-xs text-gray-500">
+                <span className="w-12 text-right text-xs text-ink-500">
                   {r.pct !== null ? `${r.pct}%` : `${barPct}%`}
                 </span>
               </div>
@@ -1053,22 +1053,22 @@ function EnergyBalanceTab() {
           })}
 
           {/* Net total row */}
-          <div className="flex items-center gap-3 px-3 py-3 rounded-lg bg-gray-900 text-white mt-2">
+          <div className="flex items-center gap-3 px-3 py-3 rounded-lg bg-ink-900 text-white mt-2">
             <div className="w-2.5 h-2.5 rounded-sm bg-white shrink-0" />
             <span className="w-28 text-sm font-semibold shrink-0">Net total</span>
             <div className="flex-1" />
             <span className="text-sm font-mono font-bold">
               {netAfterSolar.toLocaleString()} kWh
             </span>
-            <span className="w-12 text-right text-xs text-gray-400">100%</span>
+            <span className="w-12 text-right text-xs text-ink-400">100%</span>
           </div>
         </div>
       </Card>
 
       {/* Allocation note */}
-      <div className="flex items-start gap-3 p-4 bg-amber-50 rounded-xl border border-amber-200">
-        <AlertTriangle className="w-4 h-4 text-amber-500 mt-0.5 shrink-0" />
-        <div className="text-sm text-amber-800">
+      <div className="flex items-start gap-3 p-4 bg-warn/10 rounded-xl border border-warn/30">
+        <AlertTriangle className="w-4 h-4 text-warn-700 mt-0.5 shrink-0" />
+        <div className="text-sm text-warn-700">
           <span className="font-semibold">Sub-meter coverage: 94% of main incomer.</span>{" "}
           Unallocated 6% (≈17,070 kWh) is estimated. Improve coverage by installing meters
           on BOH lighting circuits, pool plant, and secondary pump sets.
@@ -1093,12 +1093,12 @@ function PeakDemandTab() {
     <div className="space-y-5">
       {/* Peak KPI cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <Card className="p-5 border-red-200 bg-red-50">
-          <p className="text-xs text-gray-500 uppercase tracking-wider font-semibold mb-1">
+        <Card className="p-5 border-bad/30 bg-bad/10">
+          <p className="text-xs text-ink-500 uppercase tracking-wider font-semibold mb-1">
             This month's peak
           </p>
-          <p className="text-3xl font-bold text-red-700 font-mono">{peakKw} kW</p>
-          <p className="text-xs text-gray-500 mt-1">
+          <p className="text-3xl font-bold text-bad-700 font-mono">{peakKw} kW</p>
+          <p className="text-xs text-ink-500 mt-1">
             Occurred 14:35 · 3 May 2026
           </p>
           <Badge tone="bad" className="mt-2">
@@ -1106,22 +1106,22 @@ function PeakDemandTab() {
           </Badge>
         </Card>
         <Card className="p-5">
-          <p className="text-xs text-gray-500 uppercase tracking-wider font-semibold mb-1">
+          <p className="text-xs text-ink-500 uppercase tracking-wider font-semibold mb-1">
             Tariff peak threshold
           </p>
-          <p className="text-3xl font-bold text-gray-800 font-mono">750 kW</p>
-          <p className="text-xs text-gray-500 mt-1">DEWA ToU demand tariff band</p>
-          <p className="text-xs text-red-600 mt-2 font-medium">
+          <p className="text-3xl font-bold text-ink-800 font-mono">750 kW</p>
+          <p className="text-xs text-ink-500 mt-1">DEWA ToU demand tariff band</p>
+          <p className="text-xs text-bad-700 mt-2 font-medium">
             Exceeded by {peakKw - thresholdKw} kW
           </p>
         </Card>
         <Card className="p-5">
-          <p className="text-xs text-gray-500 uppercase tracking-wider font-semibold mb-1">
+          <p className="text-xs text-ink-500 uppercase tracking-wider font-semibold mb-1">
             Estimated demand charge
           </p>
-          <p className="text-3xl font-bold text-amber-700 font-mono">$2,290</p>
-          <p className="text-xs text-gray-500 mt-1">This month</p>
-          <p className="text-xs text-gray-400 mt-2">$3/kW above threshold</p>
+          <p className="text-3xl font-bold text-warn-700 font-mono">$2,290</p>
+          <p className="text-xs text-ink-500 mt-1">This month</p>
+          <p className="text-xs text-ink-400 mt-2">$3/kW above threshold</p>
         </Card>
       </div>
 
@@ -1142,9 +1142,9 @@ function PeakDemandTab() {
                   className={cn(
                     "w-full rounded-t-sm transition-all",
                     isPeak
-                      ? "bg-red-500"
+                      ? "bg-bad"
                       : isAboveThreshold
-                      ? "bg-amber-400"
+                      ? "bg-warn"
                       : "bg-brand-400"
                   )}
                   style={{ height: `${hPct}%` }}
@@ -1160,35 +1160,35 @@ function PeakDemandTab() {
             {LOAD_PROFILE.map((h) => (
               <div key={h.hour} className="flex-1 min-w-0 text-center">
                 {parseInt(h.hour) % 6 === 0 && (
-                  <span className="text-[9px] text-gray-400">{h.hour}:00</span>
+                  <span className="text-[10px] text-ink-400">{h.hour}:00</span>
                 )}
               </div>
             ))}
           </div>
         </div>
-        <div className="flex items-center gap-4 mt-3 text-xs text-gray-500 flex-wrap">
+        <div className="flex items-center gap-4 mt-3 text-xs text-ink-500 flex-wrap">
           <div className="flex items-center gap-1">
             <div className="w-3 h-2 rounded-sm bg-brand-400" />
             <span>Below threshold</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-3 h-2 rounded-sm bg-amber-400" />
+            <div className="w-3 h-2 rounded-sm bg-warn" />
             <span>Above 750 kW threshold</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-3 h-2 rounded-sm bg-red-500" />
+            <div className="w-3 h-2 rounded-sm bg-bad" />
             <span>Monthly peak (842 kW)</span>
           </div>
         </div>
-        <p className="text-xs text-gray-400 mt-2">
+        <p className="text-xs text-ink-400 mt-2">
           Profile derived from 15-minute interval data · Level 2 — Main Incomer 01 · Updated 2 min ago
         </p>
       </Card>
 
       {/* Alert box */}
-      <div className="flex items-start gap-3 p-4 bg-amber-50 rounded-xl border border-amber-200">
-        <AlertTriangle className="w-4 h-4 text-amber-500 mt-0.5 shrink-0" />
-        <div className="text-sm text-amber-800">
+      <div className="flex items-start gap-3 p-4 bg-warn/10 rounded-xl border border-warn/30">
+        <AlertTriangle className="w-4 h-4 text-warn-700 mt-0.5 shrink-0" />
+        <div className="text-sm text-warn-700">
           <span className="font-semibold">Peak demand is occurring between 14:00–16:00</span>{" "}
           when Chiller 01 + Chiller 02 + Kitchen are simultaneously operating at full load.
           Shifting laundry to off-peak (22:00–06:00) could reduce coincident peak demand by
@@ -1232,12 +1232,12 @@ function PeakDemandTab() {
               </div>
               <div className="flex-1">
                 <div className="flex items-start justify-between gap-3">
-                  <p className="font-medium text-gray-800 text-sm">{item.action}</p>
+                  <p className="font-medium text-ink-800 text-sm">{item.action}</p>
                   <Badge tone={item.tone} className="shrink-0">
                     Est. {item.saving}
                   </Badge>
                 </div>
-                <p className="text-sm text-gray-500 mt-1">{item.detail}</p>
+                <p className="text-sm text-ink-500 mt-1">{item.detail}</p>
               </div>
             </li>
           ))}
@@ -1266,9 +1266,9 @@ function AssetEfficiencyTab() {
 
   return (
     <div className="space-y-5">
-      <div className="overflow-x-auto rounded-xl border border-gray-200">
-        <table className="min-w-full divide-y divide-gray-200 text-sm">
-          <thead className="bg-gray-50">
+      <div className="overflow-x-auto rounded-xl border border-ink-200">
+        <table className="min-w-full divide-y divide-ink-200 text-sm">
+          <thead className="bg-ink-50">
             <tr>
               {[
                 "Asset",
@@ -1284,28 +1284,28 @@ function AssetEfficiencyTab() {
               ].map((h) => (
                 <th
                   key={h}
-                  className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap"
+                  className="px-4 py-3 text-left text-xs font-semibold text-ink-500 uppercase tracking-wider whitespace-nowrap"
                 >
                   {h}
                 </th>
               ))}
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-100">
+          <tbody className="bg-white divide-y divide-ink-100">
             {ASSETS.map((a) => (
               <tr
                 key={a.id}
                 className={cn(
-                  "transition-colors hover:bg-gray-50",
+                  "transition-colors hover:bg-ink-50",
                   a.vsBaselineDirection === "worse" &&
                     a.vsBaselinePct >= 20 &&
-                    "bg-red-50 hover:bg-red-100"
+                    "bg-bad/10 hover:bg-bad/15"
                 )}
               >
-                <td className="px-4 py-3 font-medium text-gray-800 whitespace-nowrap">
+                <td className="px-4 py-3 font-medium text-ink-800 whitespace-nowrap">
                   {a.name}
                 </td>
-                <td className="px-4 py-3 text-gray-500 whitespace-nowrap">{a.system}</td>
+                <td className="px-4 py-3 text-ink-500 whitespace-nowrap">{a.system}</td>
                 <td className="px-4 py-3 whitespace-nowrap">
                   <Badge
                     tone={
@@ -1317,16 +1317,16 @@ function AssetEfficiencyTab() {
                     {a.status}
                   </Badge>
                 </td>
-                <td className="px-4 py-3 text-gray-500 whitespace-nowrap">{a.runtime}</td>
-                <td className="px-4 py-3 font-mono font-semibold text-gray-800 whitespace-nowrap">
+                <td className="px-4 py-3 text-ink-500 whitespace-nowrap">{a.runtime}</td>
+                <td className="px-4 py-3 font-mono font-semibold text-ink-800 whitespace-nowrap">
                   {a.energyDisplay}
                 </td>
                 <td className="px-4 py-3 whitespace-nowrap">
                   <div>
-                    <span className="font-mono font-semibold text-gray-800">
+                    <span className="font-mono font-semibold text-ink-800">
                       {a.efficiencyValue}
                     </span>
-                    <span className="block text-xs text-gray-400">{a.efficiencyKpi}</span>
+                    <span className="block text-xs text-ink-400">{a.efficiencyKpi}</span>
                   </div>
                 </td>
                 <td className="px-4 py-3 whitespace-nowrap">
@@ -1336,21 +1336,21 @@ function AssetEfficiencyTab() {
                 </td>
                 <td className="px-4 py-3 whitespace-nowrap text-sm">
                   {a.estimatedLossUsd !== null ? (
-                    <span className="font-mono font-semibold text-red-700">
+                    <span className="font-mono font-semibold text-bad-700">
                       ${a.estimatedLossUsd.toLocaleString()}/mo
                     </span>
                   ) : (
-                    <span className="text-gray-400">—</span>
+                    <span className="text-ink-400">—</span>
                   )}
                 </td>
                 <td className="px-4 py-3 whitespace-nowrap">
                   {a.alert ? (
-                    <div className="flex items-center gap-1 text-amber-600">
+                    <div className="flex items-center gap-1 text-warn-700">
                       <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
                       <span className="text-xs">Alert</span>
                     </div>
                   ) : (
-                    <span className="text-xs text-gray-400">—</span>
+                    <span className="text-xs text-ink-400">—</span>
                   )}
                 </td>
                 <td className="px-4 py-3 whitespace-nowrap">
@@ -1383,20 +1383,20 @@ function AssetEfficiencyTab() {
         {selectedAsset && (
           <div className="space-y-5">
             <div className="grid grid-cols-2 gap-4">
-              <div className="rounded-lg bg-gray-50 p-4">
-                <p className="text-xs text-gray-500 mb-1">Efficiency KPI</p>
-                <p className="text-2xl font-bold text-gray-900 font-mono">
+              <div className="rounded-lg bg-ink-50 p-4">
+                <p className="text-xs text-ink-500 mb-1">Efficiency KPI</p>
+                <p className="text-2xl font-bold text-ink-900 font-mono">
                   {selectedAsset.efficiencyValue}
                 </p>
-                <p className="text-xs text-gray-400 mt-0.5">{selectedAsset.efficiencyKpi}</p>
+                <p className="text-xs text-ink-400 mt-0.5">{selectedAsset.efficiencyKpi}</p>
               </div>
-              <div className="rounded-lg bg-gray-50 p-4">
-                <p className="text-xs text-gray-500 mb-1">vs Baseline</p>
+              <div className="rounded-lg bg-ink-50 p-4">
+                <p className="text-xs text-ink-500 mb-1">vs Baseline</p>
                 <Badge tone={baselineBadgeTone(selectedAsset.vsBaselineDirection)}>
                   {selectedAsset.vsBaseline}
                 </Badge>
                 {selectedAsset.estimatedLossUsd !== null && (
-                  <p className="text-xs text-red-600 mt-2 font-semibold">
+                  <p className="text-xs text-bad-700 mt-2 font-semibold">
                     Est. loss: ${selectedAsset.estimatedLossUsd.toLocaleString()}/month
                   </p>
                 )}
@@ -1405,31 +1405,31 @@ function AssetEfficiencyTab() {
 
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
-                <p className="text-xs text-gray-400 mb-0.5">Current energy</p>
-                <p className="font-mono font-semibold text-gray-800">{selectedAsset.energyDisplay}</p>
+                <p className="text-xs text-ink-400 mb-0.5">Current energy</p>
+                <p className="font-mono font-semibold text-ink-800">{selectedAsset.energyDisplay}</p>
               </div>
               <div>
-                <p className="text-xs text-gray-400 mb-0.5">Runtime</p>
-                <p className="font-medium text-gray-800">{selectedAsset.runtime}</p>
+                <p className="text-xs text-ink-400 mb-0.5">Runtime</p>
+                <p className="font-medium text-ink-800">{selectedAsset.runtime}</p>
               </div>
               <div>
-                <p className="text-xs text-gray-400 mb-0.5">System</p>
-                <p className="font-medium text-gray-800">{selectedAsset.system}</p>
+                <p className="text-xs text-ink-400 mb-0.5">System</p>
+                <p className="font-medium text-ink-800">{selectedAsset.system}</p>
               </div>
               <div>
-                <p className="text-xs text-gray-400 mb-0.5">Data level</p>
-                <p className="font-medium text-gray-800">Level 2 + Level 3 (BMS)</p>
+                <p className="text-xs text-ink-400 mb-0.5">Data level</p>
+                <p className="font-medium text-ink-800">Level 2 + Level 3 (BMS)</p>
               </div>
             </div>
 
             {selectedAsset.alert && (
-              <div className="flex items-start gap-2 text-sm text-amber-800 bg-amber-50 rounded-lg px-3 py-3 border border-amber-200">
-                <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0 text-amber-500" />
+              <div className="flex items-start gap-2 text-sm text-warn-700 bg-warn/10 rounded-lg px-3 py-3 border border-warn/30">
+                <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0 text-warn-700" />
                 <span>{selectedAsset.alert}</span>
               </div>
             )}
 
-            <div className="text-xs text-gray-400 pt-2 border-t border-gray-100">
+            <div className="text-xs text-ink-400 pt-2 border-t border-ink-100">
               Baseline period: Jan–Mar 2026 (pre-intervention). Efficiency is operational
               only and not used for GHG reporting. Source: BMS / sub-meter · Level 2 + 3.
             </div>

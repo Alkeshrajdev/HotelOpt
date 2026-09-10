@@ -298,7 +298,7 @@ export default function Actions() {
         <>
           {/* Market instruments disclaimer (req 2) */}
           <div className="rounded-xl border border-warn/30 bg-warn/5 p-4 flex items-start gap-3">
-            <Banknote size={18} className="text-amber-700 mt-0.5 shrink-0" />
+            <Banknote size={18} className="text-warn-700 mt-0.5 shrink-0" />
             <div>
               <div className="text-sm font-bold text-ink-900">Market Instruments</div>
               <div className="text-[13px] text-ink-600 mt-0.5">{MARKET_DISCLAIMER}</div>
@@ -339,7 +339,7 @@ function ActionCard({ action: a }: { action: Action }) {
   return (
     <li className="rounded-xl border border-ink-200 hover:shadow-card transition-shadow">
       {/* Collapsed header */}
-      <div className="p-4 cursor-pointer" onClick={() => setOpen((o) => !o)}>
+      <div className="p-4 cursor-pointer hover:bg-ink-50/60 transition-colors" onClick={() => setOpen((o) => !o)}>
         <div className="flex items-start gap-3">
           <div className="w-10 h-10 rounded-lg bg-brand-50 grid place-items-center text-brand-700 shrink-0">
             <TypeIcon size={16} />
@@ -389,7 +389,7 @@ function ActionCard({ action: a }: { action: Action }) {
 
           {/* Trigger / source */}
           {a.sourceRef && (
-            <div className="rounded-lg border border-warn/25 bg-warn/10 p-2 text-[12px] text-amber-800 flex items-start gap-1.5">
+            <div className="rounded-lg border border-warn/25 bg-warn/10 p-2 text-[12px] text-warn-700 flex items-start gap-1.5">
               <AlertTriangle size={12} className="mt-0.5 shrink-0" />
               <span><strong>{SOURCE_META[a.source].label}:</strong> {a.sourceRef}
                 {a.triggerLink && <Link className="ml-1 underline font-semibold" to={a.triggerLink}>Investigate ›</Link>}</span>
@@ -698,7 +698,7 @@ function Chip({ active, onClick, children }: { active: boolean; onClick: () => v
 
 function SavingsTile({ label, co2e, usd, hint, tone }: { label: string; co2e: number; usd: number; hint: string; tone: "info" | "warn" | "good" }) {
   const ring = { info: "border-ink-200 bg-ink-50", warn: "border-warn/25 bg-warn/10", good: "border-good/25 bg-good/10" }[tone];
-  const valTone = { info: "text-ink-900", warn: "text-amber-700", good: "text-good" }[tone];
+  const valTone = { info: "text-ink-900", warn: "text-warn-700", good: "text-good" }[tone];
   return (
     <div className={cn("rounded-xl border p-4", ring)}>
       <div className="text-[11px] uppercase tracking-wide font-semibold text-ink-500">{label}</div>
@@ -710,7 +710,7 @@ function SavingsTile({ label, co2e, usd, hint, tone }: { label: string; co2e: nu
 }
 
 function Field({ icon, label, value, tone }: { icon: React.ReactNode; label: string; value: string; tone?: "good" | "warn" | "bad" }) {
-  const vt = tone === "good" ? "text-good" : tone === "warn" ? "text-amber-700" : tone === "bad" ? "text-bad" : "text-ink-800";
+  const vt = tone === "good" ? "text-good" : tone === "warn" ? "text-warn-700" : tone === "bad" ? "text-bad" : "text-ink-800";
   return (
     <div className="rounded-lg bg-ink-50 border border-ink-100 px-2.5 py-1.5">
       <div className="flex items-center gap-1 text-[10px] text-ink-400">{icon}{label}</div>

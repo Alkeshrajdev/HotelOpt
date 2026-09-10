@@ -567,7 +567,7 @@ export default function PortfolioSetup() {
         })}
       </div>
 
-      <div className="bg-white rounded-xl border border-ink-100 p-5 shadow-sm">
+      <div className="bg-white rounded-xl border border-ink-100 p-5 shadow-card">
         {tab === "hotels"      && <HotelsTab />}
         {tab === "groups"      && <GroupsTab />}
         {tab === "targets"     && <TargetsTab />}

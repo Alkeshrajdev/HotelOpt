@@ -296,7 +296,7 @@ function Stepper({
               className={cn(
                 "flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm",
                 active
-                  ? "bg-brand-700 text-white shadow-sm"
+                  ? "bg-brand-700 text-white shadow-card"
                   : done
                     ? "bg-good/10 text-good ring-1 ring-good/25 hover:bg-good/15"
                     : "bg-ink-100 text-ink-500"
@@ -1319,7 +1319,7 @@ function FileDrop({ files, setFiles }: { files: File[]; setFiles: (f: File[]) =>
               <span className="text-ink-500">{Math.round(f.size / 1024)} KB</span>
             </li>
           ))}
-          <li className="text-[11px] text-brand-700 font-semibold cursor-pointer" onClick={() => setFiles([])}>
+          <li className="text-[11px] text-brand-700 font-semibold cursor-pointer hover:underline" onClick={() => setFiles([])}>
             Clear
           </li>
         </ul>

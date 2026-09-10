@@ -45,7 +45,7 @@ export default function StatCard({
             {label}
           </div>
           <div className="mt-1 flex items-baseline gap-1.5">
-            <div className="text-[26px] leading-none font-bold text-ink-900">
+            <div className="text-stat leading-none font-bold text-ink-900">
               {value}
             </div>
             {suffix && (

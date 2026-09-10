@@ -119,7 +119,7 @@ export default function PropertyDetail() {
             <button className="btn-secondary" onClick={() => setEditOpen(true)}>
               <Edit3 size={14} /> Edit configuration
             </button>
-            <button className="btn bg-bad text-white hover:bg-red-700">
+            <button className="btn bg-bad text-white hover:bg-bad-700">
               <PowerOff size={14} /> Deactivate
             </button>
           </>
@@ -1027,7 +1027,7 @@ function HeroStat({
         {label}
         {info && <InfoHint text={info} />}
       </div>
-      <div className="text-[26px] leading-none font-bold text-ink-900 mt-1.5 tabular-nums">
+      <div className="text-stat leading-none font-bold text-ink-900 mt-1.5 tabular-nums">
         {value}
         {suffix && <span className="text-base font-medium text-ink-500 ml-1">{suffix}</span>}
       </div>

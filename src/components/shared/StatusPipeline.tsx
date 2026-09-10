@@ -39,7 +39,7 @@ export default function StatusPipeline({
                   done
                     ? "bg-good text-white"
                     : isActive
-                      ? "bg-brand-700 text-white shadow-sm"
+                      ? "bg-brand-700 text-white shadow-card"
                       : "bg-ink-100 text-ink-500"
                 )}
               >

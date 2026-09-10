@@ -601,7 +601,7 @@ export default function Topbar({ onMenu }: { onMenu?: () => void }) {
           <input
             readOnly
             onClick={() => { setSearchOpen(true); setSearchQuery(""); setSearchIdx(0); }}
-            className="input pl-9 h-9 text-sm cursor-pointer"
+            className="input pl-9 h-9 text-sm cursor-pointer hover:border-ink-300"
             placeholder="Search properties, reports, suppliers, actions…"
           />
           <span className="kbd absolute right-3 top-1/2 -translate-y-1/2 hidden sm:inline">⌘K</span>
@@ -626,7 +626,7 @@ export default function Topbar({ onMenu }: { onMenu?: () => void }) {
             >
               <Bell size={18} />
               {totalUnread > 0 && (
-                <span className="absolute top-1 right-1 w-4 h-4 rounded-full bg-bad text-white text-[9px] font-bold grid place-items-center leading-none">
+                <span className="absolute top-1 right-1 w-4 h-4 rounded-full bg-bad text-white text-[10px] font-bold grid place-items-center leading-none">
                   {totalUnread > 9 ? "9+" : totalUnread}
                 </span>
               )}
@@ -862,7 +862,7 @@ export default function Topbar({ onMenu }: { onMenu?: () => void }) {
       {/* ── Help Panel ───────────────────────────────────────────────────── */}
       {helpOpen && (
         <>
-          <div className="fixed inset-0 z-40" onClick={() => setHelpOpen(false)} />
+          <div className="fixed inset-0 z-40 bg-ink-900/40 backdrop-blur-sm" onClick={() => setHelpOpen(false)} />
           <div className="fixed inset-y-0 right-0 w-80 z-50 bg-white border-l border-ink-200 shadow-pop-lg flex flex-col">
             <div className="px-4 py-3 border-b border-ink-200 flex items-center justify-between shrink-0">
               <span className="text-sm font-semibold text-ink-900">Help & Support</span>

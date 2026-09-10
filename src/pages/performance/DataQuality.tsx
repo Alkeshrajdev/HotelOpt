@@ -123,7 +123,7 @@ function Tile({
   return (
     <div className={`rounded-xl border p-3 ${ring}`}>
       <div className="text-[11px] font-medium text-ink-500">{label}</div>
-      <div className="text-[24px] font-bold mt-1 text-ink-900 tabular-nums">{value}</div>
+      <div className="text-2xl font-bold mt-1 text-ink-900 tabular-nums">{value}</div>
     </div>
   );
 }

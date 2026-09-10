@@ -675,7 +675,7 @@ function COPTrendChart() {
               <div
                 className={cn(
                   "w-full rounded-t",
-                  isLast ? "bg-amber-500" : val < 3.1 ? "bg-amber-400" : "bg-blue-400"
+                  isLast ? "bg-warn" : val < 3.1 ? "bg-warn" : "bg-info"
                 )}
                 style={{ height: `${Math.max(heightPct, 6)}%` }}
                 title={`${COP_DAYS[i]}: COP ${val.toFixed(2)}`}
@@ -686,15 +686,15 @@ function COPTrendChart() {
       </div>
       <div className="flex gap-1 mt-1 overflow-hidden">
         {COP_DAYS.map((d, i) => (
-          <div key={i} className="flex-1 text-center text-[9px] text-slate-400 truncate">
+          <div key={i} className="flex-1 text-center text-[10px] text-ink-400 truncate">
             {i % 3 === 0 ? d : ""}
           </div>
         ))}
       </div>
-      <div className="flex items-center gap-4 mt-2 text-xs text-slate-500">
-        <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-blue-400 inline-block" /> Above 3.1 COP</span>
-        <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-amber-400 inline-block" /> Below 3.1 COP</span>
-        <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-amber-500 inline-block" /> Current</span>
+      <div className="flex items-center gap-4 mt-2 text-xs text-ink-500">
+        <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-info inline-block" /> Above 3.1 COP</span>
+        <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-warn inline-block" /> Below 3.1 COP</span>
+        <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-warn inline-block" /> Current</span>
       </div>
     </div>
   );
@@ -718,12 +718,12 @@ function AssetDetailModal({ asset, open, onClose }: { asset: Asset | null; open:
         <div className="flex gap-3 justify-end">
           <button
             onClick={onClose}
-            className="px-4 py-2 rounded-lg border border-slate-200 text-slate-700 text-sm font-medium hover:bg-slate-50 transition-colors"
+            className="px-4 py-2 rounded-lg border border-ink-200 text-ink-700 text-sm font-medium hover:bg-ink-50 transition-colors"
           >
             Close
           </button>
           <button
-            className="px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition-colors"
+            className="px-4 py-2 rounded-lg bg-info text-white text-sm font-medium hover:bg-info-700 transition-colors"
           >
             Create Maintenance Action
           </button>
@@ -733,7 +733,7 @@ function AssetDetailModal({ asset, open, onClose }: { asset: Asset | null; open:
       <div className="space-y-5">
         {/* Identity */}
         <div>
-          <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Identity</h4>
+          <h4 className="text-xs font-semibold text-ink-500 uppercase tracking-wider mb-3">Identity</h4>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {[
               { label: "Asset ID", value: asset.id },
@@ -745,9 +745,9 @@ function AssetDetailModal({ asset, open, onClose }: { asset: Asset | null; open:
               { label: "Warranty Expires", value: isChiller01 ? "Aug 2024" : "Aug 2024" },
               { label: "Maintenance Owner", value: asset.maintenanceOwner },
             ].map(({ label, value }) => (
-              <div key={label} className="bg-slate-50 rounded-lg p-3">
-                <div className="text-[11px] text-slate-500 mb-1">{label}</div>
-                <div className="text-sm font-medium text-slate-800">{value}</div>
+              <div key={label} className="bg-ink-50 rounded-lg p-3">
+                <div className="text-[11px] text-ink-500 mb-1">{label}</div>
+                <div className="text-sm font-medium text-ink-800">{value}</div>
               </div>
             ))}
           </div>
@@ -755,53 +755,53 @@ function AssetDetailModal({ asset, open, onClose }: { asset: Asset | null; open:
 
         {/* Live Status */}
         <div>
-          <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Live Status</h4>
+          <h4 className="text-xs font-semibold text-ink-500 uppercase tracking-wider mb-3">Live Status</h4>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {isChiller01 ? (
               <>
-                <div className="bg-slate-50 rounded-lg p-3">
-                  <div className="text-[11px] text-slate-500 mb-1">Status</div>
-                  <div className="text-sm font-medium text-green-700">Running</div>
+                <div className="bg-ink-50 rounded-lg p-3">
+                  <div className="text-[11px] text-ink-500 mb-1">Status</div>
+                  <div className="text-sm font-medium text-good-700">Running</div>
                 </div>
-                <div className="bg-slate-50 rounded-lg p-3">
-                  <div className="text-[11px] text-slate-500 mb-1">Current Load</div>
-                  <div className="text-sm font-medium text-slate-800">420 kW</div>
+                <div className="bg-ink-50 rounded-lg p-3">
+                  <div className="text-[11px] text-ink-500 mb-1">Current Load</div>
+                  <div className="text-sm font-medium text-ink-800">420 kW</div>
                 </div>
-                <div className="bg-slate-50 rounded-lg p-3">
-                  <div className="text-[11px] text-slate-500 mb-1">Cooling Output</div>
-                  <div className="text-sm font-medium text-slate-800">185 TR</div>
+                <div className="bg-ink-50 rounded-lg p-3">
+                  <div className="text-[11px] text-ink-500 mb-1">Cooling Output</div>
+                  <div className="text-sm font-medium text-ink-800">185 TR</div>
                 </div>
-                <div className="bg-amber-50 rounded-lg p-3 border border-amber-200">
-                  <div className="text-[11px] text-amber-600 mb-1">Current COP</div>
-                  <div className="text-sm font-bold text-amber-700">2.94</div>
-                  <div className="text-[11px] text-amber-600 mt-1">kW/TR: 2.27</div>
+                <div className="bg-warn/10 rounded-lg p-3 border border-warn/30">
+                  <div className="text-[11px] text-warn-700 mb-1">Current COP</div>
+                  <div className="text-sm font-bold text-warn-700">2.94</div>
+                  <div className="text-[11px] text-warn-700 mt-1">kW/TR: 2.27</div>
                 </div>
               </>
             ) : (
               <>
-                <div className="bg-slate-50 rounded-lg p-3">
-                  <div className="text-[11px] text-slate-500 mb-1">Status</div>
-                  <div className="text-sm font-medium text-slate-800">{asset.status}</div>
+                <div className="bg-ink-50 rounded-lg p-3">
+                  <div className="text-[11px] text-ink-500 mb-1">Status</div>
+                  <div className="text-sm font-medium text-ink-800">{asset.status}</div>
                 </div>
-                <div className="bg-slate-50 rounded-lg p-3">
-                  <div className="text-[11px] text-slate-500 mb-1">Health</div>
-                  <div className="text-sm font-medium text-slate-800">{asset.health}</div>
+                <div className="bg-ink-50 rounded-lg p-3">
+                  <div className="text-[11px] text-ink-500 mb-1">Health</div>
+                  <div className="text-sm font-medium text-ink-800">{asset.health}</div>
                 </div>
-                <div className="bg-slate-50 rounded-lg p-3">
-                  <div className="text-[11px] text-slate-500 mb-1">Active Alerts</div>
-                  <div className="text-sm font-medium text-slate-800">{asset.activeAlerts}</div>
+                <div className="bg-ink-50 rounded-lg p-3">
+                  <div className="text-[11px] text-ink-500 mb-1">Active Alerts</div>
+                  <div className="text-sm font-medium text-ink-800">{asset.activeAlerts}</div>
                 </div>
-                <div className="bg-slate-50 rounded-lg p-3">
-                  <div className="text-[11px] text-slate-500 mb-1">Next PM</div>
-                  <div className="text-sm font-medium text-slate-800">{asset.nextPM}</div>
+                <div className="bg-ink-50 rounded-lg p-3">
+                  <div className="text-[11px] text-ink-500 mb-1">Next PM</div>
+                  <div className="text-sm font-medium text-ink-800">{asset.nextPM}</div>
                 </div>
               </>
             )}
           </div>
           {isChiller01 && (
-            <div className="mt-3 p-3 bg-amber-50 border border-amber-200 rounded-lg flex gap-2">
-              <AlertTriangle className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
-              <p className="text-sm text-amber-800">
+            <div className="mt-3 p-3 bg-warn/10 border border-warn/30 rounded-lg flex gap-2">
+              <AlertTriangle className="w-4 h-4 text-warn-700 flex-shrink-0 mt-0.5" />
+              <p className="text-sm text-warn-700">
                 22% above baseline efficiency of 0.72 kW/TR target — fault detection active. COP 2.94 vs design target 3.517+.
               </p>
             </div>
@@ -811,73 +811,73 @@ function AssetDetailModal({ asset, open, onClose }: { asset: Asset | null; open:
         {/* Performance Trend (Chiller 01 only) */}
         {isChiller01 && (
           <div>
-            <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">14-Day COP Trend</h4>
-            <div className="bg-slate-50 rounded-lg p-4">
+            <h4 className="text-xs font-semibold text-ink-500 uppercase tracking-wider mb-3">14-Day COP Trend</h4>
+            <div className="bg-ink-50 rounded-lg p-4">
               <div className="flex justify-between items-center mb-2">
-                <span className="text-sm text-slate-600">COP (Coefficient of Performance)</span>
-                <span className="text-xs text-red-600 font-medium">Declining trend</span>
+                <span className="text-sm text-ink-600">COP (Coefficient of Performance)</span>
+                <span className="text-xs text-bad-700 font-medium">Declining trend</span>
               </div>
               <COPTrendChart />
-              <p className="text-xs text-slate-500 mt-3">Target COP: 3.5 | Design COP: 3.517 | Current: 2.94 — 16% below target</p>
+              <p className="text-xs text-ink-500 mt-3">Target COP: 3.5 | Design COP: 3.517 | Current: 2.94 — 16% below target</p>
             </div>
           </div>
         )}
 
         {/* Connected Meters */}
         <div>
-          <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Connected Meters & Sensors</h4>
-          <div className="rounded-lg border border-slate-200 overflow-hidden">
+          <h4 className="text-xs font-semibold text-ink-500 uppercase tracking-wider mb-3">Connected Meters & Sensors</h4>
+          <div className="rounded-lg border border-ink-200 overflow-hidden">
             <table className="w-full text-sm">
-              <thead className="bg-slate-50">
+              <thead className="bg-ink-50">
                 <tr>
-                  <th className="text-left px-4 py-2 text-xs text-slate-500 font-medium">Meter / Sensor</th>
-                  <th className="text-left px-4 py-2 text-xs text-slate-500 font-medium">Type</th>
-                  <th className="text-left px-4 py-2 text-xs text-slate-500 font-medium">Status</th>
-                  <th className="text-left px-4 py-2 text-xs text-slate-500 font-medium">Last Reading</th>
+                  <th className="text-left px-4 py-2 text-xs text-ink-500 font-medium">Meter / Sensor</th>
+                  <th className="text-left px-4 py-2 text-xs text-ink-500 font-medium">Type</th>
+                  <th className="text-left px-4 py-2 text-xs text-ink-500 font-medium">Status</th>
+                  <th className="text-left px-4 py-2 text-xs text-ink-500 font-medium">Last Reading</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-ink-100">
                 {isChiller01 ? (
                   <>
                     <tr>
-                      <td className="px-4 py-2 font-medium text-slate-800">Power Meter CH-01-PWR</td>
-                      <td className="px-4 py-2 text-slate-600">Electrical</td>
-                      <td className="px-4 py-2"><span className="text-green-700 font-medium text-xs">Live</span></td>
-                      <td className="px-4 py-2 text-slate-500 text-xs">2 min ago</td>
+                      <td className="px-4 py-2 font-medium text-ink-800">Power Meter CH-01-PWR</td>
+                      <td className="px-4 py-2 text-ink-600">Electrical</td>
+                      <td className="px-4 py-2"><span className="text-good-700 font-medium text-xs">Live</span></td>
+                      <td className="px-4 py-2 text-ink-500 text-xs">2 min ago</td>
                     </tr>
                     <tr>
-                      <td className="px-4 py-2 font-medium text-slate-800">Condenser Water Temp Sensor</td>
-                      <td className="px-4 py-2 text-slate-600">Temperature</td>
-                      <td className="px-4 py-2"><span className="text-green-700 font-medium text-xs">Live</span></td>
-                      <td className="px-4 py-2 text-slate-500 text-xs">2 min ago</td>
+                      <td className="px-4 py-2 font-medium text-ink-800">Condenser Water Temp Sensor</td>
+                      <td className="px-4 py-2 text-ink-600">Temperature</td>
+                      <td className="px-4 py-2"><span className="text-good-700 font-medium text-xs">Live</span></td>
+                      <td className="px-4 py-2 text-ink-500 text-xs">2 min ago</td>
                     </tr>
                     <tr>
-                      <td className="px-4 py-2 font-medium text-slate-800">Evaporator Water Temp Sensor</td>
-                      <td className="px-4 py-2 text-slate-600">Temperature</td>
-                      <td className="px-4 py-2"><span className="text-green-700 font-medium text-xs">Live</span></td>
-                      <td className="px-4 py-2 text-slate-500 text-xs">2 min ago</td>
+                      <td className="px-4 py-2 font-medium text-ink-800">Evaporator Water Temp Sensor</td>
+                      <td className="px-4 py-2 text-ink-600">Temperature</td>
+                      <td className="px-4 py-2"><span className="text-good-700 font-medium text-xs">Live</span></td>
+                      <td className="px-4 py-2 text-ink-500 text-xs">2 min ago</td>
                     </tr>
                     <tr>
-                      <td className="px-4 py-2 font-medium text-slate-800">Flow Meter CH-01-FLW</td>
-                      <td className="px-4 py-2 text-slate-600">Flow</td>
-                      <td className="px-4 py-2"><span className="text-green-700 font-medium text-xs">Live</span></td>
-                      <td className="px-4 py-2 text-slate-500 text-xs">2 min ago</td>
+                      <td className="px-4 py-2 font-medium text-ink-800">Flow Meter CH-01-FLW</td>
+                      <td className="px-4 py-2 text-ink-600">Flow</td>
+                      <td className="px-4 py-2"><span className="text-good-700 font-medium text-xs">Live</span></td>
+                      <td className="px-4 py-2 text-ink-500 text-xs">2 min ago</td>
                     </tr>
                   </>
                 ) : (
                   <>
                     <tr>
-                      <td className="px-4 py-2 font-medium text-slate-800">Primary Power Meter</td>
-                      <td className="px-4 py-2 text-slate-600">Electrical</td>
-                      <td className="px-4 py-2"><span className="text-green-700 font-medium text-xs">Live</span></td>
-                      <td className="px-4 py-2 text-slate-500 text-xs">5 min ago</td>
+                      <td className="px-4 py-2 font-medium text-ink-800">Primary Power Meter</td>
+                      <td className="px-4 py-2 text-ink-600">Electrical</td>
+                      <td className="px-4 py-2"><span className="text-good-700 font-medium text-xs">Live</span></td>
+                      <td className="px-4 py-2 text-ink-500 text-xs">5 min ago</td>
                     </tr>
                     {asset.linkedSensors > 1 && (
                       <tr>
-                        <td className="px-4 py-2 font-medium text-slate-800">Temperature Sensor 01</td>
-                        <td className="px-4 py-2 text-slate-600">Temperature</td>
-                        <td className="px-4 py-2"><span className="text-green-700 font-medium text-xs">Live</span></td>
-                        <td className="px-4 py-2 text-slate-500 text-xs">5 min ago</td>
+                        <td className="px-4 py-2 font-medium text-ink-800">Temperature Sensor 01</td>
+                        <td className="px-4 py-2 text-ink-600">Temperature</td>
+                        <td className="px-4 py-2"><span className="text-good-700 font-medium text-xs">Live</span></td>
+                        <td className="px-4 py-2 text-ink-500 text-xs">5 min ago</td>
                       </tr>
                     )}
                   </>
@@ -890,31 +890,31 @@ function AssetDetailModal({ asset, open, onClose }: { asset: Asset | null; open:
         {/* Active Alerts */}
         {asset.activeAlerts > 0 && (
           <div>
-            <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Active Alerts ({asset.activeAlerts})</h4>
+            <h4 className="text-xs font-semibold text-ink-500 uppercase tracking-wider mb-3">Active Alerts ({asset.activeAlerts})</h4>
             <div className="space-y-2">
               {isChiller01 ? (
                 <>
-                  <div className="flex gap-3 p-3 bg-red-50 border border-red-200 rounded-lg">
-                    <AlertTriangle className="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" />
+                  <div className="flex gap-3 p-3 bg-bad/10 border border-bad/30 rounded-lg">
+                    <AlertTriangle className="w-4 h-4 text-bad-700 flex-shrink-0 mt-0.5" />
                     <div>
-                      <p className="text-sm font-medium text-red-800">COP 22% below baseline</p>
-                      <p className="text-xs text-red-600 mt-0.5">High severity · Detected 8 days ago</p>
+                      <p className="text-sm font-medium text-bad-700">COP 22% below baseline</p>
+                      <p className="text-xs text-bad-700 mt-0.5">High severity · Detected 8 days ago</p>
                     </div>
                   </div>
-                  <div className="flex gap-3 p-3 bg-amber-50 border border-amber-200 rounded-lg">
-                    <AlertTriangle className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
+                  <div className="flex gap-3 p-3 bg-warn/10 border border-warn/30 rounded-lg">
+                    <AlertTriangle className="w-4 h-4 text-warn-700 flex-shrink-0 mt-0.5" />
                     <div>
-                      <p className="text-sm font-medium text-amber-800">Condenser water temp 4°C above design</p>
-                      <p className="text-xs text-amber-600 mt-0.5">Medium severity · Detected 8 days ago</p>
+                      <p className="text-sm font-medium text-warn-700">Condenser water temp 4°C above design</p>
+                      <p className="text-xs text-warn-700 mt-0.5">Medium severity · Detected 8 days ago</p>
                     </div>
                   </div>
                 </>
               ) : (
-                <div className="flex gap-3 p-3 bg-amber-50 border border-amber-200 rounded-lg">
-                  <AlertTriangle className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
+                <div className="flex gap-3 p-3 bg-warn/10 border border-warn/30 rounded-lg">
+                  <AlertTriangle className="w-4 h-4 text-warn-700 flex-shrink-0 mt-0.5" />
                   <div>
-                    <p className="text-sm font-medium text-amber-800">Performance alert active</p>
-                    <p className="text-xs text-amber-600 mt-0.5">Review asset faults for details</p>
+                    <p className="text-sm font-medium text-warn-700">Performance alert active</p>
+                    <p className="text-xs text-warn-700 mt-0.5">Review asset faults for details</p>
                   </div>
                 </div>
               )}
@@ -924,50 +924,50 @@ function AssetDetailModal({ asset, open, onClose }: { asset: Asset | null; open:
 
         {/* Maintenance History */}
         <div>
-          <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Maintenance History</h4>
-          <div className="rounded-lg border border-slate-200 overflow-hidden">
+          <h4 className="text-xs font-semibold text-ink-500 uppercase tracking-wider mb-3">Maintenance History</h4>
+          <div className="rounded-lg border border-ink-200 overflow-hidden">
             <table className="w-full text-sm">
-              <thead className="bg-slate-50">
+              <thead className="bg-ink-50">
                 <tr>
-                  <th className="text-left px-4 py-2 text-xs text-slate-500 font-medium">Date</th>
-                  <th className="text-left px-4 py-2 text-xs text-slate-500 font-medium">Type</th>
-                  <th className="text-left px-4 py-2 text-xs text-slate-500 font-medium">Description</th>
-                  <th className="text-left px-4 py-2 text-xs text-slate-500 font-medium">Technician</th>
-                  <th className="text-left px-4 py-2 text-xs text-slate-500 font-medium">Duration</th>
+                  <th className="text-left px-4 py-2 text-xs text-ink-500 font-medium">Date</th>
+                  <th className="text-left px-4 py-2 text-xs text-ink-500 font-medium">Type</th>
+                  <th className="text-left px-4 py-2 text-xs text-ink-500 font-medium">Description</th>
+                  <th className="text-left px-4 py-2 text-xs text-ink-500 font-medium">Technician</th>
+                  <th className="text-left px-4 py-2 text-xs text-ink-500 font-medium">Duration</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-ink-100">
                 {isChiller01 ? (
                   <>
                     <tr>
-                      <td className="px-4 py-2 text-slate-600">Apr 2026</td>
+                      <td className="px-4 py-2 text-ink-600">Apr 2026</td>
                       <td className="px-4 py-2"><Badge tone="info">Preventive</Badge></td>
-                      <td className="px-4 py-2 text-slate-800">Condenser cleaning</td>
-                      <td className="px-4 py-2 text-slate-600">John M.</td>
-                      <td className="px-4 py-2 text-slate-500">8 hrs</td>
+                      <td className="px-4 py-2 text-ink-800">Condenser cleaning</td>
+                      <td className="px-4 py-2 text-ink-600">John M.</td>
+                      <td className="px-4 py-2 text-ink-500">8 hrs</td>
                     </tr>
                     <tr>
-                      <td className="px-4 py-2 text-slate-600">Jan 2026</td>
+                      <td className="px-4 py-2 text-ink-600">Jan 2026</td>
                       <td className="px-4 py-2"><Badge tone="info">Preventive</Badge></td>
-                      <td className="px-4 py-2 text-slate-800">Annual overhaul</td>
-                      <td className="px-4 py-2 text-slate-600">External contractor</td>
-                      <td className="px-4 py-2 text-slate-500">2 days</td>
+                      <td className="px-4 py-2 text-ink-800">Annual overhaul</td>
+                      <td className="px-4 py-2 text-ink-600">External contractor</td>
+                      <td className="px-4 py-2 text-ink-500">2 days</td>
                     </tr>
                     <tr>
-                      <td className="px-4 py-2 text-slate-600">Nov 2025</td>
+                      <td className="px-4 py-2 text-ink-600">Nov 2025</td>
                       <td className="px-4 py-2"><Badge tone="warn">Corrective</Badge></td>
-                      <td className="px-4 py-2 text-slate-800">Refrigerant top-up</td>
-                      <td className="px-4 py-2 text-slate-600">John M.</td>
-                      <td className="px-4 py-2 text-slate-500">4 hrs</td>
+                      <td className="px-4 py-2 text-ink-800">Refrigerant top-up</td>
+                      <td className="px-4 py-2 text-ink-600">John M.</td>
+                      <td className="px-4 py-2 text-ink-500">4 hrs</td>
                     </tr>
                   </>
                 ) : (
                   <tr>
-                    <td className="px-4 py-2 text-slate-600">{asset.lastInspection}</td>
+                    <td className="px-4 py-2 text-ink-600">{asset.lastInspection}</td>
                     <td className="px-4 py-2"><Badge tone="info">Preventive</Badge></td>
-                    <td className="px-4 py-2 text-slate-800">Scheduled inspection</td>
-                    <td className="px-4 py-2 text-slate-600">{asset.maintenanceOwner}</td>
-                    <td className="px-4 py-2 text-slate-500">4 hrs</td>
+                    <td className="px-4 py-2 text-ink-800">Scheduled inspection</td>
+                    <td className="px-4 py-2 text-ink-600">{asset.maintenanceOwner}</td>
+                    <td className="px-4 py-2 text-ink-500">4 hrs</td>
                   </tr>
                 )}
               </tbody>
@@ -978,9 +978,9 @@ function AssetDetailModal({ asset, open, onClose }: { asset: Asset | null; open:
         {/* Recommended Action */}
         {isChiller01 && (
           <div>
-            <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Recommended Action</h4>
-            <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-              <p className="text-sm text-blue-900">
+            <h4 className="text-xs font-semibold text-ink-500 uppercase tracking-wider mb-3">Recommended Action</h4>
+            <div className="p-4 bg-info/10 border border-info/30 rounded-lg">
+              <p className="text-sm text-info-700">
                 Inspect condenser water temperatures and chiller sequencing. Check cooling tower performance — condenser water entering temperature above 32°C. Consider chiller isolation test to assess efficiency loss.
               </p>
             </div>
@@ -990,11 +990,11 @@ function AssetDetailModal({ asset, open, onClose }: { asset: Asset | null; open:
         {/* Estimated Impact */}
         {asset.estimatedLoss && (
           <div>
-            <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Estimated Impact</h4>
+            <h4 className="text-xs font-semibold text-ink-500 uppercase tracking-wider mb-3">Estimated Impact</h4>
             <div className="grid grid-cols-3 gap-3">
-              <div className="bg-red-50 rounded-lg p-3 border border-red-100">
-                <div className="text-[11px] text-red-600 mb-1">Financial Loss</div>
-                <div className="text-sm font-bold text-red-800">{asset.estimatedLoss}</div>
+              <div className="bg-bad/10 rounded-lg p-3 border border-bad/30">
+                <div className="text-[11px] text-bad-700 mb-1">Financial Loss</div>
+                <div className="text-sm font-bold text-bad-700">{asset.estimatedLoss}</div>
               </div>
               {isChiller01 && (
                 <>
@@ -1002,9 +1002,9 @@ function AssetDetailModal({ asset, open, onClose }: { asset: Asset | null; open:
                     <div className="text-[11px] text-orange-600 mb-1">Excess Carbon</div>
                     <div className="text-sm font-bold text-orange-800">1.8 tCO₂e/month</div>
                   </div>
-                  <div className="bg-slate-50 rounded-lg p-3 border border-slate-200">
-                    <div className="text-[11px] text-slate-500 mb-1">Confidence</div>
-                    <div className="text-sm font-bold text-slate-800">High</div>
+                  <div className="bg-ink-50 rounded-lg p-3 border border-ink-200">
+                    <div className="text-[11px] text-ink-500 mb-1">Confidence</div>
+                    <div className="text-sm font-bold text-ink-800">High</div>
                   </div>
                 </>
               )}
@@ -1051,23 +1051,23 @@ function AssetRegistryTab() {
       {/* Filter bar */}
       <div className="flex flex-wrap gap-3 items-center">
         <div className="relative flex-1 min-w-52">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-400" />
           <input
             type="text"
             placeholder="Search assets..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-9 pr-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full pl-9 pr-3 py-2 text-sm border border-ink-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-info focus:border-transparent"
           />
           {search && (
             <button onClick={() => setSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2">
-              <X className="w-4 h-4 text-slate-400 hover:text-slate-600" />
+              <X className="w-4 h-4 text-ink-400 hover:text-ink-600" />
             </button>
           )}
         </div>
         <div className="flex items-center gap-2">
-          <Filter className="w-4 h-4 text-slate-400" />
-          <span className="text-sm text-slate-500">System:</span>
+          <Filter className="w-4 h-4 text-ink-400" />
+          <span className="text-sm text-ink-500">System:</span>
           <div className="flex gap-1">
             {SYSTEM_OPTIONS.map((s) => (
               <button
@@ -1076,8 +1076,8 @@ function AssetRegistryTab() {
                 className={cn(
                   "px-3 py-1.5 text-xs rounded-lg font-medium transition-colors",
                   systemFilter === s
-                    ? "bg-blue-600 text-white"
-                    : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                    ? "bg-info text-white"
+                    : "bg-ink-100 text-ink-600 hover:bg-ink-200"
                 )}
               >
                 {s}
@@ -1086,7 +1086,7 @@ function AssetRegistryTab() {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-sm text-slate-500">Health:</span>
+          <span className="text-sm text-ink-500">Health:</span>
           <div className="flex gap-1">
             {HEALTH_OPTIONS.map((h) => (
               <button
@@ -1095,8 +1095,8 @@ function AssetRegistryTab() {
                 className={cn(
                   "px-3 py-1.5 text-xs rounded-lg font-medium transition-colors",
                   healthFilter === h
-                    ? "bg-blue-600 text-white"
-                    : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                    ? "bg-info text-white"
+                    : "bg-ink-100 text-ink-600 hover:bg-ink-200"
                 )}
               >
                 {h}
@@ -1111,29 +1111,29 @@ function AssetRegistryTab() {
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-slate-100">
-                <th className="text-left px-4 py-3 text-xs text-slate-500 font-medium">Asset</th>
-                <th className="text-left px-4 py-3 text-xs text-slate-500 font-medium">Type</th>
-                <th className="text-left px-4 py-3 text-xs text-slate-500 font-medium">System</th>
-                <th className="text-left px-4 py-3 text-xs text-slate-500 font-medium">Location</th>
-                <th className="text-left px-4 py-3 text-xs text-slate-500 font-medium">Status</th>
-                <th className="text-left px-4 py-3 text-xs text-slate-500 font-medium">Health</th>
-                <th className="text-left px-4 py-3 text-xs text-slate-500 font-medium">Alerts</th>
-                <th className="text-left px-4 py-3 text-xs text-slate-500 font-medium">Next PM</th>
-                <th className="text-left px-4 py-3 text-xs text-slate-500 font-medium">Est. Loss</th>
-                <th className="text-left px-4 py-3 text-xs text-slate-500 font-medium">Action</th>
+              <tr className="border-b border-ink-100">
+                <th className="text-left px-4 py-3 text-xs text-ink-500 font-medium">Asset</th>
+                <th className="text-left px-4 py-3 text-xs text-ink-500 font-medium">Type</th>
+                <th className="text-left px-4 py-3 text-xs text-ink-500 font-medium">System</th>
+                <th className="text-left px-4 py-3 text-xs text-ink-500 font-medium">Location</th>
+                <th className="text-left px-4 py-3 text-xs text-ink-500 font-medium">Status</th>
+                <th className="text-left px-4 py-3 text-xs text-ink-500 font-medium">Health</th>
+                <th className="text-left px-4 py-3 text-xs text-ink-500 font-medium">Alerts</th>
+                <th className="text-left px-4 py-3 text-xs text-ink-500 font-medium">Next PM</th>
+                <th className="text-left px-4 py-3 text-xs text-ink-500 font-medium">Est. Loss</th>
+                <th className="text-left px-4 py-3 text-xs text-ink-500 font-medium">Action</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-50">
+            <tbody className="divide-y divide-ink-50">
               {filtered.map((asset) => (
-                <tr key={asset.id} className="hover:bg-slate-50 transition-colors">
+                <tr key={asset.id} className="hover:bg-ink-50 transition-colors">
                   <td className="px-4 py-3">
-                    <div className="font-medium text-slate-800">{asset.name}</div>
-                    <div className="text-xs text-slate-400">{asset.id}</div>
+                    <div className="font-medium text-ink-800">{asset.name}</div>
+                    <div className="text-xs text-ink-400">{asset.id}</div>
                   </td>
-                  <td className="px-4 py-3 text-slate-600 text-xs">{asset.type}</td>
-                  <td className="px-4 py-3 text-slate-600 text-xs">{asset.system}</td>
-                  <td className="px-4 py-3 text-slate-500 text-xs">{asset.location}</td>
+                  <td className="px-4 py-3 text-ink-600 text-xs">{asset.type}</td>
+                  <td className="px-4 py-3 text-ink-600 text-xs">{asset.system}</td>
+                  <td className="px-4 py-3 text-ink-500 text-xs">{asset.location}</td>
                   <td className="px-4 py-3">
                     <Badge tone={statusTone(asset.status)}>{asset.status}</Badge>
                   </td>
@@ -1142,26 +1142,26 @@ function AssetRegistryTab() {
                   </td>
                   <td className="px-4 py-3">
                     {asset.activeAlerts > 0 ? (
-                      <span className="inline-flex items-center gap-1 text-red-700 font-semibold text-sm">
+                      <span className="inline-flex items-center gap-1 text-bad-700 font-semibold text-sm">
                         <AlertTriangle className="w-3.5 h-3.5" />
                         {asset.activeAlerts}
                       </span>
                     ) : (
-                      <span className="text-slate-400 text-sm">—</span>
+                      <span className="text-ink-400 text-sm">—</span>
                     )}
                   </td>
-                  <td className="px-4 py-3 text-slate-600 text-xs">{asset.nextPM}</td>
+                  <td className="px-4 py-3 text-ink-600 text-xs">{asset.nextPM}</td>
                   <td className="px-4 py-3">
                     {asset.estimatedLoss ? (
-                      <span className="text-red-700 font-medium text-xs">{asset.estimatedLoss}</span>
+                      <span className="text-bad-700 font-medium text-xs">{asset.estimatedLoss}</span>
                     ) : (
-                      <span className="text-slate-400 text-xs">—</span>
+                      <span className="text-ink-400 text-xs">—</span>
                     )}
                   </td>
                   <td className="px-4 py-3">
                     <button
                       onClick={() => openAsset(asset)}
-                      className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors"
+                      className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-info-700 bg-info/10 hover:bg-info/15 rounded-lg transition-colors"
                     >
                       View <ChevronRight className="w-3 h-3" />
                     </button>
@@ -1170,7 +1170,7 @@ function AssetRegistryTab() {
               ))}
               {filtered.length === 0 && (
                 <tr>
-                  <td colSpan={10} className="px-4 py-12 text-center text-slate-400 text-sm">
+                  <td colSpan={10} className="px-4 py-12 text-center text-ink-400 text-sm">
                     No assets match the current filters.
                   </td>
                 </tr>
@@ -1178,7 +1178,7 @@ function AssetRegistryTab() {
             </tbody>
           </table>
         </div>
-        <div className="px-4 py-3 border-t border-slate-100 text-xs text-slate-400">
+        <div className="px-4 py-3 border-t border-ink-100 text-xs text-ink-400">
           Showing {filtered.length} of {ASSETS.length} assets
         </div>
       </Card>
@@ -1205,18 +1205,18 @@ function AssetHealthTab() {
       label: "Good",
       count: goodAssets.length,
       assets: goodAssets,
-      colour: "bg-green-50 border-green-200",
-      headerColour: "text-green-700 bg-green-100",
-      dotColour: "bg-green-500",
+      colour: "bg-good/10 border-good/30",
+      headerColour: "text-good-700 bg-good/15",
+      dotColour: "bg-good",
       tone: "good" as const,
     },
     {
       label: "Warning",
       count: warningAssets.length,
       assets: warningAssets,
-      colour: "bg-amber-50 border-amber-200",
-      headerColour: "text-amber-700 bg-amber-100",
-      dotColour: "bg-amber-500",
+      colour: "bg-warn/10 border-warn/30",
+      headerColour: "text-warn-700 bg-warn/15",
+      dotColour: "bg-warn",
       tone: "warn" as const,
     },
     {
@@ -1232,9 +1232,9 @@ function AssetHealthTab() {
       label: "Critical",
       count: criticalAssets.length,
       assets: criticalAssets,
-      colour: "bg-red-50 border-red-200",
-      headerColour: "text-red-700 bg-red-100",
-      dotColour: "bg-red-500",
+      colour: "bg-bad/10 border-bad/30",
+      headerColour: "text-bad-700 bg-bad/15",
+      dotColour: "bg-bad",
       tone: "bad" as const,
     },
   ];
@@ -1243,9 +1243,9 @@ function AssetHealthTab() {
     <div className="space-y-6">
       {/* KPI summary */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <KpiTile icon={<Database className="w-5 h-5" />} iconBg="bg-blue-50" label="Total Assets" value="14" />
-        <KpiTile icon={<CheckCircle className="w-5 h-5" />} iconBg="bg-green-50" label="Assets Good Health" value="8" delta={57} deltaUnit="% of fleet" goodDirection="up" />
-        <KpiTile icon={<AlertTriangle className="w-5 h-5" />} iconBg="bg-amber-50" label="Assets With Alerts" value="6" delta={43} deltaUnit="% of fleet" goodDirection="down" />
+        <KpiTile icon={<Database className="w-5 h-5" />} iconBg="bg-info/10" label="Total Assets" value="14" />
+        <KpiTile icon={<CheckCircle className="w-5 h-5" />} iconBg="bg-good/10" label="Assets Good Health" value="8" delta={57} deltaUnit="% of fleet" goodDirection="up" />
+        <KpiTile icon={<AlertTriangle className="w-5 h-5" />} iconBg="bg-warn/10" label="Assets With Alerts" value="6" delta={43} deltaUnit="% of fleet" goodDirection="down" />
         <KpiTile icon={<Clock className="w-5 h-5" />} iconBg="bg-orange-50" label="PM Overdue" value="2" caption="Avg asset age: 5.2 years" />
       </div>
 
@@ -1256,22 +1256,22 @@ function AssetHealthTab() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <span className={cn("w-2.5 h-2.5 rounded-full", dotColour)} />
-                <span className="font-semibold text-slate-700">{label}</span>
+                <span className="font-semibold text-ink-700">{label}</span>
               </div>
               <Badge tone={tone}>{count}</Badge>
             </div>
             <div className="space-y-1.5">
               {assets.map((a) => (
-                <div key={a.id} className="text-xs text-slate-600 flex items-center gap-1.5">
-                  <ChevronRight className="w-3 h-3 text-slate-400 flex-shrink-0" />
+                <div key={a.id} className="text-xs text-ink-600 flex items-center gap-1.5">
+                  <ChevronRight className="w-3 h-3 text-ink-400 flex-shrink-0" />
                   {a.name}
                   {a.activeAlerts > 0 && (
-                    <span className="ml-auto text-red-600 font-semibold">{a.activeAlerts}⚠</span>
+                    <span className="ml-auto text-bad-700 font-semibold">{a.activeAlerts}⚠</span>
                   )}
                 </div>
               ))}
               {assets.length === 0 && (
-                <div className="text-xs text-slate-400 italic">No assets</div>
+                <div className="text-xs text-ink-400 italic">No assets</div>
               )}
             </div>
           </div>
@@ -1279,8 +1279,8 @@ function AssetHealthTab() {
       </div>
 
       {/* Disclaimer */}
-      <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-600 flex gap-2">
-        <AlertTriangle className="w-4 h-4 text-slate-400 flex-shrink-0 mt-0.5" />
+      <div className="p-4 bg-ink-50 border border-ink-200 rounded-xl text-sm text-ink-600 flex gap-2">
+        <AlertTriangle className="w-4 h-4 text-ink-400 flex-shrink-0 mt-0.5" />
         <p>
           Asset health is based on efficiency KPIs, alert status, runtime analysis, and maintenance records. It is not a mechanical certification.
         </p>
@@ -1298,18 +1298,18 @@ function FaultsAlertsTab() {
     <div className="space-y-4">
       {/* Summary strip */}
       <div className="flex flex-wrap gap-4">
-        <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 flex items-center gap-3">
-          <AlertTriangle className="w-5 h-5 text-red-600" />
+        <div className="bg-bad/10 border border-bad/30 rounded-xl px-4 py-3 flex items-center gap-3">
+          <AlertTriangle className="w-5 h-5 text-bad-700" />
           <div>
-            <div className="text-xs text-red-600">Active Faults</div>
-            <div className="font-bold text-red-800">6 active · 1 assigned · 1 new</div>
+            <div className="text-xs text-bad-700">Active Faults</div>
+            <div className="font-bold text-bad-700">6 active · 1 assigned · 1 new</div>
           </div>
         </div>
-        <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 flex items-center gap-3">
-          <Zap className="w-5 h-5 text-amber-600" />
+        <div className="bg-warn/10 border border-warn/30 rounded-xl px-4 py-3 flex items-center gap-3">
+          <Zap className="w-5 h-5 text-warn-700" />
           <div>
-            <div className="text-xs text-amber-600">Total Estimated Loss</div>
-            <div className="font-bold text-amber-800">{totalEstimatedLoss}</div>
+            <div className="text-xs text-warn-700">Total Estimated Loss</div>
+            <div className="font-bold text-warn-700">{totalEstimatedLoss}</div>
           </div>
         </div>
       </div>
@@ -1318,44 +1318,44 @@ function FaultsAlertsTab() {
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-slate-100">
-                <th className="text-left px-4 py-3 text-xs text-slate-500 font-medium">Asset</th>
-                <th className="text-left px-4 py-3 text-xs text-slate-500 font-medium">Fault Type</th>
-                <th className="text-left px-4 py-3 text-xs text-slate-500 font-medium">Severity</th>
-                <th className="text-left px-4 py-3 text-xs text-slate-500 font-medium">Detected</th>
-                <th className="text-left px-4 py-3 text-xs text-slate-500 font-medium">Duration</th>
-                <th className="text-left px-4 py-3 text-xs text-slate-500 font-medium">Efficiency Impact</th>
-                <th className="text-left px-4 py-3 text-xs text-slate-500 font-medium">Est. Loss</th>
-                <th className="text-left px-4 py-3 text-xs text-slate-500 font-medium">Status</th>
-                <th className="text-left px-4 py-3 text-xs text-slate-500 font-medium">Action</th>
+              <tr className="border-b border-ink-100">
+                <th className="text-left px-4 py-3 text-xs text-ink-500 font-medium">Asset</th>
+                <th className="text-left px-4 py-3 text-xs text-ink-500 font-medium">Fault Type</th>
+                <th className="text-left px-4 py-3 text-xs text-ink-500 font-medium">Severity</th>
+                <th className="text-left px-4 py-3 text-xs text-ink-500 font-medium">Detected</th>
+                <th className="text-left px-4 py-3 text-xs text-ink-500 font-medium">Duration</th>
+                <th className="text-left px-4 py-3 text-xs text-ink-500 font-medium">Efficiency Impact</th>
+                <th className="text-left px-4 py-3 text-xs text-ink-500 font-medium">Est. Loss</th>
+                <th className="text-left px-4 py-3 text-xs text-ink-500 font-medium">Status</th>
+                <th className="text-left px-4 py-3 text-xs text-ink-500 font-medium">Action</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-50">
+            <tbody className="divide-y divide-ink-50">
               {FAULTS.map((fault) => (
-                <tr key={fault.id} className="hover:bg-slate-50 transition-colors">
+                <tr key={fault.id} className="hover:bg-ink-50 transition-colors">
                   <td className="px-4 py-3">
-                    <div className="font-medium text-slate-800">{fault.asset}</div>
-                    <div className="text-xs text-slate-400">{fault.id}</div>
+                    <div className="font-medium text-ink-800">{fault.asset}</div>
+                    <div className="text-xs text-ink-400">{fault.id}</div>
                   </td>
-                  <td className="px-4 py-3 text-slate-700 text-xs max-w-48">{fault.faultType}</td>
+                  <td className="px-4 py-3 text-ink-700 text-xs max-w-48">{fault.faultType}</td>
                   <td className="px-4 py-3">
                     <Badge tone={severityTone(fault.severity)}>{fault.severity}</Badge>
                   </td>
-                  <td className="px-4 py-3 text-slate-500 text-xs">{fault.detected}</td>
-                  <td className="px-4 py-3 text-slate-500 text-xs">{fault.duration}</td>
-                  <td className="px-4 py-3 text-slate-600 text-xs">{fault.efficiencyImpact}</td>
+                  <td className="px-4 py-3 text-ink-500 text-xs">{fault.detected}</td>
+                  <td className="px-4 py-3 text-ink-500 text-xs">{fault.duration}</td>
+                  <td className="px-4 py-3 text-ink-600 text-xs">{fault.efficiencyImpact}</td>
                   <td className="px-4 py-3">
                     {fault.estimatedLoss !== "—" ? (
-                      <span className="text-red-700 font-medium text-xs">{fault.estimatedLoss}</span>
+                      <span className="text-bad-700 font-medium text-xs">{fault.estimatedLoss}</span>
                     ) : (
-                      <span className="text-slate-400 text-xs">—</span>
+                      <span className="text-ink-400 text-xs">—</span>
                     )}
                   </td>
                   <td className="px-4 py-3">
                     <Badge tone={faultStatusTone(fault.status)}>{fault.status}</Badge>
                   </td>
                   <td className="px-4 py-3">
-                    <button className="text-xs text-blue-700 hover:underline font-medium">View</button>
+                    <button className="text-xs text-info-700 hover:underline font-medium">View</button>
                   </td>
                 </tr>
               ))}
@@ -1377,22 +1377,22 @@ function MaintenanceTab() {
       {/* Workflow diagram */}
       <Card>
         <div className="p-4">
-          <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Maintenance Workflow</div>
+          <div className="text-xs font-semibold text-ink-500 uppercase tracking-wider mb-3">Maintenance Workflow</div>
           <div className="flex items-center gap-0 overflow-x-auto pb-1">
             {WORKFLOW_STEPS.map((step, i) => (
               <div key={step} className="flex items-center flex-shrink-0">
                 <div className="flex flex-col items-center">
                   <div className={cn(
                     "w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold",
-                    i === 0 ? "bg-slate-200 text-slate-600" :
-                    i === 7 ? "bg-slate-800 text-white" :
-                    i === 4 || i === 6 ? "bg-green-500 text-white" :
-                    "bg-blue-500 text-white"
+                    i === 0 ? "bg-ink-200 text-ink-600" :
+                    i === 7 ? "bg-ink-800 text-white" :
+                    i === 4 || i === 6 ? "bg-good text-white" :
+                    "bg-info text-white"
                   )}>{i + 1}</div>
-                  <div className="text-[10px] text-slate-500 mt-1 text-center max-w-14 leading-tight">{step}</div>
+                  <div className="text-[10px] text-ink-500 mt-1 text-center max-w-14 leading-tight">{step}</div>
                 </div>
                 {i < WORKFLOW_STEPS.length - 1 && (
-                  <div className="w-6 h-0.5 bg-slate-200 mb-4 flex-shrink-0" />
+                  <div className="w-6 h-0.5 bg-ink-200 mb-4 flex-shrink-0" />
                 )}
               </div>
             ))}
@@ -1405,48 +1405,48 @@ function MaintenanceTab() {
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-slate-100">
-                <th className="text-left px-4 py-3 text-xs text-slate-500 font-medium">Action ID</th>
-                <th className="text-left px-4 py-3 text-xs text-slate-500 font-medium">Asset</th>
-                <th className="text-left px-4 py-3 text-xs text-slate-500 font-medium">Type</th>
-                <th className="text-left px-4 py-3 text-xs text-slate-500 font-medium">Description</th>
-                <th className="text-left px-4 py-3 text-xs text-slate-500 font-medium">Priority</th>
-                <th className="text-left px-4 py-3 text-xs text-slate-500 font-medium">Status</th>
-                <th className="text-left px-4 py-3 text-xs text-slate-500 font-medium">Assigned To</th>
-                <th className="text-left px-4 py-3 text-xs text-slate-500 font-medium">Due Date</th>
-                <th className="text-left px-4 py-3 text-xs text-slate-500 font-medium">Est. Saving</th>
-                <th className="text-left px-4 py-3 text-xs text-slate-500 font-medium">Source</th>
+              <tr className="border-b border-ink-100">
+                <th className="text-left px-4 py-3 text-xs text-ink-500 font-medium">Action ID</th>
+                <th className="text-left px-4 py-3 text-xs text-ink-500 font-medium">Asset</th>
+                <th className="text-left px-4 py-3 text-xs text-ink-500 font-medium">Type</th>
+                <th className="text-left px-4 py-3 text-xs text-ink-500 font-medium">Description</th>
+                <th className="text-left px-4 py-3 text-xs text-ink-500 font-medium">Priority</th>
+                <th className="text-left px-4 py-3 text-xs text-ink-500 font-medium">Status</th>
+                <th className="text-left px-4 py-3 text-xs text-ink-500 font-medium">Assigned To</th>
+                <th className="text-left px-4 py-3 text-xs text-ink-500 font-medium">Due Date</th>
+                <th className="text-left px-4 py-3 text-xs text-ink-500 font-medium">Est. Saving</th>
+                <th className="text-left px-4 py-3 text-xs text-ink-500 font-medium">Source</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-50">
+            <tbody className="divide-y divide-ink-50">
               {MAINTENANCE_ACTIONS.map((action) => (
-                <tr key={action.id} className="hover:bg-slate-50 transition-colors">
+                <tr key={action.id} className="hover:bg-ink-50 transition-colors">
                   <td className="px-4 py-3">
-                    <span className="font-mono text-xs font-medium text-slate-700">{action.id}</span>
+                    <span className="font-mono text-xs font-medium text-ink-700">{action.id}</span>
                   </td>
-                  <td className="px-4 py-3 font-medium text-slate-800 text-xs">{action.asset}</td>
+                  <td className="px-4 py-3 font-medium text-ink-800 text-xs">{action.asset}</td>
                   <td className="px-4 py-3">
                     <Badge tone={action.type === "Corrective" ? "warn" : action.type === "PM" ? "info" : "neutral"}>
                       {action.type}
                     </Badge>
                   </td>
-                  <td className="px-4 py-3 text-slate-600 text-xs max-w-52">{action.description}</td>
+                  <td className="px-4 py-3 text-ink-600 text-xs max-w-52">{action.description}</td>
                   <td className="px-4 py-3">
                     <Badge tone={priorityTone(action.priority)}>{action.priority}</Badge>
                   </td>
                   <td className="px-4 py-3">
                     <Badge tone={maintenanceStatusTone(action.status)}>{action.status}</Badge>
                   </td>
-                  <td className="px-4 py-3 text-slate-600 text-xs">{action.assignedTo}</td>
-                  <td className="px-4 py-3 text-slate-600 text-xs">{action.dueDate}</td>
+                  <td className="px-4 py-3 text-ink-600 text-xs">{action.assignedTo}</td>
+                  <td className="px-4 py-3 text-ink-600 text-xs">{action.dueDate}</td>
                   <td className="px-4 py-3">
                     {action.estimatedSaving !== "—" ? (
-                      <span className="text-green-700 font-medium text-xs">{action.estimatedSaving}</span>
+                      <span className="text-good-700 font-medium text-xs">{action.estimatedSaving}</span>
                     ) : (
-                      <span className="text-slate-400 text-xs">—</span>
+                      <span className="text-ink-400 text-xs">—</span>
                     )}
                   </td>
-                  <td className="px-4 py-3 text-slate-400 text-xs">{action.createdFrom}</td>
+                  <td className="px-4 py-3 text-ink-400 text-xs">{action.createdFrom}</td>
                 </tr>
               ))}
             </tbody>
@@ -1455,8 +1455,8 @@ function MaintenanceTab() {
       </Card>
 
       {/* Disclaimer */}
-      <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl text-sm text-amber-800 flex gap-2">
-        <AlertTriangle className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
+      <div className="p-4 bg-warn/10 border border-warn/30 rounded-xl text-sm text-warn-700 flex gap-2">
+        <AlertTriangle className="w-4 h-4 text-warn-700 flex-shrink-0 mt-0.5" />
         <p>
           This module provides preventive maintenance intelligence based on performance data. Hotel Optimizer does not replace on-site engineering judgment. All recommended actions should be reviewed by qualified personnel before implementation.
         </p>
@@ -1474,35 +1474,35 @@ function DocumentsTab() {
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-slate-100">
-                <th className="text-left px-4 py-3 text-xs text-slate-500 font-medium">Asset</th>
-                <th className="text-left px-4 py-3 text-xs text-slate-500 font-medium">Document</th>
-                <th className="text-left px-4 py-3 text-xs text-slate-500 font-medium">Type</th>
-                <th className="text-left px-4 py-3 text-xs text-slate-500 font-medium">Uploaded</th>
-                <th className="text-left px-4 py-3 text-xs text-slate-500 font-medium">Uploaded By</th>
-                <th className="text-left px-4 py-3 text-xs text-slate-500 font-medium">Action</th>
+              <tr className="border-b border-ink-100">
+                <th className="text-left px-4 py-3 text-xs text-ink-500 font-medium">Asset</th>
+                <th className="text-left px-4 py-3 text-xs text-ink-500 font-medium">Document</th>
+                <th className="text-left px-4 py-3 text-xs text-ink-500 font-medium">Type</th>
+                <th className="text-left px-4 py-3 text-xs text-ink-500 font-medium">Uploaded</th>
+                <th className="text-left px-4 py-3 text-xs text-ink-500 font-medium">Uploaded By</th>
+                <th className="text-left px-4 py-3 text-xs text-ink-500 font-medium">Action</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-50">
+            <tbody className="divide-y divide-ink-50">
               {DOCUMENTS.map((doc, i) => (
-                <tr key={i} className="hover:bg-slate-50 transition-colors">
-                  <td className="px-4 py-3 font-medium text-slate-800 text-xs">{doc.asset}</td>
+                <tr key={i} className="hover:bg-ink-50 transition-colors">
+                  <td className="px-4 py-3 font-medium text-ink-800 text-xs">{doc.asset}</td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
-                      <FileText className="w-4 h-4 text-slate-400 flex-shrink-0" />
-                      <span className="text-slate-700 text-sm">{doc.document}</span>
+                      <FileText className="w-4 h-4 text-ink-400 flex-shrink-0" />
+                      <span className="text-ink-700 text-sm">{doc.document}</span>
                     </div>
                   </td>
                   <td className="px-4 py-3">
                     <Badge tone="neutral">{doc.type}</Badge>
                   </td>
-                  <td className="px-4 py-3 text-slate-500 text-xs">{doc.uploaded}</td>
-                  <td className="px-4 py-3 text-slate-500 text-xs">{doc.uploadedBy}</td>
+                  <td className="px-4 py-3 text-ink-500 text-xs">{doc.uploaded}</td>
+                  <td className="px-4 py-3 text-ink-500 text-xs">{doc.uploadedBy}</td>
                   <td className="px-4 py-3">
                     <div className="flex gap-2">
-                      <button className="text-xs text-blue-700 hover:underline font-medium">View</button>
-                      <span className="text-slate-300">|</span>
-                      <button className="text-xs text-blue-700 hover:underline font-medium">Download</button>
+                      <button className="text-xs text-info-700 hover:underline font-medium">View</button>
+                      <span className="text-ink-300">|</span>
+                      <button className="text-xs text-info-700 hover:underline font-medium">Download</button>
                     </div>
                   </td>
                 </tr>
@@ -1510,9 +1510,9 @@ function DocumentsTab() {
             </tbody>
           </table>
         </div>
-        <div className="px-4 py-3 border-t border-slate-100 flex items-center justify-between">
-          <span className="text-xs text-slate-400">{DOCUMENTS.length} documents</span>
-          <button className="text-xs font-medium text-blue-700 hover:underline">Upload Document</button>
+        <div className="px-4 py-3 border-t border-ink-100 flex items-center justify-between">
+          <span className="text-xs text-ink-400">{DOCUMENTS.length} documents</span>
+          <button className="text-xs font-medium text-info-700 hover:underline">Upload Document</button>
         </div>
       </Card>
     </div>
@@ -1549,12 +1549,12 @@ export default function AssetPerformance() {
           actions={
             <div className="flex items-center gap-2">
               {totalAlerts > 0 && (
-                <div className="flex items-center gap-1.5 px-3 py-1.5 bg-red-50 border border-red-200 rounded-lg">
-                  <AlertTriangle className="w-4 h-4 text-red-600" />
-                  <span className="text-sm font-medium text-red-700">{totalAlerts} active alerts</span>
+                <div className="flex items-center gap-1.5 px-3 py-1.5 bg-bad/10 border border-bad/30 rounded-lg">
+                  <AlertTriangle className="w-4 h-4 text-bad-700" />
+                  <span className="text-sm font-medium text-bad-700">{totalAlerts} active alerts</span>
                 </div>
               )}
-              <button className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors">
+              <button className="px-4 py-2 bg-info text-white text-sm font-medium rounded-lg hover:bg-info-700 transition-colors">
                 Add Asset
               </button>
             </div>
@@ -1562,7 +1562,7 @@ export default function AssetPerformance() {
         />
 
         {/* Tab navigation */}
-        <div className="border-b border-slate-200">
+        <div className="border-b border-ink-200">
           <nav className="flex gap-0 overflow-x-auto">
             {TABS.map(({ id, label, icon: Icon }) => {
               const isActive = activeTab === id;
@@ -1574,8 +1574,8 @@ export default function AssetPerformance() {
                   className={cn(
                     "flex items-center gap-2 px-5 py-3.5 text-sm font-medium border-b-2 transition-colors whitespace-nowrap",
                     isActive
-                      ? "border-blue-600 text-blue-600"
-                      : "border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300"
+                      ? "border-info text-info-700"
+                      : "border-transparent text-ink-500 hover:text-ink-700 hover:border-ink-300"
                   )}
                 >
                   <Icon className="w-4 h-4" />
@@ -1583,7 +1583,7 @@ export default function AssetPerformance() {
                   {alertBadge > 0 && (
                     <span className={cn(
                       "inline-flex items-center justify-center w-5 h-5 text-[11px] rounded-full font-bold",
-                      isActive ? "bg-blue-100 text-blue-700" : "bg-slate-200 text-slate-600"
+                      isActive ? "bg-info/15 text-info-700" : "bg-ink-200 text-ink-600"
                     )}>
                       {alertBadge}
                     </span>

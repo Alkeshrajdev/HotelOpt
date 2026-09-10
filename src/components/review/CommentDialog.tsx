@@ -55,7 +55,7 @@ export default function CommentDialog({
               meta.ctaTone === "good"
                 ? "btn-primary"
                 : meta.ctaTone === "bad"
-                  ? "btn bg-bad text-white hover:bg-red-700"
+                  ? "btn bg-bad text-white hover:bg-bad-700"
                   : "btn bg-warn text-white hover:bg-warn/80"
             }
           >

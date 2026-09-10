@@ -83,7 +83,7 @@ function ConsolidatedTooltip({ active, payload, label }: {
           <span>{diff < 0 ? "" : "+"}{diff.toLocaleString()} MWh</span>
         </div>
       )}
-      {cost  && <div className="flex justify-between gap-4 mt-2 border-t border-ink-100 pt-1.5"><span className="text-ink-500">Cost (TY)</span><span className="font-bold text-amber-600">${cost.value}k</span></div>}
+      {cost  && <div className="flex justify-between gap-4 mt-2 border-t border-ink-100 pt-1.5"><span className="text-ink-500">Cost (TY)</span><span className="font-bold text-warn-700">${cost.value}k</span></div>}
       {costPY && <div className="flex justify-between gap-4"><span className="text-ink-500">Cost (PY)</span><span className="text-ink-400">${costPY.value}k</span></div>}
     </div>
   );
@@ -134,7 +134,7 @@ function SourceChart({
       <div className="flex items-start justify-between">
         <div>
           <div className="text-[12px] font-semibold text-ink-700">{source.fullLabel}</div>
-          <div className="text-[1.5rem] font-bold tabular-nums text-ink-900 leading-tight mt-0.5">
+          <div className="text-2xl font-bold tabular-nums text-ink-900 leading-tight mt-0.5">
             {annualTY.toLocaleString()}
             <span className="text-[11px] font-semibold text-ink-400 ml-1">MWh</span>
           </div>
@@ -234,7 +234,7 @@ export default function EnergyOverview() {
               className={cn(
                 "text-[11px] font-semibold px-2.5 py-1 rounded-lg transition-colors",
                 showCost
-                  ? "bg-amber-100 text-amber-700"
+                  ? "bg-warn/15 text-warn-700"
                   : "bg-ink-100 text-ink-500 hover:bg-ink-200"
               )}
             >

@@ -132,7 +132,7 @@ function ProvisioningCard() {
                 onClick={() => setAccountType(t)}
                 className={cn(
                   "px-3 h-7 text-[12px] font-medium rounded-md transition-colors capitalize",
-                  account.accountType === t ? "bg-white text-ink-900 shadow-sm" : "text-ink-500 hover:text-ink-700"
+                  account.accountType === t ? "bg-white text-ink-900 shadow-card" : "text-ink-500 hover:text-ink-700"
                 )}
               >
                 {t === "single" ? "Single hotel" : "Portfolio"}

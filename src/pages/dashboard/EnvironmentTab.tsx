@@ -116,7 +116,7 @@ function TargetBanner({
       status === "bad" ? "border-bad/20 bg-bad/5" : "border-warn/20 bg-warn/5"
     )}>
       <div className="px-3 py-2 border-r border-ink-100 text-center shrink-0">
-        <div className="text-[9px] text-ink-400 uppercase tracking-wide font-semibold">Baseline {baseYear}</div>
+        <div className="text-[10px] text-ink-400 uppercase tracking-wide font-semibold">Baseline {baseYear}</div>
         <div className="font-bold text-ink-600 tabular-nums">{baseline}</div>
       </div>
       <div className="flex-1 px-3 py-2 flex items-center gap-2">
@@ -135,11 +135,11 @@ function TargetBanner({
         </span>
       </div>
       <div className="px-3 py-2 border-l border-ink-100 text-center shrink-0">
-        <div className="text-[9px] text-ink-400 uppercase tracking-wide font-semibold">Target {targetYear}</div>
+        <div className="text-[10px] text-ink-400 uppercase tracking-wide font-semibold">Target {targetYear}</div>
         <div className="font-bold text-good tabular-nums">{target}</div>
       </div>
       <div className="px-3 py-2 border-l border-ink-100 shrink-0 hidden lg:block">
-        <div className="text-[9px] text-ink-400 uppercase tracking-wide font-semibold">Owner</div>
+        <div className="text-[10px] text-ink-400 uppercase tracking-wide font-semibold">Owner</div>
         <div className="font-semibold text-ink-700">{owner}</div>
       </div>
     </div>
@@ -184,7 +184,7 @@ function DrilldownPanel({
     flag === "bad" ? "#EF4444" : flag === "warn" ? "#F59E0B" : flag === "good" ? "#22C55E" : data.color;
 
   return (
-    <div ref={panelRef} className="rounded-2xl border-2 border-brand-200 bg-white shadow-sm overflow-hidden">
+    <div ref={panelRef} className="rounded-2xl border-2 border-brand-200 bg-white shadow-card overflow-hidden">
       {/* Header */}
       <div className="px-5 pt-4 pb-3 border-b border-ink-100 flex items-center justify-between gap-4">
         <div className="min-w-0">
@@ -410,13 +410,13 @@ function CarbonSection() {
             <div className="grid grid-cols-2 gap-3">
               <div className="card-level-3 p-3 rounded-lg">
                 <div className="text-[10px] text-ink-500 font-semibold uppercase tracking-wide mb-1">Location-based</div>
-                <div className="text-[20px] font-bold text-ink-900 tabular-nums">14,569</div>
+                <div className="text-xl font-bold text-ink-900 tabular-nums">14,569</div>
                 <div className="text-[10px] text-ink-400">tCO₂e · grid avg factor</div>
                 <div className="text-[10px] text-ink-500 mt-1">0.251 kgCO₂/kWh</div>
               </div>
               <div className="card-level-3 p-3 rounded-lg border border-good/20">
                 <div className="text-[10px] text-good font-semibold uppercase tracking-wide mb-1">Market-based</div>
-                <div className="text-[20px] font-bold text-good tabular-nums">12,400</div>
+                <div className="text-xl font-bold text-good tabular-nums">12,400</div>
                 <div className="text-[10px] text-ink-400">tCO₂e · after RECs</div>
                 <div className="text-[10px] text-good mt-1">−2,169 tCO₂e vs location</div>
               </div>

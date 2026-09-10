@@ -333,7 +333,7 @@ export default function AIAssistant() {
         <div className="fixed inset-0 z-50 flex justify-end" onClick={() => setAuditOpen(false)}>
           <div className="absolute inset-0 bg-ink-900/40 backdrop-blur-[2px]" />
           <div onClick={(e) => e.stopPropagation()}
-            className="relative w-full max-w-md bg-white border-l border-ink-200 shadow-2xl overflow-y-auto">
+            className="relative w-full max-w-md bg-white border-l border-ink-200 shadow-pop-lg overflow-y-auto">
             <div className="p-5 border-b border-ink-200 flex items-center justify-between">
               <div>
                 <div className="text-sm font-bold text-ink-900">AI audit log</div>
@@ -410,7 +410,7 @@ function ChatPane({
           <select
             value={scope}
             onChange={(e) => setScope(e.target.value as ContextScope)}
-            className="h-8 pl-3 pr-7 rounded-lg border border-ink-200 bg-white text-[12px] font-medium text-ink-700 appearance-none cursor-pointer"
+            className="h-8 pl-3 pr-7 rounded-lg border border-ink-200 bg-white text-[12px] font-medium text-ink-700 appearance-none cursor-pointer hover:bg-ink-50"
           >
             {(Object.keys(SCOPE_LABELS) as ContextScope[]).map((s) => (
               <option key={s} value={s}>{SCOPE_LABELS[s]}</option>
@@ -505,7 +505,7 @@ function UserBubble({ text, ts }: { text: string; ts: string }) {
   return (
     <div className="flex justify-end gap-2 items-end">
       <span className="text-[10px] text-ink-400 mb-0.5">{ts}</span>
-      <div className="max-w-[80%] rounded-2xl rounded-br-sm bg-brand-700 text-white px-4 py-2.5 text-sm shadow-sm">
+      <div className="max-w-[80%] rounded-2xl rounded-br-sm bg-brand-700 text-white px-4 py-2.5 text-sm shadow-card">
         {text}
       </div>
     </div>

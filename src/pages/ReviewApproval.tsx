@@ -413,7 +413,7 @@ export default function ReviewApproval() {
                       key={r.id}
                       onClick={() => setSelectedId(r.id)}
                       className={cn(
-                        "cursor-pointer",
+                        "cursor-pointer hover:bg-ink-50/60",
                         selected?.id === r.id ? "bg-brand-50/60" : "hover:bg-ink-50/60"
                       )}
                     >
@@ -637,9 +637,9 @@ function CaptureStatusTab() {
           <div className="text-[11px] text-bad/70">entries not submitted</div>
         </div>
         <div className="rounded-xl border border-warn/25 bg-warn/5 p-3">
-          <div className="text-[11px] text-amber-700 mb-1">In progress</div>
-          <div className="text-xl font-bold text-amber-700">{pending}</div>
-          <div className="text-[11px] text-amber-600/70">submitted or draft</div>
+          <div className="text-[11px] text-warn-700 mb-1">In progress</div>
+          <div className="text-xl font-bold text-warn-700">{pending}</div>
+          <div className="text-[11px] text-warn/70">submitted or draft</div>
         </div>
         <div className="rounded-xl border border-ink-200 bg-white p-3 flex flex-col justify-between">
           <div className="text-[11px] text-ink-500 mb-1">Contacts to remind</div>
@@ -707,7 +707,7 @@ function CaptureStatusTab() {
                         <CaptureStatusChip status={row.cells[m]?.status ?? "missing"} />
                       </td>
                     ))}
-                    <td className={cn("px-3 py-2.5 text-center font-semibold tabular-nums", cov >= 80 ? "text-good" : cov >= 50 ? "text-amber-700" : "text-bad")}>{cov}%</td>
+                    <td className={cn("px-3 py-2.5 text-center font-semibold tabular-nums", cov >= 80 ? "text-good" : cov >= 50 ? "text-warn-700" : "text-bad")}>{cov}%</td>
                   </tr>
                 );
               })}
@@ -717,7 +717,7 @@ function CaptureStatusTab() {
                 <td className="px-4 py-2 font-semibold sticky left-0 bg-ink-50" colSpan={3}>Monthly coverage</td>
                 {DISPLAY_MONTHS.map((m) => {
                   const c = monthCoverage(rows, m);
-                  return <td key={m} className={cn("px-2 py-2 text-center font-semibold tabular-nums", c >= 80 ? "text-good" : c >= 50 ? "text-amber-700" : "text-bad")}>{c}%</td>;
+                  return <td key={m} className={cn("px-2 py-2 text-center font-semibold tabular-nums", c >= 80 ? "text-good" : c >= 50 ? "text-warn-700" : "text-bad")}>{c}%</td>;
                 })}
                 <td />
               </tr>
@@ -941,7 +941,7 @@ function DetailPanel({
               <button disabled={!canQuery} onClick={() => onAction("query")} className="btn-secondary disabled:opacity-40">
                 <MessageCircle size={14} /> Query
               </button>
-              <button disabled={!canReject} onClick={() => onAction("reject")} className="btn bg-bad text-white hover:bg-red-700 disabled:opacity-40">
+              <button disabled={!canReject} onClick={() => onAction("reject")} className="btn bg-bad text-white hover:bg-bad-700 disabled:opacity-40">
                 <X size={14} /> Reject
               </button>
               <button disabled={!canApprove} onClick={() => onAction("approve")} className="btn-primary disabled:opacity-40">

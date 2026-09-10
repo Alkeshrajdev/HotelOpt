@@ -277,8 +277,8 @@ function PublicPageTab({ property }: { property: string }) {
           </div>
           <div className="flex items-center gap-2 flex-wrap">
             {status === "draft"    && <button className="btn-primary" onClick={() => setStatus("pending")}><Send size={14} /> Submit for approval</button>}
-            {status === "pending"  && <><button className="btn bg-bad text-white hover:bg-red-700" onClick={() => setStatus("draft")}>Reject</button><button className="btn-primary" onClick={() => setStatus("live")}><CheckCircle2 size={14} /> Approve &amp; publish</button></>}
-            {status === "live"     && <button className="btn bg-bad text-white hover:bg-red-700" onClick={() => setStatus("disabled")}><PowerOff size={14} /> Disable</button>}
+            {status === "pending"  && <><button className="btn bg-bad text-white hover:bg-bad-700" onClick={() => setStatus("draft")}>Reject</button><button className="btn-primary" onClick={() => setStatus("live")}><CheckCircle2 size={14} /> Approve &amp; publish</button></>}
+            {status === "live"     && <button className="btn bg-bad text-white hover:bg-bad-700" onClick={() => setStatus("disabled")}><PowerOff size={14} /> Disable</button>}
             {status === "disabled" && <button className="btn-primary" onClick={() => setStatus("pending")}>Re-publish</button>}
           </div>
         </div>
@@ -532,7 +532,7 @@ function RenewableClaimsPanel() {
                     : "Sustainability Manager — please approve public visibility. Once approved, this claim will appear on the guest page and in campaign templates."}
                 </div>
                 <button
-                  className="btn bg-bad text-white hover:bg-red-700 h-8 px-3 text-[12px] shrink-0"
+                  className="btn bg-bad text-white hover:bg-bad-700 h-8 px-3 text-[12px] shrink-0"
                   onClick={() => reject(claim.id)}
                 >
                   Reject
@@ -1168,7 +1168,7 @@ function QrAnalyticsTab({ property }: { property: string }) {
                   </div>
                   <div className="text-right shrink-0">
                     <div className="text-[13px] font-bold text-ink-900 tabular-nums">{p.scans.toLocaleString()}</div>
-                    <div className={cn("text-[10px] font-semibold", p.conv >= 25 ? "text-good" : p.conv >= 12 ? "text-amber-700" : "text-ink-400")}>{p.conv}% → action</div>
+                    <div className={cn("text-[10px] font-semibold", p.conv >= 25 ? "text-good" : p.conv >= 12 ? "text-warn-700" : "text-ink-400")}>{p.conv}% → action</div>
                   </div>
                 </div>
                 <div className="mt-2 h-1.5 rounded-full bg-ink-100 overflow-hidden">
@@ -1311,7 +1311,7 @@ function OverviewTab({ property, onJump }: { property: string; onJump: (t: Tab) 
 }
 
 function PulseTile({ label, value, sub, tone, icon, onClick }: { label: string; value: string; sub?: string; tone: "good" | "warn" | "info"; icon: React.ReactNode; onClick?: () => void }) {
-  const v = tone === "good" ? "text-good" : tone === "warn" ? "text-amber-700" : "text-ink-900";
+  const v = tone === "good" ? "text-good" : tone === "warn" ? "text-warn-700" : "text-ink-900";
   const inner = (
     <>
       <div className="flex items-center justify-between"><span className="text-[11px] text-ink-500">{label}</span><span className="text-ink-300">{icon}</span></div>

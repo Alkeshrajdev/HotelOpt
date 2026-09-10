@@ -56,6 +56,12 @@
   --warn: 245 158 11;
   --bad:  220 38 38;
   --info: 14 165 233;
+  /* Darker, contrast-safe shades for status TEXT and icons on light tints
+     (the base shades pass for fills/chips but not for small text on white). */
+  --good-700: 21 128 61;
+  --warn-700: 180 83 9;
+  --bad-700:  185 28 28;
+  --info-700: 3 105 161;
 
   /* Pillar — RGB triplets for opacity utilities (bg-pillar-energy/10 etc.)
    * Energy=green · Water=blue · Waste=teal · Carbon=deep-teal · Social=purple · Gov=orange */
@@ -105,6 +111,10 @@
   }
   .card-pad {
     @apply p-6;
+  }
+  /* Any clickable card/tile: one consistent affordance (cursor, lift, shadow). */
+  .card-interactive {
+    @apply cursor-pointer transition-all duration-150 hover:shadow-pop hover:-translate-y-0.5;
   }
   .card-pad-lg {
     @apply p-7;
@@ -237,6 +247,10 @@
   }
 }
 
+
+/* Motion — entrances for overlays and toasts (160ms, ease-out) */
+@keyframes fadein  { from { opacity: 0; transform: translateY(6px) scale(0.99); } to { opacity: 1; transform: none; } }
+@keyframes toastin { from { opacity: 0; transform: translateY(8px); }             to { opacity: 1; transform: none; } }
 
 /* Scrollbar polish */
 ::-webkit-scrollbar { width: 10px; height: 10px; }
