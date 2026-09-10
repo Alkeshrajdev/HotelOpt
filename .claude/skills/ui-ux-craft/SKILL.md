@@ -31,7 +31,12 @@ repo's tokens. When in doubt, the rule wins over the existing code.
 - Grid column counts must divide the item count (8 → 4 cols, 10 → 5, 12 → 4). If the count is
   data-driven, keep cards the same size and let the last row left-align.
 - Two-column splits: tables and charts take the wide half (8/4 or 7/5); key/value rails take the narrow.
-  Equal content → equal halves (6/6). Use `items-start` so short cards don't stretch.
+  Equal content → equal halves (6/6).
+- **Cards hug their content.** Card rows are `items-start` — a card never stretches to pool empty
+  space below its content. Compose rows from cards of comparable depth (compact breakdowns
+  together, long lists together); pin supporting notes to the bottom with `mt-auto` so slack sits
+  between sections; if a card is inherently short next to its neighbours, give it a purposeful
+  visual (a mini trend chart), not filler.
 
 ## 3. Visual hierarchy
 - One page title (`h1.page-title`, 700/-0.021em), optional short eyebrow, **no subtitle paragraphs**.
@@ -59,6 +64,22 @@ repo's tokens. When in doubt, the rule wins over the existing code.
   as template/AI decoration (user feedback, Sep 2026). Carry pillar/status colour in the icon chip,
   a `Badge`, or the value colour instead.
 - Tints: `bg-good/10` + `border-good/30` + `text-good-700` is the status-callout recipe.
+- **Charts use their own palette, never UI status hues or raw Tailwind colours.** It is
+  `src/lib/chartPalette.ts` ("A Bridesmaid's Touch", chosen by the owner): olive `#807245`
+  primary → mauve `#AF8D84` → moss `#959891` → blush `#F6C8CC` → cocoa `#8B6D66`; sage `#E0E5DA`
+  for tracks/neutral; rose `#B33650` for negatives; sand `#CDB872` for warnings (sparingly).
+  Hand-built bars and legend swatches use the matching `bg-chart-*` classes. Stacked series get a
+  1px white separator. Pillars map via `CHART_PILLAR`, thresholds via `CHART_STATUS`.
+  **Assigning a breakdown:** rank items by share and walk `CHART_SERIES` in order (olive → mauve
+  → moss → blush → cocoa → sand → sage); "nothing happened" slices (landfill, other, conventional
+  grid) take `CHART.remainder`; genuinely bad slices (hazardous, overdue) take `CHART.rose`.
+  Prior-period bars `CHART.prior`, dashed baselines/averages `CHART.reference`, gridlines and
+  tooltip borders `CHART.grid`, ticks and legend text `CHART.axis`, category labels `CHART.label`.
+  Import from `chartPalette` — never from `tokens.ts` (those are UI hues) and never a literal
+  Tailwind hex. Tooltip labels get a `bg-chart-*` dot, not coloured text (mauve/blush can't
+  carry 12px text on white).
+- Tab rows are contained pill tracks (`Tabs` primitive, or `inline-flex … rounded-full bg-ink-100 p-1`
+  with white active pills) — never an underline row floating on the page.
 
 ## 6. Elevation & shadows
 - `shadow-card` (resting card), `shadow-card-lg` (primary card), `shadow-pop` (menus, popovers,
@@ -95,7 +116,14 @@ repo's tokens. When in doubt, the rule wins over the existing code.
 - Every interactive element has hover, focus-visible (global), active, disabled. Clickable cards use
   `card-interactive`; clickable rows use `hover:bg-ink-50/60 cursor-pointer`.
 - Every save/submit/approve/delete gives feedback: `useToast().success("Saved")` / `.error(...)`.
-- Empty (`EmptyState`), loading, and error states exist for every data surface.
+- Every filtered list/table has an empty state, and it is always the same one: `EmptyState`
+  (icon + short title + one-line hint + a way out, usually "Clear filters"). Inside a table use
+  `<tr><td colSpan={n} className="p-0"><EmptyState inset … /></td></tr>`; standalone (grid of
+  cards) use the non-inset card form. Never an inline "No results" `<td>` or `<li>`.
+- Loading is `PageSkeleton` (route Suspense in AppShell) or `Skeleton` blocks shaped like the
+  content — no spinners in the shell. Route errors are caught by `ErrorBoundary` (Reload +
+  Dashboard); don't add per-page try/catch UI.
+- A search box that doesn't filter is a lie — wire it or remove it.
 - Transitions 100–150ms (`transition-colors` / `transition-all duration-150`); hover lift is
   `-translate-y-0.5` + `shadow-pop`.
 
@@ -113,5 +141,5 @@ repo's tokens. When in doubt, the rule wins over the existing code.
 - [ ] tokens only (no raw palette), status text uses `*-700`
 - [ ] no text under 10px; numbers on `kpi`/`stat`
 - [ ] hover + focus on everything clickable; toast on every action
-- [ ] charts render with data; empty state without
+- [ ] charts render with data; every list/table has an `EmptyState` (inset in tables) with a way out
 - [ ] one primary button; destructive demoted; no subtitle paragraphs

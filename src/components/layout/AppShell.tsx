@@ -1,6 +1,7 @@
 import { Suspense, useEffect, useState } from "react";
-import { Outlet } from "react-router-dom";
-import RouteFallback from "@/components/ui/RouteFallback";
+import { Outlet, useLocation } from "react-router-dom";
+import ErrorBoundary from "@/components/ui/ErrorBoundary";
+import { PageSkeleton } from "@/components/ui/Skeleton";
 import Sidebar from "./Sidebar";
 import Topbar from "./Topbar";
 import EntitlementGuard from "./EntitlementGuard";
@@ -10,6 +11,7 @@ import { ToastProvider } from "@/components/ui/Toast";
 
 export default function AppShell() {
   // Desktop manual collapse (icon rail). Mobile uses an off-canvas drawer.
+  const location = useLocation();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -46,10 +48,14 @@ export default function AppShell() {
           <SampleDataNotice />
           <main className="flex-1 overflow-y-auto">
             <div className="px-4 sm:px-6 py-5 max-w-[1600px] mx-auto">
-              {/* Page chunks load here; the shell stays put (see App.tsx). */}
-              <Suspense fallback={<RouteFallback />}>
-                <Outlet />
-              </Suspense>
+              {/* Page chunks load here; the shell stays put (see App.tsx). A structured
+                  skeleton shows the page's shape while it arrives; a render error or a
+                  stale chunk is caught with a way out, and clears on navigation. */}
+              <ErrorBoundary resetKey={location.pathname}>
+                <Suspense fallback={<PageSkeleton />}>
+                  <Outlet />
+                </Suspense>
+              </ErrorBoundary>
             </div>
           </main>
         </div>

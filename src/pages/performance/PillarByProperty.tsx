@@ -59,7 +59,7 @@ const DATA: Record<"water"|"waste"|"carbon", { rows: PropRow[]; avg: number; uni
   },
 };
 
-const RAG_BAR = { green:"#16a34a", amber:"#f59e0b", red:"#ef4444" };
+const RAG_BAR = { green:"#807245", amber:"#CDB872", red:"#B33650" };
 const RAG_CHIP = {
   green:"bg-good/10 text-good border border-good/20",
   amber:"bg-warn/10 text-warn border border-warn/25",
@@ -76,7 +76,7 @@ export default function PillarByProperty({ pillar }: { pillar: "water"|"waste"|"
   return (
     <div className="space-y-5">
       {/* Summary tiles */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 items-start">
         {[
           { label:"Best",       value:`${best}`,  unit, sub:rows[0].name,          color:"text-good"  },
           { label:"Portfolio avg",value:`${avg}`, unit, sub:"across all hotels",  color:"text-ink-900"},

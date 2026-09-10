@@ -53,12 +53,12 @@ const SOURCES: {
   color: string;
   lightColor: string;
 }[] = [
-  { key: "grid",     label: "Grid",          fullLabel: "Grid Electricity",   color: "#0F6A3C", lightColor: "#dcfce7" },
-  { key: "boiler",   label: "Boiler fuel",   fullLabel: "Boiler Fuel (Gas)",  color: "#ea580c", lightColor: "#ffedd5" },
-  { key: "kitchen",  label: "Kitchen gas",   fullLabel: "Kitchen Gas",        color: "#f59e0b", lightColor: "#fef3c7" },
-  { key: "distCool", label: "Dist. cooling", fullLabel: "District Cooling",   color: "#0ea5e9", lightColor: "#e0f2fe" },
-  { key: "solar",    label: "Solar PV",      fullLabel: "Solar PV (on-site)", color: "#84cc16", lightColor: "#f0fdf4" },
-  { key: "diesel",   label: "Diesel",        fullLabel: "Diesel / Generator", color: "#78716c", lightColor: "#f5f5f4" },
+  { key: "grid",     label: "Grid",          fullLabel: "Grid Electricity",   color: "#807245", lightColor: "#F1DFA3" },
+  { key: "boiler",   label: "Boiler fuel",   fullLabel: "Boiler Fuel (Gas)",  color: "#AF8D84", lightColor: "#E8E0DE" },
+  { key: "kitchen",  label: "Kitchen gas",   fullLabel: "Kitchen Gas",        color: "#CDB872", lightColor: "#F1DFA3" },
+  { key: "distCool", label: "Dist. cooling", fullLabel: "District Cooling",   color: "#959891", lightColor: "#E0E5DA" },
+  { key: "solar",    label: "Solar PV",      fullLabel: "Solar PV (on-site)", color: "#F6C8CC", lightColor: "#F6C8CC" },
+  { key: "diesel",   label: "Diesel",        fullLabel: "Diesel / Generator", color: "#8B6D66", lightColor: "#E8E0DE" },
 ];
 
 /* ─── Custom tooltips ───────────────────────────────────────────────────────*/
@@ -156,13 +156,13 @@ function SourceChart({
         <BarChart data={chartData} barGap={1} barCategoryGap="30%">
           <XAxis
             dataKey="month"
-            tick={{ fontSize: 9, fill: "#9ca3af" }}
+            tick={{ fontSize: 9, fill: "#7B8285" }}
             axisLine={false}
             tickLine={false}
           />
           <YAxis hide domain={[0, "auto"]} />
           <Tooltip content={<SourceTooltip />} cursor={{ fill: "rgba(0,0,0,0.04)" }} />
-          <Bar dataKey="py" fill="#e5e7eb" radius={[2, 2, 0, 0]} isAnimationActive={false} name="Prior year" />
+          <Bar dataKey="py" fill="#EDEFF0" radius={[2, 2, 0, 0]} isAnimationActive={false} name="Prior year" />
           <Bar dataKey="ty" fill={source.color} radius={[2, 2, 0, 0]} isAnimationActive={false} name="This year" />
         </BarChart>
       </ResponsiveContainer>
@@ -193,7 +193,7 @@ function EnergyOverviewSample() {
     <div className="space-y-5">
 
       {/* ── KPI tiles ──────────────────────────────────────────────────── */}
-      <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 items-start">
         <KpiTile
           icon={<Zap size={18} />}
           iconBg="bg-pillar-energy/10 text-pillar-energy"
@@ -253,10 +253,10 @@ function EnergyOverviewSample() {
         <div className="px-6 pb-6 pt-4">
           <ResponsiveContainer width="100%" height={300}>
             <ComposedChart data={MONTHLY} barGap={2} barCategoryGap="25%">
-              <CartesianGrid vertical={false} stroke="#f3f4f6" />
+              <CartesianGrid vertical={false} stroke="#EDEFF0" />
               <XAxis
                 dataKey="month"
-                tick={{ fontSize: 11, fill: "#6b7280" }}
+                tick={{ fontSize: 11, fill: "#7B8285" }}
                 axisLine={false}
                 tickLine={false}
               />
@@ -264,20 +264,20 @@ function EnergyOverviewSample() {
               <YAxis
                 yAxisId="mwh"
                 orientation="left"
-                tick={{ fontSize: 11, fill: "#6b7280" }}
+                tick={{ fontSize: 11, fill: "#7B8285" }}
                 tickFormatter={(v) => `${v}`}
                 axisLine={false}
                 tickLine={false}
                 width={40}
                 domain={[0, 10000]}
-                label={{ value: "MWh", angle: -90, position: "insideLeft", offset: 12, style: { fontSize: 10, fill: "#9ca3af" } }}
+                label={{ value: "MWh", angle: -90, position: "insideLeft", offset: 12, style: { fontSize: 10, fill: "#7B8285" } }}
               />
               {/* Right axis — $k */}
               {showCost && (
                 <YAxis
                   yAxisId="cost"
                   orientation="right"
-                  tick={{ fontSize: 11, fill: "#b45309" }}
+                  tick={{ fontSize: 11, fill: "#CDB872" }}
                   tickFormatter={(v) => `$${v}k`}
                   axisLine={false}
                   tickLine={false}
@@ -287,16 +287,16 @@ function EnergyOverviewSample() {
               )}
               <Tooltip content={<ConsolidatedTooltip />} cursor={{ fill: "rgba(0,0,0,0.03)" }} />
               {/* TY bar */}
-              <Bar yAxisId="mwh" dataKey="ty" name="This year" fill="#0F6A3C" radius={[3, 3, 0, 0]} isAnimationActive={false} />
+              <Bar yAxisId="mwh" dataKey="ty" name="This year" fill="#807245" radius={[3, 3, 0, 0]} isAnimationActive={false} />
               {/* PY bar */}
-              <Bar yAxisId="mwh" dataKey="py" name="Prior year" fill="#cbd5e1" radius={[3, 3, 0, 0]} isAnimationActive={false} />
+              <Bar yAxisId="mwh" dataKey="py" name="Prior year" fill="#BABEB5" radius={[3, 3, 0, 0]} isAnimationActive={false} />
               {/* Cost lines */}
               {showCost && (
                 <Line
                   yAxisId="cost"
                   dataKey="costTY"
                   name="Cost (this year)"
-                  stroke="#d97706"
+                  stroke="#CDB872"
                   strokeWidth={2}
                   dot={false}
                   isAnimationActive={false}
@@ -307,7 +307,7 @@ function EnergyOverviewSample() {
                   yAxisId="cost"
                   dataKey="costPY"
                   name="Cost (prior year)"
-                  stroke="#fcd34d"
+                  stroke="#CDB872"
                   strokeWidth={1.5}
                   strokeDasharray="4 3"
                   dot={false}
@@ -317,7 +317,7 @@ function EnergyOverviewSample() {
               <Legend
                 wrapperStyle={{ fontSize: 11, paddingTop: 12 }}
                 formatter={(value) => (
-                  <span style={{ color: "#6b7280" }}>{value}</span>
+                  <span style={{ color: "#7B8285" }}>{value}</span>
                 )}
               />
             </ComposedChart>
@@ -354,7 +354,7 @@ function EnergyOverviewSample() {
         <h2 className="text-[13px] font-semibold text-ink-700 mb-3">
           Consumption by energy source
         </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 items-start">
           {SOURCES.map((s) => (
             <SourceChart key={s.key} source={s} data={MONTHLY} />
           ))}

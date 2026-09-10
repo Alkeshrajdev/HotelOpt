@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { ChevronRight, Info, Plus, Settings, Sparkles, TrendingDown, TrendingUp, X } from "lucide-react";
 import PageHeader from "@/components/ui/PageHeader";
+import StatTile from "@/components/ui/StatTile";
 import { Card, CardHeader } from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import GenuinePerformancePanel from "@/components/properties/GenuinePerformancePanel";
@@ -52,11 +53,11 @@ export default function GenuinePortfolio() {
       </div>
 
       {/* Summary tiles */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <SummaryTile label="Portfolio genuine" value={pct(avg)} tone={avg <= 0 ? "good" : "bad"} icon={<Sparkles size={18} />} hint="avg across hotels & utilities" />
-        <SummaryTile label="Improving" value={String(improving)} tone="good" icon={<TrendingDown size={18} />} hint="genuine efficiency gain" />
-        <SummaryTile label="Worsening" value={String(worsening)} tone="bad" icon={<TrendingUp size={18} />} hint="used more than expected" />
-        <SummaryTile label="Savings opportunity" value={fmtUsd(cost.leakageUsd)} tone="bad" icon={<TrendingUp size={18} />} hint="recoverable genuine overspend / yr" />
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 items-start">
+        <StatTile label="Portfolio genuine" value={pct(avg)} tone={avg <= 0 ? "good" : "bad"} icon={<Sparkles size={18} />} hint="avg across hotels & utilities" />
+        <StatTile label="Improving" value={String(improving)} tone="good" icon={<TrendingDown size={18} />} hint="genuine efficiency gain" />
+        <StatTile label="Worsening" value={String(worsening)} tone="bad" icon={<TrendingUp size={18} />} hint="used more than expected" />
+        <StatTile label="Savings opportunity" value={fmtUsd(cost.leakageUsd)} tone="bad" icon={<TrendingUp size={18} />} hint="recoverable genuine overspend / yr" />
       </div>
 
       {/* Leaderboard */}
@@ -190,21 +191,5 @@ export default function GenuinePortfolio() {
         </div>
       </div>
     </div>
-  );
-}
-
-function SummaryTile({ label, value, tone, icon, hint }: {
-  label: string; value: string; tone: "good" | "bad" | "info"; icon: React.ReactNode; hint: string;
-}) {
-  const ring = { good: "text-good", bad: "text-bad", info: "text-info" }[tone];
-  return (
-    <Card className="p-4">
-      <div className="flex items-center justify-between">
-        <div className="text-[11px] font-semibold uppercase tracking-wide text-ink-500">{label}</div>
-        <span className={ring}>{icon}</span>
-      </div>
-      <div className={`text-2xl font-bold mt-1 tabular-nums ${ring}`}>{value}</div>
-      <div className="text-[11px] text-ink-400 mt-0.5">{hint}</div>
-    </Card>
   );
 }

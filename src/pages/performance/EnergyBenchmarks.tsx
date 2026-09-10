@@ -93,7 +93,7 @@ function MetricChart({ metric }: { metric: MetricConfig }) {
             <XAxis
               type="number"
               domain={domain}
-              tick={{ fontSize: 10, fill: "#9ca3af" }}
+              tick={{ fontSize: 10, fill: "#7B8285" }}
               axisLine={false}
               tickLine={false}
               tickFormatter={metric.format}
@@ -108,7 +108,7 @@ function MetricChart({ metric }: { metric: MetricConfig }) {
                   dominantBaseline="middle"
                   fontSize={11}
                   fontWeight={payload.value === "You" ? 700 : 400}
-                  fill={payload.value === "You" ? "#0F6A3C" : "#6b7280"}
+                  fill={payload.value === "You" ? "#807245" : "#7B8285"}
                 >
                   {payload.value}
                 </text>
@@ -121,7 +121,7 @@ function MetricChart({ metric }: { metric: MetricConfig }) {
             {/* Reference line at best peer value */}
             <ReferenceLine
               x={bestVal}
-              stroke="#16a34a"
+              stroke="#807245"
               strokeDasharray="3 3"
               strokeOpacity={0.5}
             />
@@ -129,7 +129,7 @@ function MetricChart({ metric }: { metric: MetricConfig }) {
               {data.map((entry, i) => (
                 <Cell
                   key={i}
-                  fill={entry.isYou ? "#0F6A3C" : "#e2e8f0"}
+                  fill={entry.isYou ? "#807245" : "#EDEFF0"}
                 />
               ))}
             </Bar>
@@ -154,7 +154,7 @@ export default function EnergyBenchmarks() {
     <div className="space-y-5">
 
       {/* ── Savings callout ────────────────────────────────────────────── */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-start">
         <div className="card p-6 flex flex-col gap-1">
           <div className="flex items-center gap-2 mb-1">
             <div className="w-8 h-8 rounded-full bg-brand-50 grid place-items-center shrink-0">
@@ -181,7 +181,7 @@ export default function EnergyBenchmarks() {
       </div>
 
       {/* ── Metric charts ──────────────────────────────────────────────── */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-start">
         {METRIC_CONFIGS.map((m) => (
           <MetricChart key={m.key} metric={m} />
         ))}

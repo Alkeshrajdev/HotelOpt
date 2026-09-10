@@ -21,7 +21,7 @@ export function WaterIntensityDrilldown() {
           <AreaTrend
             data={WATER.trend.map((d) => ({ x: d.x, v: d.v }))}
             dataKey="v"
-            color="#0EA5E9"
+            color="#AF8D84"
             format={(v) => v.toFixed(2)}
           />
         </div>
@@ -77,7 +77,7 @@ export function WaterRecycledDrilldown() {
               { x: "Feb", v: 21 }, { x: "Mar", v: 22 }, { x: "Apr", v: 22 },
             ]}
             dataKey="v"
-            color="#22D3EE"
+            color="#AF8D84"
             format={(v) => `${v}%`}
           />
         </div>
@@ -89,9 +89,9 @@ export function WaterRecycledDrilldown() {
             totalValue="22%"
             totalLabel="recycled"
             data={[
-              { name: "Greywater (sinks/showers)", value: 12, color: "#22D3EE" },
-              { name: "HVAC condensate",           value: 6,  color: "#06B6D4" },
-              { name: "Rainwater harvested",       value: 4,  color: "#7DD3FC" },
+              { name: "Greywater (sinks/showers)", value: 12, color: "#807245" },
+              { name: "HVAC condensate",           value: 6,  color: "#AF8D84" },
+              { name: "Rainwater harvested",       value: 4,  color: "#959891" },
             ]}
           />
         </div>
@@ -143,7 +143,7 @@ export function WasteIntensityDrilldown() {
           <AreaTrend
             data={WASTE.trend.map((d) => ({ x: d.x, v: d.v }))}
             dataKey="v"
-            color="#0D9488"
+            color="#959891"
             format={(v) => v.toFixed(2)}
           />
         </div>
@@ -233,7 +233,7 @@ export function CarbonIntensityDrilldown() {
           <AreaTrend
             data={CARBON.trend.map((d) => ({ x: d.x, v: d.v }))}
             dataKey="v"
-            color="#134E4A"
+            color="#8B6D66"
             format={(v) => v.toFixed(3)}
           />
         </div>
@@ -245,9 +245,9 @@ export function CarbonIntensityDrilldown() {
             totalValue="29.4k"
             totalLabel="tCO₂e (12 mo)"
             data={[
-              { name: "Scope 1",          value: 1820,  color: "#0F6A3C" },
-              { name: "Scope 2 (market)", value: 4910,  color: "#0EA5E9" },
-              { name: "Scope 3",          value: 22640, color: "#7C3AED" },
+              { name: "Scope 1",          value: 1820,  color: "#807245" },
+              { name: "Scope 2 (market)", value: 4910,  color: "#AF8D84" },
+              { name: "Scope 3",          value: 22640, color: "#959891" },
             ]}
           />
         </div>
@@ -267,7 +267,7 @@ export function HeadcountDrilldown() {
           <AreaTrend
             data={SOCIAL.headcountTrend.map((d) => ({ x: d.x, v: d.v }))}
             dataKey="v"
-            color="#7C3AED"
+            color="#634D48"
           />
         </div>
       </Card>
@@ -311,7 +311,7 @@ export function DiversityDrilldown() {
               { x: "Feb", v: 41 }, { x: "Mar", v: 42 }, { x: "Apr", v: 42 },
             ]}
             dataKey="v"
-            color="#7C3AED"
+            color="#634D48"
             format={(v) => `${v}%`}
           />
         </div>
@@ -323,9 +323,9 @@ export function DiversityDrilldown() {
             totalValue="42%"
             totalLabel="female"
             data={[
-              { name: "Female leaders", value: 42, color: "#7C3AED" },
-              { name: "Male leaders", value: 56, color: "#A78BFA" },
-              { name: "Other / undisclosed", value: 2, color: "#C4B5FD" },
+              { name: "Female leaders", value: 42, color: "#807245" },
+              { name: "Male leaders", value: 56, color: "#959891" },
+              { name: "Other / undisclosed", value: 2, color: "#E0E5DA" },
             ]}
           />
         </div>
@@ -356,7 +356,7 @@ export function SafetyDrilldown() {
           <AreaTrend
             data={SOCIAL.ltifrTrend.map((d) => ({ x: d.x, v: d.v }))}
             dataKey="v"
-            color="#DC2626"
+            color="#B33650"
             format={(v) => v.toFixed(2)}
           />
         </div>
@@ -420,10 +420,10 @@ export function AntiCorruptionDrilldown() {
             totalValue="96%"
             totalLabel="completion"
             data={[
-              { name: "Code of conduct",       value: 32, color: "#EA580C" },
-              { name: "Anti-bribery",          value: 28, color: "#F97316" },
-              { name: "Conflict of interest",  value: 22, color: "#FB923C" },
-              { name: "Data privacy",          value: 18, color: "#FDBA74" },
+              { name: "Code of conduct",       value: 32, color: "#807245" },
+              { name: "Anti-bribery",          value: 28, color: "#AF8D84" },
+              { name: "Conflict of interest",  value: 22, color: "#959891" },
+              { name: "Data privacy",          value: 18, color: "#F6C8CC" },
             ]}
           />
         </div>
@@ -479,7 +479,7 @@ export function SupplierCodeDrilldown() {
               { x: "Feb", v: 73 }, { x: "Mar", v: 74 }, { x: "Apr", v: 74 },
             ]}
             dataKey="v"
-            color="#EA580C"
+            color="#747771"
             format={(v) => `${v}%`}
           />
         </div>

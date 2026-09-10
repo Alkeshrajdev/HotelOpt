@@ -52,11 +52,11 @@ const DAILY_WATER_TREND = [
 ];
 
 const AREA_BREAKDOWN = [
-  { label: "Guestrooms", pct: 41, color: "bg-info" },
-  { label: "Kitchen", pct: 22, color: "bg-good" },
-  { label: "Laundry", pct: 18, color: "bg-violet-500" },
-  { label: "Irrigation", pct: 11, color: "bg-warn" },
-  { label: "Cooling Tower", pct: 8, color: "bg-info" },
+  { label: "Guestrooms", pct: 41, color: "bg-chart-olive" },
+  { label: "Kitchen", pct: 22, color: "bg-chart-mauve" },
+  { label: "Laundry", pct: 18, color: "bg-chart-moss" },
+  { label: "Irrigation", pct: 11, color: "bg-chart-blush" },
+  { label: "Cooling Tower", pct: 8, color: "bg-chart-cocoa" },
 ];
 
 const NIGHT_FLOW = [
@@ -382,7 +382,7 @@ function MeterModal({ meter, open, onClose }: { meter: Meter | null; open: boole
                   <span className="text-[10px] text-ink-400">{v}</span>
                   <div className="w-full flex-1 flex items-end">
                     <div
-                      className={cn("w-full rounded-t", isAlert ? "bg-bad" : "bg-info")}
+                      className={cn("w-full rounded-t", isAlert ? "bg-chart-rose" : "bg-chart-mauve")}
                       style={{ height: `${pct}%` }}
                     />
                   </div>
@@ -450,7 +450,7 @@ function OverviewTab() {
       </div>
 
       {/* primary KPIs */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 items-start">
         <KpiTile
           icon={<Droplets size={20} />}
           iconBg="bg-info/15"
@@ -473,7 +473,7 @@ function OverviewTab() {
         />
         <KpiTile
           icon={<Gauge size={20} />}
-          iconBg="bg-violet-100"
+          iconBg="bg-ink-100"
           label="L / Guest Night"
           value="284"
           unit="L"
@@ -495,10 +495,10 @@ function OverviewTab() {
       </div>
 
       {/* secondary KPIs */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 items-start">
         <KpiTile
           icon={<Filter size={20} />}
-          iconBg="bg-teal-100"
+          iconBg="bg-ink-100"
           label="L / kg Laundry"
           value="14.2"
           unit="L"
@@ -508,7 +508,7 @@ function OverviewTab() {
         />
         <KpiTile
           icon={<Thermometer size={20} />}
-          iconBg="bg-orange-100"
+          iconBg="bg-warn/10"
           label="L / F&B Cover"
           value="18.5"
           unit="L"
@@ -533,7 +533,7 @@ function OverviewTab() {
       </div>
 
       {/* charts row */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-start">
         {/* 14-day daily trend */}
         <Card className="p-5">
           <p className="text-sm font-semibold text-ink-700 mb-4">14-Day Daily Water Consumption</p>
@@ -545,7 +545,7 @@ function OverviewTab() {
                   {/* Track fills the column so the bar's % height resolves against a definite size */}
                   <div className="w-full flex-1 flex items-end">
                     <div
-                      className="w-full rounded-t bg-info hover:bg-info transition-colors"
+                      className="w-full rounded-t bg-chart-mauve hover:bg-chart-mauve transition-colors"
                       style={{ height: `${pct}%` }}
                       title={`${v} m³`}
                     />
@@ -606,7 +606,7 @@ function OverviewTab() {
                 <span className="text-[10px] text-ink-500">{d.value}</span>
                 <div className="w-full flex-1 flex items-end">
                   <div
-                    className={cn("w-full rounded-t transition-colors", d.alert ? "bg-bad" : "bg-info")}
+                    className={cn("w-full rounded-t transition-colors", d.alert ? "bg-chart-rose" : "bg-chart-mauve")}
                     style={{ height: `${pct}%` }}
                     title={`${d.day}: ${d.value} m³/hr`}
                   />
@@ -618,11 +618,11 @@ function OverviewTab() {
         </div>
         <div className="flex items-center gap-4 mt-3">
           <div className="flex items-center gap-1.5">
-            <div className="w-3 h-3 rounded-sm bg-info" />
+            <div className="w-3 h-3 rounded-sm bg-chart-mauve" />
             <span className="text-xs text-ink-500">Normal</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <div className="w-3 h-3 rounded-sm bg-bad" />
+            <div className="w-3 h-3 rounded-sm bg-chart-rose" />
             <span className="text-xs text-ink-500">Alert (above 8 m³/hr baseline)</span>
           </div>
         </div>
@@ -764,7 +764,7 @@ function WaterBalanceTab() {
               </div>
               <div className="w-full bg-ink-100 rounded-full h-3">
                 <div
-                  className="h-3 rounded-full bg-info transition-all"
+                  className="h-3 rounded-full bg-chart-mauve transition-all"
                   style={{ width: `${row.pct}%` }}
                 />
               </div>
@@ -832,7 +832,7 @@ function LeakDetectionTab() {
       {/* header KPIs */}
       <p className="text-sm font-semibold text-ink-600">Active leak alerts and night flow analysis</p>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 items-start">
         <Card className="p-4">
           <p className="text-xs text-ink-500">Baseline Night Flow (00:00–05:00)</p>
           <p className="text-xl font-bold text-ink-700 mt-1">5.8 <span className="text-sm font-normal">m³/hr</span></p>
@@ -870,7 +870,7 @@ function LeakDetectionTab() {
                   return (
                     <div key={i} className="flex-1 h-full flex items-end">
                       <div
-                        className={cn("w-full rounded-sm", isAlert ? "bg-bad" : "bg-info/25")}
+                        className={cn("w-full rounded-sm", isAlert ? "bg-chart-rose" : "bg-chart-mauve/25")}
                         style={{ height: `${pct}%` }}
                         title={`${dayLabels[i]} ${row.hour}: ${v} m³/hr`}
                       />

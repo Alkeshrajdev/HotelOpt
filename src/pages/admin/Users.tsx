@@ -1,6 +1,9 @@
+import { useState } from "react";
 import { Plus, Search, ShieldCheck, UserCog, UserMinus } from "lucide-react";
 import { Card, CardHeader } from "@/components/ui/Card";
+import StatTile from "@/components/ui/StatTile";
 import Badge from "@/components/ui/Badge";
+import EmptyState from "@/components/ui/EmptyState";
 import AdminShell from "./AdminShell";
 
 const ROLES = [
@@ -33,6 +36,10 @@ const ROLE_TONE: Record<string, "good"|"info"|"warn"|"brand"|"neutral"> = {
 };
 
 export default function AdminUsers() {
+  const [search, setSearch] = useState("");
+  const q = search.trim().toLowerCase();
+  const filtered = USERS.filter((u) => !q || [u.name, u.email, u.role, u.properties].some((v) => v.toLowerCase().includes(q)));
+
   return (
     <AdminShell
       eyebrow="Identity"
@@ -45,11 +52,11 @@ export default function AdminUsers() {
         </>
       }
     >
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <Tile label="Total users"   value={String(USERS.length)} />
-        <Tile label="Roles defined"  value={String(ROLES.length)} hint="per BRD §4" />
-        <Tile label="MFA enforced"   value="86%" hint="6 of 7 active" />
-        <Tile label="External users" value="124" hint="suppliers + auditors" />
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 items-start">
+        <StatTile label="Total users"   value={String(USERS.length)} />
+        <StatTile label="Roles defined"  value={String(ROLES.length)} hint="per BRD §4" />
+        <StatTile label="MFA enforced"   value="86%" hint="6 of 7 active" />
+        <StatTile label="External users" value="124" hint="suppliers + auditors" />
       </div>
 
       <Card>
@@ -71,7 +78,7 @@ export default function AdminUsers() {
       <div className="flex items-center gap-2">
         <div className="relative w-72">
           <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-400" />
-          <input className="input pl-9" placeholder="Search users, emails, roles…" />
+          <input className="input pl-9" placeholder="Search users, emails, roles…" value={search} onChange={(e) => setSearch(e.target.value)} />
         </div>
         <select className="input max-w-[160px]"><option>All roles</option></select>
         <select className="input max-w-[160px]"><option>MFA: any</option></select>
@@ -93,7 +100,14 @@ export default function AdminUsers() {
               </tr>
             </thead>
             <tbody>
-              {USERS.map((u) => (
+              {filtered.length === 0 && (
+                <tr>
+                  <td colSpan={7} className="p-0">
+                    <EmptyState inset icon={<Search size={20} />} title="No users match" description="Try a different name, email or role." action={<button className="btn-secondary" onClick={() => setSearch("")}>Clear search</button>} />
+                  </td>
+                </tr>
+              )}
+              {filtered.map((u) => (
                 <tr key={u.id} className="hover:bg-ink-50/60">
                   <td className="table-td font-medium text-ink-900">{u.name}</td>
                   <td className="table-td">{u.email}</td>
@@ -118,15 +132,5 @@ export default function AdminUsers() {
         </div>
       </Card>
     </AdminShell>
-  );
-}
-
-function Tile({ label, value, hint }: { label: string; value: string; hint?: string }) {
-  return (
-    <div className="rounded-xl border border-ink-200 bg-white p-4">
-      <div className="text-[11px] uppercase tracking-wide font-semibold text-ink-500">{label}</div>
-      <div className="text-2xl font-bold text-ink-900 mt-0.5">{value}</div>
-      {hint && <div className="text-[11px] text-ink-500">{hint}</div>}
-    </div>
   );
 }

@@ -302,7 +302,7 @@ export default function ReviewApproval() {
 
       {pageTab === "queue" && <>
       {/* Summary cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 items-start">
         <SummaryCard label="Pending review" value={summary.pending} icon={<Clock size={14} />} tone="warn"  onClick={() => setFilters((f) => ({ ...f, status: "submitted" }))} active={filters.status === "submitted"} />
         <SummaryCard label="Queried"        value={summary.queried} icon={<MessageCircle size={14} />} tone="info" onClick={() => setFilters((f) => ({ ...f, status: "queried" }))} active={filters.status === "queried"} />
         <SummaryCard label="Overdue"        value={summary.overdue} icon={<ShieldAlert size={14} />} tone="bad"  onClick={() => setFilters((f) => ({ ...f, status: "overdue" }))} active={filters.status === "overdue"} />
@@ -537,7 +537,7 @@ function PlatformReviewTab() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 items-start">
         <SummaryCard label="Awaiting platform sign-off" value={pending} icon={<ShieldAlert size={14} />} tone="warn" />
         <SummaryCard label="Platform-approved" value={items.filter((i) => i.state === "approved").length} icon={<CheckCircle2 size={14} />} tone="good" />
         <SummaryCard label="Bypassed" value={items.filter((i) => i.state === "bypassed").length} icon={<ArrowRight size={14} />} tone="info" />
@@ -626,7 +626,7 @@ function CaptureStatusTab() {
   return (
     <div className="space-y-4">
       {/* Summary strip */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 items-start">
         <div className="rounded-xl border border-ink-200 bg-white p-3">
           <div className="text-[11px] text-ink-500 mb-1">Coverage</div>
           <div className="text-xl font-bold text-ink-900">{Math.round((approved / (applicable || 1)) * 100)}%</div>
@@ -986,16 +986,16 @@ function DetailPanel({
       )}
 
       {/* Tabs */}
-      <div className="px-6 mt-4 flex items-center gap-1 border-b border-ink-200 overflow-x-auto -mb-px">
+      <div className="mx-6 mt-4 inline-flex max-w-full items-center gap-1 rounded-full bg-ink-100 p-1 overflow-x-auto">
         {tabs.map((t) => (
           <button
             key={t.key}
             onClick={() => setTab(t.key)}
             className={cn(
-              "inline-flex items-center gap-2 px-3.5 py-2.5 text-sm font-medium border-b-2 -mb-px",
+              "inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-full",
               tab === t.key
-                ? "text-ink-900 border-brand-700"
-                : "text-ink-500 hover:text-ink-900 border-transparent"
+                ? "bg-white shadow-card text-ink-900"
+                : "text-ink-500 hover:text-ink-900"
             )}
           >
             {t.label}

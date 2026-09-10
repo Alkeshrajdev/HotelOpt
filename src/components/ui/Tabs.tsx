@@ -72,12 +72,14 @@ export default function Tabs({
     );
   }
 
-  // underline
+  // Primary tabs — a contained pill track (the same language as the selector
+  // variant, sized for page-level navigation). An underline row floated on the
+  // page with nothing to its right; a track reads as one object wherever it sits.
   return (
     <div
       role="tablist"
       aria-label={ariaLabel}
-      className={cn("flex items-center gap-1 border-b border-ink-200 overflow-x-auto", className)}
+      className={cn("inline-flex max-w-full items-center gap-1 rounded-full bg-ink-100 p-1 overflow-x-auto", className)}
     >
       {items.map((t) => {
         const Icon = t.icon;
@@ -89,17 +91,17 @@ export default function Tabs({
             aria-selected={active}
             onClick={() => onChange(t.key)}
             className={cn(
-              "inline-flex items-center gap-2 font-medium transition-colors -mb-px border-b-2 whitespace-nowrap",
-              size === "sm" ? "px-3 py-2 text-[13px]" : "px-4 py-3 text-sm",
+              "inline-flex items-center gap-2 rounded-full font-medium whitespace-nowrap transition-colors",
+              size === "sm" ? "px-3 py-1.5 text-[13px]" : "px-4 py-2 text-sm",
               active
-                ? "text-ink-900 border-brand-700"
-                : "text-ink-500 hover:text-ink-900 border-transparent"
+                ? "bg-white shadow-card text-ink-900"
+                : "text-ink-500 hover:text-ink-900"
             )}
           >
             {Icon && <Icon size={size === "sm" ? 14 : 16} className={active ? t.activeColor ?? "text-brand-700" : "text-ink-400"} />}
             {t.label}
             {t.badge != null && (
-              <span className="rounded-full bg-ink-100 px-1.5 text-[10px] font-semibold text-ink-600">{t.badge}</span>
+              <span className={cn("rounded-full px-1.5 text-[10px] font-semibold", active ? "bg-ink-100 text-ink-600" : "bg-ink-200 text-ink-500")}>{t.badge}</span>
             )}
           </button>
         );

@@ -336,7 +336,7 @@ function PickDataType({ onPick }: { onPick: (k: DataTypeKey) => void }) {
           <h2 className="text-lg font-bold text-ink-900">What do you want to capture?</h2>
         </div>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 items-start">
         {DATA_TYPES.map((dt) => {
           const Icon = dt.icon;
           return (
@@ -398,7 +398,7 @@ function PickMethod({
           <h2 className="text-lg font-bold text-ink-900">How would you like to enter it?</h2>
         </div>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 items-start">
         {ALL_METHODS.map((m) => {
           const supported = cfg.methods.includes(m);
           const meta = METHOD_META[m];

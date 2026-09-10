@@ -24,7 +24,7 @@ export default function Internal({ pillar }: { pillar: PillarKey }) {
 
   return (
     <div className="space-y-5">
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 items-start">
         <KpiTile
           icon={<Trophy size={18} />}
           iconBg="bg-pillar-energy/10 text-pillar-energy"
@@ -222,7 +222,7 @@ function PropertyProfile({ property }: { property: typeof PROPERTIES[number] }) 
               { x: "Jan", v: property.score - 1 }, { x: "Feb", v: property.score - 1 },
               { x: "Mar", v: property.score - 1 }, { x: "Apr", v: property.score },
             ]}
-            dataKey="v" color="#0F6A3C"
+            dataKey="v" color="#807245"
           />
         </div>
       </Card>

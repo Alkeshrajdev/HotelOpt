@@ -34,6 +34,7 @@ import {
   Zap,
 } from "lucide-react";
 import PageHeader from "@/components/ui/PageHeader";
+import EmptyState from "@/components/ui/EmptyState";
 import { PORTFOLIO_HOTELS } from "@/lib/mock";
 import { Card, CardHeader } from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
@@ -198,7 +199,7 @@ export default function Actions() {
       />
 
       {/* Tabs */}
-      <div className="flex items-center gap-1 border-b border-ink-200">
+      <div className="inline-flex max-w-full items-center gap-1 rounded-full bg-ink-100 p-1 overflow-x-auto">
         <TabBtn active={tab === "reduction"} onClick={() => { setTab("reduction"); setLens(null); }} icon={<Target size={14} />}>
           Reduction actions <Badge tone="neutral" className="ml-1">{reduction.length}</Badge>
         </TabBtn>
@@ -210,7 +211,7 @@ export default function Actions() {
       {tab === "reduction" ? (
         <>
           {/* Savings buckets + pathway (req 3 + 4) */}
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-3">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-3 items-start">
             <SavingsTile
               label="Estimated pipeline" tone="info"
               co2e={buckets.estimated.co2e} usd={buckets.estimated.usd}
@@ -284,7 +285,7 @@ export default function Actions() {
             <CardHeader title="Actions" hint={`${filtered.length} of ${reduction.length}`} />
             <ul className="p-2 space-y-2">
               {filtered.map((a) => <ActionCard key={a.id} action={a} />)}
-              {filtered.length === 0 && <li className="p-8 text-center text-sm text-ink-500">No actions match the selected filters.</li>}
+              {filtered.length === 0 && <li><EmptyState inset icon={<Target size={20} />} title="No actions match" description="Try a different lens, pillar or source filter." /></li>}
             </ul>
           </Card>
 
@@ -316,6 +317,7 @@ export default function Actions() {
             <CardHeader title="Market instruments" hint={`${filtered.length} of ${market.length} · excluded from verified reduction`} />
             <ul className="p-2 space-y-2">
               {filtered.map((a) => <ActionCard key={a.id} action={a} />)}
+              {filtered.length === 0 && <li><EmptyState inset icon={<Target size={20} />} title="No market instruments match" description="Try a different filter." /></li>}
               {filtered.length === 0 && <li className="p-8 text-center text-sm text-ink-500">No instruments match the selected filters.</li>}
             </ul>
           </Card>
@@ -688,7 +690,7 @@ function NewActionModal({ open, onClose, initial }: { open: boolean; onClose: ()
 
 function TabBtn({ active, onClick, icon, children }: { active: boolean; onClick: () => void; icon: React.ReactNode; children: React.ReactNode }) {
   return (
-    <button onClick={onClick} className={cn("inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium -mb-px border-b-2 transition-colors", active ? "text-ink-900 border-brand-700" : "text-ink-500 hover:text-ink-900 border-transparent")}>
+    <button onClick={onClick} className={cn("inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-full transition-colors", active ? "bg-white shadow-card text-ink-900" : "text-ink-500 hover:text-ink-900")}>
       <span className={active ? "text-brand-700" : "text-ink-400"}>{icon}</span>{children}
     </button>
   );

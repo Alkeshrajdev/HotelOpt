@@ -59,7 +59,7 @@ function MiniTrend({ data, color, title }: { data: {q:string;pct:number}[]; colo
       </div>
       <ResponsiveContainer width="100%" height={80}>
         <BarChart data={data} barCategoryGap="30%">
-          <XAxis dataKey="q" tick={{ fontSize:9, fill:"#9ca3af" }} axisLine={false} tickLine={false} />
+          <XAxis dataKey="q" tick={{ fontSize:9, fill:"#7B8285" }} axisLine={false} tickLine={false} />
           <YAxis domain={[60,100]} hide />
           <Tooltip content={<BarTip />} cursor={{ fill:"rgba(0,0,0,0.04)" }} />
           <Bar dataKey="pct" fill={color} radius={[2,2,0,0]} isAnimationActive={false} />
@@ -73,7 +73,7 @@ export default function GovernanceOverview() {
   return (
     <div className="space-y-5">
       {/* KPIs */}
-      <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 items-start">
         <KpiTile icon={<FileCheck size={18}/>}    iconBg="bg-pillar-gov/10 text-pillar-gov" label="Attestations" value="11/12" caption="1 outstanding" />
         <KpiTile icon={<ShieldCheck size={18}/>}   iconBg="bg-pillar-gov/10 text-pillar-gov" label="Anti-corruption training" value="96" unit="%" delta={4.0} goodDirection="up" />
         <KpiTile icon={<Users size={18}/>}          iconBg="bg-brand-50 text-brand-700"       label="Supplier code adoption" value="74" unit="%" delta={6.0} goodDirection="up" />
@@ -81,10 +81,10 @@ export default function GovernanceOverview() {
       </div>
 
       {/* Trend charts */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <MiniTrend data={ATTESTATION_TREND} color="#ea580c" title="Annual attestations" />
-        <MiniTrend data={TRAINING_TREND}    color="#0F6A3C" title="Anti-corruption training" />
-        <MiniTrend data={SUPPLIER_TREND}    color="#7c3aed" title="Supplier code adoption" />
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-start">
+        <MiniTrend data={ATTESTATION_TREND} color="#CDB872" title="Annual attestations" />
+        <MiniTrend data={TRAINING_TREND}    color="#807245" title="Anti-corruption training" />
+        <MiniTrend data={SUPPLIER_TREND}    color="#959891" title="Supplier code adoption" />
       </div>
 
       {/* Outstanding items */}

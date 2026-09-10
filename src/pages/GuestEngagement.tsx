@@ -39,6 +39,7 @@ import {
   Zap,
 } from "lucide-react";
 import PageHeader from "@/components/ui/PageHeader";
+import StatTile from "@/components/ui/StatTile";
 import { Card, CardHeader } from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import Modal from "@/components/ui/Modal";
@@ -311,7 +312,7 @@ function PublicPageTab({ property }: { property: string }) {
                 <div className="text-2xl font-bold">A more sustainable stay</div>
                 <div className="text-sm opacity-90">All metrics independently verified through Hotel Optimizer.</div>
               </div>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 p-4">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 items-start p-4">
                 {metrics.filter((m) => m.isPublic).slice(0, 4).map((m) => (
                   <div key={m.name} className="rounded-xl border border-ink-200 p-3">
                     <div className="text-[11px] text-ink-500">{m.name}</div>
@@ -616,11 +617,11 @@ function CampaignsTab({ property }: { property: string }) {
   return (
     <>
       {/* Summary row — mirrors the Overview / Eco-points tile rows so the tabs read as one system */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <Tile label="Active campaigns" value={String(activeCount)} hint={`${campaigns.length} total`} tone="good" />
-        <Tile label="Total reach" value={totalReach.toLocaleString()} hint="guests across campaigns" tone="info" />
-        <Tile label="Avg open rate" value={`${avgOpen}%`} hint="of delivered" tone={avgOpen >= 40 ? "good" : "warn"} />
-        <Tile label="Completed" value={String(completedCount)} hint="campaigns this year" tone="info" />
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 items-start">
+        <StatTile label="Active campaigns" value={String(activeCount)} hint={`${campaigns.length} total`} tone="good" />
+        <StatTile label="Total reach" value={totalReach.toLocaleString()} hint="guests across campaigns" tone="info" />
+        <StatTile label="Avg open rate" value={`${avgOpen}%`} hint="of delivered" tone={avgOpen >= 40 ? "good" : "warn"} />
+        <StatTile label="Completed" value={String(completedCount)} hint="campaigns this year" tone="info" />
       </div>
 
       <Card>
@@ -739,10 +740,10 @@ function CampaignDetailModal({ campaign: c, onClose }: { campaign: Campaign | nu
   return (
     <Modal open onClose={onClose} title={c.name} subtitle={`${CHANNEL_LABEL[c.channel]} · ${c.property} · ${c.scheduled}`} size="md">
       <div className="p-5 space-y-4">
-        <div className="grid grid-cols-3 gap-3">
-          <Tile label="Reach" value={c.reach.toLocaleString()} tone="info" />
-          <Tile label="Open rate" value={`${c.openRate}%`} tone={c.openRate >= 40 ? "good" : "warn"} />
-          <Tile label="Eco-action rate" value={`${ofSent(steps[4].count)}%`} hint="of sent" tone="good" />
+        <div className="grid grid-cols-3 gap-4 items-start">
+          <StatTile variant="panel" label="Reach" value={c.reach.toLocaleString()} tone="info" />
+          <StatTile variant="panel" label="Open rate" value={`${c.openRate}%`} tone={c.openRate >= 40 ? "good" : "warn"} />
+          <StatTile variant="panel" label="Eco-action rate" value={`${ofSent(steps[4].count)}%`} hint="of sent" tone="good" />
         </div>
         <div>
           <div className="text-[11px] font-semibold text-ink-500 uppercase tracking-wide mb-2">Conversion funnel</div>
@@ -754,7 +755,7 @@ function CampaignDetailModal({ campaign: c, onClose }: { campaign: Campaign | nu
                 <div key={s.label} className="flex items-center gap-3">
                   <span className="w-28 text-[12px] text-ink-700 shrink-0">{s.label}</span>
                   <div className="flex-1 h-7 rounded-lg bg-ink-100 overflow-hidden relative">
-                    <div className={cn("h-full rounded-lg", i === steps.length - 1 ? "bg-brand-700" : "bg-brand-400")} style={{ width: `${Math.max(pct, 3)}%` }} />
+                    <div className={cn("h-full rounded-lg", i === steps.length - 1 ? "bg-chart-olive" : "bg-chart-mauve")} style={{ width: `${Math.max(pct, 3)}%` }} />
                     <span className="absolute inset-y-0 left-2 flex items-center text-[11px] font-semibold text-ink-800">{s.count.toLocaleString()}</span>
                   </div>
                   <span className="w-16 text-right text-[11px] text-ink-500 shrink-0 tabular-nums">{pct}%{i > 0 && <span className="text-ink-400"> · {stepConv}%↓</span>}</span>
@@ -867,9 +868,9 @@ function SurveysTab({ property }: { property: string }) {
                 <div className={cn("text-5xl font-bold tabular-nums", npsColor)}>+{NPS_SCORE}</div>
                 <div className="flex-1">
                   <div className="relative h-4 rounded-full overflow-hidden flex">
-                    <div className="bg-bad   flex-1 h-full" style={{ flex: "0 0 33%" }} />
-                    <div className="bg-warn  flex-1 h-full" style={{ flex: "0 0 17%" }} />
-                    <div className="bg-good  flex-1 h-full" style={{ flex: "0 0 50%" }} />
+                    <div className="bg-chart-rose   flex-1 h-full" style={{ flex: "0 0 33%" }} />
+                    <div className="bg-chart-sand  flex-1 h-full" style={{ flex: "0 0 17%" }} />
+                    <div className="bg-chart-olive  flex-1 h-full" style={{ flex: "0 0 50%" }} />
                   </div>
                   {/* Pin */}
                   <div className="relative h-0">
@@ -879,9 +880,9 @@ function SurveysTab({ property }: { property: string }) {
                     <span>−100</span><span>0</span><span>+100</span>
                   </div>
                   <div className="flex gap-3 mt-1.5 text-[10px]">
-                    <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-bad inline-block" /> Detractor</span>
-                    <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-warn inline-block" /> Passive</span>
-                    <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-good inline-block" /> Promoter</span>
+                    <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-chart-rose inline-block" /> Detractor</span>
+                    <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-chart-sand inline-block" /> Passive</span>
+                    <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-chart-olive inline-block" /> Promoter</span>
                   </div>
                 </div>
               </div>
@@ -894,7 +895,7 @@ function SurveysTab({ property }: { property: string }) {
                 {RATING_DIST.map((pct, i) => (
                   <div key={i} className="flex-1 flex flex-col items-center gap-1">
                     <div
-                      className={cn("w-full rounded-t", i >= 3 ? "bg-good" : i === 2 ? "bg-warn" : "bg-bad")}
+                      className={cn("w-full rounded-t", i >= 3 ? "bg-chart-olive" : i === 2 ? "bg-chart-sand" : "bg-chart-rose")}
                       style={{ height: `${pct * 1.5}px` }}
                     />
                     <div className="text-[10px] text-ink-500 flex items-center gap-0.5">
@@ -933,18 +934,18 @@ function SurveysTab({ property }: { property: string }) {
                 <div key={d.m} className="flex items-center gap-2">
                   <span className="w-7 text-[10px] text-ink-400 shrink-0">{d.m}</span>
                   <div className="flex-1 flex h-3.5 rounded-full overflow-hidden">
-                    <div className="bg-good"  style={{ width: `${d.pos}%` }} title={`Positive ${d.pos}%`} />
-                    <div className="bg-ink-300" style={{ width: `${d.neu}%` }} title={`Neutral ${d.neu}%`} />
-                    <div className="bg-bad"   style={{ width: `${d.neg}%` }} title={`Negative ${d.neg}%`} />
+                    <div className="bg-chart-olive"  style={{ width: `${d.pos}%` }} title={`Positive ${d.pos}%`} />
+                    <div className="bg-chart-remainder" style={{ width: `${d.neu}%` }} title={`Neutral ${d.neu}%`} />
+                    <div className="bg-chart-rose"   style={{ width: `${d.neg}%` }} title={`Negative ${d.neg}%`} />
                   </div>
-                  <span className="w-9 text-[10px] text-good font-semibold text-right shrink-0 tabular-nums">{d.pos}%</span>
+                  <span className="w-9 text-[10px] text-ink-700 font-semibold text-right shrink-0 tabular-nums">{d.pos}%</span>
                 </div>
               ))}
             </div>
             <div className="flex gap-3 mt-2 text-[10px] text-ink-500">
-              <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-good inline-block" /> Positive</span>
-              <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-ink-300 inline-block" /> Neutral</span>
-              <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-bad inline-block" /> Negative</span>
+              <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-chart-olive inline-block" /> Positive</span>
+              <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-chart-remainder inline-block" /> Neutral</span>
+              <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-chart-rose inline-block" /> Negative</span>
             </div>
           </div>
         </div>
@@ -984,7 +985,7 @@ function EcoPointsTab() {
       {/* Eco actions catalogue */}
       <Card>
         <CardHeader title="Eco-points catalogue" hint="Points awarded per qualifying guest action" />
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 p-5">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 items-start p-5">
           {ECO_ACTIONS.map((a) => (
             <div key={a.id} className="rounded-xl border border-ink-200 p-4 text-center hover:bg-ink-50/60">
               <div className="w-8 h-8 rounded-full bg-brand-50 text-brand-700 grid place-items-center mx-auto mb-2">
@@ -999,16 +1000,16 @@ function EcoPointsTab() {
       </Card>
 
       {/* Summary tiles */}
-      <div className="grid grid-cols-3 gap-3">
-        <Tile label="Total issued" value={totalIssued.toLocaleString()} hint="pts this period" tone="info" />
-        <Tile label="Redeemed"     value={totalRedeemed.toLocaleString()} hint="pts converted" tone="good" />
-        <Tile label="Redemption rate" value={`${Math.round(totalRedeemed / totalIssued * 100)}%`} hint="of issued points" tone="warn" />
+      <div className="grid grid-cols-3 gap-4 items-start">
+        <StatTile label="Total issued" value={totalIssued.toLocaleString()} hint="pts this period" tone="info" />
+        <StatTile label="Redeemed"     value={totalRedeemed.toLocaleString()} hint="pts converted" tone="good" />
+        <StatTile label="Redemption rate" value={`${Math.round(totalRedeemed / totalIssued * 100)}%`} hint="of issued points" tone="warn" />
       </div>
 
       {/* Rewards catalogue — what points redeem for */}
       <Card>
         <CardHeader title="Rewards catalogue" hint="What guests can redeem their points for" right={<button className="btn-secondary text-[12px] h-8"><Plus size={13} /> Add reward</button>} />
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 p-5">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 items-start p-5">
           {REWARDS.map((r) => {
             const Icon = r.icon;
             return (
@@ -1052,7 +1053,7 @@ function EcoPointsTab() {
                     </div>
                   </div>
                   <div className="mt-2 h-1.5 rounded-full bg-ink-100 overflow-hidden">
-                    <div className="h-full rounded-full bg-brand-500" style={{ width: `${c.pct}%` }} />
+                    <div className="h-full rounded-full bg-chart-olive" style={{ width: `${c.pct}%` }} />
                   </div>
                 </div>
               );
@@ -1139,11 +1140,11 @@ function QrAnalyticsTab({ property }: { property: string }) {
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <Tile label="Scans · 30d" value={totalScans.toLocaleString()} hint="in-room + public points" tone="info" />
-        <Tile label="Scan → action" value={`${weightedConv}%`} hint="led to an eco-action" tone="good" />
-        <Tile label="Active QR points" value={String(QR_POINTS.length)} hint={property} tone="info" />
-        <Tile label="Unique guests" value={`~${(totalScans * 0.8 / 1000).toFixed(1)}k`} hint="est. distinct scanners" tone="info" />
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 items-start">
+        <StatTile label="Scans · 30d" value={totalScans.toLocaleString()} hint="in-room + public points" tone="info" />
+        <StatTile label="Scan → action" value={`${weightedConv}%`} hint="led to an eco-action" tone="good" />
+        <StatTile label="Active QR points" value={String(QR_POINTS.length)} hint={property} tone="info" />
+        <StatTile label="Unique guests" value={`~${(totalScans * 0.8 / 1000).toFixed(1)}k`} hint="est. distinct scanners" tone="info" />
       </div>
 
       <div className="grid grid-cols-12 gap-4">
@@ -1176,7 +1177,7 @@ function QrAnalyticsTab({ property }: { property: string }) {
                   </div>
                 </div>
                 <div className="mt-2 h-1.5 rounded-full bg-ink-100 overflow-hidden">
-                  <div className="h-full rounded-full bg-info" style={{ width: `${(p.scans / maxScans) * 100}%` }} />
+                  <div className="h-full rounded-full bg-chart-olive" style={{ width: `${(p.scans / maxScans) * 100}%` }} />
                 </div>
               </div>
             ))}
@@ -1343,17 +1344,5 @@ function Trend({ data, className = "text-brand-600", height = 44 }: { data: numb
       <path d={area} fill="currentColor" opacity={0.1} />
       <path d={line} fill="none" stroke="currentColor" strokeWidth={1.5} vectorEffect="non-scaling-stroke" />
     </svg>
-  );
-}
-
-function Tile({ label, value, hint, tone }: { label: string; value: string; hint?: string; tone: "good" | "warn" | "info" | "bad" | "neutral" }) {
-  const border = tone === "good" ? "border-good/20" : tone === "warn" ? "border-warn/20" : tone === "bad" ? "border-bad/20" : "border-ink-200";
-  const text   = tone === "good" ? "text-good"      : tone === "warn" ? "text-warn"      : tone === "bad" ? "text-bad"      : "text-brand-700";
-  return (
-    <div className={cn("rounded-2xl border bg-white p-4", border)}>
-      <div className="text-[11px] font-semibold uppercase tracking-[0.06em] text-ink-500">{label}</div>
-      <div className={cn("text-3xl font-bold mt-1 tabular-nums", text)}>{value}</div>
-      {hint && <div className="text-[11px] text-ink-400 mt-0.5">{hint}</div>}
-    </div>
   );
 }

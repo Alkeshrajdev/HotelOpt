@@ -92,11 +92,11 @@ type Aggregation = "monthly" | "quarterly" | "annually";
 type Metric = "energy" | "water" | "waste" | "combined" | "carbon";
 
 const METRICS: { key: Metric; label: string; color: string; pyKey: string }[] = [
-  { key: "energy",   label: "Energy",   color: "#D97706", pyKey: "energyPY" },
-  { key: "water",    label: "Water",    color: "#0EA5E9", pyKey: "waterPY"  },
-  { key: "waste",    label: "Waste",    color: "#7C3AED", pyKey: "wastePY"  },
-  { key: "combined", label: "Combined", color: "#0F6A3C", pyKey: "costPY"   },
-  { key: "carbon",   label: "Carbon",   color: "#0f766e", pyKey: ""         },
+  { key: "energy",   label: "Energy",   color: "#807245", pyKey: "energyPY" },
+  { key: "water",    label: "Water",    color: "#AF8D84", pyKey: "waterPY"  },
+  { key: "waste",    label: "Waste",    color: "#F6C8CC", pyKey: "wastePY"  },
+  { key: "combined", label: "Combined", color: "#807245", pyKey: "costPY"   },
+  { key: "carbon",   label: "Carbon",   color: "#AF8D84", pyKey: ""         },
 ];
 
 /* ─── Executive Snapshot tiles ───────────────────────────────────────────── */
@@ -197,28 +197,28 @@ type EffTile = {
 
 const EFF_TILES: EffTile[] = [
   {
-    icon: Zap, color: "#D97706",
+    icon: Zap, color: "#807245",
     label: "Energy intensity", value: portfolioEnergyPerOrnTotal().toFixed(0), unit: "kWh / ORN",
     delta: -6.0,
     progress: 42, // (137−118)/(137−91)
     targetLabel: "Target 91 kWh/ORN by 2030",
   },
   {
-    icon: Droplet, color: "#0EA5E9",
+    icon: Droplet, color: "#AF8D84",
     label: "Water intensity", value: portfolioWaterPerGn().toFixed(0), unit: "L / GN",
     delta: -8.0,
     progress: 50, // (612−556)/(612−500) — water on guest-night basis
     targetLabel: "Target 500 L/GN by 2030",
   },
   {
-    icon: Cloud, color: "#0F6A3C",
+    icon: Cloud, color: "#807245",
     label: "Carbon intensity", value: carbonS12PerOrn().toFixed(1), unit: "kgCO₂e / ORN",
     delta: -10.0,
     progress: 52, // (34.0−25.2)/(34.0−17.0) — Scope 1+2 basis
     targetLabel: "SBTi −50% by 2030 (17.0)",
   },
   {
-    icon: Recycle, color: "#7C3AED",
+    icon: Recycle, color: "#F6C8CC",
     label: "Waste diversion", value: `${wasteDiversionDual()}%`, unit: "TRUE / incl WtE",
     delta: 6.0,
     progress: 50, // TRUE 42%: (42−24)/(60−24)
@@ -243,7 +243,7 @@ function ChartTip({ active, payload, label, metric }: {
         {int && (
           <div className="flex justify-between gap-4">
             <span className="text-ink-500">Carbon intensity</span>
-            <span className="font-bold text-teal-700">{int.value} kgCO₂e/ORN</span>
+            <span className="font-bold text-ink-900">{int.value} kgCO₂e/ORN</span>
           </div>
         )}
         <div className="flex justify-between gap-4 mt-1 text-ink-400 text-[11px]">
@@ -267,9 +267,9 @@ function ChartTip({ active, payload, label, metric }: {
       <div className="bg-white border border-ink-200 rounded-xl shadow-pop px-3.5 py-3 text-[12px] min-w-[190px]">
         <div className="font-semibold text-ink-800 mb-2">{label}</div>
         <div className="space-y-0.5">
-          <div className="flex justify-between gap-4"><span className="text-warn-700">Energy</span><span className="font-medium">${eTY}k</span></div>
-          <div className="flex justify-between gap-4"><span className="text-info-700">Water</span><span className="font-medium">${wTY}k</span></div>
-          <div className="flex justify-between gap-4"><span className="text-violet-600">Waste</span><span className="font-medium">${dTY}k</span></div>
+          <div className="flex justify-between gap-4"><span className="flex items-center gap-1.5 text-ink-600"><span className="w-2 h-2 rounded-full bg-chart-olive inline-block" />Energy</span><span className="font-medium">${eTY}k</span></div>
+          <div className="flex justify-between gap-4"><span className="flex items-center gap-1.5 text-ink-600"><span className="w-2 h-2 rounded-full bg-chart-mauve inline-block" />Water</span><span className="font-medium">${wTY}k</span></div>
+          <div className="flex justify-between gap-4"><span className="flex items-center gap-1.5 text-ink-600"><span className="w-2 h-2 rounded-full bg-chart-blush inline-block" />Waste</span><span className="font-medium">${dTY}k</span></div>
         </div>
         <div className="border-t border-ink-100 mt-1.5 pt-1.5 space-y-0.5">
           <div className="flex justify-between gap-4 font-semibold"><span className="text-ink-700">Total TY</span><span>${tot}k</span></div>
@@ -325,7 +325,7 @@ function NeedsAttention() {
   return (
     <div>
       <SectionLabel title="Needs attention" />
-      <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-4 items-start">
         {ACTION_CENTRE.map((it) => (
           <Link
             key={it.label}
@@ -368,7 +368,7 @@ export default function OverviewTab({ onNavigate }: Props) {
 
       {/* ── 1. Executive Snapshot ─────────────────────────────────────────── */}
       <div>
-        <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-7 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-7 gap-4 items-start">
           {SNAP_TILES.map((t) => {
             const Icon = t.icon;
             const pct = isPctDelta(t.delta);
@@ -504,9 +504,9 @@ export default function OverviewTab({ onNavigate }: Props) {
             <div className="ml-auto flex items-center gap-3 text-[11px] text-ink-500">
               {metric === "combined" && (
                 <>
-                  <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm inline-block bg-warn" />Energy</span>
-                  <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm inline-block bg-info" />Water</span>
-                  <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm inline-block bg-violet-600" />Waste</span>
+                  <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm inline-block bg-chart-olive" />Energy</span>
+                  <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm inline-block bg-chart-mauve" />Water</span>
+                  <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm inline-block bg-chart-blush" />Waste</span>
                 </>
               )}
               {metric !== "combined" && metric !== "carbon" && (
@@ -523,8 +523,8 @@ export default function OverviewTab({ onNavigate }: Props) {
               )}
               {metric === "carbon" && (
                 <>
-                  <span className="flex items-center gap-1.5"><span className="w-5 border-t-2 border-teal-600 inline-block" />Intensity</span>
-                  <span className="flex items-center gap-1.5"><span className="w-5 border-t-2 border-dashed border-good inline-block" />2030 target</span>
+                  <span className="flex items-center gap-1.5"><span className="w-5 border-t-2 border-chart-mauve inline-block" />Intensity</span>
+                  <span className="flex items-center gap-1.5"><span className="w-5 border-t-2 border-dashed border-chart-olive inline-block" />2030 target</span>
                 </>
               )}
             </div>
@@ -532,14 +532,14 @@ export default function OverviewTab({ onNavigate }: Props) {
 
           <ResponsiveContainer width="100%" height={280}>
             <ComposedChart data={chartData} barCategoryGap={aggregation === "annually" ? "40%" : "28%"}>
-              <CartesianGrid vertical={false} stroke="#f3f4f6" />
-              <XAxis dataKey={xKey} tick={{ fontSize:11, fill:"#6b7280" }} axisLine={false} tickLine={false} />
+              <CartesianGrid vertical={false} stroke="#EDEFF0" />
+              <XAxis dataKey={xKey} tick={{ fontSize:11, fill:"#7B8285" }} axisLine={false} tickLine={false} />
 
               {/* Cost Y-axis (non-carbon modes) */}
               {metric !== "carbon" && (
                 <YAxis
                   yAxisId="main" orientation="left"
-                  tick={{ fontSize:11, fill:"#6b7280" }}
+                  tick={{ fontSize:11, fill:"#7B8285" }}
                   tickFormatter={(v) => `$${v}k`}
                   axisLine={false} tickLine={false} width={52}
                 />
@@ -549,11 +549,11 @@ export default function OverviewTab({ onNavigate }: Props) {
               {metric === "carbon" && (
                 <YAxis
                   yAxisId="main" orientation="left"
-                  tick={{ fontSize:11, fill:"#0f766e" }}
+                  tick={{ fontSize:11, fill:"#AF8D84" }}
                   tickFormatter={(v) => `${v}`}
                   axisLine={false} tickLine={false} width={40}
                   domain={[14, 34]}
-                  label={{ value:"kgCO₂e/ORN", angle:-90, position:"insideLeft", offset:-2, style:{ fontSize:9, fill:"#0f766e" } }}
+                  label={{ value:"kgCO₂e/ORN", angle:-90, position:"insideLeft", offset:-2, style:{ fontSize:9, fill:"#AF8D84" } }}
                 />
               )}
 
@@ -572,9 +572,9 @@ export default function OverviewTab({ onNavigate }: Props) {
               {/* ── Bars — Combined mode (stacked) ── */}
               {metric === "combined" && (
                 <>
-                  <Bar yAxisId="main" dataKey="energyTY" stackId="s" fill="#F59E0B" radius={[0,0,0,0]} isAnimationActive={false} />
-                  <Bar yAxisId="main" dataKey="waterTY"  stackId="s" fill="#38BDF8" radius={[0,0,0,0]} isAnimationActive={false} />
-                  <Bar yAxisId="main" dataKey="wasteTY"  stackId="s" fill="#7C3AED" radius={[3,3,0,0]} isAnimationActive={false} />
+                  <Bar yAxisId="main" dataKey="energyTY" stackId="s" fill="#807245" stroke="#ffffff" strokeWidth={1} radius={[0,0,0,0]} isAnimationActive={false} />
+                  <Bar yAxisId="main" dataKey="waterTY"  stackId="s" fill="#AF8D84" stroke="#ffffff" strokeWidth={1} radius={[0,0,0,0]} isAnimationActive={false} />
+                  <Bar yAxisId="main" dataKey="wasteTY"  stackId="s" fill="#F6C8CC" stroke="#ffffff" strokeWidth={1} radius={[3,3,0,0]} isAnimationActive={false} />
                 </>
               )}
 
@@ -595,11 +595,11 @@ export default function OverviewTab({ onNavigate }: Props) {
                 <Line
                   yAxisId="main"
                   dataKey={metricCfg.pyKey}
-                  stroke="#94a3b8"
+                  stroke="#9BA3A8"
                   strokeWidth={1.5}
                   strokeDasharray="5 3"
                   dot={false}
-                  activeDot={{ r: 4, fill: "#94a3b8" }}
+                  activeDot={{ r: 4, fill: "#9BA3A8" }}
                   isAnimationActive={false}
                 />
               )}
@@ -610,19 +610,19 @@ export default function OverviewTab({ onNavigate }: Props) {
                   <Line
                     yAxisId="main"
                     dataKey="intensity"
-                    stroke="#0f766e"
+                    stroke="#AF8D84"
                     strokeWidth={2}
-                    dot={{ fill:"#0f766e", r:3 }}
+                    dot={{ fill:"#AF8D84", r:3 }}
                     activeDot={{ r:5 }}
                     isAnimationActive={false}
                   />
                   <ReferenceLine
                     yAxisId="main"
                     y={CARBON_ORN_TARGET_2030}
-                    stroke="#16a34a"
+                    stroke="#807245"
                     strokeDasharray="4 2"
                     strokeWidth={1.5}
-                    label={{ value:"2030 target", position:"insideTopRight", fontSize:10, fill:"#16a34a" }}
+                    label={{ value:"2030 target", position:"insideTopRight", fontSize:10, fill:"#807245" }}
                   />
                 </>
               )}
@@ -638,7 +638,7 @@ export default function OverviewTab({ onNavigate }: Props) {
           action="View performance"
           onClick={() => onNavigate("environment")}
         />
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 items-start">
           {EFF_TILES.map((t) => {
             const Icon = t.icon;
             const isGood = t.delta < 0 ? true : t.label.includes("diversion");
@@ -680,7 +680,7 @@ export default function OverviewTab({ onNavigate }: Props) {
                       className="h-full rounded-full transition-all"
                       style={{
                         width: `${t.progress}%`,
-                        background: t.progress >= 60 ? "#16a34a" : t.progress >= 40 ? "#d97706" : "#ef4444",
+                        background: t.progress >= 60 ? "#807245" : t.progress >= 40 ? "#CDB872" : "#B33650",
                       }}
                     />
                   </div>

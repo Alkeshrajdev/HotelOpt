@@ -10,6 +10,8 @@ import {
   X,
 } from "lucide-react";
 import PageHeader from "@/components/ui/PageHeader";
+import StatTile from "@/components/ui/StatTile";
+import EmptyState from "@/components/ui/EmptyState";
 import { Card, CardHeader } from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import ProgressBar from "@/components/ui/ProgressBar";
@@ -141,11 +143,11 @@ export default function Properties() {
       />
 
       {/* Summary strip */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
-        <SummaryTile label="Total properties" value={String(summary.total)} hint={`${registry.length} on platform`} />
-        <SummaryTile label="At/above CHSB median" value={`${summary.total - summary.belowMedian} / ${summary.total}`} hint="carbon/ORN vs cohort" tone="good" />
-        <SummaryTile label="Data completeness" value={`${summary.avgCompleteness}%`} hint="approved records" tone="info" />
-        <SummaryTile label="GP ready"          value={`${summary.gpReady} / ${summary.total}`} hint="full baseline + 12 mo data" tone="good" />
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 items-start mb-4">
+        <StatTile label="Total properties" value={String(summary.total)} hint={`${registry.length} on platform`} />
+        <StatTile label="At/above CHSB median" value={`${summary.total - summary.belowMedian} / ${summary.total}`} hint="carbon/ORN vs cohort" tone="good" />
+        <StatTile label="Data completeness" value={`${summary.avgCompleteness}%`} hint="approved records" tone="info" />
+        <StatTile label="GP ready"          value={`${summary.gpReady} / ${summary.total}`} hint="full baseline + 12 mo data" tone="good" />
       </div>
 
       {/* Search + filter chips */}
@@ -295,24 +297,37 @@ export default function Properties() {
               ))}
               {loading && (
                 <tr>
-                  <td colSpan={10} className="table-td text-center py-10 text-ink-500">
+                  <td colSpan={11} className="table-td text-center py-10 text-ink-500">
                     Reading your hotels from the platform…
                   </td>
                 </tr>
               )}
               {error && (
                 <tr>
-                  <td colSpan={10} className="table-td text-center py-10 text-bad">
+                  <td colSpan={11} className="table-td text-center py-10 text-bad-700">
                     Your hotels could not be read: {error}
                   </td>
                 </tr>
               )}
               {!loading && !error && filtered.length === 0 && (
                 <tr>
-                  <td colSpan={10} className="table-td text-center py-10 text-ink-500">
-                    {registry.length === 0 && mode === "live"
-                      ? "No property is in your access. A portfolio or property administrator grants that."
-                      : "No properties match these filters."}
+                  <td colSpan={11} className="p-0">
+                    {registry.length === 0 && mode === "live" ? (
+                      <EmptyState
+                        inset
+                        icon={<Building2 size={20} />}
+                        title="No property is in your access"
+                        description="A portfolio or property administrator grants access to a hotel; once granted, it appears here."
+                      />
+                    ) : (
+                      <EmptyState
+                        inset
+                        icon={<Search size={20} />}
+                        title="No properties match"
+                        description="Try a different search, or clear the active filters."
+                        action={<button className="btn-secondary" onClick={() => setFilters(INITIAL_FILTERS)}>Clear filters</button>}
+                      />
+                    )}
                   </td>
                 </tr>
               )}
@@ -403,37 +418,6 @@ function PropertyRow({ p }: { p: RichProperty }) {
         <RowActionsMenu propertyId={p.id} />
       </td>
     </tr>
-  );
-}
-
-function SummaryTile({
-  label,
-  value,
-  hint,
-  info,
-  tone = "neutral",
-}: {
-  label: string;
-  value: string;
-  hint?: string;
-  info?: string;
-  tone?: "neutral" | "good" | "info";
-}) {
-  const accent =
-    tone === "good"
-      ? ""
-      : tone === "info"
-        ? ""
-        : "";
-  return (
-    <div className={cn("card card-pad", accent)}>
-      <div className="flex items-center gap-1 text-[11px] uppercase tracking-[0.06em] font-semibold text-ink-400">
-        {label}
-        {info && <InfoHint text={info} />}
-      </div>
-      <div className="text-stat leading-none font-bold text-ink-900 mt-1.5 tabular-nums">{value}</div>
-      {hint && <div className="text-[12px] text-ink-500 mt-1">{hint}</div>}
-    </div>
   );
 }
 

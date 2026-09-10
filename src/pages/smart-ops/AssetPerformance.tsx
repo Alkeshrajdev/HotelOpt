@@ -1,6 +1,8 @@
 import { useState, useMemo } from "react";
+import { SearchX } from "lucide-react";
 import { Wrench, AlertTriangle, Activity, FileText, Database, ChevronRight, Search, Filter, X, CheckCircle, Clock, Zap, Thermometer, Droplets, Sun, Car, Waves } from "lucide-react";
 import PageHeader from "@/components/ui/PageHeader";
+import EmptyState from "@/components/ui/EmptyState";
 import { Card } from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import KpiTile from "@/components/ui/KpiTile";
@@ -675,7 +677,7 @@ function COPTrendChart() {
               <div
                 className={cn(
                   "w-full rounded-t",
-                  isLast ? "bg-warn" : val < 3.1 ? "bg-warn" : "bg-info"
+                  isLast ? "bg-chart-cocoa" : val < 3.1 ? "bg-chart-sand" : "bg-chart-olive"
                 )}
                 style={{ height: `${Math.max(heightPct, 6)}%` }}
                 title={`${COP_DAYS[i]}: COP ${val.toFixed(2)}`}
@@ -692,9 +694,9 @@ function COPTrendChart() {
         ))}
       </div>
       <div className="flex items-center gap-4 mt-2 text-xs text-ink-500">
-        <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-info inline-block" /> Above 3.1 COP</span>
-        <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-warn inline-block" /> Below 3.1 COP</span>
-        <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-warn inline-block" /> Current</span>
+        <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-chart-olive inline-block" /> Above 3.1 COP</span>
+        <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-chart-sand inline-block" /> Below 3.1 COP</span>
+        <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-chart-cocoa inline-block" /> Current</span>
       </div>
     </div>
   );
@@ -734,7 +736,7 @@ function AssetDetailModal({ asset, open, onClose }: { asset: Asset | null; open:
         {/* Identity */}
         <div>
           <h4 className="text-xs font-semibold text-ink-500 uppercase tracking-wider mb-3">Identity</h4>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 items-start">
             {[
               { label: "Asset ID", value: asset.id },
               { label: "Manufacturer", value: asset.manufacturer },
@@ -756,7 +758,7 @@ function AssetDetailModal({ asset, open, onClose }: { asset: Asset | null; open:
         {/* Live Status */}
         <div>
           <h4 className="text-xs font-semibold text-ink-500 uppercase tracking-wider mb-3">Live Status</h4>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 items-start">
             {isChiller01 ? (
               <>
                 <div className="bg-ink-50 rounded-lg p-3">
@@ -998,9 +1000,9 @@ function AssetDetailModal({ asset, open, onClose }: { asset: Asset | null; open:
               </div>
               {isChiller01 && (
                 <>
-                  <div className="bg-orange-50 rounded-lg p-3 border border-orange-100">
-                    <div className="text-[11px] text-orange-600 mb-1">Excess Carbon</div>
-                    <div className="text-sm font-bold text-orange-800">1.8 tCO₂e/month</div>
+                  <div className="bg-warn/10 rounded-lg p-3 border border-warn/30">
+                    <div className="text-[11px] text-warn-700 mb-1">Excess Carbon</div>
+                    <div className="text-sm font-bold text-warn-700">1.8 tCO₂e/month</div>
                   </div>
                   <div className="bg-ink-50 rounded-lg p-3 border border-ink-200">
                     <div className="text-[11px] text-ink-500 mb-1">Confidence</div>
@@ -1057,7 +1059,7 @@ function AssetRegistryTab() {
             placeholder="Search assets..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-9 pr-3 py-2 text-sm border border-ink-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-info focus:border-transparent"
+            className="w-full pl-9 pr-3 py-2 text-sm border border-ink-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-info focus:"
           />
           {search && (
             <button onClick={() => setSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2">
@@ -1170,8 +1172,8 @@ function AssetRegistryTab() {
               ))}
               {filtered.length === 0 && (
                 <tr>
-                  <td colSpan={10} className="px-4 py-12 text-center text-ink-400 text-sm">
-                    No assets match the current filters.
+                  <td colSpan={10} className="p-0">
+                    <EmptyState inset icon={<SearchX size={20} />} title="No assets match" description="Try a different system or health filter." />
                   </td>
                 </tr>
               )}
@@ -1205,7 +1207,7 @@ function AssetHealthTab() {
       label: "Good",
       count: goodAssets.length,
       assets: goodAssets,
-      colour: "bg-good/10 border-good/30",
+      colour: "bg-chart-olive/10 border-good/30",
       headerColour: "text-good-700 bg-good/15",
       dotColour: "bg-good",
       tone: "good" as const,
@@ -1214,7 +1216,7 @@ function AssetHealthTab() {
       label: "Warning",
       count: warningAssets.length,
       assets: warningAssets,
-      colour: "bg-warn/10 border-warn/30",
+      colour: "bg-chart-sand/10 border-warn/30",
       headerColour: "text-warn-700 bg-warn/15",
       dotColour: "bg-warn",
       tone: "warn" as const,
@@ -1223,16 +1225,16 @@ function AssetHealthTab() {
       label: "Poor",
       count: poorAssets.length,
       assets: poorAssets,
-      colour: "bg-orange-50 border-orange-200",
-      headerColour: "text-orange-700 bg-orange-100",
-      dotColour: "bg-orange-500",
+      colour: "bg-warn/10 border-warn/30",
+      headerColour: "text-warn-700 bg-warn/10",
+      dotColour: "bg-warn",
       tone: "warn" as const,
     },
     {
       label: "Critical",
       count: criticalAssets.length,
       assets: criticalAssets,
-      colour: "bg-bad/10 border-bad/30",
+      colour: "bg-chart-rose/10 border-bad/30",
       headerColour: "text-bad-700 bg-bad/15",
       dotColour: "bg-bad",
       tone: "bad" as const,
@@ -1242,15 +1244,15 @@ function AssetHealthTab() {
   return (
     <div className="space-y-6">
       {/* KPI summary */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 items-start">
         <KpiTile icon={<Database className="w-5 h-5" />} iconBg="bg-info/10" label="Total Assets" value="14" />
         <KpiTile icon={<CheckCircle className="w-5 h-5" />} iconBg="bg-good/10" label="Assets Good Health" value="8" delta={57} deltaUnit="% of fleet" goodDirection="up" />
         <KpiTile icon={<AlertTriangle className="w-5 h-5" />} iconBg="bg-warn/10" label="Assets With Alerts" value="6" delta={43} deltaUnit="% of fleet" goodDirection="down" />
-        <KpiTile icon={<Clock className="w-5 h-5" />} iconBg="bg-orange-50" label="PM Overdue" value="2" caption="Avg asset age: 5.2 years" />
+        <KpiTile icon={<Clock className="w-5 h-5" />} iconBg="bg-warn/10" label="PM Overdue" value="2" caption="Avg asset age: 5.2 years" />
       </div>
 
       {/* Health breakdown */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-start">
         {healthCategories.map(({ label, count, assets, colour, headerColour, dotColour, tone }) => (
           <div key={label} className={cn("rounded-xl border p-4 space-y-3", colour)}>
             <div className="flex items-center justify-between">
@@ -1562,8 +1564,8 @@ export default function AssetPerformance() {
         />
 
         {/* Tab navigation */}
-        <div className="border-b border-ink-200">
-          <nav className="flex gap-0 overflow-x-auto">
+        <div>
+          <nav className="inline-flex max-w-full items-center gap-1 rounded-full bg-ink-100 p-1 overflow-x-auto">
             {TABS.map(({ id, label, icon: Icon }) => {
               const isActive = activeTab === id;
               const alertBadge = id === "faults" ? FAULTS.length : id === "maintenance" ? MAINTENANCE_ACTIONS.filter((a) => a.status === "In Progress").length : 0;
@@ -1572,10 +1574,10 @@ export default function AssetPerformance() {
                   key={id}
                   onClick={() => setActiveTab(id)}
                   className={cn(
-                    "flex items-center gap-2 px-5 py-3.5 text-sm font-medium border-b-2 transition-colors whitespace-nowrap",
+                    "flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-full transition-colors whitespace-nowrap",
                     isActive
-                      ? "border-info text-info-700"
-                      : "border-transparent text-ink-500 hover:text-ink-700 hover:border-ink-300"
+                      ? "bg-white shadow-card text-ink-900"
+                      : "text-ink-500 hover:text-ink-900"
                   )}
                 >
                   <Icon className="w-4 h-4" />

@@ -27,6 +27,7 @@ import {
   X,
 } from "lucide-react";
 import PageHeader from "@/components/ui/PageHeader";
+import StatTile from "@/components/ui/StatTile";
 import { Card, CardHeader } from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import Modal from "@/components/ui/Modal";
@@ -53,7 +54,7 @@ type InviteForm = { email: string; role: UserRole };
 /* ------------------------------------------------------------------ */
 
 const PLAN = {
-  name: "Hotel Optimizer · Enterprise", type: "White-label", cycle: "Annual",
+  name: "Hotel Optimizer · Enterprise", tier: "Enterprise", type: "White-label", cycle: "Annual",
   baseFee: 36000, perPropertyFee: 600, propertiesIncluded: 100, propertiesUsed: 10,
   whiteLabelLicenceFee: 12000, currency: "USD", renewsOn: "31 Dec 2026",
 };
@@ -143,11 +144,11 @@ function BillingTab() {
         </Card>
       )}
 
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <Tile label="Plan"        value={PLAN.name}           hint={`${PLAN.cycle} · ${PLAN.type}`} tone="brand" />
-        <Tile label="Properties"  value={`${PLAN.propertiesUsed} / ${PLAN.propertiesIncluded}`} hint="under licence" tone="info" />
-        <Tile label="Renews"      value={PLAN.renewsOn}       hint="auto-renewal on" tone="info" />
-        <Tile label="Access"      value="Active"              hint="all features available" tone="good" />
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 items-start">
+        <StatTile label="Plan"        value={PLAN.tier}           hint={`${PLAN.cycle} · ${PLAN.type}`} tone="brand" />
+        <StatTile label="Properties"  value={`${PLAN.propertiesUsed} / ${PLAN.propertiesIncluded}`} hint="under licence" tone="info" />
+        <StatTile label="Renews"      value={PLAN.renewsOn}       hint="auto-renewal on" tone="info" />
+        <StatTile label="Access"      value="Active"              hint="all features available" tone="good" />
       </div>
 
       <div className="grid grid-cols-12 gap-4">
@@ -261,10 +262,10 @@ function SeatsTab() {
 
   return (
     <>
-      <div className="grid grid-cols-3 gap-3">
-        <Tile label="Seats used"   value={`${seats.length} / 20`} hint="of plan limit" tone="info" />
-        <Tile label="Active"       value={String(activeCount)}      hint="currently active" tone="good" />
-        <Tile label="Pending"      value={String(pendingCount)}     hint="invite not accepted" tone="warn" />
+      <div className="grid grid-cols-3 gap-4 items-start">
+        <StatTile label="Seats used"   value={`${seats.length} / 20`} hint="of plan limit" tone="info" />
+        <StatTile label="Active"       value={String(activeCount)}      hint="currently active" tone="good" />
+        <StatTile label="Pending"      value={String(pendingCount)}     hint="invite not accepted" tone="warn" />
       </div>
 
       <Card>
@@ -525,11 +526,11 @@ function PaymentsTab() {
       </Card>
 
       {/* Summary */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <Tile label="Outstanding"  value={`$${outstanding.toLocaleString()}`} hint={`overdue ${overdueDays}d`} tone="bad" />
-        <Tile label="Next charge"  value={`$${outstanding.toLocaleString()}`} hint="31 Dec 2026 · renewal" tone="info" />
-        <Tile label="Paid YTD"     value={`$${paidYtd.toLocaleString()}`}     hint="2026 to date" tone="good" />
-        <Tile label="Lifetime"     value={`$${Math.round(lifetime).toLocaleString()}`} hint="since 2024" tone="brand" />
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 items-start">
+        <StatTile label="Outstanding"  value={`$${outstanding.toLocaleString()}`} hint={`overdue ${overdueDays}d`} tone="bad" />
+        <StatTile label="Next charge"  value={`$${outstanding.toLocaleString()}`} hint="31 Dec 2026 · renewal" tone="info" />
+        <StatTile label="Paid YTD"     value={`$${paidYtd.toLocaleString()}`}     hint="2026 to date" tone="good" />
+        <StatTile label="Lifetime"     value={`$${Math.round(lifetime).toLocaleString()}`} hint="since 2024" tone="brand" />
       </div>
 
       {/* Payment history */}
@@ -647,18 +648,6 @@ function PaymentsTab() {
 /* ------------------------------------------------------------------ */
 /* Shared components                                                    */
 /* ------------------------------------------------------------------ */
-
-function Tile({ label, value, hint, tone }: { label: string; value: string; hint?: string; tone: "good" | "warn" | "bad" | "info" | "brand" }) {
-  const ring = { good: "border-good/25", warn: "border-warn/25", bad: "border-bad/25", info: "border-ink-200", brand: "border-brand-200 bg-brand-50/40" }[tone];
-  const text = { good: "text-good", warn: "text-warn", bad: "text-bad", info: "text-brand-700", brand: "text-brand-800" }[tone];
-  return (
-    <div className={cn("rounded-xl border p-4", ring)}>
-      <div className="text-[11px] uppercase tracking-wide font-semibold text-ink-500">{label}</div>
-      <div className={cn("text-lg font-bold mt-0.5 truncate", text)}>{value}</div>
-      {hint && <div className="text-[11px] text-ink-400">{hint}</div>}
-    </div>
-  );
-}
 
 function PlanRow({ label, value }: { label: string; value: string }) {
   return (

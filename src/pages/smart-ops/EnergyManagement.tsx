@@ -411,10 +411,10 @@ const DAILY_TREND: { label: string; value: number }[] = [
 ];
 
 const ENERGY_BY_SYSTEM: { label: string; pct: number; color: string }[] = [
-  { label: "HVAC", pct: 58, color: "bg-brand-600" },
-  { label: "Lighting", pct: 14, color: "bg-info" },
-  { label: "Kitchen", pct: 12, color: "bg-warn" },
-  { label: "Laundry", pct: 8, color: "bg-violet-400" },
+  { label: "HVAC", pct: 58, color: "bg-chart-olive" },
+  { label: "Lighting", pct: 14, color: "bg-chart-mauve" },
+  { label: "Kitchen", pct: 12, color: "bg-chart-sand" },
+  { label: "Laundry", pct: 8, color: "bg-chart-moss" },
   { label: "BOH", pct: 5, color: "bg-ink-400" },
   { label: "Other", pct: 3, color: "bg-ink-300" },
 ];
@@ -432,14 +432,14 @@ const VS_OCC: { day: string; kwh: number; occ: number }[] = [
 
 // Energy balance
 const BALANCE_ROWS: { label: string; kwh: number; pct: number | null; color: string; isOffset?: boolean }[] = [
-  { label: "HVAC", kwh: 164910, pct: 58.0, color: "bg-brand-600" },
-  { label: "Lighting", kwh: 39830, pct: 14.0, color: "bg-info" },
-  { label: "Kitchen", kwh: 34140, pct: 12.0, color: "bg-warn" },
-  { label: "Laundry", kwh: 22760, pct: 8.0, color: "bg-violet-400" },
-  { label: "Guest Rooms", kwh: 14225, pct: 5.0, color: "bg-teal-400" },
-  { label: "BOH", kwh: 5690, pct: 2.0, color: "bg-ink-400" },
-  { label: "EV Charging", kwh: 2845, pct: 1.0, color: "bg-good" },
-  { label: "Solar Offset", kwh: -18200, pct: null, color: "bg-good", isOffset: true },
+  { label: "HVAC", kwh: 164910, pct: 58.0, color: "bg-chart-olive" },
+  { label: "Lighting", kwh: 39830, pct: 14.0, color: "bg-chart-mauve" },
+  { label: "Kitchen", kwh: 34140, pct: 12.0, color: "bg-chart-moss" },
+  { label: "Laundry", kwh: 22760, pct: 8.0, color: "bg-chart-blush" },
+  { label: "Guest Rooms", kwh: 14225, pct: 5.0, color: "bg-chart-cocoa" },
+  { label: "BOH", kwh: 5690, pct: 2.0, color: "bg-chart-remainder" },
+  { label: "EV Charging", kwh: 2845, pct: 1.0, color: "bg-chart-sand" },
+  { label: "Solar Offset", kwh: -18200, pct: null, color: "bg-chart-sage", isOffset: true },
 ];
 
 // 24-hour load profile kW values (index 0 = 00:00, index 23 = 23:00)
@@ -487,16 +487,16 @@ function TabBar({
     { id: "assets", label: "Asset Efficiency" },
   ];
   return (
-    <div className="flex gap-1 border-b border-ink-200 mb-6">
+    <div className="inline-flex max-w-full items-center gap-1 rounded-full bg-ink-100 p-1 overflow-x-auto mb-6">
       {tabs.map((t) => (
         <button
           key={t.id}
           onClick={() => onChange(t.id)}
           className={cn(
-            "px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors",
+            "px-4 py-2 text-sm font-medium rounded-full transition-colors",
             active === t.id
-              ? "border-brand-600 text-brand-700"
-              : "border-transparent text-ink-500 hover:text-ink-700 hover:border-ink-300"
+              ? "bg-white shadow-card text-ink-900"
+              : "text-ink-500 hover:text-ink-900"
           )}
         >
           {t.label}
@@ -538,7 +538,7 @@ function MiniTrend({ values, unit }: { values: number[]; unit: string }) {
             <div key={i} className="h-full flex flex-col items-center gap-1 flex-1 min-w-0">
               <div className="w-full flex-1 flex items-end">
                 <div
-                  className="w-full rounded-sm bg-brand-500 transition-all"
+                  className="w-full rounded-sm bg-chart-olive transition-all"
                   style={{ height: `${h}%` }}
                   title={`${v} ${unit}`}
                 />
@@ -578,7 +578,7 @@ function OverviewTab() {
   return (
     <div className="space-y-5">
       {/* KPI row 1 */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 items-start">
         <KpiTile
           icon={<Zap className="w-5 h-5" />}
           iconBg="bg-brand-50"
@@ -622,7 +622,7 @@ function OverviewTab() {
       </div>
 
       {/* KPI row 2 */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 items-start">
         <KpiTile
           icon={<TrendingUp className="w-5 h-5" />}
           iconBg="bg-bad/10"
@@ -636,7 +636,7 @@ function OverviewTab() {
         />
         <KpiTile
           icon={<Gauge className="w-5 h-5" />}
-          iconBg="bg-violet-50"
+          iconBg="bg-ink-100"
           label="Load factor"
           value="64"
           unit="%"
@@ -655,7 +655,7 @@ function OverviewTab() {
         />
         <KpiTile
           icon={<Wind className="w-5 h-5" />}
-          iconBg="bg-teal-50"
+          iconBg="bg-ink-100"
           label="Energy intensity"
           value="31.2"
           unit="kWh/m²"
@@ -667,7 +667,7 @@ function OverviewTab() {
       </div>
 
       {/* Charts row */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
         {/* Daily energy trend */}
         <Card className="p-5">
           <SectionLabel>Daily energy trend — last 14 days</SectionLabel>
@@ -685,7 +685,7 @@ function OverviewTab() {
                     <div
                       className={cn(
                         "w-full rounded-t-sm transition-all",
-                        isPeak ? "bg-bad" : "bg-brand-500"
+                        isPeak ? "bg-chart-rose" : "bg-chart-olive"
                       )}
                       style={{ height: `${hPct}%` }}
                       title={`${d.label}: ${d.value.toLocaleString()} kWh`}
@@ -698,11 +698,11 @@ function OverviewTab() {
           </div>
           <div className="flex items-center gap-4 mt-3 text-xs text-ink-500">
             <div className="flex items-center gap-1">
-              <div className="w-3 h-2 rounded-sm bg-brand-500" />
+              <div className="w-3 h-2 rounded-sm bg-chart-olive" />
               <span>Normal</span>
             </div>
             <div className="flex items-center gap-1">
-              <div className="w-3 h-2 rounded-sm bg-bad" />
+              <div className="w-3 h-2 rounded-sm bg-chart-rose" />
               <span>Peak day (&gt;11,800 kWh)</span>
             </div>
           </div>
@@ -754,12 +754,12 @@ function OverviewTab() {
               <div key={d.day} className="flex flex-col items-center gap-1">
                 <div className="flex items-end gap-0.5 h-20">
                   <div
-                    className="w-3 bg-brand-500 rounded-t-sm"
+                    className="w-3 bg-chart-olive rounded-t-sm"
                     style={{ height: `${kwhH}%` }}
                     title={`${d.kwh.toLocaleString()} kWh`}
                   />
                   <div
-                    className="w-3 bg-warn rounded-t-sm"
+                    className="w-3 bg-chart-sand rounded-t-sm"
                     style={{ height: `${occH}%` }}
                     title={`${d.occ}% occupancy`}
                   />
@@ -773,11 +773,11 @@ function OverviewTab() {
         </div>
         <div className="flex items-center gap-4 mt-3 text-xs text-ink-500">
           <div className="flex items-center gap-1">
-            <div className="w-3 h-2 rounded-sm bg-brand-500" />
+            <div className="w-3 h-2 rounded-sm bg-chart-olive" />
             <span>kWh consumed</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-3 h-2 rounded-sm bg-warn" />
+            <div className="w-3 h-2 rounded-sm bg-chart-sand" />
             <span>Occupancy %</span>
           </div>
         </div>
@@ -1092,7 +1092,7 @@ function PeakDemandTab() {
   return (
     <div className="space-y-5">
       {/* Peak KPI cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-start">
         <Card className="p-5 border-bad/30 bg-bad/10">
           <p className="text-xs text-ink-500 uppercase tracking-wider font-semibold mb-1">
             This month's peak
@@ -1142,10 +1142,10 @@ function PeakDemandTab() {
                   className={cn(
                     "w-full rounded-t-sm transition-all",
                     isPeak
-                      ? "bg-bad"
+                      ? "bg-chart-rose"
                       : isAboveThreshold
-                      ? "bg-warn"
-                      : "bg-brand-400"
+                      ? "bg-chart-sand"
+                      : "bg-chart-olive"
                   )}
                   style={{ height: `${hPct}%` }}
                   title={`${h.hour}:00 — ${h.kw} kW`}
@@ -1168,15 +1168,15 @@ function PeakDemandTab() {
         </div>
         <div className="flex items-center gap-4 mt-3 text-xs text-ink-500 flex-wrap">
           <div className="flex items-center gap-1">
-            <div className="w-3 h-2 rounded-sm bg-brand-400" />
+            <div className="w-3 h-2 rounded-sm bg-chart-olive" />
             <span>Below threshold</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-3 h-2 rounded-sm bg-warn" />
+            <div className="w-3 h-2 rounded-sm bg-chart-sand" />
             <span>Above 750 kW threshold</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-3 h-2 rounded-sm bg-bad" />
+            <div className="w-3 h-2 rounded-sm bg-chart-rose" />
             <span>Monthly peak (842 kW)</span>
           </div>
         </div>

@@ -79,6 +79,23 @@ export default {
           social: "rgb(var(--pillar-social) / <alpha-value>)",
           gov:    "rgb(var(--pillar-gov)    / <alpha-value>)",
         },
+        // Data-viz palette — mirrors src/lib/chartPalette.ts. For hand-built bars, dots
+        // and legend swatches; recharts uses the hex constants from that module.
+        chart: {
+          olive: "#807245",
+          mauve: "#AF8D84",
+          blush: "#F6C8CC",
+          sage:  "#E0E5DA",
+          moss:  "#959891",
+          cocoa: "#8B6D66",
+          rose:  "#B33650",
+          sand:  "#CDB872",
+          prior: "#BABEB5",
+          reference: "#9BA3A8",
+          remainder: "#C2C9CC",
+          plum:  "#634D48",
+          stone: "#747771",
+        },
       },
       boxShadow: {
         // Soft, layered elevation so surfaces lift off the page (premium-SaaS feel)

@@ -101,21 +101,21 @@ function MetricChart({ metric, peers }: { metric: MetricDef; peers: Peer[] }) {
       <div className="px-2 pb-4">
         <ResponsiveContainer width="100%" height={140}>
           <BarChart layout="vertical" data={sorted} barCategoryGap="22%">
-            <XAxis type="number" domain={[0, maxVal]} tick={{ fontSize:10, fill:"#9ca3af" }} axisLine={false} tickLine={false} tickFormatter={metric.format} />
+            <XAxis type="number" domain={[0, maxVal]} tick={{ fontSize:10, fill:"#7B8285" }} axisLine={false} tickLine={false} tickFormatter={metric.format} />
             <YAxis type="category" dataKey="name"
               tick={({ x, y, payload }) => (
                 <text x={x-4} y={y} textAnchor="end" dominantBaseline="middle"
                   fontSize={11} fontWeight={payload.value==="You"?700:400}
-                  fill={payload.value==="You"?"#0F6A3C":"#6b7280"}>
+                  fill={payload.value==="You"?"#807245":"#7B8285"}>
                   {payload.value}
                 </text>
               )}
               width={48} axisLine={false} tickLine={false}
             />
             <Tooltip content={<Tip format={metric.format} />} cursor={{ fill:"rgba(0,0,0,0.03)" }} />
-            <ReferenceLine x={bestVal} stroke="#16a34a" strokeDasharray="3 3" strokeOpacity={0.5} />
+            <ReferenceLine x={bestVal} stroke="#807245" strokeDasharray="3 3" strokeOpacity={0.5} />
             <Bar dataKey="value" radius={[0,3,3,0]} isAnimationActive={false}>
-              {sorted.map((e,i) => <Cell key={i} fill={e.isYou ? "#0F6A3C" : "#e2e8f0"} />)}
+              {sorted.map((e,i) => <Cell key={i} fill={e.isYou ? "#807245" : "#EDEFF0"} />)}
             </Bar>
           </BarChart>
         </ResponsiveContainer>
@@ -149,7 +149,7 @@ export default function PillarBenchmarks({ pillar }: { pillar: "water"|"waste"|"
   return (
     <div className="space-y-5">
       {/* Callout */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-start">
         <div className="card p-6 flex flex-col gap-1">
           <div className="flex items-center gap-2 mb-1">
             <div className="w-8 h-8 rounded-full bg-brand-50 grid place-items-center shrink-0"><TrendingDown size={15} className="text-brand-700" /></div>
@@ -169,7 +169,7 @@ export default function PillarBenchmarks({ pillar }: { pillar: "water"|"waste"|"
       </div>
 
       {/* Metric charts */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-start">
         {metrics.map(m => <MetricChart key={m.key} metric={m} peers={peers} />)}
       </div>
 

@@ -10,6 +10,7 @@ import {
   ShowerHead, Lightbulb, ShieldCheck, Plus, Minus,
 } from "lucide-react";
 import PageHeader from "@/components/ui/PageHeader";
+import EmptyState from "@/components/ui/EmptyState";
 import { Card } from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import Modal from "@/components/ui/Modal";
@@ -1153,10 +1154,10 @@ export default function Marketplace() {
           <button
             key={t.id}
             className={cn(
-              "flex items-center gap-1.5 px-4 py-2.5 text-[13px] font-medium border-b-2 transition-colors",
+              "flex items-center gap-1.5 px-4 py-2.5 text-[13px] font-medium rounded-full transition-colors",
               tab === t.id
-                ? "border-brand-500 text-brand-700"
-                : "border-transparent text-ink-500 hover:text-ink-800"
+                ? "bg-white shadow-card text-ink-900"
+                : "text-ink-500 hover:text-ink-900"
             )}
             onClick={() => setTab(t.id)}
           >
@@ -1324,18 +1325,21 @@ export default function Marketplace() {
             </div>
 
             {filtered.length === 0 ? (
-              <div className="text-center py-16 text-ink-400">
-                <Package size={32} className="mx-auto mb-3 opacity-30" />
-                <div className="text-[14px]">No products match your filters.</div>
-                <button
-                  className="mt-3 text-[12px] text-brand-600 hover:underline"
-                  onClick={() => { setSearch(""); setCategoryFilter("all"); setClaimFilter("all"); setScopeFilter("all"); setHotelAreaFilter("all"); }}
-                >
-                  Clear all filters
-                </button>
-              </div>
+              <EmptyState
+                icon={<Package size={20} />}
+                title="No products match"
+                description="Try a different search, or clear the active filters."
+                action={
+                  <button
+                    className="btn-secondary"
+                    onClick={() => { setSearch(""); setCategoryFilter("all"); setClaimFilter("all"); setScopeFilter("all"); setHotelAreaFilter("all"); }}
+                  >
+                    Clear filters
+                  </button>
+                }
+              />
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 items-start">
                 {filtered.map((p) => (
                   <ProductCard
                     key={p.id}
@@ -1355,13 +1359,12 @@ export default function Marketplace() {
       {tab === "shortlist" && (
         <div>
           {shortlistedProducts.length === 0 ? (
-            <div className="text-center py-20 text-ink-400">
-              <Star size={36} className="mx-auto mb-3 opacity-20" />
-              <div className="text-[14px]">No products shortlisted yet.</div>
-              <button className="mt-3 text-[12px] text-brand-600 hover:underline" onClick={() => setTab("products")}>
-                Browse products
-              </button>
-            </div>
+            <EmptyState
+              icon={<Star size={20} />}
+              title="Nothing shortlisted yet"
+              description="Star products in the catalogue to compare them here."
+              action={<button className="btn-secondary" onClick={() => setTab("products")}>Browse products</button>}
+            />
           ) : (
             <div className="space-y-4">
               <div className="flex items-center justify-between">
@@ -1377,7 +1380,7 @@ export default function Marketplace() {
                   RFQ all shortlisted
                 </button>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 items-start">
                 {shortlistedProducts.map((p) => (
                   <ProductCard
                     key={p.id}

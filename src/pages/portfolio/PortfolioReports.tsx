@@ -254,7 +254,7 @@ function GenerateReportTab() {
               { val: "single", label: "Single hotel",     sub: "One property" },
               { val: "custom", label: "Custom selection", sub: "Choose specific hotels" },
             ].map(o => (
-              <label key={o.val} className={cn("rounded-xl border p-4 cursor-pointer transition-colors", scope === o.val ? "border-brand-400 bg-brand-50" : "border-ink-200 hover:border-ink-300")}>
+              <label key={o.val} className={cn("rounded-xl border p-4 cursor-pointer transition-colors", scope === o.val ? "border-brand-400 bg-brand-50" : "border-ink-200")}>
                 <input type="radio" name="scope" value={o.val} checked={scope === o.val} onChange={() => setScope(o.val)} className="sr-only" />
                 <div className="font-medium text-ink-900 text-[13px]">{o.label}</div>
                 <div className="text-[11px] text-ink-500 mt-0.5">{o.sub}</div>
@@ -286,7 +286,7 @@ function GenerateReportTab() {
           <h3 className="font-semibold text-ink-900">Select reporting period</h3>
           <div className="grid grid-cols-2 gap-3">
             {["2024 Full Year", "2023 Full Year", "Q1 2025", "Q4 2024", "Jan–Mar 2025", "Custom range"].map(p => (
-              <label key={p} className={cn("rounded-xl border p-3 cursor-pointer transition-colors text-[13px] font-medium text-ink-800", period === p ? "border-brand-400 bg-brand-50 text-brand-800" : "border-ink-200 hover:border-ink-300")}>
+              <label key={p} className={cn("rounded-xl border p-3 cursor-pointer transition-colors text-[13px] font-medium text-ink-800", period === p ? "border-brand-400 bg-brand-50 text-brand-800" : "border-ink-200")}>
                 <input type="radio" name="period" value={p} checked={period === p} onChange={() => setPeriod(p)} className="sr-only" />
                 {p}
               </label>
@@ -310,7 +310,7 @@ function GenerateReportTab() {
               { val: "PowerPoint",   label: "PowerPoint",       sub: "Presentation-ready slides" },
               { val: "Evidence ZIP", label: "Evidence ZIP",     sub: "All evidence files bundled" },
             ].map(o => (
-              <label key={o.val} className={cn("rounded-xl border p-4 cursor-pointer transition-colors", format === o.val ? "border-brand-400 bg-brand-50" : "border-ink-200 hover:border-ink-300")}>
+              <label key={o.val} className={cn("rounded-xl border p-4 cursor-pointer transition-colors", format === o.val ? "border-brand-400 bg-brand-50" : "border-ink-200")}>
                 <input type="radio" name="format" value={o.val} checked={format === o.val} onChange={() => setFormat(o.val)} className="sr-only" />
                 <div className="font-medium text-ink-900 text-[13px]">{o.label}</div>
                 <div className="text-[11px] text-ink-500 mt-0.5">{o.sub}</div>
@@ -330,7 +330,7 @@ function GenerateReportTab() {
           <h3 className="font-semibold text-ink-900">Select framework or report type</h3>
           <div className="grid gap-2">
             {FRAMEWORKS.map(f => (
-              <label key={f} className={cn("rounded-xl border px-4 py-3 cursor-pointer flex items-center gap-3 transition-colors", framework === f ? "border-brand-400 bg-brand-50" : "border-ink-200 hover:border-ink-300")}>
+              <label key={f} className={cn("rounded-xl border px-4 py-3 cursor-pointer flex items-center gap-3 transition-colors", framework === f ? "border-brand-400 bg-brand-50" : "border-ink-200")}>
                 <input type="radio" name="framework" value={f} checked={framework === f} onChange={() => setFramework(f)} className="sr-only" />
                 <div className={cn("w-3 h-3 rounded-full border-2 shrink-0 flex items-center justify-center", framework === f ? "border-brand-600" : "border-ink-300")}>
                   {framework === f && <div className="w-1.5 h-1.5 rounded-full bg-brand-600" />}
@@ -795,15 +795,15 @@ export default function PortfolioReports() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 border-b border-ink-100 overflow-x-auto">
+      <div className="inline-flex max-w-full items-center gap-1 rounded-full bg-ink-100 p-1 overflow-x-auto">
         {TABS.map(t => {
           const Icon = t.icon;
           const badge = t.key === "evidence" ? blocking : t.key === "certification" ? renewSoon : t.key === "status" ? reportBlocked : 0;
           return (
             <button key={t.key} onClick={() => setTab(t.key)}
               className={cn(
-                "flex items-center gap-1.5 px-4 py-2.5 text-[13px] font-medium border-b-2 -mb-px whitespace-nowrap transition-colors",
-                tab === t.key ? "border-brand-600 text-brand-700" : "border-transparent text-ink-500 hover:text-ink-800 hover:border-ink-200"
+                "flex items-center gap-1.5 px-4 py-2.5 text-[13px] font-medium rounded-full whitespace-nowrap transition-colors",
+                tab === t.key ? "bg-white shadow-card text-ink-900" : "text-ink-500 hover:text-ink-900"
               )}>
               <Icon size={14} />
               {t.label}

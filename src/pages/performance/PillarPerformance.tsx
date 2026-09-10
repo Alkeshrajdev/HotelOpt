@@ -20,7 +20,7 @@ type Initiative = { name: string; category: string; startYear: number; startMont
 
 const MONTH_SHORT = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 const BAR_COLOR: Record<WfStep["type"], string> = {
-  base:"#94a3b8", up:"#fb923c", "down-neutral":"#7dd3fc", "down-good":"#16a34a", total:"#0F6A3C"
+  base:"#9BA3A8", up:"#CDB872", "down-neutral":"#AF8D84", "down-good":"#807245", total:"#807245"
 };
 
 function isActiveInYear(i: Initiative, yr: number) {
@@ -184,7 +184,7 @@ export default function PillarPerformance({ pillar }: { pillar: "water"|"waste"|
   return (
     <div className="space-y-5">
       {/* Headlines */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-start">
         {[
           { icon:<TrendingDown size={15} className="text-good"/>, bg:"bg-good/10", title:"Genuine saving", value:`${wf.savingValue.toLocaleString()} ${wf.savingUnit}`, sub:"after adjusting for external factors", color:"text-good" },
           { icon:<DollarSign   size={15} className="text-good"/>, bg:"bg-good/10", title:"Financial impact", value:`$${wf.savingCost.toLocaleString()}`, sub:wf.costUnit, color:"text-good" },
@@ -207,14 +207,14 @@ export default function PillarPerformance({ pillar }: { pillar: "water"|"waste"|
         <div className="px-6 pb-2 pt-4">
           <ResponsiveContainer width="100%" height={280}>
             <BarChart data={wf.steps} barCategoryGap="28%">
-              <XAxis dataKey="name" tick={{ fontSize: 11, fill:"#6b7280" }} axisLine={false} tickLine={false} />
-              <YAxis domain={yDomain} tick={{ fontSize:11, fill:"#6b7280" }}
+              <XAxis dataKey="name" tick={{ fontSize: 11, fill:"#7B8285" }} axisLine={false} tickLine={false} />
+              <YAxis domain={yDomain} tick={{ fontSize:11, fill:"#7B8285" }}
                 tickFormatter={v => pillar==="water" ? `${(v/1000).toFixed(0)}k` : `${v.toLocaleString()}`}
                 axisLine={false} tickLine={false} width={44}
               />
               <Tooltip content={<WfTip />} cursor={{ fill:"rgba(0,0,0,0.03)" }} />
-              <ReferenceLine y={wf.baseline} stroke="#94a3b8" strokeDasharray="4 3"
-                label={{ value: wf.baselineLabel, position:"insideTopRight", fontSize:10, fill:"#94a3b8" }}
+              <ReferenceLine y={wf.baseline} stroke="#9BA3A8" strokeDasharray="4 3"
+                label={{ value: wf.baselineLabel, position:"insideTopRight", fontSize:10, fill:"#9BA3A8" }}
               />
               <Bar dataKey="spacer" stackId="wf" fill="transparent" stroke="none" isAnimationActive={false} />
               <Bar dataKey="delta"  stackId="wf" radius={[3,3,0,0]} isAnimationActive={false}>
@@ -224,7 +224,7 @@ export default function PillarPerformance({ pillar }: { pillar: "water"|"waste"|
           </ResponsiveContainer>
         </div>
         <div className="flex flex-wrap gap-4 px-6 pb-5 text-[11px] text-ink-500">
-          {[["#94a3b8","Reference"],["#fb923c","External — up"],["#7dd3fc","External — down"],["#16a34a","Net management change"]].map(([c,l]) => (
+          {[["#9BA3A8","Reference"],["#CDB872","External — up"],["#AF8D84","External — down"],["#807245","Net management change"]].map(([c,l]) => (
             <span key={l} className="flex items-center gap-1.5">
               <span className="w-3 h-3 rounded-sm inline-block shrink-0" style={{ background: c }} />{l}
             </span>
@@ -238,16 +238,16 @@ export default function PillarPerformance({ pillar }: { pillar: "water"|"waste"|
         <div className="px-6 pb-6 pt-4">
           <ResponsiveContainer width="100%" height={230}>
             <LineChart data={intData}>
-              <CartesianGrid vertical={false} stroke="#f3f4f6" />
-              <XAxis dataKey="month" tick={{ fontSize:11, fill:"#6b7280" }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize:11, fill:"#6b7280" }} axisLine={false} tickLine={false} width={36} />
-              <Tooltip content={<IntTip unit={intUnit} />} cursor={{ stroke:"#e5e7eb" }} />
-              <ReferenceLine y={avgTY} stroke="#0F6A3C" strokeDasharray="3 3" strokeOpacity={0.35} />
+              <CartesianGrid vertical={false} stroke="#EDEFF0" />
+              <XAxis dataKey="month" tick={{ fontSize:11, fill:"#7B8285" }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fontSize:11, fill:"#7B8285" }} axisLine={false} tickLine={false} width={36} />
+              <Tooltip content={<IntTip unit={intUnit} />} cursor={{ stroke:"#EDEFF0" }} />
+              <ReferenceLine y={avgTY} stroke="#807245" strokeDasharray="3 3" strokeOpacity={0.35} />
               <Legend wrapperStyle={{ fontSize:11, paddingTop:10 }}
-                formatter={v => <span style={{ color:"#6b7280" }}>{v==="ty"?"This year":"Prior year"}</span>}
+                formatter={v => <span style={{ color:"#7B8285" }}>{v==="ty"?"This year":"Prior year"}</span>}
               />
-              <Line dataKey="py" name="py" stroke="#cbd5e1" strokeWidth={2} strokeDasharray="5 3" dot={false} isAnimationActive={false} />
-              <Line dataKey="ty" name="ty" stroke="#0F6A3C" strokeWidth={2.5} dot={{ fill:"#0F6A3C",r:3 }} activeDot={{ r:5 }} isAnimationActive={false} />
+              <Line dataKey="py" name="py" stroke="#BABEB5" strokeWidth={2} strokeDasharray="5 3" dot={false} isAnimationActive={false} />
+              <Line dataKey="ty" name="ty" stroke="#807245" strokeWidth={2.5} dot={{ fill:"#807245",r:3 }} activeDot={{ r:5 }} isAnimationActive={false} />
             </LineChart>
           </ResponsiveContainer>
         </div>

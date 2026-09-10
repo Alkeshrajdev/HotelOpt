@@ -19,7 +19,7 @@ export const DRILLDOWN_DATA: Record<string, DrilldownEntry> = {
   // ── CARBON: Scope 1 ─────────────────────────────────────────────────────────
 
   "scope1.gas": {
-    unit: "tCO₂e", parentLabel: "Carbon → Scope 1 — Direct Emissions", color: "#F59E0B",
+    unit: "tCO₂e", parentLabel: "Carbon → Scope 1 — Direct Emissions", color: "#807245",
     insight: "Airport Hotel Dubai (old 2012 boilers) and Skyline Dubai together represent 36% of portfolio gas emissions. Replacing the Airport Dubai plant in the 2026 capex cycle would remove ~245 tCO₂e/yr at payback <4 years.",
     hotels: [
       { name: "Skyline Dubai",        value: 280, secondary: "1,270 m³/mo", context: "DHW & kitchen gas; heat-recovery on flues proposed for Q3 2026", flag: "warn" },
@@ -36,7 +36,7 @@ export const DRILLDOWN_DATA: Record<string, DrilldownEntry> = {
   },
 
   "scope1.refrigerants": {
-    unit: "tCO₂e", parentLabel: "Carbon → Scope 1 — Direct Emissions", color: "#8B5CF6",
+    unit: "tCO₂e", parentLabel: "Carbon → Scope 1 — Direct Emissions", color: "#AF8D84",
     insight: "Skyline Dubai and Bay View Singapore together represent 45% of refrigerant emissions. Annual HVAC leak testing is overdue at Skyline Dubai — scheduling this immediately could reduce 2026 Scope 1 by up to 60 tCO₂e.",
     hotels: [
       { name: "Skyline Dubai",        value: 240, secondary: "R-410A · 3.2% leak",  context: "2 chillers overdue annual leak test — flagged for immediate action", flag: "bad"  },
@@ -53,7 +53,7 @@ export const DRILLDOWN_DATA: Record<string, DrilldownEntry> = {
   },
 
   "scope1.diesel": {
-    unit: "tCO₂e", parentLabel: "Carbon → Scope 1 — Direct Emissions", color: "#EF4444",
+    unit: "tCO₂e", parentLabel: "Carbon → Scope 1 — Direct Emissions", color: "#959891",
     insight: "Dubai hotels account for 53% of diesel emissions and Cape Town faces escalating load-shedding events. A battery + solar storage system at Airport Dubai (feasibility complete) would eliminate backup-gen usage and cut 185 tCO₂e/yr.",
     hotels: [
       { name: "Skyline Dubai",        value: 195, secondary: "82,400 L/yr",  context: "3 × 2MW generators for peak demand; demand-reduction programme active", flag: "bad"  },
@@ -70,7 +70,7 @@ export const DRILLDOWN_DATA: Record<string, DrilldownEntry> = {
   },
 
   "scope1.vehicles": {
-    unit: "tCO₂e", parentLabel: "Carbon → Scope 1 — Direct Emissions", color: "#6B7280",
+    unit: "tCO₂e", parentLabel: "Carbon → Scope 1 — Direct Emissions", color: "#8B6D66",
     insight: "Bay View Singapore and Pavilion London are leading EV fleet transition. Portfolio-wide EV adoption plan could eliminate 140+ tCO₂e/yr by 2027 — Cape Town is the key blocker due to grid instability limiting EV charging.",
     hotels: [
       { name: "Skyline Dubai",        value: 48, secondary: "14 vehicles",  context: "Airport shuttle ×4, golf carts ×10; 2 EV replacements planned 2026", flag: "warn" },
@@ -87,7 +87,7 @@ export const DRILLDOWN_DATA: Record<string, DrilldownEntry> = {
   },
 
   "scope1.other": {
-    unit: "tCO₂e", parentLabel: "Carbon → Scope 1 — Direct Emissions", color: "#D1D5DB",
+    unit: "tCO₂e", parentLabel: "Carbon → Scope 1 — Direct Emissions", color: "#E0E5DA",
     insight: "Other combustion sources (biomass, LPG, cooking gas) are relatively minor at 3% of Scope 1 but should be metered individually. Three hotels still lump these under a single meter — separating will improve reporting accuracy.",
     hotels: [
       { name: "Skyline Dubai",        value: 28, secondary: "LPG + cooking gas", context: "Multiple gas types; separate metering planned Q2 2026", flag: "warn" },
@@ -106,7 +106,7 @@ export const DRILLDOWN_DATA: Record<string, DrilldownEntry> = {
   // ── CARBON: Scope 3 ─────────────────────────────────────────────────────────
 
   "scope3.goods": {
-    unit: "tCO₂e", parentLabel: "Carbon → Scope 3 — Value Chain", color: "#6EE7B7",
+    unit: "tCO₂e", parentLabel: "Carbon → Scope 3 — Value Chain", color: "#807245",
     insight: "Airport Hotel Dubai has the highest unmatched supplier count (22) driving emission-factor uncertainty. Prioritising supplier engagement there first — combined with Skyline Dubai (18 unmatched) — addresses 41% of Scope 3 goods emissions.",
     hotels: [
       { name: "Skyline Dubai",        value: 2800, secondary: "18 unmatched suppliers", context: "F&B procurement dominates; 6 key suppliers on-boarded to platform Q1", flag: "warn" },
@@ -123,7 +123,7 @@ export const DRILLDOWN_DATA: Record<string, DrilldownEntry> = {
   },
 
   "scope3.travel": {
-    unit: "tCO₂e", parentLabel: "Carbon → Scope 3 — Value Chain", color: "#6EE7B7",
+    unit: "tCO₂e", parentLabel: "Carbon → Scope 3 — Value Chain", color: "#807245",
     insight: "Skyline Dubai and Airport Dubai together generate 42% of business travel emissions. A portfolio-wide video-conference-first policy (modelled on Pavilion London's UK rail policy) could cut travel emissions by ~25% across 2 years.",
     hotels: [
       { name: "Skyline Dubai",        value: 940, secondary: "1,240 flights/yr", context: "HQ & regional meetings; VC-first policy reduced air travel ~30% since 2024", flag: "warn" },
@@ -142,7 +142,7 @@ export const DRILLDOWN_DATA: Record<string, DrilldownEntry> = {
   // ── ENERGY: End-use systems ──────────────────────────────────────────────────
 
   "energy.hvac": {
-    unit: "MWh", parentLabel: "Energy → HVAC & Cooling", color: "#0EA5E9",
+    unit: "MWh", parentLabel: "Energy → HVAC & Cooling", color: "#807245",
     insight: "Skyline Dubai, Airport Dubai, and Bay View Singapore together account for 60% of HVAC energy. BMS optimisation across these three could save 4,400 MWh/yr — equivalent to 1,170 tCO₂e in avoided Scope 2 emissions.",
     hotels: [
       { name: "Skyline Dubai",        value: 8200, secondary: "78.1 kWh/RN",  context: "Free-cooling hours limited; BMS upgrade Q1 2026 targeting 12% saving", flag: "bad"  },
@@ -159,7 +159,7 @@ export const DRILLDOWN_DATA: Record<string, DrilldownEntry> = {
   },
 
   "energy.kitchen": {
-    unit: "MWh", parentLabel: "Energy → Kitchen & F&B", color: "#F59E0B",
+    unit: "MWh", parentLabel: "Energy → Kitchen & F&B", color: "#AF8D84",
     insight: "Airport Dubai's airline catering kitchen is the highest per-room-night consumer. Switching high-BTU gas cooking to induction (piloted at Pavilion London with 80% already converted) would save an estimated 1,200 MWh/yr portfolio-wide.",
     hotels: [
       { name: "Skyline Dubai",        value: 3400, secondary: "32.4 kWh/RN",  context: "5 restaurants + 24-hr room service; induction rollout plan approved 2026", flag: "warn" },
@@ -176,7 +176,7 @@ export const DRILLDOWN_DATA: Record<string, DrilldownEntry> = {
   },
 
   "energy.rooms": {
-    unit: "MWh", parentLabel: "Energy → Guest Rooms", color: "#6366F1",
+    unit: "MWh", parentLabel: "Energy → Guest Rooms", color: "#959891",
     insight: "Airport Hotel Dubai lacks occupancy sensors — a quick-win retrofit (est. AED 85k, 8-month payback) could save 480 MWh/yr. Pavilion London's LED + smart-control retrofit is the benchmark to replicate across the high-intensity properties.",
     hotels: [
       { name: "Skyline Dubai",        value: 3200, secondary: "30.5 kWh/RN",  context: "In-room AC control; key-card cut-off installed since 2024", flag: "warn" },
@@ -193,7 +193,7 @@ export const DRILLDOWN_DATA: Record<string, DrilldownEntry> = {
   },
 
   "energy.laundry": {
-    unit: "MWh", parentLabel: "Energy → Laundry", color: "#22C55E",
+    unit: "MWh", parentLabel: "Energy → Laundry", color: "#F6C8CC",
     insight: "Skyline Dubai and Airport Dubai drive 39% of laundry energy. Pavilion London's ozone cold-wash system + 62% linen reuse is the proven playbook — replicating it at Skyline Dubai alone would save ~380 MWh/yr.",
     hotels: [
       { name: "Skyline Dubai",        value: 1600, secondary: "15.2 kWh/RN",  context: "High turnover; linen reuse opt-in at only 22% — key action needed", flag: "bad"  },
@@ -212,7 +212,7 @@ export const DRILLDOWN_DATA: Record<string, DrilldownEntry> = {
   // ── WATER: End-use ───────────────────────────────────────────────────────────
 
   "water.rooms": {
-    unit: "m³", parentLabel: "Water → Guest Rooms & Bathrooms", color: "#0EA5E9",
+    unit: "m³", parentLabel: "Water → Guest Rooms & Bathrooms", color: "#807245",
     insight: "Skyline Dubai and Bay View Singapore each use 40+ L/GN more than the Cape Town benchmark. Completing the low-flow fitting rollout at Skyline Dubai (currently 60%) to 100% would save an estimated 8,600 m³/yr.",
     hotels: [
       { name: "Skyline Dubai",        value: 43000, secondary: "410 L/GN",  context: "Low-flow fittings in 60% of rooms; programme to 100% by Q3 2026", flag: "warn" },
@@ -229,7 +229,7 @@ export const DRILLDOWN_DATA: Record<string, DrilldownEntry> = {
   },
 
   "water.laundry": {
-    unit: "m³", parentLabel: "Water → Laundry", color: "#38BDF8",
+    unit: "m³", parentLabel: "Water → Laundry", color: "#AF8D84",
     insight: "Skyline Dubai's 22% linen reuse rate is the portfolio's weakest. Bringing it to Pavilion London's 62% level would reduce laundry water by an estimated 6,800 m³/yr — the single highest-ROI water action available.",
     hotels: [
       { name: "Skyline Dubai",        value: 31000, secondary: "295 L/GN",  context: "Linen reuse at 22%; target 60% by Q4 2026 — top water priority", flag: "bad"  },
@@ -246,7 +246,7 @@ export const DRILLDOWN_DATA: Record<string, DrilldownEntry> = {
   },
 
   "water.kitchen": {
-    unit: "m³", parentLabel: "Water → Kitchen & F&B", color: "#7DD3FC",
+    unit: "m³", parentLabel: "Water → Kitchen & F&B", color: "#959891",
     insight: "Cape Town's kitchen uses 50 L/GN vs Skyline Dubai's 219 L/GN — a 4× difference driven by Day Zero water habits. Pre-rinse spray valve replacement (est. AED 12k per hotel) would cut kitchen water by ~8% across the portfolio.",
     hotels: [
       { name: "Skyline Dubai",        value: 23000, secondary: "219 L/GN", context: "Pre-rinse spray valve efficiency project approved, starting Q2", flag: "warn" },
@@ -263,7 +263,7 @@ export const DRILLDOWN_DATA: Record<string, DrilldownEntry> = {
   },
 
   "water.pool": {
-    unit: "m³", parentLabel: "Water → Pool, Spa & Recreation", color: "#BAE6FD",
+    unit: "m³", parentLabel: "Water → Pool, Spa & Recreation", color: "#F6C8CC",
     insight: "Skyline Dubai's pool complex (25,000 m³/yr) is 3× the next largest user. Installing pool covers and recirculating filtration would cut pool water by 18–25% — saving 4,500–6,250 m³/yr with no guest experience impact.",
     hotels: [
       { name: "Skyline Dubai",        value: 25000, secondary: "3 pools + lagoon",   context: "Resort pool complex; evaporation loss high in desert climate", flag: "bad"  },
@@ -280,7 +280,7 @@ export const DRILLDOWN_DATA: Record<string, DrilldownEntry> = {
   },
 
   "water.cooling": {
-    unit: "m³", parentLabel: "Water → Cooling Towers & HVAC", color: "#6366F1",
+    unit: "m³", parentLabel: "Water → Cooling Towers & HVAC", color: "#8B6D66",
     insight: "Desert-climate hotels (Dubai) account for 65% of cooling tower water. Conductivity monitoring and bleed-off optimisation at Skyline Dubai (est. AED 18k) could cut cooling water by 15% — saving 2,100 m³/yr.",
     hotels: [
       { name: "Skyline Dubai",        value: 14000, secondary: "7.0 cycles of concentration", context: "High evaporation in desert climate; conductivity controls to improve", flag: "bad"  },
@@ -299,7 +299,7 @@ export const DRILLDOWN_DATA: Record<string, DrilldownEntry> = {
   // ── WASTE: Sources ───────────────────────────────────────────────────────────
 
   "waste.fb": {
-    unit: "t", parentLabel: "Waste → F&B & Kitchen", color: "#F59E0B",
+    unit: "t", parentLabel: "Waste → F&B & Kitchen", color: "#807245",
     insight: "Airport Dubai's airline catering adds ~180t of avoidable waste. Bay View Singapore's on-site composting (68% diversion) and Pavilion London's portion-control pilot (18% waste reduction) are the two actions to replicate portfolio-wide immediately.",
     hotels: [
       { name: "Skyline Dubai",        value: 820, secondary: "5 F&B outlets",              context: "Food waste tracking per outlet since Jan 2026; pre-consumer 40%", flag: "warn" },
@@ -316,7 +316,7 @@ export const DRILLDOWN_DATA: Record<string, DrilldownEntry> = {
   },
 
   "waste.rooms": {
-    unit: "t", parentLabel: "Waste → Rooms & Housekeeping", color: "#6366F1",
+    unit: "t", parentLabel: "Waste → Rooms & Housekeeping", color: "#AF8D84",
     insight: "Skyline Dubai and Airport Dubai still use single-use amenities for all rooms. Switching to bulk dispensers (proven at Bay View Singapore with 8t/yr projected saving) and linen opt-out programmes are the two immediate actions available.",
     hotels: [
       { name: "Skyline Dubai",        value: 506, secondary: "Resort, daily linen change",  context: "Single-use amenities standard; opt-out linen programme Q2 2026", flag: "bad"  },
@@ -333,7 +333,7 @@ export const DRILLDOWN_DATA: Record<string, DrilldownEntry> = {
   },
 
   "waste.maintenance": {
-    unit: "t", parentLabel: "Waste → Maintenance & Operations", color: "#6B7280",
+    unit: "t", parentLabel: "Waste → Maintenance & Operations", color: "#959891",
     insight: "Skyline Dubai's renovation project (casino refit 2025) inflated maintenance waste significantly — this normalises by Q3 2026. Pavilion London's 85% recycling rate for refurb waste is the standard all properties should target for planned works.",
     hotels: [
       { name: "Skyline Dubai",        value: 360, secondary: "Casino refit 2025",           context: "Renovation waste inflating figure — normalises Q3 2026", flag: "bad"  },
@@ -350,7 +350,7 @@ export const DRILLDOWN_DATA: Record<string, DrilldownEntry> = {
   },
 
   "waste.events": {
-    unit: "t", parentLabel: "Waste → Events & Conferences", color: "#EC4899",
+    unit: "t", parentLabel: "Waste → Events & Conferences", color: "#F6C8CC",
     insight: "Skyline Dubai and Airport Dubai together generate 44% of events waste with the lowest diversion. Mandatory waste stream segregation — bins at every table station — is the simplest intervention and costs under AED 5k per event.",
     hotels: [
       { name: "Skyline Dubai",        value: 260, secondary: "24 events/mo avg",  context: "Large ballroom events; bin segregation not enforced — high priority", flag: "bad"  },

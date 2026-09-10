@@ -114,7 +114,7 @@ function HotelsTab() {
   return (
     <div className="space-y-5">
       {/* Scope summary */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 items-start">
         {[
           { label: "In portfolio",  val: `${included} / ${HOTELS.length}`, colour: "text-ink-900" },
           { label: "Blocked",       val: blocked,  colour: blocked  > 0 ? "text-bad"  : "text-good" },
@@ -553,14 +553,14 @@ export default function PortfolioSetup() {
     <div className="space-y-5">
       <PageHeader title="Portfolio Setup" />
 
-      <div className="flex gap-1 border-b border-ink-100 overflow-x-auto">
+      <div className="inline-flex max-w-full items-center gap-1 rounded-full bg-ink-100 p-1 overflow-x-auto">
         {TABS.map(t => {
           const Icon = t.icon;
           return (
             <button key={t.key} onClick={() => setTab(t.key)}
               className={cn(
-                "flex items-center gap-1.5 px-4 py-2.5 text-[13px] font-medium border-b-2 -mb-px whitespace-nowrap transition-colors",
-                tab === t.key ? "border-brand-600 text-brand-700" : "border-transparent text-ink-500 hover:text-ink-800 hover:border-ink-200"
+                "flex items-center gap-1.5 px-4 py-2.5 text-[13px] font-medium rounded-full whitespace-nowrap transition-colors",
+                tab === t.key ? "bg-white shadow-card text-ink-900" : "text-ink-500 hover:text-ink-900"
               )}>
               <Icon size={14} />
               {t.label}

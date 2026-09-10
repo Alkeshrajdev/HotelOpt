@@ -66,7 +66,7 @@ export default function SocialOverview() {
   return (
     <div className="space-y-5">
       {/* KPIs */}
-      <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 items-start">
         <KpiTile icon={<Users size={18}/>}        iconBg="bg-pillar-social/10 text-pillar-social" label="Total headcount" value="3,240" unit="FTE"  delta={4.1} goodDirection="up" />
         <KpiTile icon={<Shield size={18}/>}        iconBg="bg-pillar-social/10 text-pillar-social" label="Female leadership" value="42" unit="%" delta={3.5} goodDirection="up" />
         <KpiTile icon={<BookOpen size={18}/>}      iconBg="bg-brand-50 text-brand-700"             label="Training hrs/FTE" value="18" unit="hrs" delta={11.1} goodDirection="up" />
@@ -74,19 +74,19 @@ export default function SocialOverview() {
       </div>
 
       {/* Charts row 1 */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
         <Card>
           <CardHeader title="Headcount over time" />
           <div className="px-6 pb-6 pt-4">
             <ResponsiveContainer width="100%" height={220}>
               <LineChart data={HEADCOUNT}>
-                <CartesianGrid vertical={false} stroke="#f3f4f6" />
-                <XAxis dataKey="m" tick={{ fontSize:11, fill:"#6b7280" }} axisLine={false} tickLine={false} />
-                <YAxis domain={[2800,3400]} tick={{ fontSize:11, fill:"#6b7280" }} axisLine={false} tickLine={false} width={36} />
-                <Tooltip content={<SimpleTip />} cursor={{ stroke:"#e5e7eb" }} />
-                <Legend wrapperStyle={{ fontSize:11, paddingTop:8 }} formatter={v=><span style={{color:"#6b7280"}}>{v==="ty"?"This year":"Prior year"}</span>} />
-                <Line dataKey="py" name="py" stroke="#cbd5e1" strokeWidth={2} strokeDasharray="5 3" dot={false} isAnimationActive={false} />
-                <Line dataKey="ty" name="ty" stroke="#7c3aed" strokeWidth={2.5} dot={{ fill:"#7c3aed",r:3 }} activeDot={{ r:5 }} isAnimationActive={false} />
+                <CartesianGrid vertical={false} stroke="#EDEFF0" />
+                <XAxis dataKey="m" tick={{ fontSize:11, fill:"#7B8285" }} axisLine={false} tickLine={false} />
+                <YAxis domain={[2800,3400]} tick={{ fontSize:11, fill:"#7B8285" }} axisLine={false} tickLine={false} width={36} />
+                <Tooltip content={<SimpleTip />} cursor={{ stroke:"#EDEFF0" }} />
+                <Legend wrapperStyle={{ fontSize:11, paddingTop:8 }} formatter={v=><span style={{color:"#7B8285"}}>{v==="ty"?"This year":"Prior year"}</span>} />
+                <Line dataKey="py" name="py" stroke="#BABEB5" strokeWidth={2} strokeDasharray="5 3" dot={false} isAnimationActive={false} />
+                <Line dataKey="ty" name="ty" stroke="#959891" strokeWidth={2.5} dot={{ fill:"#959891",r:3 }} activeDot={{ r:5 }} isAnimationActive={false} />
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -97,13 +97,13 @@ export default function SocialOverview() {
           <div className="px-6 pb-6 pt-4">
             <ResponsiveContainer width="100%" height={220}>
               <LineChart data={DIVERSITY}>
-                <CartesianGrid vertical={false} stroke="#f3f4f6" />
-                <XAxis dataKey="q" tick={{ fontSize:11, fill:"#6b7280" }} axisLine={false} tickLine={false} />
-                <YAxis domain={[30,65]} tick={{ fontSize:11, fill:"#6b7280" }} axisLine={false} tickLine={false} width={28} />
-                <Tooltip content={<SimpleTip />} cursor={{ stroke:"#e5e7eb" }} />
-                <Legend wrapperStyle={{ fontSize:11, paddingTop:8 }} formatter={v=><span style={{color:"#6b7280"}}>{v==="leadership"?"Leadership":"All staff"}</span>} />
-                <Line dataKey="broader" name="broader" stroke="#a5b4fc" strokeWidth={2} strokeDasharray="4 2" dot={false} isAnimationActive={false} />
-                <Line dataKey="leadership" name="leadership" stroke="#7c3aed" strokeWidth={2.5} dot={{ fill:"#7c3aed",r:3 }} activeDot={{ r:5 }} isAnimationActive={false} />
+                <CartesianGrid vertical={false} stroke="#EDEFF0" />
+                <XAxis dataKey="q" tick={{ fontSize:11, fill:"#7B8285" }} axisLine={false} tickLine={false} />
+                <YAxis domain={[30,65]} tick={{ fontSize:11, fill:"#7B8285" }} axisLine={false} tickLine={false} width={28} />
+                <Tooltip content={<SimpleTip />} cursor={{ stroke:"#EDEFF0" }} />
+                <Legend wrapperStyle={{ fontSize:11, paddingTop:8 }} formatter={v=><span style={{color:"#7B8285"}}>{v==="leadership"?"Leadership":"All staff"}</span>} />
+                <Line dataKey="broader" name="broader" stroke="#959891" strokeWidth={2} strokeDasharray="4 2" dot={false} isAnimationActive={false} />
+                <Line dataKey="leadership" name="leadership" stroke="#959891" strokeWidth={2.5} dot={{ fill:"#959891",r:3 }} activeDot={{ r:5 }} isAnimationActive={false} />
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -111,17 +111,17 @@ export default function SocialOverview() {
       </div>
 
       {/* Charts row 2 */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
         <Card>
           <CardHeader title="Training hours per FTE" />
           <div className="px-6 pb-6 pt-4">
             <ResponsiveContainer width="100%" height={200}>
               <BarChart data={TRAINING} barCategoryGap="35%">
-                <CartesianGrid vertical={false} stroke="#f3f4f6" />
-                <XAxis dataKey="q" tick={{ fontSize:11, fill:"#6b7280" }} axisLine={false} tickLine={false} />
-                <YAxis domain={[0,25]} tick={{ fontSize:11, fill:"#6b7280" }} axisLine={false} tickLine={false} width={24} />
+                <CartesianGrid vertical={false} stroke="#EDEFF0" />
+                <XAxis dataKey="q" tick={{ fontSize:11, fill:"#7B8285" }} axisLine={false} tickLine={false} />
+                <YAxis domain={[0,25]} tick={{ fontSize:11, fill:"#7B8285" }} axisLine={false} tickLine={false} width={24} />
                 <Tooltip content={<SimpleTip />} cursor={{ fill:"rgba(0,0,0,0.03)" }} />
-                <Bar dataKey="hrs" name="hrs/FTE" fill="#7c3aed" radius={[3,3,0,0]} isAnimationActive={false} />
+                <Bar dataKey="hrs" name="hrs/FTE" fill="#959891" radius={[3,3,0,0]} isAnimationActive={false} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -132,11 +132,11 @@ export default function SocialOverview() {
           <div className="px-6 pb-6 pt-4">
             <ResponsiveContainer width="100%" height={200}>
               <LineChart data={SAFETY}>
-                <CartesianGrid vertical={false} stroke="#f3f4f6" />
-                <XAxis dataKey="q" tick={{ fontSize:11, fill:"#6b7280" }} axisLine={false} tickLine={false} />
-                <YAxis domain={[0, 0.8]} tick={{ fontSize:11, fill:"#6b7280" }} axisLine={false} tickLine={false} width={28} />
-                <Tooltip content={<SimpleTip />} cursor={{ stroke:"#e5e7eb" }} />
-                <Line dataKey="ltifr" name="LTIFR" stroke="#ef4444" strokeWidth={2.5} dot={{ fill:"#ef4444",r:3 }} activeDot={{ r:5 }} isAnimationActive={false} />
+                <CartesianGrid vertical={false} stroke="#EDEFF0" />
+                <XAxis dataKey="q" tick={{ fontSize:11, fill:"#7B8285" }} axisLine={false} tickLine={false} />
+                <YAxis domain={[0, 0.8]} tick={{ fontSize:11, fill:"#7B8285" }} axisLine={false} tickLine={false} width={28} />
+                <Tooltip content={<SimpleTip />} cursor={{ stroke:"#EDEFF0" }} />
+                <Line dataKey="ltifr" name="LTIFR" stroke="#634D48" strokeWidth={2.5} dot={{ fill:"#634D48",r:3 }} activeDot={{ r:5 }} isAnimationActive={false} />
               </LineChart>
             </ResponsiveContainer>
           </div>
