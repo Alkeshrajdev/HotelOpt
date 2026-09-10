@@ -539,7 +539,7 @@ export default function Certifications() {
                     <tr key={c.code} className="hover:bg-ink-50/60">
                       <td className="table-td">
                         <div className="flex items-center gap-2">
-                          <span className="w-10 shrink-0 rounded-md bg-ink-50 grid place-items-center text-xs font-bold text-ink-700 py-1">{PROGRAMME_SHORT[c.code] ?? c.code}</span>
+                          <span className="w-10 shrink-0 rounded-md bg-ink-50 grid place-items-center text-xs font-bold text-ink-700 py-1">{c.code}</span>
                           <div className="font-medium text-ink-900 truncate">{c.title}</div>
                         </div>
                       </td>

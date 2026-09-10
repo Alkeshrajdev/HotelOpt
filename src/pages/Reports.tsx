@@ -288,7 +288,7 @@ export default function Reports() {
       {/* Report type cards */}
       <Card>
         <CardHeader title="Report types" />
-        <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
+        <div className="p-5 grid grid-cols-2 xl:grid-cols-4 gap-4">
           {REPORT_TYPES.map((rt) => (
             <button
               key={rt.id}
