@@ -276,7 +276,7 @@ export default function SmartOpsOverview() {
       </div>
 
       {/* Row 2 — System breakdown cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 items-start">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 items-start">
         {/* Energy by system */}
         <Card level={2}>
           <CardHeader

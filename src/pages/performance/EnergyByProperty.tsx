@@ -121,7 +121,7 @@ export default function EnergyByProperty() {
 
         {/* Table */}
         <div className="overflow-x-auto mt-4 border-t border-ink-100">
-          <table className="min-w-full">
+          <table className="w-full min-w-[720px]">
             <thead>
               <tr className="bg-ink-50">
                 <th className="table-th">Property</th>

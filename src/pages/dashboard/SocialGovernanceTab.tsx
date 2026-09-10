@@ -326,7 +326,7 @@ function EvidenceSection() {
           )}
         </div>
         <div className="rounded-xl border border-ink-100 overflow-x-auto">
-          <table className="min-w-full">
+          <table className="w-full min-w-[720px]">
             <thead>
               <tr className="bg-ink-50 border-b border-ink-100">
                 <th className="table-th min-w-[200px]">Evidence needed</th>
@@ -374,7 +374,7 @@ function EvidenceSection() {
 
       {/* Hotel overview */}
       <div className="rounded-xl border border-ink-100 overflow-x-auto">
-        <table className="min-w-full">
+        <table className="w-full min-w-[960px]">
           <thead>
             <tr className="bg-ink-50 border-b border-ink-100">
               <th className="table-th min-w-[140px]">Hotel</th>

@@ -142,7 +142,7 @@ export default function Properties() {
       />
 
       {/* Summary strip */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 items-start mb-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 items-start mb-4">
         <StatTile label="Total properties" value={String(summary.total)} hint={`${PROPERTIES.length} on platform`} />
         <StatTile label="At/above CHSB median" value={`${summary.total - summary.belowMedian} / ${summary.total}`} hint="carbon/ORN vs cohort" tone="good" />
         <StatTile label="Data completeness" value={`${summary.avgCompleteness}%`} hint="approved records" tone="info" />
@@ -275,7 +275,7 @@ export default function Properties() {
       {/* Table */}
       <Card>
         <div className="overflow-x-auto">
-          <table className="min-w-full">
+          <table className="w-full min-w-[960px]">
             <thead>
               <tr className="bg-ink-50">
                 <th className="table-th">Property</th>

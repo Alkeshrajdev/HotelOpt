@@ -450,7 +450,7 @@ function OverviewTab() {
       </div>
 
       {/* primary KPIs */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 items-start">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 items-start">
         <KpiTile
           icon={<Droplets size={20} />}
           iconBg="bg-info/15"
@@ -495,7 +495,7 @@ function OverviewTab() {
       </div>
 
       {/* secondary KPIs */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 items-start">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 items-start">
         <KpiTile
           icon={<Filter size={20} />}
           iconBg="bg-ink-100"
@@ -643,7 +643,7 @@ function SmartMetersTab() {
 
       <Card className="overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full text-sm min-w-[960px]">
             <thead>
               <tr className="bg-ink-50 border-b border-ink-200">
                 <th className="text-left px-4 py-3 text-xs font-semibold text-ink-500 uppercase tracking-wide whitespace-nowrap">Meter Name</th>

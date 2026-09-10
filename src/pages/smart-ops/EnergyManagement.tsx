@@ -578,7 +578,7 @@ function OverviewTab() {
   return (
     <div className="space-y-5">
       {/* KPI row 1 */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 items-start">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 items-start">
         <KpiTile
           icon={<Zap className="w-5 h-5" />}
           iconBg="bg-brand-50"
@@ -622,7 +622,7 @@ function OverviewTab() {
       </div>
 
       {/* KPI row 2 */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 items-start">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 items-start">
         <KpiTile
           icon={<TrendingUp className="w-5 h-5" />}
           iconBg="bg-bad/10"

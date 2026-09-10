@@ -41,7 +41,7 @@ export default function AdminPools() {
       <Card>
         <CardHeader title="Pools" hint="Filters: climate, star rating, size band" />
         <div className="overflow-x-auto">
-          <table className="min-w-full">
+          <table className="w-full min-w-[960px]">
             <thead>
               <tr className="bg-ink-50">
                 <th className="table-th">Pool</th>

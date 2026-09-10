@@ -212,7 +212,7 @@ export default function Overview({ pillar }: { pillar: PillarKey }) {
   return (
     <div className="space-y-5">
       {/* KPI tiles */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 items-start">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 items-start">
         {cfg.kpis.map((k) => (
           <KpiTile
             key={k.id}
@@ -260,7 +260,7 @@ export default function Overview({ pillar }: { pillar: PillarKey }) {
         <Card>
           <CardHeader title="Targets" hint="FR-3.7 — RAG vs target" />
           <div className="overflow-x-auto">
-            <table className="min-w-full">
+            <table className="w-full min-w-[720px]">
               <thead>
                 <tr className="bg-ink-50">
                   <th className="table-th">Metric</th>

@@ -43,7 +43,7 @@ export default function DataQuality({ pillar }: { pillar: PillarKey }) {
 
   return (
     <div className="space-y-5">
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 items-start">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 items-start">
         <KpiTile
           icon={<CheckCircle2 size={18} />}
           iconBg="bg-pillar-energy/10 text-pillar-energy"
@@ -84,7 +84,7 @@ export default function DataQuality({ pillar }: { pillar: PillarKey }) {
 
         <Card className="col-span-12 lg:col-span-5">
           <CardHeader title="Approval status" hint="Maker–Checker queue" />
-          <div className="p-5 grid grid-cols-2 gap-3">
+          <div className="p-5 grid grid-cols-1 sm:grid-cols-2 gap-3">
             <StatTile variant="panel" label="Pending review" value={a.pending} tone="warn" />
             <StatTile variant="panel" label="Overdue" value={a.overdue} tone="bad" />
             <StatTile variant="panel" label="Approved this period" value={a.approved} tone="good" />

@@ -87,7 +87,7 @@ export default function AdminUsers() {
       <Card>
         <CardHeader title="Users" />
         <div className="overflow-x-auto">
-          <table className="min-w-full">
+          <table className="w-full min-w-[720px]">
             <thead>
               <tr className="bg-ink-50">
                 <th className="table-th">Name</th>

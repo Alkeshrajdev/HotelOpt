@@ -211,7 +211,7 @@ export default function Actions() {
       {tab === "reduction" ? (
         <>
           {/* Savings buckets + pathway (req 3 + 4) */}
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-3 items-start">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 items-start">
             <SavingsTile
               label="Estimated pipeline" tone="info"
               co2e={buckets.estimated.co2e} usd={buckets.estimated.usd}

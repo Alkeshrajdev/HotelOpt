@@ -511,7 +511,7 @@ export default function Certifications() {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="min-w-full">
+            <table className="w-full min-w-[720px]">
               <thead>
                 <tr className="bg-ink-50">
                   <th className="table-th">Criterion</th>
@@ -698,7 +698,7 @@ function CertCertificatePanel() {
         </div>
       </div>
       <div className="overflow-x-auto border-t border-ink-100">
-        <table className="min-w-full">
+        <table className="w-full min-w-[720px]">
           <thead>
             <tr className="bg-ink-50">
               <th className="table-th">Type</th>

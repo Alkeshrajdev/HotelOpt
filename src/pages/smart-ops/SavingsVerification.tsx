@@ -581,7 +581,7 @@ function SavingsTable({ records }: { records: SavingRecord[] }) {
     <>
       <Card>
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full text-sm min-w-[960px]">
             <thead>
               <tr className="border-b border-ink-100">
                 <th className="text-left px-4 py-3 text-xs text-ink-500 font-medium">Saving Name</th>
@@ -781,7 +781,7 @@ function EnergySavingsTab() {
   return (
     <div className="space-y-6">
       {/* Energy summary KPIs */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <KpiTile
           icon={<Zap className="w-5 h-5" />}
           iconBg="bg-warn/10"
@@ -836,7 +836,7 @@ function WaterSavingsTab() {
   return (
     <div className="space-y-6">
       {/* Water summary KPIs */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <KpiTile
           icon={<Droplets className="w-5 h-5" />}
           iconBg="bg-info/10"

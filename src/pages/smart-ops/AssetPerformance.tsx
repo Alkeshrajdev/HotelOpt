@@ -1111,7 +1111,7 @@ function AssetRegistryTab() {
       {/* Table */}
       <Card>
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full text-sm min-w-[960px]">
             <thead>
               <tr className="border-b border-ink-100">
                 <th className="text-left px-4 py-3 text-xs text-ink-500 font-medium">Asset</th>
@@ -1318,7 +1318,7 @@ function FaultsAlertsTab() {
 
       <Card>
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full text-sm min-w-[960px]">
             <thead>
               <tr className="border-b border-ink-100">
                 <th className="text-left px-4 py-3 text-xs text-ink-500 font-medium">Asset</th>
@@ -1405,7 +1405,7 @@ function MaintenanceTab() {
       {/* Actions table */}
       <Card>
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full text-sm min-w-[960px]">
             <thead>
               <tr className="border-b border-ink-100">
                 <th className="text-left px-4 py-3 text-xs text-ink-500 font-medium">Action ID</th>
@@ -1474,7 +1474,7 @@ function DocumentsTab() {
     <div className="space-y-4">
       <Card>
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full text-sm min-w-[720px]">
             <thead>
               <tr className="border-b border-ink-100">
                 <th className="text-left px-4 py-3 text-xs text-ink-500 font-medium">Asset</th>

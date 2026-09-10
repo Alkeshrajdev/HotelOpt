@@ -224,7 +224,7 @@ export default function PillarOverview({ pillar }: { pillar: "water"|"waste"|"ca
   return (
     <div className="space-y-5">
       {/* KPI tiles */}
-      <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 items-start">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 items-start">
         {cfg.kpis.map((k) => (
           <KpiTile
             key={k.label}

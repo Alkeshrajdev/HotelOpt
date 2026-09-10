@@ -53,7 +53,7 @@ export default function GenuinePortfolio() {
       </div>
 
       {/* Summary tiles */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 items-start">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 items-start">
         <StatTile label="Portfolio genuine" value={pct(avg)} tone={avg <= 0 ? "good" : "bad"} icon={<Sparkles size={18} />} hint="avg across hotels & utilities" />
         <StatTile label="Improving" value={String(improving)} tone="good" icon={<TrendingDown size={18} />} hint="genuine efficiency gain" />
         <StatTile label="Worsening" value={String(worsening)} tone="bad" icon={<TrendingUp size={18} />} hint="used more than expected" />
@@ -156,7 +156,7 @@ export default function GenuinePortfolio() {
           right={<button className="btn-primary"><Plus size={14} /> Log event</button>}
         />
         <div className="overflow-x-auto">
-          <table className="min-w-full text-sm">
+          <table className="text-sm w-full min-w-[720px]">
             <thead>
               <tr className="bg-ink-50 text-left">
                 <th className="table-th">Date</th>

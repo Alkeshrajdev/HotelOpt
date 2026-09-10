@@ -185,7 +185,7 @@ export default function EnergyOverview() {
     <div className="space-y-5">
 
       {/* ── KPI tiles ──────────────────────────────────────────────────── */}
-      <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 items-start">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 items-start">
         <KpiTile
           icon={<Zap size={18} />}
           iconBg="bg-pillar-energy/10 text-pillar-energy"

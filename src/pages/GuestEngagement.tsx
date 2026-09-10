@@ -617,7 +617,7 @@ function CampaignsTab({ property }: { property: string }) {
   return (
     <>
       {/* Summary row — mirrors the Overview / Eco-points tile rows so the tabs read as one system */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 items-start">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 items-start">
         <StatTile label="Active campaigns" value={String(activeCount)} hint={`${campaigns.length} total`} tone="good" />
         <StatTile label="Total reach" value={totalReach.toLocaleString()} hint="guests across campaigns" tone="info" />
         <StatTile label="Avg open rate" value={`${avgOpen}%`} hint="of delivered" tone={avgOpen >= 40 ? "good" : "warn"} />
@@ -627,7 +627,7 @@ function CampaignsTab({ property }: { property: string }) {
       <Card>
         <CardHeader title="Campaigns" hint="Click a campaign to see its performance funnel" right={<button className="btn-primary" onClick={openNew}><Plus size={14} /> New campaign</button>} />
         <div className="overflow-x-auto">
-          <table className="min-w-full">
+          <table className="w-full min-w-[960px]">
             <thead>
               <tr className="bg-ink-50">
                 <th className="table-th">Campaign</th>
@@ -740,7 +740,7 @@ function CampaignDetailModal({ campaign: c, onClose }: { campaign: Campaign | nu
   return (
     <Modal open onClose={onClose} title={c.name} subtitle={`${CHANNEL_LABEL[c.channel]} · ${c.property} · ${c.scheduled}`} size="md">
       <div className="p-5 space-y-4">
-        <div className="grid grid-cols-3 gap-4 items-start">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-start">
           <StatTile variant="panel" label="Reach" value={c.reach.toLocaleString()} tone="info" />
           <StatTile variant="panel" label="Open rate" value={`${c.openRate}%`} tone={c.openRate >= 40 ? "good" : "warn"} />
           <StatTile variant="panel" label="Eco-action rate" value={`${ofSent(steps[4].count)}%`} hint="of sent" tone="good" />
@@ -1000,7 +1000,7 @@ function EcoPointsTab() {
       </Card>
 
       {/* Summary tiles */}
-      <div className="grid grid-cols-3 gap-4 items-start">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-start">
         <StatTile label="Total issued" value={totalIssued.toLocaleString()} hint="pts this period" tone="info" />
         <StatTile label="Redeemed"     value={totalRedeemed.toLocaleString()} hint="pts converted" tone="good" />
         <StatTile label="Redemption rate" value={`${Math.round(totalRedeemed / totalIssued * 100)}%`} hint="of issued points" tone="warn" />
@@ -1140,7 +1140,7 @@ function QrAnalyticsTab({ property }: { property: string }) {
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 items-start">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 items-start">
         <StatTile label="Scans · 30d" value={totalScans.toLocaleString()} hint="in-room + public points" tone="info" />
         <StatTile label="Scan → action" value={`${weightedConv}%`} hint="led to an eco-action" tone="good" />
         <StatTile label="Active QR points" value={String(QR_POINTS.length)} hint={property} tone="info" />

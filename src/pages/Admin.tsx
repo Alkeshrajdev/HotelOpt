@@ -228,7 +228,7 @@ function AuditLog() {
       </div>
 
       <div className="overflow-x-auto">
-        <table className="min-w-full">
+        <table className="w-full min-w-[720px]">
           <thead>
             <tr className="bg-ink-50">
               <th className="table-th">Timestamp</th>

@@ -54,7 +54,7 @@ export default function AdminEFLibrary() {
       <Card>
         <CardHeader title="Emission factors" hint="Locking a version freezes it for assurance" />
         <div className="overflow-x-auto">
-          <table className="min-w-full">
+          <table className="w-full min-w-[960px]">
             <thead>
               <tr className="bg-ink-50">
                 <th className="table-th">Source</th>

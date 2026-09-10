@@ -393,7 +393,7 @@ export default function ReviewApproval() {
             <EmptyState icon={<ClipboardCheck size={20} />} title="No records here" description="Try clearing filters or switching role." />
           ) : (
             <div className="overflow-x-auto">
-              <table className="min-w-full">
+              <table className="w-full min-w-[960px]">
                 <thead>
                   <tr className="bg-ink-50">
                     <th className="table-th">Pri</th>
@@ -546,7 +546,7 @@ function PlatformReviewTab() {
       <Card>
         <CardHeader title="Company-approved · awaiting platform review" hint={`${pending} pending`} />
         <div className="overflow-x-auto">
-          <table className="min-w-full text-sm">
+          <table className="text-sm w-full min-w-[720px]">
             <thead><tr className="bg-ink-50 text-left">
               <th className="table-th">Record</th><th className="table-th">Property</th><th className="table-th">Data</th>
               <th className="table-th">Period</th><th className="table-th">Company approver</th><th className="table-th">State</th>

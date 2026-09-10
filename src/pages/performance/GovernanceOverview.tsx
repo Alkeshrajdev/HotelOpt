@@ -73,7 +73,7 @@ export default function GovernanceOverview() {
   return (
     <div className="space-y-5">
       {/* KPIs */}
-      <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 items-start">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 items-start">
         <KpiTile icon={<FileCheck size={18}/>}    iconBg="bg-pillar-gov/10 text-pillar-gov" label="Attestations" value="11/12" caption="1 outstanding" />
         <KpiTile icon={<ShieldCheck size={18}/>}   iconBg="bg-pillar-gov/10 text-pillar-gov" label="Anti-corruption training" value="96" unit="%" delta={4.0} goodDirection="up" />
         <KpiTile icon={<Users size={18}/>}          iconBg="bg-brand-50 text-brand-700"       label="Supplier code adoption" value="74" unit="%" delta={6.0} goodDirection="up" />

@@ -66,7 +66,7 @@ export default function SocialOverview() {
   return (
     <div className="space-y-5">
       {/* KPIs */}
-      <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 items-start">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 items-start">
         <KpiTile icon={<Users size={18}/>}        iconBg="bg-pillar-social/10 text-pillar-social" label="Total headcount" value="3,240" unit="FTE"  delta={4.1} goodDirection="up" />
         <KpiTile icon={<Shield size={18}/>}        iconBg="bg-pillar-social/10 text-pillar-social" label="Female leadership" value="42" unit="%" delta={3.5} goodDirection="up" />
         <KpiTile icon={<BookOpen size={18}/>}      iconBg="bg-brand-50 text-brand-700"             label="Training hrs/FTE" value="18" unit="hrs" delta={11.1} goodDirection="up" />
