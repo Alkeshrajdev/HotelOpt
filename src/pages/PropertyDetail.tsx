@@ -168,7 +168,7 @@ export default function PropertyDetail() {
 function OverviewTab({ property }: { property: RichProperty }) {
   return (
     <div className="grid grid-cols-12 gap-4">
-      <Card className="col-span-12 lg:col-span-7">
+      <Card className="col-span-12 lg:col-span-6">
         <CardHeader title="Identity & location" />
         <div className="p-6 grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
           <Row label="Brand" value={property.brand} />
@@ -182,7 +182,7 @@ function OverviewTab({ property }: { property: RichProperty }) {
         </div>
       </Card>
 
-      <Card className="col-span-12 lg:col-span-5">
+      <Card className="col-span-12 lg:col-span-6">
         <CardHeader title="Operations" />
         <div className="p-6 grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
           <Row label="Operation type" value={property.operationType.replace("-", " ")} />

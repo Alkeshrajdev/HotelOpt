@@ -54,7 +54,7 @@ export default function AdminUsers() {
 
       <Card>
         <CardHeader title="Role catalogue" hint="What each role can see and do" />
-        <div className="p-6 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+        <div className="p-6 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-3">
           {ROLES.map((r) => (
             <div key={r.key} className="rounded-xl border border-ink-200 p-3">
               <div className="flex items-center justify-between gap-2">

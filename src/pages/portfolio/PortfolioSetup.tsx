@@ -378,8 +378,8 @@ function RulesTab() {
   const [groupingLogic, setGroupingLogic] = useState("Region");
 
   return (
-    <div className="space-y-6">
-      <div className="grid lg:grid-cols-2 gap-x-6 gap-y-8 items-start">
+    <div className="space-y-5">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-start">
       {/* Reporting */}
       <section>
         <h3 className="text-[12px] font-bold uppercase tracking-wider text-ink-400 mb-3">Reporting Settings</h3>
@@ -548,7 +548,7 @@ export default function PortfolioSetup() {
   const [tab, setTab] = useState<Tab>("hotels");
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       <PageHeader title="Portfolio Setup" />
 
       <div className="flex gap-1 border-b border-ink-100 overflow-x-auto">

@@ -326,7 +326,7 @@ function NeedsAttention() {
   return (
     <div>
       <SectionLabel title="Needs attention" />
-      <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-4">
         {ACTION_CENTRE.map((it) => (
           <Link
             key={it.label}
@@ -362,7 +362,7 @@ export default function OverviewTab({ onNavigate }: Props) {
   const showPYLine = aggregation !== "annually" && metric !== "carbon";;
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-5">
 
       {/* ── 0. Needs attention — the "act" entry point ────────────────────── */}
       <NeedsAttention />

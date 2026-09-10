@@ -378,12 +378,14 @@ function MeterModal({ meter, open, onClose }: { meter: Meter | null; open: boole
               const pct = Math.round((v / maxVal) * 100);
               const isAlert = v > 4 && meter.name.includes("Zone B") && (i === 4 || i === 5);
               return (
-                <div key={i} className="flex-1 flex flex-col items-center gap-1">
+                <div key={i} className="flex-1 min-w-0 h-full flex flex-col items-center gap-1">
                   <span className="text-[9px] text-neutral-400">{v}</span>
-                  <div
-                    className={cn("w-full rounded-t", isAlert ? "bg-red-400" : "bg-blue-400")}
-                    style={{ height: `${pct}%` }}
-                  />
+                  <div className="w-full flex-1 flex items-end">
+                    <div
+                      className={cn("w-full rounded-t", isAlert ? "bg-red-400" : "bg-blue-400")}
+                      style={{ height: `${pct}%` }}
+                    />
+                  </div>
                   <span className="text-[9px] text-neutral-400">D{i + 1}</span>
                 </div>
               );
@@ -539,15 +541,16 @@ function OverviewTab() {
             {DAILY_WATER_TREND.map((v, i) => {
               const pct = Math.round((v / maxDaily) * 100);
               return (
-                <div key={i} className="flex-1 flex flex-col items-center gap-1">
-                  <div
-                    className="w-full rounded-t bg-blue-400 hover:bg-blue-500 transition-colors"
-                    style={{ height: `${pct}%` }}
-                    title={`${v} m³`}
-                  />
-                  {i % 2 === 0 && (
-                    <span className="text-[9px] text-neutral-400">D{i + 1}</span>
-                  )}
+                <div key={i} className="flex-1 min-w-0 h-full flex flex-col items-center gap-1">
+                  {/* Track fills the column so the bar's % height resolves against a definite size */}
+                  <div className="w-full flex-1 flex items-end">
+                    <div
+                      className="w-full rounded-t bg-blue-400 hover:bg-blue-500 transition-colors"
+                      style={{ height: `${pct}%` }}
+                      title={`${v} m³`}
+                    />
+                  </div>
+                  <span className="text-[9px] text-neutral-400 h-3 leading-3">{i % 2 === 0 ? `D${i + 1}` : ""}</span>
                 </div>
               );
             })}
@@ -599,13 +602,15 @@ function OverviewTab() {
           {NIGHT_FLOW.map((d, i) => {
             const pct = Math.round((d.value / 16) * 100);
             return (
-              <div key={i} className="flex-1 flex flex-col items-center gap-1">
+              <div key={i} className="flex-1 min-w-0 h-full flex flex-col items-center gap-1">
                 <span className="text-[9px] text-neutral-500">{d.value}</span>
-                <div
-                  className={cn("w-full rounded-t transition-colors", d.alert ? "bg-red-400" : "bg-blue-400")}
-                  style={{ height: `${pct}%` }}
-                  title={`${d.day}: ${d.value} m³/hr`}
-                />
+                <div className="w-full flex-1 flex items-end">
+                  <div
+                    className={cn("w-full rounded-t transition-colors", d.alert ? "bg-red-400" : "bg-blue-400")}
+                    style={{ height: `${pct}%` }}
+                    title={`${d.day}: ${d.value} m³/hr`}
+                  />
+                </div>
                 <span className="text-[9px] text-neutral-400">{d.day.replace("Day ", "D")}</span>
               </div>
             );
@@ -863,7 +868,7 @@ function LeakDetectionTab() {
                   const pct = Math.round((v / maxVal) * 100);
                   const isAlert = v > 8;
                   return (
-                    <div key={i} className="flex-1 flex items-end">
+                    <div key={i} className="flex-1 h-full flex items-end">
                       <div
                         className={cn("w-full rounded-sm", isAlert ? "bg-red-400" : "bg-blue-300")}
                         style={{ height: `${pct}%` }}
@@ -1014,8 +1019,8 @@ export default function WaterManagement() {
   const [activeTab, setActiveTab] = useState<Tab>("overview");
 
   return (
-    <div className="min-h-screen bg-neutral-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+    <div>
+      <div className="space-y-5">
 
         <PageHeader
           eyebrow="Smart Operations · Water"

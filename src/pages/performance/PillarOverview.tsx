@@ -273,7 +273,7 @@ export default function PillarOverview({ pillar }: { pillar: "water"|"waste"|"ca
       {/* Source / stream mini-charts */}
       <div>
         <h2 className="text-[13px] font-semibold text-ink-700 mb-3">By source</h2>
-        <div className={cn("grid gap-4", cfg.sources.length <= 2 ? "grid-cols-1 sm:grid-cols-2" : "grid-cols-1 sm:grid-cols-2 xl:grid-cols-3")}>
+        <div className={cn("grid gap-4", cfg.sources.length <= 2 ? "grid-cols-1 sm:grid-cols-2" : cfg.sources.length === 4 ? "grid-cols-1 sm:grid-cols-2 xl:grid-cols-4" : "grid-cols-1 sm:grid-cols-2 xl:grid-cols-3")}>
           {cfg.sources.map(s => (
             <SourceChart key={s.key} source={s} data={cfg.monthly} unit={cfg.unit} />
           ))}

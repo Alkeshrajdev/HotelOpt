@@ -214,7 +214,7 @@ function DrilldownPanel({
       </div>
 
       {/* Content */}
-      <div className="p-5 grid grid-cols-1 lg:grid-cols-2 gap-5">
+      <div className="p-5 grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Chart */}
         <div>
           <div className="text-[11px] font-semibold text-ink-500 mb-3 uppercase tracking-wide">
@@ -341,7 +341,7 @@ function CarbonSection() {
       <SectionHeader confidence={AVG_CONFIDENCE} hubTo="/performance/carbon/overview" hubLabel="Open Carbon Hub" />
 
       {/* Scope 1 + Scope 2 + Scope 3 breakdown — 3 columns */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
 
         {/* Scope 1 detail */}
         <Card>
@@ -594,7 +594,7 @@ function EnergySection() {
 
       <SectionHeader confidence={AVG_CONFIDENCE} hubTo="/performance/energy/overview" hubLabel="Open Energy Hub" />
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
 
         {/* Energy by system */}
         <Card>
@@ -771,7 +771,7 @@ function WaterSection() {
 
       <SectionHeader confidence={AVG_CONFIDENCE} hubTo="/performance/water/overview" hubLabel="Open Water Hub" />
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
 
         {/* Water by end-use */}
         <Card>
@@ -1022,7 +1022,7 @@ function WasteSection() {
         </div>
       </Card>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
 
         {/* Waste by source — stacked streams */}
         <Card>

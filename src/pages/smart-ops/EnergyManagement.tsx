@@ -535,12 +535,14 @@ function MiniTrend({ values, unit }: { values: number[]; unit: string }) {
         {values.map((v, i) => {
           const h = max === 0 ? 0 : Math.round((Math.abs(v) / max) * 100);
           return (
-            <div key={i} className="flex flex-col items-center gap-1 flex-1">
-              <div
-                className="w-full rounded-sm bg-brand-500 transition-all"
-                style={{ height: `${h}%` }}
-                title={`${v} ${unit}`}
-              />
+            <div key={i} className="h-full flex flex-col items-center gap-1 flex-1 min-w-0">
+              <div className="w-full flex-1 flex items-end">
+                <div
+                  className="w-full rounded-sm bg-brand-500 transition-all"
+                  style={{ height: `${h}%` }}
+                  title={`${v} ${unit}`}
+                />
+              </div>
               <span className="text-[10px] text-gray-400">{days[i]}</span>
             </div>
           );
@@ -665,7 +667,7 @@ function OverviewTab() {
       </div>
 
       {/* Charts row */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Daily energy trend */}
         <Card className="p-5">
           <SectionLabel>Daily energy trend — last 14 days</SectionLabel>
@@ -674,18 +676,21 @@ function OverviewTab() {
               const hPct = Math.round((d.value / trendMax) * 100);
               const isPeak = d.value >= 11800;
               return (
-                <div key={i} className="flex flex-col items-center gap-1 flex-1 min-w-0">
+                <div key={i} className="h-full flex flex-col items-center gap-1 flex-1 min-w-0">
                   <span className="text-[9px] text-gray-400 leading-none">
                     {(d.value / 1000).toFixed(1)}k
                   </span>
-                  <div
-                    className={cn(
-                      "w-full rounded-t-sm transition-all",
-                      isPeak ? "bg-red-400" : "bg-brand-500"
-                    )}
-                    style={{ height: `${hPct}%` }}
-                    title={`${d.label}: ${d.value.toLocaleString()} kWh`}
-                  />
+                  {/* Track fills the column so the bar's % height resolves against a definite size */}
+                  <div className="w-full flex-1 flex items-end">
+                    <div
+                      className={cn(
+                        "w-full rounded-t-sm transition-all",
+                        isPeak ? "bg-red-400" : "bg-brand-500"
+                      )}
+                      style={{ height: `${hPct}%` }}
+                      title={`${d.label}: ${d.value.toLocaleString()} kWh`}
+                    />
+                  </div>
                   <span className="text-[9px] text-gray-400">{d.label}</span>
                 </div>
               );
@@ -973,7 +978,7 @@ function EnergyBalanceTab() {
   const netAfterSolar = mainTotal + solarOffset;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {/* Main incomer header */}
       <Card className="p-5">
         <div className="flex items-center justify-between mb-6">
@@ -1085,7 +1090,7 @@ function PeakDemandTab() {
   const maxKw = 900;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {/* Peak KPI cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <Card className="p-5 border-red-200 bg-red-50">
@@ -1260,7 +1265,7 @@ function AssetEfficiencyTab() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       <div className="overflow-x-auto rounded-xl border border-gray-200">
         <table className="min-w-full divide-y divide-gray-200 text-sm">
           <thead className="bg-gray-50">
@@ -1442,7 +1447,7 @@ export default function EnergyManagement() {
   const [activeTab, setActiveTab] = useState<Tab>("overview");
 
   return (
-    <div className="space-y-6 pb-12">
+    <div className="space-y-5">
 
       <PageHeader
         eyebrow="Smart Operations · Energy"

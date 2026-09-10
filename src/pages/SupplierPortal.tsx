@@ -797,7 +797,7 @@ function SupplierView() {
       </Card>
 
       <div className="grid grid-cols-12 gap-4">
-        <Card className="col-span-12 lg:col-span-7">
+        <Card className="col-span-12 lg:col-span-6">
           <CardHeader title="Certifications" hint="Visible to every client that subscribes to your products" right={<button className="btn-secondary"><Upload size={14} /> Upload</button>} />
           <ul className="p-5 space-y-2 text-sm">
             <CertRow name="ISO 14001 — environmental management" expires="2027-03-12" status="ready" />
@@ -806,7 +806,7 @@ function SupplierView() {
             <CertRow name="ISO 50001 — energy management"        expires="2026-05-20" status="warn" hint="Expiring in 18 days" />
           </ul>
         </Card>
-        <Card className="col-span-12 lg:col-span-5">
+        <Card className="col-span-12 lg:col-span-6">
           <CardHeader title="Code-of-conduct attestations" hint="Required for GRI 414 (supplier social assessment)" />
           <ul className="p-5 space-y-2 text-sm">
             <AttRow label="Supplier code of conduct"    signed="2026-04-02" />

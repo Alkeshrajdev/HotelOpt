@@ -567,9 +567,9 @@ function PaymentsTab() {
 
       <div className="grid grid-cols-12 gap-4">
         {/* Per-property cost breakdown */}
-        <Card className="col-span-12 lg:col-span-7">
+        <Card className="col-span-12 lg:col-span-8">
           <CardHeader title="Cost by property" hint={`USD ${perPropAnnual.toLocaleString()} / property / year · base + licence allocation`} />
-          <div className="overflow-x-auto max-h-[300px]">
+          <div className="overflow-x-auto">
             <table className="min-w-full text-sm">
               <thead><tr className="bg-ink-50 text-left sticky top-0">
                 <th className="table-th">Property</th><th className="table-th">Region</th><th className="table-th text-right">Annual</th>
@@ -593,7 +593,7 @@ function PaymentsTab() {
           </div>
         </Card>
 
-        <div className="col-span-12 lg:col-span-5 space-y-4">
+        <div className="col-span-12 lg:col-span-4 space-y-4">
           {/* Proration preview */}
           <Card>
             <CardHeader title="Proration preview" hint="Mid-cycle property change" />

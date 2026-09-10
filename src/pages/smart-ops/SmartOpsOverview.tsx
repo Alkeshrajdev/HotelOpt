@@ -188,7 +188,7 @@ export default function SmartOpsOverview() {
   const [_activeAlert, setActiveAlert] = useState<string | null>(null);
 
   return (
-    <div className="page-container space-y-6">
+    <div className="space-y-5">
       <PageHeader
         title="Smart Operations"
         subtitle="Monitor energy, water, IAQ, and asset performance across hotel operations"
@@ -276,7 +276,7 @@ export default function SmartOpsOverview() {
       </div>
 
       {/* Row 2 — System breakdown cards */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Energy by system */}
         <Card level={2}>
           <CardHeader
@@ -368,7 +368,7 @@ export default function SmartOpsOverview() {
       </div>
 
       {/* Row 3 — Alerts, maintenance, sensor health, savings */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Recent critical alerts — spans 2 cols */}
         <Card level={2} className="lg:col-span-2">
           <CardHeader
