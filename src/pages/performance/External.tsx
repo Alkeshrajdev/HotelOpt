@@ -108,15 +108,17 @@ export default function External({ pillar }: { pillar: PillarKey }) {
       <Card>
         <CardHeader title={`Distribution — ${PILLAR_LABEL[pillar]} Intensity (normalised)`} />
         <div className="p-6">
-          <div className="grid grid-cols-12 gap-1 items-end h-44">
+          <div className="flex gap-1 h-44">
             {[6, 10, 14, 18, 22, 28, 24, 18, 12, 9, 6, 3].map((h, i) => {
               const isYou = i === 4;
               return (
-                <div key={i} className="flex flex-col items-center gap-1">
-                  <div
-                    className={"w-full rounded-t " + (isYou ? "bg-brand-700" : "bg-ink-200")}
-                    style={{ height: `${(h / 30) * 100}%` }}
-                  />
+                <div key={i} className="flex-1 min-w-0 h-full flex flex-col items-center gap-1">
+                  <div className="w-full flex-1 flex items-end">
+                    <div
+                      className={"w-full rounded-t " + (isYou ? "bg-brand-700" : "bg-ink-200")}
+                      style={{ height: `${(h / 30) * 100}%` }}
+                    />
+                  </div>
                   <span className="text-[10px] text-ink-500">{18 + i * 2}</span>
                 </div>
               );
@@ -196,15 +198,17 @@ function drillContent(d: Drill) {
         <Card>
           <CardHeader title="Distribution — your bin highlighted" />
           <div className="p-6">
-            <div className="grid grid-cols-12 gap-1 items-end h-52">
+            <div className="flex gap-1 h-52">
               {[6, 10, 14, 18, 22, 28, 24, 18, 12, 9, 6, 3].map((h, i) => {
                 const isYou = i === 4;
                 return (
-                  <div key={i} className="flex flex-col items-center gap-1">
-                    <div
-                      className={"w-full rounded-t " + (isYou ? "bg-brand-700" : "bg-ink-200")}
-                      style={{ height: `${(h / 30) * 100}%` }}
-                    />
+                  <div key={i} className="flex-1 min-w-0 h-full flex flex-col items-center gap-1">
+                    <div className="w-full flex-1 flex items-end">
+                      <div
+                        className={"w-full rounded-t " + (isYou ? "bg-brand-700" : "bg-ink-200")}
+                        style={{ height: `${(h / 30) * 100}%` }}
+                      />
+                    </div>
                     <span className="text-[10px] text-ink-500">{18 + i * 2}</span>
                   </div>
                 );

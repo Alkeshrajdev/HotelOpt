@@ -675,15 +675,15 @@ function Co2VentilationTab() {
                         v >= 800 ? "bg-amber-400 hover:bg-amber-500" :
                         `${colors[zone]} hover:opacity-90`;
                       return (
-                        <div key={i} className="flex-1 flex flex-col items-center gap-1">
-                          <div
-                            className={cn("w-full rounded-t transition-colors", barColor)}
-                            style={{ height: `${pct}%` }}
-                            title={`D${i + 1}: ${v} ppm`}
-                          />
-                          {i % 3 === 0 && (
-                            <span className="text-[8px] text-neutral-400">D{i + 1}</span>
-                          )}
+                        <div key={i} className="flex-1 min-w-0 h-full flex flex-col items-center gap-1">
+                          <div className="w-full flex-1 flex items-end">
+                            <div
+                              className={cn("w-full rounded-t transition-colors", barColor)}
+                              style={{ height: `${pct}%` }}
+                              title={`D${i + 1}: ${v} ppm`}
+                            />
+                          </div>
+                          <span className="text-[8px] text-neutral-400 h-2.5 leading-none">{i % 3 === 0 ? `D${i + 1}` : ""}</span>
                         </div>
                       );
                     })}

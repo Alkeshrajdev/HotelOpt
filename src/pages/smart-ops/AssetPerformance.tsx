@@ -671,13 +671,13 @@ function COPTrendChart() {
           const heightPct = ((val - minVal) / range) * 100;
           const isLast = i === COP_TREND.length - 1;
           return (
-            <div key={i} className="flex-1 flex flex-col items-center gap-0.5">
+            <div key={i} className="flex-1 min-w-0 h-full flex flex-col justify-end items-center gap-0.5">
               <div
                 className={cn(
                   "w-full rounded-t",
                   isLast ? "bg-amber-500" : val < 3.1 ? "bg-amber-400" : "bg-blue-400"
                 )}
-                style={{ height: `${heightPct}%` }}
+                style={{ height: `${Math.max(heightPct, 6)}%` }}
                 title={`${COP_DAYS[i]}: COP ${val.toFixed(2)}`}
               />
             </div>
