@@ -10,6 +10,7 @@ import {
   X,
 } from "lucide-react";
 import PageHeader from "@/components/ui/PageHeader";
+import StatTile from "@/components/ui/StatTile";
 import EmptyState from "@/components/ui/EmptyState";
 import { Card, CardHeader } from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
@@ -141,11 +142,11 @@ export default function Properties() {
       />
 
       {/* Summary strip */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 items-start mb-4">
-        <SummaryTile label="Total properties" value={String(summary.total)} hint={`${PROPERTIES.length} on platform`} />
-        <SummaryTile label="At/above CHSB median" value={`${summary.total - summary.belowMedian} / ${summary.total}`} hint="carbon/ORN vs cohort" tone="good" />
-        <SummaryTile label="Data completeness" value={`${summary.avgCompleteness}%`} hint="approved records" tone="info" />
-        <SummaryTile label="GP ready"          value={`${summary.gpReady} / ${summary.total}`} hint="full baseline + 12 mo data" tone="good" />
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 items-start mb-4">
+        <StatTile label="Total properties" value={String(summary.total)} hint={`${PROPERTIES.length} on platform`} />
+        <StatTile label="At/above CHSB median" value={`${summary.total - summary.belowMedian} / ${summary.total}`} hint="carbon/ORN vs cohort" tone="good" />
+        <StatTile label="Data completeness" value={`${summary.avgCompleteness}%`} hint="approved records" tone="info" />
+        <StatTile label="GP ready"          value={`${summary.gpReady} / ${summary.total}`} hint="full baseline + 12 mo data" tone="good" />
       </div>
 
       {/* Search + filter chips */}
@@ -393,37 +394,6 @@ function PropertyRow({ p }: { p: RichProperty }) {
         <RowActionsMenu propertyId={p.id} />
       </td>
     </tr>
-  );
-}
-
-function SummaryTile({
-  label,
-  value,
-  hint,
-  info,
-  tone = "neutral",
-}: {
-  label: string;
-  value: string;
-  hint?: string;
-  info?: string;
-  tone?: "neutral" | "good" | "info";
-}) {
-  const accent =
-    tone === "good"
-      ? ""
-      : tone === "info"
-        ? ""
-        : "";
-  return (
-    <div className={cn("card card-pad", accent)}>
-      <div className="flex items-center gap-1 text-[11px] uppercase tracking-[0.06em] font-semibold text-ink-400">
-        {label}
-        {info && <InfoHint text={info} />}
-      </div>
-      <div className="text-stat leading-none font-bold text-ink-900 mt-1.5 tabular-nums">{value}</div>
-      {hint && <div className="text-[12px] text-ink-500 mt-1">{hint}</div>}
-    </div>
   );
 }
 

@@ -1,5 +1,6 @@
 import { AlertTriangle, CheckCircle2, FileWarning, ShieldAlert } from "lucide-react";
 import { Card, CardHeader } from "@/components/ui/Card";
+import StatTile from "@/components/ui/StatTile";
 import KpiTile from "@/components/ui/KpiTile";
 import HBar from "@/components/charts/HBar";
 import Badge from "@/components/ui/Badge";
@@ -84,10 +85,10 @@ export default function DataQuality({ pillar }: { pillar: PillarKey }) {
         <Card className="col-span-12 lg:col-span-5">
           <CardHeader title="Approval status" hint="Maker–Checker queue" />
           <div className="p-5 grid grid-cols-2 gap-3">
-            <Tile label="Pending review" value={a.pending} tone="warn" />
-            <Tile label="Overdue" value={a.overdue} tone="bad" />
-            <Tile label="Approved this period" value={a.approved} tone="good" />
-            <Tile label="Low-confidence flagged" value={a.lowConfidence} tone="info" />
+            <StatTile variant="panel" label="Pending review" value={a.pending} tone="warn" />
+            <StatTile variant="panel" label="Overdue" value={a.overdue} tone="bad" />
+            <StatTile variant="panel" label="Approved this period" value={a.approved} tone="good" />
+            <StatTile variant="panel" label="Low-confidence flagged" value={a.lowConfidence} tone="info" />
           </div>
         </Card>
       </div>
@@ -101,29 +102,6 @@ export default function DataQuality({ pillar }: { pillar: PillarKey }) {
           <Issue icon="good" text="No anomaly clusters detected. Recent submissions trend within 5 % of seasonal baseline." />
         </ul>
       </Card>
-    </div>
-  );
-}
-
-function Tile({
-  label,
-  value,
-  tone,
-}: {
-  label: string;
-  value: number;
-  tone: "good" | "warn" | "bad" | "info";
-}) {
-  const ring = {
-    good: "border-good/25 bg-good/10",
-    warn: "border-warn/25 bg-warn/10",
-    bad: "border-bad/25 bg-bad/10",
-    info: "border-info/25 bg-info/10",
-  }[tone];
-  return (
-    <div className={`rounded-xl border p-3 ${ring}`}>
-      <div className="text-[11px] font-medium text-ink-500">{label}</div>
-      <div className="text-2xl font-bold mt-1 text-ink-900 tabular-nums">{value}</div>
     </div>
   );
 }

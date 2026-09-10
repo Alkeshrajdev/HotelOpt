@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Building2, Globe2, Lock, Plus, Search, RotateCcw } from "lucide-react";
 import { Card, CardHeader } from "@/components/ui/Card";
+import StatTile from "@/components/ui/StatTile";
 import Badge from "@/components/ui/Badge";
 import EmptyState from "@/components/ui/EmptyState";
 import AdminShell from "./AdminShell";
@@ -30,11 +31,11 @@ export default function AdminClients() {
     >
       <ProvisioningCard />
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 items-start">
-        <Tile label="Total clients"           value="5"  hint="across 4 deployment types" />
-        <Tile label="White-label"             value="3"  />
-        <Tile label="Sovereign hosting"       value="1"  />
-        <Tile label="Properties under licence" value="59" />
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 items-start">
+        <StatTile label="Total clients"           value="5"  hint="across 4 deployment types" />
+        <StatTile label="White-label"             value="3"  />
+        <StatTile label="Sovereign hosting"       value="1"  />
+        <StatTile label="Properties under licence" value="59" />
       </div>
 
       <div className="flex items-center gap-2">
@@ -212,15 +213,5 @@ function ProvisioningCard() {
         </div>
       </div>
     </Card>
-  );
-}
-
-function Tile({ label, value, hint }: { label: string; value: string; hint?: string }) {
-  return (
-    <div className="rounded-xl border border-ink-200 bg-white p-4">
-      <div className="text-[11px] uppercase tracking-wide font-semibold text-ink-500">{label}</div>
-      <div className="text-2xl font-bold text-ink-900 mt-0.5">{value}</div>
-      {hint && <div className="text-[11px] text-ink-500">{hint}</div>}
-    </div>
   );
 }

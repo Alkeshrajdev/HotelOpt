@@ -30,6 +30,7 @@ import {
   XCircle,
 } from "lucide-react";
 import PageHeader from "@/components/ui/PageHeader";
+import StatTile from "@/components/ui/StatTile";
 import EmptyState from "@/components/ui/EmptyState";
 import { Card, CardHeader } from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
@@ -149,11 +150,11 @@ function ClientView() {
 
   return (
     <>
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 items-start">
-        <Tile label="Suppliers invited"    value="120" tone="info" />
-        <Tile label="Active responses"     value="68"  tone="good" hint="57% response rate" />
-        <Tile label="Attestations on file" value="312" tone="info" />
-        <Tile label="Pending re-review"    value="9"   tone="warn" hint="supplier corrections" />
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 items-start">
+        <StatTile label="Suppliers invited"    value="120" tone="info" />
+        <StatTile label="Active responses"     value="68"  tone="good" hint="57% response rate" />
+        <StatTile label="Attestations on file" value="312" tone="info" />
+        <StatTile label="Pending re-review"    value="9"   tone="warn" hint="supplier corrections" />
       </div>
 
       {/* Supplier directory */}
@@ -740,11 +741,11 @@ function InviteSupplierModal({ open, onClose }: { open: boolean; onClose: () => 
 function SupplierView() {
   return (
     <>
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 items-start">
-        <Tile label="Client requests open"  value="3"  tone="warn" hint="due within 14 days" />
-        <Tile label="Clients you supply"    value="12" tone="info" />
-        <Tile label="Products in catalogue" value="8"  tone="info" />
-        <Tile label="Attestations on file"  value="6"  tone="good" hint="all current" />
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 items-start">
+        <StatTile label="Client requests open"  value="3"  tone="warn" hint="due within 14 days" />
+        <StatTile label="Clients you supply"    value="12" tone="info" />
+        <StatTile label="Products in catalogue" value="8"  tone="info" />
+        <StatTile label="Attestations on file"  value="6"  tone="good" hint="all current" />
       </div>
 
       <div className="grid grid-cols-12 gap-4">
@@ -943,17 +944,6 @@ function Row({ label, value }: { label: string; value: string }) {
       <span className="text-[12px] text-ink-500">{label}</span>
       <span className="font-medium text-ink-900">{value}</span>
     </li>
-  );
-}
-
-function Tile({ label, value, hint, tone }: { label: string; value: string; hint?: string; tone: "good" | "info" | "warn" }) {
-  const ring = { good: "border-good/25 bg-good/10", info: "border-ink-200 bg-ink-50", warn: "border-warn/25 bg-warn/10" }[tone];
-  return (
-    <div className={cn("rounded-xl border p-4", ring)}>
-      <div className="text-[11px] uppercase tracking-wide font-semibold text-ink-500">{label}</div>
-      <div className="text-2xl font-bold text-ink-900 mt-0.5">{value}</div>
-      {hint && <div className="text-[11px] text-ink-500">{hint}</div>}
-    </div>
   );
 }
 

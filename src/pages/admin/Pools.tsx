@@ -1,5 +1,6 @@
 import { Globe2, Plus, ShieldAlert, Users2 } from "lucide-react";
 import { Card, CardHeader } from "@/components/ui/Card";
+import StatTile from "@/components/ui/StatTile";
 import Badge from "@/components/ui/Badge";
 import AdminShell from "./AdminShell";
 
@@ -23,11 +24,11 @@ export default function AdminPools() {
       subtitle="Pools are isolated per client deployment. A property in one client's pool is never compared against any other client's properties (BRD §2.3). Display level is set automatically by pool size."
       actions={<button className="btn-primary"><Plus size={14} /> New pool</button>}
     >
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 items-start">
-        <Tile label="Total pools"          value={String(POOLS.length)} />
-        <Tile label="Properties pooled"    value={String(POOLS.reduce((s, p) => s + p.properties, 0))} />
-        <Tile label="Full-display pools"   value={String(POOLS.filter((p) => p.level === "Full").length)} hint="≥ 10 properties" />
-        <Tile label="Onboarding pools"     value={String(POOLS.filter((p) => p.level === "Reference").length)} hint="< 4 properties" />
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 items-start">
+        <StatTile label="Total pools"          value={String(POOLS.length)} />
+        <StatTile label="Properties pooled"    value={String(POOLS.reduce((s, p) => s + p.properties, 0))} />
+        <StatTile label="Full-display pools"   value={String(POOLS.filter((p) => p.level === "Full").length)} hint="≥ 10 properties" />
+        <StatTile label="Onboarding pools"     value={String(POOLS.filter((p) => p.level === "Reference").length)} hint="< 4 properties" />
       </div>
 
       <div className="rounded-xl border border-warn/25 bg-warn/10 p-3 flex items-start gap-2 text-[13px] text-warn">
@@ -77,15 +78,5 @@ export default function AdminPools() {
         </div>
       </Card>
     </AdminShell>
-  );
-}
-
-function Tile({ label, value, hint }: { label: string; value: string; hint?: string }) {
-  return (
-    <div className="rounded-xl border border-ink-200 bg-white p-4">
-      <div className="text-[11px] uppercase tracking-wide font-semibold text-ink-500">{label}</div>
-      <div className="text-2xl font-bold text-ink-900 mt-0.5">{value}</div>
-      {hint && <div className="text-[11px] text-ink-500">{hint}</div>}
-    </div>
   );
 }

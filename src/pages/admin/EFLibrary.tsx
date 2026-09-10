@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { History, Plus, Search, Upload } from "lucide-react";
 import { Card, CardHeader } from "@/components/ui/Card";
+import StatTile from "@/components/ui/StatTile";
 import Badge from "@/components/ui/Badge";
 import EmptyState from "@/components/ui/EmptyState";
 import AdminShell from "./AdminShell";
@@ -33,11 +34,11 @@ export default function AdminEFLibrary() {
         </>
       }
     >
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 items-start">
-        <Tile label="Active EFs"    value={String(EFS.filter((e) => e.active).length)} hint={`${EFS.length} total`} />
-        <Tile label="Sources"        value="84"  hint="across regions" />
-        <Tile label="Supplier-specific" value="36" hint="Cat 1 / 2 / 4" />
-        <Tile label="Pending review" value="2"   hint="awaiting Super Admin" />
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 items-start">
+        <StatTile label="Active EFs"    value={String(EFS.filter((e) => e.active).length)} hint={`${EFS.length} total`} />
+        <StatTile label="Sources"        value="84"  hint="across regions" />
+        <StatTile label="Supplier-specific" value="36" hint="Cat 1 / 2 / 4" />
+        <StatTile label="Pending review" value="2"   hint="awaiting Super Admin" />
       </div>
 
       <div className="flex items-center gap-2 flex-wrap">
@@ -101,15 +102,5 @@ export default function AdminEFLibrary() {
         </div>
       </Card>
     </AdminShell>
-  );
-}
-
-function Tile({ label, value, hint }: { label: string; value: string; hint?: string }) {
-  return (
-    <div className="rounded-xl border border-ink-200 bg-white p-4">
-      <div className="text-[11px] uppercase tracking-wide font-semibold text-ink-500">{label}</div>
-      <div className="text-2xl font-bold text-ink-900 mt-0.5">{value}</div>
-      {hint && <div className="text-[11px] text-ink-500">{hint}</div>}
-    </div>
   );
 }

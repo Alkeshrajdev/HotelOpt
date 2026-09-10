@@ -39,6 +39,7 @@ import {
   Zap,
 } from "lucide-react";
 import PageHeader from "@/components/ui/PageHeader";
+import StatTile from "@/components/ui/StatTile";
 import { Card, CardHeader } from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import Modal from "@/components/ui/Modal";
@@ -311,7 +312,7 @@ function PublicPageTab({ property }: { property: string }) {
                 <div className="text-2xl font-bold">A more sustainable stay</div>
                 <div className="text-sm opacity-90">All metrics independently verified through Hotel Optimizer.</div>
               </div>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 items-start p-4">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 items-start p-4">
                 {metrics.filter((m) => m.isPublic).slice(0, 4).map((m) => (
                   <div key={m.name} className="rounded-xl border border-ink-200 p-3">
                     <div className="text-[11px] text-ink-500">{m.name}</div>
@@ -616,11 +617,11 @@ function CampaignsTab({ property }: { property: string }) {
   return (
     <>
       {/* Summary row — mirrors the Overview / Eco-points tile rows so the tabs read as one system */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 items-start">
-        <Tile label="Active campaigns" value={String(activeCount)} hint={`${campaigns.length} total`} tone="good" />
-        <Tile label="Total reach" value={totalReach.toLocaleString()} hint="guests across campaigns" tone="info" />
-        <Tile label="Avg open rate" value={`${avgOpen}%`} hint="of delivered" tone={avgOpen >= 40 ? "good" : "warn"} />
-        <Tile label="Completed" value={String(completedCount)} hint="campaigns this year" tone="info" />
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 items-start">
+        <StatTile label="Active campaigns" value={String(activeCount)} hint={`${campaigns.length} total`} tone="good" />
+        <StatTile label="Total reach" value={totalReach.toLocaleString()} hint="guests across campaigns" tone="info" />
+        <StatTile label="Avg open rate" value={`${avgOpen}%`} hint="of delivered" tone={avgOpen >= 40 ? "good" : "warn"} />
+        <StatTile label="Completed" value={String(completedCount)} hint="campaigns this year" tone="info" />
       </div>
 
       <Card>
@@ -739,10 +740,10 @@ function CampaignDetailModal({ campaign: c, onClose }: { campaign: Campaign | nu
   return (
     <Modal open onClose={onClose} title={c.name} subtitle={`${CHANNEL_LABEL[c.channel]} · ${c.property} · ${c.scheduled}`} size="md">
       <div className="p-5 space-y-4">
-        <div className="grid grid-cols-3 gap-3">
-          <Tile label="Reach" value={c.reach.toLocaleString()} tone="info" />
-          <Tile label="Open rate" value={`${c.openRate}%`} tone={c.openRate >= 40 ? "good" : "warn"} />
-          <Tile label="Eco-action rate" value={`${ofSent(steps[4].count)}%`} hint="of sent" tone="good" />
+        <div className="grid grid-cols-3 gap-4 items-start">
+          <StatTile variant="panel" label="Reach" value={c.reach.toLocaleString()} tone="info" />
+          <StatTile variant="panel" label="Open rate" value={`${c.openRate}%`} tone={c.openRate >= 40 ? "good" : "warn"} />
+          <StatTile variant="panel" label="Eco-action rate" value={`${ofSent(steps[4].count)}%`} hint="of sent" tone="good" />
         </div>
         <div>
           <div className="text-[11px] font-semibold text-ink-500 uppercase tracking-wide mb-2">Conversion funnel</div>
@@ -999,10 +1000,10 @@ function EcoPointsTab() {
       </Card>
 
       {/* Summary tiles */}
-      <div className="grid grid-cols-3 gap-3">
-        <Tile label="Total issued" value={totalIssued.toLocaleString()} hint="pts this period" tone="info" />
-        <Tile label="Redeemed"     value={totalRedeemed.toLocaleString()} hint="pts converted" tone="good" />
-        <Tile label="Redemption rate" value={`${Math.round(totalRedeemed / totalIssued * 100)}%`} hint="of issued points" tone="warn" />
+      <div className="grid grid-cols-3 gap-4 items-start">
+        <StatTile label="Total issued" value={totalIssued.toLocaleString()} hint="pts this period" tone="info" />
+        <StatTile label="Redeemed"     value={totalRedeemed.toLocaleString()} hint="pts converted" tone="good" />
+        <StatTile label="Redemption rate" value={`${Math.round(totalRedeemed / totalIssued * 100)}%`} hint="of issued points" tone="warn" />
       </div>
 
       {/* Rewards catalogue — what points redeem for */}
@@ -1139,11 +1140,11 @@ function QrAnalyticsTab({ property }: { property: string }) {
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 items-start">
-        <Tile label="Scans · 30d" value={totalScans.toLocaleString()} hint="in-room + public points" tone="info" />
-        <Tile label="Scan → action" value={`${weightedConv}%`} hint="led to an eco-action" tone="good" />
-        <Tile label="Active QR points" value={String(QR_POINTS.length)} hint={property} tone="info" />
-        <Tile label="Unique guests" value={`~${(totalScans * 0.8 / 1000).toFixed(1)}k`} hint="est. distinct scanners" tone="info" />
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 items-start">
+        <StatTile label="Scans · 30d" value={totalScans.toLocaleString()} hint="in-room + public points" tone="info" />
+        <StatTile label="Scan → action" value={`${weightedConv}%`} hint="led to an eco-action" tone="good" />
+        <StatTile label="Active QR points" value={String(QR_POINTS.length)} hint={property} tone="info" />
+        <StatTile label="Unique guests" value={`~${(totalScans * 0.8 / 1000).toFixed(1)}k`} hint="est. distinct scanners" tone="info" />
       </div>
 
       <div className="grid grid-cols-12 gap-4">
@@ -1343,17 +1344,5 @@ function Trend({ data, className = "text-brand-600", height = 44 }: { data: numb
       <path d={area} fill="currentColor" opacity={0.1} />
       <path d={line} fill="none" stroke="currentColor" strokeWidth={1.5} vectorEffect="non-scaling-stroke" />
     </svg>
-  );
-}
-
-function Tile({ label, value, hint, tone }: { label: string; value: string; hint?: string; tone: "good" | "warn" | "info" | "bad" | "neutral" }) {
-  const border = tone === "good" ? "border-good/20" : tone === "warn" ? "border-warn/20" : tone === "bad" ? "border-bad/20" : "border-ink-200";
-  const text   = tone === "good" ? "text-good"      : tone === "warn" ? "text-warn"      : tone === "bad" ? "text-bad"      : "text-brand-700";
-  return (
-    <div className={cn("rounded-2xl border bg-white p-4", border)}>
-      <div className="text-[11px] font-semibold uppercase tracking-[0.06em] text-ink-500">{label}</div>
-      <div className={cn("text-3xl font-bold mt-1 tabular-nums", text)}>{value}</div>
-      {hint && <div className="text-[11px] text-ink-400 mt-0.5">{hint}</div>}
-    </div>
   );
 }

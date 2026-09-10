@@ -21,6 +21,7 @@ import {
   XCircle,
 } from "lucide-react";
 import PageHeader from "@/components/ui/PageHeader";
+import StatTile from "@/components/ui/StatTile";
 import { Card, CardHeader } from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import ProgressBar from "@/components/ui/ProgressBar";
@@ -491,11 +492,11 @@ export default function Certifications() {
       </Card>
 
       {/* Programme-level summary */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 items-start">
-        <SummaryTile label={cert?.code ?? programme} value={`${summary.readyPct}% ready`} hint={cert?.name ?? ""} tone="brand" />
-        <SummaryTile label="Ready"     value={String(summary.ready)}   hint={`of ${summary.total} criteria`} tone="good" />
-        <SummaryTile label="Partial"   value={String(summary.partial)} hint="awaiting evidence"              tone="warn" />
-        <SummaryTile label="Not ready" value={String(summary.gap)}     hint="needs action"                   tone="bad" />
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 items-start">
+        <StatTile label={cert?.code ?? programme} value={`${summary.readyPct}% ready`} hint={cert?.name ?? ""} tone="brand" />
+        <StatTile label="Ready"     value={String(summary.ready)}   hint={`of ${summary.total} criteria`} tone="good" />
+        <StatTile label="Partial"   value={String(summary.partial)} hint="awaiting evidence"              tone="warn" />
+        <StatTile label="Not ready" value={String(summary.gap)}     hint="needs action"                   tone="bad" />
       </div>
 
       {/* Criterion table */}
@@ -747,19 +748,6 @@ function CertCertificatePanel() {
 }
 
 /* ---------- helpers ---------- */
-
-function SummaryTile({ label, value, hint, tone }: {
-  label: string; value: string; hint?: string; tone: "brand" | "good" | "warn" | "bad";
-}) {
-  const accent = { brand: "", good: "", warn: "", bad: "" }[tone];
-  return (
-    <div className={cn("card card-pad", accent)}>
-      <div className="text-[11px] uppercase tracking-[0.06em] font-semibold text-ink-400">{label}</div>
-      <div className="text-stat leading-none font-bold text-ink-900 mt-1.5 tabular-nums">{value}</div>
-      {hint && <div className="text-[12px] text-ink-500 mt-1">{hint}</div>}
-    </div>
-  );
-}
 
 function EvidenceRow({ name, type, uploaded }: { name: string; type: string; uploaded: string }) {
   return (
