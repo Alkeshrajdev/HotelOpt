@@ -34,7 +34,7 @@ export default function AdminEFLibrary() {
         </>
       }
     >
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 items-start">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <StatTile label="Active EFs"    value={String(EFS.filter((e) => e.active).length)} hint={`${EFS.length} total`} />
         <StatTile label="Sources"        value="84"  hint="across regions" />
         <StatTile label="Supplier-specific" value="36" hint="Cat 1 / 2 / 4" />
@@ -54,7 +54,7 @@ export default function AdminEFLibrary() {
       <Card>
         <CardHeader title="Emission factors" hint="Locking a version freezes it for assurance" />
         <div className="overflow-x-auto">
-          <table className="min-w-full">
+          <table className="w-full min-w-[960px]">
             <thead>
               <tr className="bg-ink-50">
                 <th className="table-th">Source</th>

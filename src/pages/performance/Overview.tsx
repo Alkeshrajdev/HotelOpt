@@ -4,9 +4,7 @@ import {
   Droplet,
   Lightbulb,
   Recycle,
-  ShieldCheck,
   Target,
-  Users as UsersIcon,
   Zap,
 } from "lucide-react";
 import KpiTile from "@/components/ui/KpiTile";
@@ -15,7 +13,7 @@ import { Card, CardHeader } from "@/components/ui/Card";
 import IntensityChart from "@/components/charts/IntensityChart";
 import AreaTrend from "@/components/charts/Area";
 import HBar from "@/components/charts/HBar";
-import { CARBON, GOVERNANCE, SOCIAL, WASTE, WATER } from "@/lib/pillarData";
+import { CARBON, WASTE, WATER } from "@/lib/pillarData";
 import { MONTHLY_INTENSITY } from "@/lib/mock";
 import {
   EnergyCostDrilldown,
@@ -27,21 +25,13 @@ import {
   ScopeDrilldown,
 } from "@/components/dashboard/Drilldowns";
 import {
-  AntiCorruptionDrilldown,
-  AttestationsDrilldown,
   CarbonIntensityDrilldown,
-  DiversityDrilldown,
-  HeadcountDrilldown,
-  SafetyDrilldown,
-  SupplierCodeDrilldown,
-  TrainingDrilldown,
   WasteDiversionDrilldown,
   WasteFoodDrilldown,
   WasteIntensityDrilldown,
   WaterIntensityDrilldown,
   WaterLeaksDrilldown,
   WaterRecycledDrilldown,
-  WhistleblowDrilldown,
 } from "@/components/dashboard/PillarDrilldowns";
 import type { PillarKey } from "./Shell";
 
@@ -121,43 +111,8 @@ const CARBON_CFG: PillarConfig = {
   trend: { kind: "area", data: CARBON.trend, color: "#8B6D66", format: (v) => v.toFixed(3) },
 };
 
-const SOCIAL_CFG: PillarConfig = {
-  kpis: SOCIAL.kpis.map((k) => ({
-    id: k.drilldown,
-    icon: <UsersIcon size={18} />,
-    iconBg: "bg-pillar-social/10 text-pillar-social",
-    label: k.label, value: k.value, unit: k.unit, delta: k.delta,
-    goodDirection: k.goodDirection,
-  })),
-  trendTitle: "Headcount over time",
-  trend: { kind: "area", data: SOCIAL.headcountTrend, color: "#634D48" },
-};
-
-const GOV_CFG: PillarConfig = {
-  kpis: GOVERNANCE.kpis.map((k) => ({
-    id: k.drilldown,
-    icon: <ShieldCheck size={18} />,
-    iconBg: "bg-pillar-gov/10 text-pillar-gov",
-    label: k.label, value: k.value, unit: k.unit, delta: k.delta,
-    goodDirection: k.goodDirection, caption: k.caption,
-  })),
-  trendTitle: "Supplier code adoption over time",
-  trend: {
-    kind: "area",
-    data: [
-      { x: "May", v: 56 }, { x: "Jun", v: 58 }, { x: "Jul", v: 61 },
-      { x: "Aug", v: 64 }, { x: "Sep", v: 66 }, { x: "Oct", v: 68 },
-      { x: "Nov", v: 70 }, { x: "Dec", v: 71 }, { x: "Jan", v: 72 },
-      { x: "Feb", v: 73 }, { x: "Mar", v: 74 }, { x: "Apr", v: 74 },
-    ],
-    color: "#747771",
-    format: (v) => `${v}%`,
-  },
-};
-
 const CONFIGS: Record<PillarKey, PillarConfig> = {
-  energy: ENERGY_CFG, water: WATER_CFG, waste: WASTE_CFG,
-  carbon: CARBON_CFG, social: SOCIAL_CFG, governance: GOV_CFG,
+  energy: ENERGY_CFG, water: WATER_CFG, waste: WASTE_CFG, carbon: CARBON_CFG,
 };
 
 /* Per-pillar evidence / provenance summary — feeds the EvidenceMeta strip. */
@@ -169,8 +124,6 @@ const EVIDENCE_BY_PILLAR: Record<
   water:      { records: 178, matchPct: 84, lastApproved: "18 May 2026" },
   waste:      { records: 296, matchPct: 71, lastApproved: "15 May 2026" },
   carbon:     { records: 142, matchPct: 92, lastApproved: "12 May 2026" },
-  social:     { records:  84, matchPct: 78, lastApproved: "30 Apr 2026" },
-  governance: { records:  48, matchPct: 96, lastApproved: "02 May 2026" },
 };
 
 /* Drilldown registry — same as Dashboard, kept here so this view is self-contained */
@@ -192,14 +145,6 @@ function getDrill(id: string): { title: string; subtitle?: string; hero?: ReactN
     case "scope-1":          return { title: "Scope 1 — direct emissions", hero: <HeroValue value="3,428" unit="tCO₂e" delta={-3.1} />, body: <ScopeDrilldown scope={1} /> };
     case "scope-2":          return { title: "Scope 2 — purchased energy", hero: <HeroValue value="14,569" unit="tCO₂e" delta={-12.1} />, body: <ScopeDrilldown scope={2} /> };
     case "scope-3":          return { title: "Scope 3 — value chain", hero: <HeroValue value="24,853" unit="tCO₂e" delta={-2.2} />, body: <ScopeDrilldown scope={3} /> };
-    case "headcount":        return { title: "Headcount", hero: <HeroValue value="3,240" delta={4.1} goodDirection="up" />, body: <HeadcountDrilldown /> };
-    case "diversity":        return { title: "Female leadership", hero: <HeroValue value="42" unit="%" delta={3.5} goodDirection="up" />, body: <DiversityDrilldown /> };
-    case "training":         return { title: "Training hours per FTE", hero: <HeroValue value="18" delta={2.0} goodDirection="up" />, body: <TrainingDrilldown /> };
-    case "safety":           return { title: "Health & safety — LTIFR", hero: <HeroValue value="0.42" delta={-12} />, body: <SafetyDrilldown /> };
-    case "attestations":     return { title: "Annual attestations", hero: <HeroValue value="11/12" context="1 outstanding" />, body: <AttestationsDrilldown /> };
-    case "ac-training":      return { title: "Anti-corruption training", hero: <HeroValue value="96" unit="%" delta={4} goodDirection="up" />, body: <AntiCorruptionDrilldown /> };
-    case "whistleblow":      return { title: "Whistleblowing reports", hero: <HeroValue value="3/3" context="resolved last 12 months" />, body: <WhistleblowDrilldown /> };
-    case "supplier-code":    return { title: "Supplier code adoption", hero: <HeroValue value="74" unit="%" delta={6} goodDirection="up" />, body: <SupplierCodeDrilldown /> };
     default: return null;
   }
 }
@@ -212,7 +157,7 @@ export default function Overview({ pillar }: { pillar: PillarKey }) {
   return (
     <div className="space-y-5">
       {/* KPI tiles */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 items-start">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {cfg.kpis.map((k) => (
           <KpiTile
             key={k.id}
@@ -248,7 +193,7 @@ export default function Overview({ pillar }: { pillar: PillarKey }) {
         </Card>
 
         <Card className="col-span-12 lg:col-span-4">
-          <CardHeader title="Source split" hint={pillar === "social" || pillar === "governance" ? "Composition" : "Where consumption comes from"} />
+          <CardHeader title="Source split" hint="Where consumption comes from" />
           <div className="p-6">
             <HBar data={breakdownFor(pillar)} />
           </div>
@@ -260,7 +205,7 @@ export default function Overview({ pillar }: { pillar: PillarKey }) {
         <Card>
           <CardHeader title="Targets" hint="FR-3.7 — RAG vs target" />
           <div className="overflow-x-auto">
-            <table className="min-w-full">
+            <table className="w-full min-w-[720px]">
               <thead>
                 <tr className="bg-ink-50">
                   <th className="table-th">Metric</th>
@@ -314,16 +259,6 @@ function breakdownFor(pillar: PillarKey): { name: string; value: number }[] {
         { name: "Scope 1", value: 8 },
         { name: "Scope 2 (location)", value: 34 },
         { name: "Scope 3", value: 58 },
-      ];
-    case "social":
-      return SOCIAL.byRole;
-    case "governance":
-      return [
-        { name: "Anti-corruption training", value: 96 },
-        { name: "Supplier code adoption", value: 74 },
-        { name: "Code of conduct signed", value: 100 },
-        { name: "Conflict register up to date", value: 92 },
-        { name: "Whistleblowing reports closed", value: 100 },
       ];
   }
 }

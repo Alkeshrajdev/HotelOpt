@@ -383,7 +383,7 @@ function SavingsDetailModal({ saving, open, onClose }: { saving: SavingRecord | 
         {/* Identity */}
         <div>
           <h4 className="text-xs font-semibold text-ink-500 uppercase tracking-wider mb-3">Saving Details</h4>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3 items-start">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
             {[
               { label: "Record ID", value: saving.id },
               { label: "Category", value: saving.category },
@@ -581,7 +581,7 @@ function SavingsTable({ records }: { records: SavingRecord[] }) {
     <>
       <Card>
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full text-sm min-w-[960px]">
             <thead>
               <tr className="border-b border-ink-100">
                 <th className="text-left px-4 py-3 text-xs text-ink-500 font-medium">Saving Name</th>
@@ -781,7 +781,7 @@ function EnergySavingsTab() {
   return (
     <div className="space-y-6">
       {/* Energy summary KPIs */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <KpiTile
           icon={<Zap className="w-5 h-5" />}
           iconBg="bg-warn/10"
@@ -836,7 +836,7 @@ function WaterSavingsTab() {
   return (
     <div className="space-y-6">
       {/* Water summary KPIs */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <KpiTile
           icon={<Droplets className="w-5 h-5" />}
           iconBg="bg-info/10"
@@ -944,7 +944,7 @@ function ReportingStatusTab() {
   return (
     <div className="space-y-6">
       {/* Framework eligibility cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {REPORTING_CATEGORIES.map((cat) => {
           const records = countByStatus[cat.status] ?? [];
           return (
@@ -1117,7 +1117,7 @@ export default function SavingsVerification() {
         </div>
 
         {/* KPI bar */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 items-start">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <KpiTile
             icon={<CheckCircle className="w-5 h-5 text-good-700" />}
             iconBg="bg-good/10"

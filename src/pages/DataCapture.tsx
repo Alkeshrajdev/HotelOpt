@@ -336,7 +336,7 @@ function PickDataType({ onPick }: { onPick: (k: DataTypeKey) => void }) {
           <h2 className="text-lg font-bold text-ink-900">What do you want to capture?</h2>
         </div>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 items-start">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4">
         {DATA_TYPES.map((dt) => {
           const Icon = dt.icon;
           return (
@@ -398,7 +398,7 @@ function PickMethod({
           <h2 className="text-lg font-bold text-ink-900">How would you like to enter it?</h2>
         </div>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 items-start">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
         {ALL_METHODS.map((m) => {
           const supported = cfg.methods.includes(m);
           const meta = METHOD_META[m];
@@ -1329,7 +1329,7 @@ function FileDrop({ files, setFiles }: { files: File[]; setFiles: (f: File[]) =>
 }
 
 function PillarMulti({ value, onChange }: { value: string[]; onChange: (v: string[]) => void }) {
-  const PILLARS = ["energy", "water", "waste", "carbon", "social", "governance"];
+  const PILLARS = ["energy", "water", "waste", "carbon"];
   return (
     <div className="flex flex-wrap gap-2">
       {PILLARS.map((p) => {
@@ -2146,7 +2146,7 @@ function SurveyWorkflow({ cfg }: { cfg: DataTypeConfig }) {
       )}
       {!createMode && (
         <div className="overflow-x-auto">
-          <table className="min-w-full">
+          <table className="w-full min-w-[720px]">
             <thead>
               <tr className="bg-ink-50">
                 <th className="table-th">Campaign</th>

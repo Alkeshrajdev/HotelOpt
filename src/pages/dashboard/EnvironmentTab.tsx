@@ -341,15 +341,15 @@ function CarbonSection() {
       <SectionHeader confidence={AVG_CONFIDENCE} hubTo="/performance/carbon/overview" hubLabel="Open Carbon Hub" />
 
       {/* Scope 1 + Scope 2 + Scope 3 breakdown — 3 columns */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
 
         {/* Scope 1 detail */}
-        <Card>
+        <Card className="flex flex-col">
           <CardHeader
             title="Scope 1 — Source Breakdown"
             hint="3,428 tCO₂e · direct combustion & fugitives"
           />
-          <div className="px-4 pb-4 pt-2 space-y-4">
+          <div className="px-4 pb-4 pt-2 flex-1 flex flex-col gap-4">
             <ResponsiveContainer width="100%" height={160}>
               <BarChart data={SCOPE1_BREAKDOWN} layout="vertical" margin={{ top: 0, right: 40, bottom: 0, left: 0 }}>
                 <XAxis type="number" tick={{ fontSize: 9, fill: "#7B8285" }} axisLine={false} tickLine={false} />
@@ -393,7 +393,7 @@ function CarbonSection() {
                 </li>
               ))}
             </ul>
-            <div className="flex items-start gap-1.5 rounded-lg bg-warn/10 px-3 py-2 text-[11px] text-warn">
+            <div className="flex items-start gap-1.5 rounded-lg bg-warn/10 px-3 py-2 text-[11px] text-warn mt-auto">
               <Info size={11} className="shrink-0 mt-0.5" />
               <span>Refrigerant leaks are the highest Scope 1 reduction opportunity — survey all HVAC units annually.</span>
             </div>
@@ -401,12 +401,12 @@ function CarbonSection() {
         </Card>
 
         {/* Scope 2 methods */}
-        <Card>
+        <Card className="flex flex-col">
           <CardHeader
             title="Scope 2 — Location vs Market"
             hint="both methods required by GHG Protocol"
           />
-          <div className="px-4 pb-4 pt-2 space-y-4">
+          <div className="px-4 pb-4 pt-2 flex-1 flex flex-col gap-4">
             <div className="grid grid-cols-2 gap-3">
               <div className="card-level-3 p-3 rounded-lg">
                 <div className="text-[10px] text-ink-500 font-semibold uppercase tracking-wide mb-1">Location-based</div>
@@ -480,7 +480,7 @@ function CarbonSection() {
               </li>
             </ul>
 
-            <div className="flex items-start gap-1.5 rounded-lg bg-brand-50 px-3 py-2 text-[11px] text-brand-700">
+            <div className="flex items-start gap-1.5 rounded-lg bg-brand-50 px-3 py-2 text-[11px] text-brand-700 mt-auto">
               <Info size={11} className="shrink-0 mt-0.5" />
               <span>PPAs would allow full market-based abatement — Bay View SG chiller PPA in feasibility.</span>
             </div>
@@ -488,12 +488,12 @@ function CarbonSection() {
         </Card>
 
         {/* Scope 3 categories */}
-        <Card>
+        <Card className="flex flex-col">
           <CardHeader
             title="Scope 3 — Category Breakdown"
             hint="24,853 tCO₂e · upstream & downstream"
           />
-          <div className="px-4 pb-4 pt-2 space-y-3">
+          <div className="px-4 pb-4 pt-2 flex-1 flex flex-col gap-3">
             <ResponsiveContainer width="100%" height={170}>
               <BarChart data={PORTFOLIO_SCOPE3_CATEGORIES} layout="vertical"
                 margin={{ top: 0, right: 40, bottom: 0, left: 0 }}>
@@ -527,7 +527,7 @@ function CarbonSection() {
                 </li>
               ))}
             </ul>
-            <div className="flex items-start gap-1.5 rounded-lg bg-warn/10 px-3 py-2 text-[11px] text-warn">
+            <div className="flex items-start gap-1.5 rounded-lg bg-warn/10 px-3 py-2 text-[11px] text-warn mt-auto">
               <Info size={11} className="shrink-0 mt-0.5" />
               <span>Purchased goods & services (50%) dominates — 18 suppliers still using default emission factors.</span>
             </div>
@@ -620,7 +620,7 @@ function EnergySection() {
 
       <SectionHeader confidence={AVG_CONFIDENCE} hubTo="/performance/energy/overview" hubLabel="Open Energy Hub" />
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
 
         {/* Energy by system */}
         <Card>
@@ -797,7 +797,7 @@ function WaterSection() {
 
       <SectionHeader confidence={AVG_CONFIDENCE} hubTo="/performance/water/overview" hubLabel="Open Water Hub" />
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
 
         {/* Water by end-use */}
         <Card>
@@ -1048,7 +1048,7 @@ function WasteSection() {
         </div>
       </Card>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
 
         {/* Waste by source — stacked streams */}
         <Card>

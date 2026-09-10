@@ -312,7 +312,7 @@ function PublicPageTab({ property }: { property: string }) {
                 <div className="text-2xl font-bold">A more sustainable stay</div>
                 <div className="text-sm opacity-90">All metrics independently verified through Hotel Optimizer.</div>
               </div>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 items-start p-4">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4">
                 {metrics.filter((m) => m.isPublic).slice(0, 4).map((m) => (
                   <div key={m.name} className="rounded-xl border border-ink-200 p-3">
                     <div className="text-[11px] text-ink-500">{m.name}</div>
@@ -617,7 +617,7 @@ function CampaignsTab({ property }: { property: string }) {
   return (
     <>
       {/* Summary row — mirrors the Overview / Eco-points tile rows so the tabs read as one system */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 items-start">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <StatTile label="Active campaigns" value={String(activeCount)} hint={`${campaigns.length} total`} tone="good" />
         <StatTile label="Total reach" value={totalReach.toLocaleString()} hint="guests across campaigns" tone="info" />
         <StatTile label="Avg open rate" value={`${avgOpen}%`} hint="of delivered" tone={avgOpen >= 40 ? "good" : "warn"} />
@@ -627,7 +627,7 @@ function CampaignsTab({ property }: { property: string }) {
       <Card>
         <CardHeader title="Campaigns" hint="Click a campaign to see its performance funnel" right={<button className="btn-primary" onClick={openNew}><Plus size={14} /> New campaign</button>} />
         <div className="overflow-x-auto">
-          <table className="min-w-full">
+          <table className="w-full min-w-[960px]">
             <thead>
               <tr className="bg-ink-50">
                 <th className="table-th">Campaign</th>
@@ -740,7 +740,7 @@ function CampaignDetailModal({ campaign: c, onClose }: { campaign: Campaign | nu
   return (
     <Modal open onClose={onClose} title={c.name} subtitle={`${CHANNEL_LABEL[c.channel]} · ${c.property} · ${c.scheduled}`} size="md">
       <div className="p-5 space-y-4">
-        <div className="grid grid-cols-3 gap-4 items-start">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <StatTile variant="panel" label="Reach" value={c.reach.toLocaleString()} tone="info" />
           <StatTile variant="panel" label="Open rate" value={`${c.openRate}%`} tone={c.openRate >= 40 ? "good" : "warn"} />
           <StatTile variant="panel" label="Eco-action rate" value={`${ofSent(steps[4].count)}%`} hint="of sent" tone="good" />
@@ -985,7 +985,7 @@ function EcoPointsTab() {
       {/* Eco actions catalogue */}
       <Card>
         <CardHeader title="Eco-points catalogue" hint="Points awarded per qualifying guest action" />
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 items-start p-5">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 p-5">
           {ECO_ACTIONS.map((a) => (
             <div key={a.id} className="rounded-xl border border-ink-200 p-4 text-center hover:bg-ink-50/60">
               <div className="w-8 h-8 rounded-full bg-brand-50 text-brand-700 grid place-items-center mx-auto mb-2">
@@ -1000,7 +1000,7 @@ function EcoPointsTab() {
       </Card>
 
       {/* Summary tiles */}
-      <div className="grid grid-cols-3 gap-4 items-start">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <StatTile label="Total issued" value={totalIssued.toLocaleString()} hint="pts this period" tone="info" />
         <StatTile label="Redeemed"     value={totalRedeemed.toLocaleString()} hint="pts converted" tone="good" />
         <StatTile label="Redemption rate" value={`${Math.round(totalRedeemed / totalIssued * 100)}%`} hint="of issued points" tone="warn" />
@@ -1009,7 +1009,7 @@ function EcoPointsTab() {
       {/* Rewards catalogue — what points redeem for */}
       <Card>
         <CardHeader title="Rewards catalogue" hint="What guests can redeem their points for" right={<button className="btn-secondary text-[12px] h-8"><Plus size={13} /> Add reward</button>} />
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 items-start p-5">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 p-5">
           {REWARDS.map((r) => {
             const Icon = r.icon;
             return (
@@ -1140,7 +1140,7 @@ function QrAnalyticsTab({ property }: { property: string }) {
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 items-start">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <StatTile label="Scans · 30d" value={totalScans.toLocaleString()} hint="in-room + public points" tone="info" />
         <StatTile label="Scan → action" value={`${weightedConv}%`} hint="led to an eco-action" tone="good" />
         <StatTile label="Active QR points" value={String(QR_POINTS.length)} hint={property} tone="info" />
@@ -1207,6 +1207,7 @@ const JOURNEY: { stage: string; icon: typeof Leaf; points: Touchpoint[] }[] = [
   { stage: "Pre-stay", icon: LogIn, points: [
     { label: "Booking confirmation footprint", metric: "PMS-driven · every booking", active: true },
     { label: "Pre-arrival eco-tips email",     metric: "48% open rate", active: true },
+    { label: "Airport transfer options",        metric: "not configured", active: false },
   ] },
   { stage: "In-stay", icon: Smartphone, points: [
     { label: "In-room QR sustainability page", metric: "2,140 scans / 30d", active: true },
@@ -1258,7 +1259,7 @@ function OverviewTab({ property, onJump }: { property: string; onJump: (t: Tab) 
               <div><div className="font-bold text-lg tabular-nums">{impact.actions.toLocaleString()}</div><div className="opacity-80 text-[11px]">guest actions</div></div>
             </div>
           </div>
-          <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-2 content-start">
+          <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-2">
             {GUEST_ACTIONS.filter((a) => a.co2 > 0 || a.water > 0).map((a) => {
               const Icon = a.icon;
               const co2 = a.co2 * a.count;

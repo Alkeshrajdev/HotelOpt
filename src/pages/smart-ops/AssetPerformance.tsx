@@ -736,7 +736,7 @@ function AssetDetailModal({ asset, open, onClose }: { asset: Asset | null; open:
         {/* Identity */}
         <div>
           <h4 className="text-xs font-semibold text-ink-500 uppercase tracking-wider mb-3">Identity</h4>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 items-start">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {[
               { label: "Asset ID", value: asset.id },
               { label: "Manufacturer", value: asset.manufacturer },
@@ -758,7 +758,7 @@ function AssetDetailModal({ asset, open, onClose }: { asset: Asset | null; open:
         {/* Live Status */}
         <div>
           <h4 className="text-xs font-semibold text-ink-500 uppercase tracking-wider mb-3">Live Status</h4>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 items-start">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {isChiller01 ? (
               <>
                 <div className="bg-ink-50 rounded-lg p-3">
@@ -1111,7 +1111,7 @@ function AssetRegistryTab() {
       {/* Table */}
       <Card>
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full text-sm min-w-[960px]">
             <thead>
               <tr className="border-b border-ink-100">
                 <th className="text-left px-4 py-3 text-xs text-ink-500 font-medium">Asset</th>
@@ -1244,7 +1244,7 @@ function AssetHealthTab() {
   return (
     <div className="space-y-6">
       {/* KPI summary */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 items-start">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <KpiTile icon={<Database className="w-5 h-5" />} iconBg="bg-info/10" label="Total Assets" value="14" />
         <KpiTile icon={<CheckCircle className="w-5 h-5" />} iconBg="bg-good/10" label="Assets Good Health" value="8" delta={57} deltaUnit="% of fleet" goodDirection="up" />
         <KpiTile icon={<AlertTriangle className="w-5 h-5" />} iconBg="bg-warn/10" label="Assets With Alerts" value="6" delta={43} deltaUnit="% of fleet" goodDirection="down" />
@@ -1252,7 +1252,7 @@ function AssetHealthTab() {
       </div>
 
       {/* Health breakdown */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-start">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {healthCategories.map(({ label, count, assets, colour, headerColour, dotColour, tone }) => (
           <div key={label} className={cn("rounded-xl border p-4 space-y-3", colour)}>
             <div className="flex items-center justify-between">
@@ -1318,7 +1318,7 @@ function FaultsAlertsTab() {
 
       <Card>
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full text-sm min-w-[960px]">
             <thead>
               <tr className="border-b border-ink-100">
                 <th className="text-left px-4 py-3 text-xs text-ink-500 font-medium">Asset</th>
@@ -1405,7 +1405,7 @@ function MaintenanceTab() {
       {/* Actions table */}
       <Card>
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full text-sm min-w-[960px]">
             <thead>
               <tr className="border-b border-ink-100">
                 <th className="text-left px-4 py-3 text-xs text-ink-500 font-medium">Action ID</th>
@@ -1474,7 +1474,7 @@ function DocumentsTab() {
     <div className="space-y-4">
       <Card>
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full text-sm min-w-[720px]">
             <thead>
               <tr className="border-b border-ink-100">
                 <th className="text-left px-4 py-3 text-xs text-ink-500 font-medium">Asset</th>

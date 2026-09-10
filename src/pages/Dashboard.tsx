@@ -6,14 +6,12 @@ import OverviewTab from "./dashboard/OverviewTab";
 import EnvironmentTab from "./dashboard/EnvironmentTab";
 import TargetsTab from "./dashboard/TargetsTab";
 import HotelsTab from "./dashboard/HotelsTab";
-import SocialGovernanceTab from "./dashboard/SocialGovernanceTab";
 
 const TABS = [
   { key: "overview",     label: "Overview" },
   { key: "environment",  label: "Environment" },
   { key: "targets",      label: "Targets" },
   { key: "hotels",       label: "Hotels" },
-  { key: "social",       label: "Social & Governance" },
 ] as const;
 
 type TabKey = (typeof TABS)[number]["key"];
@@ -45,7 +43,6 @@ export default function Dashboard() {
         {tab === "environment" && <EnvironmentTab />}
         {tab === "targets"     && <TargetsTab />}
         {tab === "hotels"      && <HotelsTab />}
-        {tab === "social"      && <SocialGovernanceTab />}
       </div>
     </div>
   );

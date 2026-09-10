@@ -60,7 +60,7 @@ export default function GenuinePerformancePanel({ propertyName }: { propertyName
           hint="Expected = baseline scaled for how the drivers moved · Genuine = Measured vs Expected"
         />
         <div className="overflow-x-auto">
-          <table className="min-w-full text-sm">
+          <table className="text-sm w-full min-w-[720px]">
             <thead>
               <tr className="bg-ink-50 text-left">
                 <th className="table-th">Utility</th>

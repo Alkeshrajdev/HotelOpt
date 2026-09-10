@@ -590,7 +590,7 @@ export default function AlertsCentre() {
       {/* Alert table */}
       <Card level={2}>
         <div className="overflow-x-auto">
-          <table className="w-full">
+          <table className="w-full min-w-[960px]">
             <thead>
               <tr className="border-b border-ink-100">
                 <th className="text-left px-4 py-3 text-[11px] font-semibold text-ink-500 uppercase tracking-wide w-[100px]">Severity</th>

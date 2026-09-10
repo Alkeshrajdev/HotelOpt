@@ -476,7 +476,7 @@ function sumMetric(actions: Action[], key: string): number {
 
 export function pillarProgress(): PillarProgress[] {
   const reduction = reductionActions();
-  const pillars: Pillar[] = ["energy", "water", "waste", "carbon", "social", "governance"];
+  const pillars: Pillar[] = ["energy", "water", "waste", "carbon"];
   return pillars.map((p) => {
     const inPillar = reduction.filter((a) => a.pillar === p);
     const delivered = inPillar.filter((a) => DELIVERED.includes(a.stage));

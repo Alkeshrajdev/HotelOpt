@@ -193,7 +193,7 @@ function EnergyOverviewSample() {
     <div className="space-y-5">
 
       {/* ── KPI tiles ──────────────────────────────────────────────────── */}
-      <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 items-start">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <KpiTile
           icon={<Zap size={18} />}
           iconBg="bg-pillar-energy/10 text-pillar-energy"
@@ -354,7 +354,7 @@ function EnergyOverviewSample() {
         <h2 className="text-[13px] font-semibold text-ink-700 mb-3">
           Consumption by energy source
         </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 items-start">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
           {SOURCES.map((s) => (
             <SourceChart key={s.key} source={s} data={MONTHLY} />
           ))}

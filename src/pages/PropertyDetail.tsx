@@ -334,7 +334,7 @@ function MeterRegistry({ property }: { property: RichProperty }) {
         right={<button className="btn-secondary" onClick={openNew}><Plus size={14} /> Add meter</button>}
       />
       <div className="overflow-x-auto">
-        <table className="min-w-full text-sm">
+        <table className="text-sm w-full min-w-[720px]">
           <thead>
             <tr className="bg-ink-50 text-left">
               <th className="table-th">Type</th>
@@ -474,7 +474,7 @@ function UsersTab({ property }: { property: RichProperty }) {
           right={<button className="btn-primary">+ Assign user</button>}
         />
         <div className="overflow-x-auto">
-          <table className="min-w-full">
+          <table className="w-full min-w-[960px]">
             <thead>
               <tr className="bg-ink-50">
                 <th className="table-th">Name</th>
@@ -643,7 +643,7 @@ function QrPointsTab({ property }: { property: RichProperty }) {
           }
         />
         <div className="overflow-x-auto">
-          <table className="min-w-full">
+          <table className="w-full min-w-[960px]">
             <thead>
               <tr className="bg-ink-50">
                 <th className="table-th">Label</th>
@@ -737,7 +737,7 @@ function AuditHistoryTab({ property }: { property: RichProperty }) {
         hint="Immutable. Every change to a GP-affecting attribute is logged with old value, new value, actor, change date, effective date, and reason."
       />
       <div className="overflow-x-auto">
-        <table className="min-w-full">
+        <table className="w-full min-w-[720px]">
           <thead>
             <tr className="bg-ink-50">
               <th className="table-th">Field</th>
@@ -1063,8 +1063,6 @@ function PillarBadges({ pillars }: { pillars: PillarKey[] }) {
     water: Droplet,
     waste: Recycle,
     carbon: Cloud,
-    social: Users,
-    governance: ShieldCheck,
   };
   return (
     <div className="flex flex-wrap gap-1.5">

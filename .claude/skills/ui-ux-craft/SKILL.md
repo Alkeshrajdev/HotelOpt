@@ -32,11 +32,15 @@ repo's tokens. When in doubt, the rule wins over the existing code.
   data-driven, keep cards the same size and let the last row left-align.
 - Two-column splits: tables and charts take the wide half (8/4 or 7/5); key/value rails take the narrow.
   Equal content → equal halves (6/6).
-- **Cards hug their content.** Card rows are `items-start` — a card never stretches to pool empty
-  space below its content. Compose rows from cards of comparable depth (compact breakdowns
-  together, long lists together); pin supporting notes to the bottom with `mt-auto` so slack sits
-  between sections; if a card is inherently short next to its neighbours, give it a purposeful
-  visual (a mini trend chart), not filler.
+- **Rows align; content fills.** Cards in a row are always the same height (grid default
+  `items-stretch` — never `items-start`, ragged bottoms read as broken). Empty space inside an
+  equal-height card is solved by composing the content, in this order: (1) `flex flex-col` on the
+  card + `mt-auto` on the footnote/summary so slack becomes designed spacing between body and
+  footer (use `gap-*`, not `space-y-*`, or the margin is overridden); (2) give the short card a
+  purposeful footer or element — a pinned total, a "due today" line, a mini trend; (3) trim the
+  tall neighbour (fewer rows, shorter copy); (4) regroup so neighbours have comparable depth.
+  Stat/KPI tiles reserve their hint/delta line so values share one baseline across the row; a
+  label that wraps to two lines is renamed, not tolerated.
 
 ## 3. Visual hierarchy
 - One page title (`h1.page-title`, 700/-0.021em), optional short eyebrow, **no subtitle paragraphs**.

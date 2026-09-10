@@ -211,7 +211,7 @@ export default function Actions() {
       {tab === "reduction" ? (
         <>
           {/* Savings buckets + pathway (req 3 + 4) */}
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-3 items-start">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             <SavingsTile
               label="Estimated pipeline" tone="info"
               co2e={buckets.estimated.co2e} usd={buckets.estimated.usd}
@@ -540,7 +540,7 @@ function BaseFilters({
     <div className="flex flex-wrap items-center gap-2">
       <select className="input h-9 max-w-[180px]" value={pillarFilter} onChange={(e) => setPillarFilter(e.target.value as any)}>
         <option value="all">All pillars</option>
-        {(["energy", "water", "waste", "carbon", "social", "governance"] as Pillar[]).map((p) => (
+        {(["energy", "water", "waste", "carbon"] as Pillar[]).map((p) => (
           <option key={p} value={p} className="capitalize">{p[0].toUpperCase() + p.slice(1)}</option>
         ))}
       </select>
@@ -627,7 +627,7 @@ function NewActionModal({ open, onClose, initial }: { open: boolean; onClose: ()
               <span className="text-[12px] font-medium text-ink-600">Pillar <span className="text-bad">*</span></span>
               <select className="input mt-1" value={form.pillar} onChange={(e) => set("pillar", e.target.value as any)}>
                 <option value="">— Select —</option>
-                {["energy", "water", "waste", "carbon", "social", "governance"].map((p) => (
+                {["energy", "water", "waste", "carbon"].map((p) => (
                   <option key={p} value={p}>{p[0].toUpperCase() + p.slice(1)}</option>
                 ))}
               </select>

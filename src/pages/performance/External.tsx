@@ -14,21 +14,12 @@ type Drill = null | "pool" | "percentile" | "filters";
 
 const PILLAR_LABEL: Record<PillarKey, string> = {
   energy: "Energy", water: "Water", waste: "Waste",
-  carbon: "Carbon", social: "Social", governance: "Governance",
+  carbon: "Carbon",
 };
 
 export default function External({ pillar }: { pillar: PillarKey }) {
   const [drill, setDrill] = useState<Drill>(null);
 
-  // Should never get here for social/governance — Shell hides this view.
-  if (pillar === "social" || pillar === "governance") {
-    return (
-      <InsufficientData
-        title="External Comparison is not available for this pillar"
-        body="Social and Governance metrics cannot be meaningfully compared across hotels in a benchmark pool — the conditions vary too much. External Comparison is available for Energy, Water, Waste, and Carbon only."
-      />
-    );
-  }
 
   const poolSize = 23;
   const level =
@@ -41,7 +32,7 @@ export default function External({ pillar }: { pillar: PillarKey }) {
 
   return (
     <div className="space-y-5">
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 items-start">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <KpiTile
           icon={<Users2 size={18} />}
           iconBg="bg-brand-50 text-brand-700"

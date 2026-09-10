@@ -31,7 +31,7 @@ export default function AdminClients() {
     >
       <ProvisioningCard />
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 items-start">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <StatTile label="Total clients"           value="5"  hint="across 4 deployment types" />
         <StatTile label="White-label"             value="3"  />
         <StatTile label="Sovereign hosting"       value="1"  />
@@ -50,7 +50,7 @@ export default function AdminClients() {
       <Card>
         <CardHeader title="Clients" hint={`${CLIENTS.length} on platform`} />
         <div className="overflow-x-auto">
-          <table className="min-w-full">
+          <table className="w-full min-w-[720px]">
             <thead>
               <tr className="bg-ink-50">
                 <th className="table-th">Client</th>

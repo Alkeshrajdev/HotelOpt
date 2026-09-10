@@ -492,7 +492,7 @@ export default function Certifications() {
       </Card>
 
       {/* Programme-level summary */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 items-start">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <StatTile label={cert?.code ?? programme} value={`${summary.readyPct}% ready`} hint={cert?.name ?? ""} tone="brand" />
         <StatTile label="Ready"     value={String(summary.ready)}   hint={`of ${summary.total} criteria`} tone="good" />
         <StatTile label="Partial"   value={String(summary.partial)} hint="awaiting evidence"              tone="warn" />
@@ -511,7 +511,7 @@ export default function Certifications() {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="min-w-full">
+            <table className="w-full min-w-[720px]">
               <thead>
                 <tr className="bg-ink-50">
                   <th className="table-th">Criterion</th>
@@ -698,7 +698,7 @@ function CertCertificatePanel() {
         </div>
       </div>
       <div className="overflow-x-auto border-t border-ink-100">
-        <table className="min-w-full">
+        <table className="w-full min-w-[720px]">
           <thead>
             <tr className="bg-ink-50">
               <th className="table-th">Type</th>

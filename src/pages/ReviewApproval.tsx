@@ -302,7 +302,7 @@ export default function ReviewApproval() {
 
       {pageTab === "queue" && <>
       {/* Summary cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 items-start">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
         <SummaryCard label="Pending review" value={summary.pending} icon={<Clock size={14} />} tone="warn"  onClick={() => setFilters((f) => ({ ...f, status: "submitted" }))} active={filters.status === "submitted"} />
         <SummaryCard label="Queried"        value={summary.queried} icon={<MessageCircle size={14} />} tone="info" onClick={() => setFilters((f) => ({ ...f, status: "queried" }))} active={filters.status === "queried"} />
         <SummaryCard label="Overdue"        value={summary.overdue} icon={<ShieldAlert size={14} />} tone="bad"  onClick={() => setFilters((f) => ({ ...f, status: "overdue" }))} active={filters.status === "overdue"} />
@@ -393,7 +393,7 @@ export default function ReviewApproval() {
             <EmptyState icon={<ClipboardCheck size={20} />} title="No records here" description="Try clearing filters or switching role." />
           ) : (
             <div className="overflow-x-auto">
-              <table className="min-w-full">
+              <table className="w-full min-w-[960px]">
                 <thead>
                   <tr className="bg-ink-50">
                     <th className="table-th">Pri</th>
@@ -537,7 +537,7 @@ function PlatformReviewTab() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 items-start">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
         <SummaryCard label="Awaiting platform sign-off" value={pending} icon={<ShieldAlert size={14} />} tone="warn" />
         <SummaryCard label="Platform-approved" value={items.filter((i) => i.state === "approved").length} icon={<CheckCircle2 size={14} />} tone="good" />
         <SummaryCard label="Bypassed" value={items.filter((i) => i.state === "bypassed").length} icon={<ArrowRight size={14} />} tone="info" />
@@ -546,7 +546,7 @@ function PlatformReviewTab() {
       <Card>
         <CardHeader title="Company-approved · awaiting platform review" hint={`${pending} pending`} />
         <div className="overflow-x-auto">
-          <table className="min-w-full text-sm">
+          <table className="text-sm w-full min-w-[720px]">
             <thead><tr className="bg-ink-50 text-left">
               <th className="table-th">Record</th><th className="table-th">Property</th><th className="table-th">Data</th>
               <th className="table-th">Period</th><th className="table-th">Company approver</th><th className="table-th">State</th>
@@ -626,7 +626,7 @@ function CaptureStatusTab() {
   return (
     <div className="space-y-4">
       {/* Summary strip */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 items-start">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <div className="rounded-xl border border-ink-200 bg-white p-3">
           <div className="text-[11px] text-ink-500 mb-1">Coverage</div>
           <div className="text-xl font-bold text-ink-900">{Math.round((approved / (applicable || 1)) * 100)}%</div>

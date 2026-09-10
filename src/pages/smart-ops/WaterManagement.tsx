@@ -450,7 +450,7 @@ function OverviewTab() {
       </div>
 
       {/* primary KPIs */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 items-start">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <KpiTile
           icon={<Droplets size={20} />}
           iconBg="bg-info/15"
@@ -495,7 +495,7 @@ function OverviewTab() {
       </div>
 
       {/* secondary KPIs */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 items-start">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <KpiTile
           icon={<Filter size={20} />}
           iconBg="bg-ink-100"
@@ -533,7 +533,7 @@ function OverviewTab() {
       </div>
 
       {/* charts row */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         {/* 14-day daily trend */}
         <Card className="p-5">
           <p className="text-sm font-semibold text-ink-700 mb-4">14-Day Daily Water Consumption</p>
@@ -643,7 +643,7 @@ function SmartMetersTab() {
 
       <Card className="overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full text-sm min-w-[960px]">
             <thead>
               <tr className="bg-ink-50 border-b border-ink-200">
                 <th className="text-left px-4 py-3 text-xs font-semibold text-ink-500 uppercase tracking-wide whitespace-nowrap">Meter Name</th>
@@ -832,7 +832,7 @@ function LeakDetectionTab() {
       {/* header KPIs */}
       <p className="text-sm font-semibold text-ink-600">Active leak alerts and night flow analysis</p>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 items-start">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <Card className="p-4">
           <p className="text-xs text-ink-500">Baseline Night Flow (00:00–05:00)</p>
           <p className="text-xl font-bold text-ink-700 mt-1">5.8 <span className="text-sm font-normal">m³/hr</span></p>

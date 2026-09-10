@@ -8,7 +8,7 @@ import type { PillarKey } from "./Shell";
 
 const PILLAR_LABEL: Record<PillarKey, string> = {
   energy: "Energy", water: "Water", waste: "Waste",
-  carbon: "Carbon", social: "Social", governance: "Governance",
+  carbon: "Carbon",
 };
 
 type Quality = {
@@ -24,8 +24,6 @@ const QUALITY: Record<PillarKey, Quality> = {
   water:      { high: 78, fitForPurpose: 71, goodCoverage: 58, adequatePPF: 52, certEvidenceMatch: 69 },
   waste:      { high: 71, fitForPurpose: 66, goodCoverage: 54, adequatePPF: 48, certEvidenceMatch: 62 },
   carbon:     { high: 80, fitForPurpose: 74, goodCoverage: 60, adequatePPF: 53, certEvidenceMatch: 72 },
-  social:     { high: 86, fitForPurpose: 80, goodCoverage: 72, adequatePPF: 64, certEvidenceMatch: 78 },
-  governance: { high: 92, fitForPurpose: 88, goodCoverage: 86, adequatePPF: 80, certEvidenceMatch: 84 },
 };
 
 const APPROVAL_STATUS: Record<PillarKey, { pending: number; overdue: number; approved: number; lowConfidence: number }> = {
@@ -33,8 +31,6 @@ const APPROVAL_STATUS: Record<PillarKey, { pending: number; overdue: number; app
   water:      { pending: 12, overdue: 2, approved: 96,  lowConfidence: 4 },
   waste:      { pending: 18, overdue: 5, approved: 124, lowConfidence: 11 },
   carbon:     { pending: 8,  overdue: 1, approved: 64,  lowConfidence: 3 },
-  social:     { pending: 6,  overdue: 0, approved: 48,  lowConfidence: 2 },
-  governance: { pending: 1,  overdue: 0, approved: 12,  lowConfidence: 0 },
 };
 
 export default function DataQuality({ pillar }: { pillar: PillarKey }) {
@@ -43,7 +39,7 @@ export default function DataQuality({ pillar }: { pillar: PillarKey }) {
 
   return (
     <div className="space-y-5">
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 items-start">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <KpiTile
           icon={<CheckCircle2 size={18} />}
           iconBg="bg-pillar-energy/10 text-pillar-energy"
@@ -84,7 +80,7 @@ export default function DataQuality({ pillar }: { pillar: PillarKey }) {
 
         <Card className="col-span-12 lg:col-span-5">
           <CardHeader title="Approval status" hint="Maker–Checker queue" />
-          <div className="p-5 grid grid-cols-2 gap-3">
+          <div className="p-5 grid grid-cols-1 sm:grid-cols-2 gap-3">
             <StatTile variant="panel" label="Pending review" value={a.pending} tone="warn" />
             <StatTile variant="panel" label="Overdue" value={a.overdue} tone="bad" />
             <StatTile variant="panel" label="Approved this period" value={a.approved} tone="good" />

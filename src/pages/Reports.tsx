@@ -184,7 +184,7 @@ function ReportTracker({ onRemind }: { onRemind: (name: string) => void }) {
         right={<button className="btn-secondary h-8 px-3 text-[12px]" onClick={() => onRemind("")}><Bell size={13} /> Send reminder</button>}
       />
       <div className="overflow-x-auto">
-        <table className="min-w-full text-sm">
+        <table className="text-sm w-full min-w-[720px]">
           <thead><tr className="bg-ink-50 text-left">
             <th className="table-th">Report</th>
             <th className="table-th">Cadence</th>
@@ -482,7 +482,7 @@ export default function Reports() {
           }
         />
         <div className="overflow-x-auto">
-          <table className="min-w-full">
+          <table className="w-full min-w-[720px]">
             <thead>
               <tr className="bg-ink-50">
                 <th className="table-th">Report type</th>
@@ -565,7 +565,7 @@ export default function Reports() {
           right={<button className="btn-secondary"><Plus size={14} /> New schedule</button>}
         />
         <div className="overflow-x-auto">
-          <table className="min-w-full">
+          <table className="w-full min-w-[720px]">
             <thead>
               <tr className="bg-ink-50">
                 <th className="table-th">Name</th>
@@ -732,7 +732,7 @@ function CertificateEvidencePanel() {
       {/* Detail table (expandable) */}
       {expanded && (
         <div className="overflow-x-auto border-t border-ink-100">
-          <table className="min-w-full">
+          <table className="w-full min-w-[720px]">
             <thead>
               <tr className="bg-ink-50">
                 <th className="table-th">Type</th>

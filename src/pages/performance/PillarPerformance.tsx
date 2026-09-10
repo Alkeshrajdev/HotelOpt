@@ -184,7 +184,7 @@ export default function PillarPerformance({ pillar }: { pillar: "water"|"waste"|
   return (
     <div className="space-y-5">
       {/* Headlines */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-start">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {[
           { icon:<TrendingDown size={15} className="text-good"/>, bg:"bg-good/10", title:"Genuine saving", value:`${wf.savingValue.toLocaleString()} ${wf.savingUnit}`, sub:"after adjusting for external factors", color:"text-good" },
           { icon:<DollarSign   size={15} className="text-good"/>, bg:"bg-good/10", title:"Financial impact", value:`$${wf.savingCost.toLocaleString()}`, sub:wf.costUnit, color:"text-good" },
