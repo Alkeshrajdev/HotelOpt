@@ -111,7 +111,7 @@ function HotelsTab() {
   const certGaps = HOTELS.filter(h => h.included && h.certStatus !== "Current" && h.certStatus !== "—").length;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       {/* Scope summary */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[

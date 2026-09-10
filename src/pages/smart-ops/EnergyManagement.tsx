@@ -574,7 +574,7 @@ function OverviewTab() {
   const trendMax = Math.max(...DAILY_TREND.map((d) => d.value));
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {/* KPI row 1 */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <KpiTile

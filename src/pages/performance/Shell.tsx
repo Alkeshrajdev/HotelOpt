@@ -160,7 +160,7 @@ export default function PerformanceShell() {
   const viewItems: TabItem[] = allowedViews.map((v) => ({ key: v, label: VIEW_LABEL[v] }));
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       <div className="space-y-2">
         <div className="text-[11px] uppercase tracking-[0.06em] font-semibold text-ink-400">Performance</div>
         <Tabs
