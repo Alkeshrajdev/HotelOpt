@@ -417,7 +417,7 @@ export default function AlertsCentre() {
   };
 
   return (
-    <div className="page-container space-y-5">
+    <div className="space-y-5">
       <PageHeader
         eyebrow="Smart Operations"
         title="Alerts Centre"

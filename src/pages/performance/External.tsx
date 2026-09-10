@@ -74,7 +74,7 @@ export default function External({ pillar }: { pillar: PillarKey }) {
       </div>
 
       <div className="grid grid-cols-12 gap-4">
-        <Card className="col-span-12 md:col-span-4">
+        <Card className="col-span-12 md:col-span-3">
           <CardHeader title="Comparable pool" hint="Drives benchmark pool eligibility" />
           <div className="p-5 space-y-2 text-sm">
             <PoolRow label="Pool size" value={`${poolSize} properties`} />
@@ -92,7 +92,7 @@ export default function External({ pillar }: { pillar: PillarKey }) {
           </div>
         </Card>
 
-        <Card className="col-span-12 md:col-span-8">
+        <Card className="col-span-12 md:col-span-9">
           <CardHeader title="Comparability filters" />
           <div className="p-5 grid grid-cols-2 md:grid-cols-3 gap-2">
             <select className="input"><option>Climate zone — auto</option></select>

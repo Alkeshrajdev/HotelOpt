@@ -40,7 +40,7 @@ export default function CarbonInventory() {
       </div>
 
       <div className="grid grid-cols-12 gap-4">
-        <Card className="col-span-12 lg:col-span-7">
+        <Card className="col-span-12 lg:col-span-5">
           <CardHeader title="Scope 3 by category" hint="% of Scope 3 inventory" />
           <div className="p-6">
             <HBar
@@ -57,7 +57,7 @@ export default function CarbonInventory() {
           </div>
         </Card>
 
-        <Card className="col-span-12 lg:col-span-5">
+        <Card className="col-span-12 lg:col-span-7">
           <CardHeader title="Emission factor library" hint="Versioned · audit-logged" />
           <div className="overflow-x-auto">
             <table className="min-w-full">

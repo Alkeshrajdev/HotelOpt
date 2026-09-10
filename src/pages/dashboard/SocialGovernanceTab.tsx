@@ -115,7 +115,7 @@ function PeopleSection() {
   const avgTraining = Math.round(trainingData.reduce((s, d) => s + d.val, 0) / trainingData.length);
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
 
       {/* Training */}
       <Card>
@@ -181,7 +181,7 @@ function GovernanceSection() {
   );
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
 
       {/* Policy status */}
       <Card>

@@ -1025,8 +1025,8 @@ export default function IAQComfort() {
   const [activeTab, setActiveTab] = useState<Tab>("overview");
 
   return (
-    <div className="min-h-screen bg-neutral-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+    <div>
+      <div className="space-y-5">
 
         <PageHeader
           eyebrow="Smart Operations · IAQ & Comfort"

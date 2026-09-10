@@ -756,7 +756,7 @@ export default function PortfolioReports() {
   const reportBlocked = REPORTING_STATUS.filter(r => r.status === "Blocked").length;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       <PageHeader
         eyebrow="Portfolio rollup"
         title="Reporting Readiness"

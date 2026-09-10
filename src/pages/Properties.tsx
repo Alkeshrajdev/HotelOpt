@@ -149,7 +149,7 @@ export default function Properties() {
 
       {/* Search + filter chips */}
       <div className="flex flex-wrap items-center gap-2 mb-4">
-        <div className="relative w-72">
+        <div className="relative flex-1 min-w-[16rem] max-w-md">
           <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-400" />
           <input
             className="input pl-9"
@@ -203,7 +203,7 @@ export default function Properties() {
               </button>
             }
           />
-          <div className="p-6 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+          <div className="p-6 grid grid-cols-2 md:grid-cols-4 gap-3">
             <SelectField
               label="Region"
               value={filters.region}
