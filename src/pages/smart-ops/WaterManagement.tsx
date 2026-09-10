@@ -971,10 +971,10 @@ function WaterActionsTab() {
 
       {sorted.map((action) => (
         <Card key={action.id} className={cn(
-          "p-5 border-l-4",
-          action.priority === "Critical" && "border-l-red-500",
-          action.priority === "Medium" && "border-l-amber-400",
-          action.priority === "Low" && "border-l-blue-400"
+          "p-5",
+          action.priority === "Critical" && "",
+          action.priority === "Medium" && "",
+          action.priority === "Low" && ""
         )}>
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1">

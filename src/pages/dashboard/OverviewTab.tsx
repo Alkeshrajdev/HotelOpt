@@ -187,7 +187,6 @@ const isNegDelta = (d: string) => d.trimStart().startsWith("−") || d.trimStart
 type EffTile = {
   icon:     React.ElementType;
   color:    string;
-  accentBg: string;
   label:    string;
   value:    string;
   unit:     string;
@@ -198,28 +197,28 @@ type EffTile = {
 
 const EFF_TILES: EffTile[] = [
   {
-    icon: Zap, color: "#D97706", accentBg: "border-l-[#D97706]",
+    icon: Zap, color: "#D97706",
     label: "Energy intensity", value: portfolioEnergyPerOrnTotal().toFixed(0), unit: "kWh / ORN",
     delta: -6.0,
     progress: 42, // (137−118)/(137−91)
     targetLabel: "Target 91 kWh/ORN by 2030",
   },
   {
-    icon: Droplet, color: "#0EA5E9", accentBg: "border-l-[#0EA5E9]",
+    icon: Droplet, color: "#0EA5E9",
     label: "Water intensity", value: portfolioWaterPerGn().toFixed(0), unit: "L / GN",
     delta: -8.0,
     progress: 50, // (612−556)/(612−500) — water on guest-night basis
     targetLabel: "Target 500 L/GN by 2030",
   },
   {
-    icon: Cloud, color: "#0F6A3C", accentBg: "border-l-[#0F6A3C]",
+    icon: Cloud, color: "#0F6A3C",
     label: "Carbon intensity", value: carbonS12PerOrn().toFixed(1), unit: "kgCO₂e / ORN",
     delta: -10.0,
     progress: 52, // (34.0−25.2)/(34.0−17.0) — Scope 1+2 basis
     targetLabel: "SBTi −50% by 2030 (17.0)",
   },
   {
-    icon: Recycle, color: "#7C3AED", accentBg: "border-l-[#7C3AED]",
+    icon: Recycle, color: "#7C3AED",
     label: "Waste diversion", value: `${wasteDiversionDual()}%`, unit: "TRUE / incl WtE",
     delta: 6.0,
     progress: 50, // TRUE 42%: (42−24)/(60−24)
@@ -377,13 +376,8 @@ export default function OverviewTab({ onNavigate }: Props) {
             return (
               <div
                 key={t.label}
-                className={cn(
-                  "group relative overflow-hidden rounded-xl2 border bg-white p-4 shadow-card transition-all duration-150 hover:shadow-card-lg hover:-translate-y-px",
-                  t.highlight ? "border-good/40 ring-1 ring-good/10" : "border-ink-200/70"
-                )}
+                className="group relative overflow-hidden rounded-xl2 bg-white p-4 shadow-card transition-all duration-150 hover:shadow-card-lg hover:-translate-y-px"
               >
-                {/* colour accent bar keys the tile to its metric */}
-                <span className={cn("absolute inset-x-0 top-0 h-[3px]", snapAccent(t.iconBg))} />
                 <div className="flex items-center justify-between gap-2">
                   <div className="text-[10px] font-semibold uppercase tracking-[0.07em] text-ink-500 leading-snug">{t.label}</div>
                   <div className={cn("w-8 h-8 rounded-full grid place-items-center shrink-0", t.iconBg)}>
@@ -651,8 +645,7 @@ export default function OverviewTab({ onNavigate }: Props) {
             return (
               <div
                 key={t.label}
-                className="card p-5 border-l-4 flex flex-col gap-3"
-                style={{ borderLeftColor: t.color }}
+                className="card p-5 flex flex-col gap-3"
               >
                 {/* Header */}
                 <div className="flex items-center justify-between">

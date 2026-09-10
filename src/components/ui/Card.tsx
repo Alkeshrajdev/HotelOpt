@@ -40,14 +40,8 @@ export function Card({
     <div
       className={cn(
         base,
-        level === 1 && accentColor && "card-level-1-accent",
         className
       )}
-      style={
-        level === 1 && accentColor
-          ? { borderLeftColor: accentColor }
-          : undefined
-      }
       {...rest}
     >
       {children}

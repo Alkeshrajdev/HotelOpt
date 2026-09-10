@@ -55,6 +55,9 @@ repo's tokens. When in doubt, the rule wins over the existing code.
   (`slate-*`, `gray-*`, `amber-*`, `blue-*` …) — the one exception is a categorical chart series.
 - Colour means something: status, pillar, or brand action. Decorative colour (rainbow icon chips on
   settings/hub cards) is replaced by `bg-ink-100 text-ink-600`.
+- **No accent lines.** No coloured top bars, left bars, or outline rings on cards/tiles — they read
+  as template/AI decoration (user feedback, Sep 2026). Carry pillar/status colour in the icon chip,
+  a `Badge`, or the value colour instead.
 - Tints: `bg-good/10` + `border-good/30` + `text-good-700` is the status-callout recipe.
 
 ## 6. Elevation & shadows
@@ -93,7 +96,7 @@ repo's tokens. When in doubt, the rule wins over the existing code.
   "View all →", expandable rows, advanced-filter toggles). Don't put every metric on the first screen.
 
 ## 12. Component families (one design per family)
-- KPI row: `KpiTile`. Summary/hero tiles: elevated `card card-pad` + optional `border-l-4 border-l-{tone}`.
+- KPI row: `KpiTile`. Summary/hero tiles: plain elevated `card card-pad` (label / value / hint) — no accent bars.
   Tables: `table-th` / `table-td`. Status: `Badge`. Cards: `Card` + `CardHeader`. Tabs: `Tabs`.
   Don't introduce a new variant of an existing family — extend the family.
 

@@ -404,9 +404,9 @@ function SummaryTile({
 }) {
   const accent =
     tone === "good"
-      ? "border-l-4 border-l-good"
+      ? ""
       : tone === "info"
-        ? "border-l-4 border-l-info"
+        ? ""
         : "";
   return (
     <div className={cn("card card-pad", accent)}>

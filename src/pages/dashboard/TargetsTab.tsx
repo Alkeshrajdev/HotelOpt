@@ -79,7 +79,7 @@ const BAR_COLOR: Record<TargetStatus, string> = {
   "on-track": "bg-good", "at-risk": "bg-warn", "off-track": "bg-bad",
 };
 const BORDER: Record<TargetStatus, string> = {
-  "on-track": "border-l-good", "at-risk": "border-l-warn", "off-track": "border-l-bad",
+  "on-track": "", "at-risk": "", "off-track": "",
 };
 
 const fmtVal = (v: number, unit: string) => (unit === "%" ? `${v}%` : `${v} ${unit}`);
@@ -101,7 +101,7 @@ function TargetCard({ target }: { target: Target }) {
   const tone = STATUS_TONE[target.status];
   const onTrack = target.status === "on-track";
   return (
-    <div className={cn("card p-5 border-l-4", BORDER[target.status])}>
+    <div className={cn("card p-5", BORDER[target.status])}>
       {/* Header */}
       <div className="flex items-start justify-between gap-3 mb-4">
         <div className="flex items-center gap-3">

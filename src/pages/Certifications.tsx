@@ -751,9 +751,9 @@ function CertCertificatePanel() {
 function SummaryTile({ label, value, hint, tone }: {
   label: string; value: string; hint?: string; tone: "brand" | "good" | "warn" | "bad";
 }) {
-  const accent = { brand: "border-l-brand-500", good: "border-l-good", warn: "border-l-warn", bad: "border-l-bad" }[tone];
+  const accent = { brand: "", good: "", warn: "", bad: "" }[tone];
   return (
-    <div className={cn("card card-pad border-l-4", accent)}>
+    <div className={cn("card card-pad", accent)}>
       <div className="text-[11px] uppercase tracking-[0.06em] font-semibold text-ink-400">{label}</div>
       <div className="text-stat leading-none font-bold text-ink-900 mt-1.5 tabular-nums">{value}</div>
       {hint && <div className="text-[12px] text-ink-500 mt-1">{hint}</div>}

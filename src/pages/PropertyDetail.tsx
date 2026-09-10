@@ -1019,13 +1019,13 @@ function HeroStat({
   info?: string;
 }) {
   const accent = {
-    good: "border-l-good",
-    warn: "border-l-warn",
-    bad:  "border-l-bad",
-    info: "border-l-info",
+    good: "",
+    warn: "",
+    bad:  "",
+    info: "",
   }[tone];
   return (
-    <div className={cn("card card-pad border-l-4", accent)}>
+    <div className={cn("card card-pad", accent)}>
       <div className="flex items-center gap-1 text-[11px] uppercase font-semibold tracking-[0.06em] text-ink-400">
         {label}
         {info && <InfoHint text={info} />}

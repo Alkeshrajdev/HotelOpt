@@ -491,10 +491,10 @@ function ZoneMapTab() {
             key={z.zone}
             className={cn(
               "bg-white rounded-xl border border-ink-200 overflow-hidden shadow-card hover:shadow-pop transition-shadow",
-              "border-l-4",
-              z.status === "Good" && "border-l-emerald-500",
-              z.status === "Warn" && "border-l-amber-400",
-              z.status === "ALERT" && "border-l-red-500"
+              "",
+              z.status === "Good" && "",
+              z.status === "Warn" && "",
+              z.status === "ALERT" && ""
             )}
           >
             {/* card header */}
@@ -699,7 +699,7 @@ function Co2VentilationTab() {
       <div className="space-y-3">
         <p className="text-sm font-semibold text-ink-700">Ventilation Recommendations</p>
 
-        <Card className="p-5 border-l-4 border-l-red-500">
+        <Card className="p-5">
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-1">
@@ -728,7 +728,7 @@ function Co2VentilationTab() {
           </div>
         </Card>
 
-        <Card className="p-5 border-l-4 border-l-amber-400">
+        <Card className="p-5">
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-1">
@@ -887,8 +887,8 @@ function TempHumidityTab() {
         <p className="text-sm font-semibold text-ink-700">Out-of-Band Zone Detail</p>
         {OUT_OF_BAND.map((item) => (
           <Card key={item.zone} className={cn(
-            "p-4 border-l-4",
-            item.severity === "Medium" ? "border-l-amber-400" : "border-l-blue-400"
+            "p-4",
+            item.severity === "Medium" ? "" : ""
           )}>
             <div className="flex items-start justify-between gap-4">
               <div>
