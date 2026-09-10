@@ -63,7 +63,7 @@ export default function Modal({
       />
       <div
         className={cn(
-          "relative w-full bg-white rounded-2xl shadow-pop border border-ink-200 max-h-[88vh] flex flex-col overflow-hidden animate-[fadein_.18s_ease-out]",
+          "relative w-full bg-white rounded-xl3 shadow-pop-lg ring-1 ring-ink-900/[0.06] max-h-[88vh] flex flex-col overflow-hidden animate-[fadein_.18s_ease-out]",
           SIZE[size]
         )}
       >

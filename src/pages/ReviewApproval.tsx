@@ -457,7 +457,7 @@ export default function ReviewApproval() {
             onClick={() => setSelectedId("")}
             aria-hidden
           />
-          <div className="fixed inset-y-0 right-0 z-50 w-full max-w-[600px] bg-white shadow-pop flex flex-col">
+          <div className="fixed inset-y-0 right-0 z-50 w-full max-w-[600px] bg-white shadow-pop-lg ring-1 ring-ink-900/[0.06] flex flex-col">
             <div className="flex items-center justify-between h-12 px-4 border-b border-ink-200 shrink-0 bg-ink-50">
               <span className="text-[12px] font-semibold uppercase tracking-wide text-ink-500">Record detail</span>
               <button

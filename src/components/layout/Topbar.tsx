@@ -468,7 +468,7 @@ export default function Topbar({ onMenu }: { onMenu?: () => void }) {
                 <ChevronDown size={11} className="opacity-60" />
               </button>
               {basisOpen && (
-                <div className="absolute left-0 top-10 w-52 card shadow-pop z-40 py-1 overflow-hidden">
+                <div className="absolute left-0 top-10 w-52 popover z-40 py-1 overflow-hidden">
                   {DATA_BASIS_OPTIONS.map((opt) => (
                     <button
                       key={opt}
@@ -497,7 +497,7 @@ export default function Topbar({ onMenu }: { onMenu?: () => void }) {
             <SlidersHorizontal size={13} /> Filters
           </button>
           {filtersOpen && (
-            <div className="absolute left-0 top-10 w-[300px] card shadow-pop z-40">
+            <div className="absolute left-0 top-10 w-[300px] popover z-40">
               <div className="px-4 py-3 border-b border-ink-200 flex items-center justify-between">
                 <span className="text-sm font-semibold text-ink-900">Filters</span>
                 <button onClick={() => setFiltersOpen(false)} className="btn-ghost w-7 h-7 p-0"><X size={13} /></button>
@@ -633,7 +633,7 @@ export default function Topbar({ onMenu }: { onMenu?: () => void }) {
             </button>
 
             {notifOpen && (
-              <div className="absolute right-0 mt-2 w-[420px] card shadow-pop z-40 overflow-hidden flex flex-col max-h-[520px]">
+              <div className="absolute right-0 mt-2 w-[420px] popover z-40 overflow-hidden flex flex-col max-h-[520px]">
                 <div className="px-4 py-3 border-b border-ink-200 flex items-center justify-between shrink-0">
                   <span className="text-sm font-semibold text-ink-900">Notifications</span>
                   <div className="flex items-center gap-2">
@@ -752,7 +752,7 @@ export default function Topbar({ onMenu }: { onMenu?: () => void }) {
             </button>
 
             {menuOpen && (
-              <div className="absolute right-0 mt-2 w-64 card shadow-pop z-40 overflow-hidden py-1">
+              <div className="absolute right-0 mt-2 w-64 popover z-40 overflow-hidden py-1">
                 <div className="px-4 py-3 border-b border-ink-100 mb-1">
                   <div className="text-sm font-semibold text-ink-900 truncate">{fullName}</div>
                   <div className="text-[11px] text-ink-500">{roleLabel}</div>
@@ -787,7 +787,7 @@ export default function Topbar({ onMenu }: { onMenu?: () => void }) {
           onClick={() => { setSearchOpen(false); setSearchQuery(""); }}
         >
           <div
-            className="w-full max-w-2xl bg-white rounded-2xl shadow-pop-lg overflow-hidden mx-4"
+            className="w-full max-w-2xl bg-white rounded-xl3 shadow-pop-lg ring-1 ring-ink-900/[0.06] overflow-hidden mx-4"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Input row */}
@@ -1010,7 +1010,7 @@ function DropdownList({
   width?: string;
 }) {
   return (
-    <div className={cn("absolute left-0 top-12 card shadow-pop z-40 py-1 overflow-y-auto max-h-64", width)}>
+    <div className={cn("absolute left-0 top-12 popover z-40 py-1 overflow-y-auto max-h-64", width)}>
       {options.map((opt) => (
         <button
           key={opt}
