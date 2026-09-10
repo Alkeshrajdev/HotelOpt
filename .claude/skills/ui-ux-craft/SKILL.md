@@ -31,7 +31,12 @@ repo's tokens. When in doubt, the rule wins over the existing code.
 - Grid column counts must divide the item count (8 → 4 cols, 10 → 5, 12 → 4). If the count is
   data-driven, keep cards the same size and let the last row left-align.
 - Two-column splits: tables and charts take the wide half (8/4 or 7/5); key/value rails take the narrow.
-  Equal content → equal halves (6/6). Use `items-start` so short cards don't stretch.
+  Equal content → equal halves (6/6).
+- **Cards hug their content.** Card rows are `items-start` — a card never stretches to pool empty
+  space below its content. Compose rows from cards of comparable depth (compact breakdowns
+  together, long lists together); pin supporting notes to the bottom with `mt-auto` so slack sits
+  between sections; if a card is inherently short next to its neighbours, give it a purposeful
+  visual (a mini trend chart), not filler.
 
 ## 3. Visual hierarchy
 - One page title (`h1.page-title`, 700/-0.021em), optional short eyebrow, **no subtitle paragraphs**.
