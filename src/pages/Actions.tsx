@@ -41,6 +41,7 @@ import ProgressBar from "@/components/ui/ProgressBar";
 import StatusPipeline from "@/components/shared/StatusPipeline";
 import Modal from "@/components/ui/Modal";
 import { cn } from "@/lib/utils";
+import { useToast } from "@/components/ui/Toast";
 import {
   ACTIONS,
   ACTION_TYPE_META,
@@ -567,6 +568,7 @@ const EMPTY_FORM: NewActionForm = {
 };
 
 function NewActionModal({ open, onClose, initial }: { open: boolean; onClose: () => void; initial?: Partial<NewActionForm> | null }) {
+  const toast = useToast();
   const [form, setForm] = useState<NewActionForm>(EMPTY_FORM);
   const [submitted, setSubmitted] = useState(false);
   const set = <K extends keyof NewActionForm>(k: K, v: NewActionForm[K]) => setForm((f) => ({ ...f, [k]: v }));
@@ -591,7 +593,7 @@ function NewActionModal({ open, onClose, initial }: { open: boolean; onClose: ()
       ) : (
         <>
           <button className="btn-secondary" onClick={handleClose}>Cancel</button>
-          <button className={cn("btn-primary", !canSubmit && "opacity-50 cursor-not-allowed")} onClick={() => canSubmit && setSubmitted(true)} disabled={!canSubmit}>
+          <button className={cn("btn-primary", !canSubmit && "opacity-50 cursor-not-allowed")} onClick={() => canSubmit && (setSubmitted(true), toast.success("Action created", "Routed for approval before implementation."))} disabled={!canSubmit}>
             <ArrowRight size={14} /> Submit for approval
           </button>
         </>

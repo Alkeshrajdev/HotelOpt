@@ -46,6 +46,7 @@ import Tabs from "@/components/ui/Tabs";
 import StatusPipeline from "@/components/shared/StatusPipeline";
 import { PORTFOLIO_HOTELS } from "@/lib/mock";
 import { cn } from "@/lib/utils";
+import { useToast } from "@/components/ui/Toast";
 
 const PROPERTY_NAMES = PORTFOLIO_HOTELS.map((h) => h.name);
 const slug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
@@ -581,6 +582,7 @@ function CampaignsTab({ property }: { property: string }) {
   const [editId, setEditId]       = useState<string | null>(null);
   const [detailId, setDetailId]   = useState<string | null>(null);
   const [form, setForm]           = useState<CampaignForm>({ ...CAMPAIGN_INITIAL, property });
+  const toast = useToast();
 
   function set<K extends keyof CampaignForm>(k: K, v: CampaignForm[K]) { setForm((f) => ({ ...f, [k]: v })); }
 
@@ -600,6 +602,7 @@ function CampaignsTab({ property }: { property: string }) {
       setCampaigns((cs) => [nc, ...cs]);
     }
     setModalOpen(false);
+    toast.success(editId ? "Campaign updated" : "Campaign created", form.name);
   }
 
   const CAMP_STATUS_TONE: Record<CampaignStatus, "good" | "neutral" | "info"> = { active: "good", draft: "neutral", completed: "info" };
@@ -775,6 +778,7 @@ function CampaignDetailModal({ campaign: c, onClose }: { campaign: Campaign | nu
 
 function SurveysTab({ property }: { property: string }) {
   const [questions, setQuestions] = useState<SurveyQuestion[]>(INITIAL_QUESTIONS);
+  const toast = useToast();
   const [adding, setAdding]       = useState<QuestionType | null>(null);
   const [newText, setNewText]     = useState("");
 
@@ -847,8 +851,8 @@ function SurveysTab({ property }: { property: string }) {
           )}
 
           <div className="px-4 pb-4 border-t border-ink-200 pt-3 flex gap-2">
-            <button className="btn-primary text-[12px] h-8"><Send size={12} /> Publish survey</button>
-            <button className="btn-secondary text-[12px] h-8">Save draft</button>
+            <button className="btn-primary text-[12px] h-8" onClick={() => toast.success("Survey published", "Live on the public page and in-room QR.")}><Send size={12} /> Publish survey</button>
+            <button className="btn-secondary text-[12px] h-8" onClick={() => toast.info("Draft saved")}>Save draft</button>
           </div>
         </Card>
 

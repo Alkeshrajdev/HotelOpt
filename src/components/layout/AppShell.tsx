@@ -4,6 +4,7 @@ import Sidebar from "./Sidebar";
 import Topbar from "./Topbar";
 import EntitlementGuard from "./EntitlementGuard";
 import { TopbarProvider } from "@/lib/topbarContext";
+import { ToastProvider } from "@/components/ui/Toast";
 
 export default function AppShell() {
   // Desktop manual collapse (icon rail). Mobile uses an off-canvas drawer.
@@ -20,6 +21,7 @@ export default function AppShell() {
   }, []);
 
   return (
+    <ToastProvider>
     <TopbarProvider>
       <EntitlementGuard />
       <div className="flex h-screen w-screen overflow-hidden bg-[#EEF1F1]">
@@ -47,5 +49,6 @@ export default function AppShell() {
         </div>
       </div>
     </TopbarProvider>
+    </ToastProvider>
   );
 }

@@ -80,6 +80,7 @@ import ReminderModal, { type ReminderGroup } from "@/components/review/ReminderM
 import CaptureStatusChip from "@/components/review/CaptureStatusChip";
 import AnomaliesPanel from "@/components/review/AnomaliesPanel";
 import { cn } from "@/lib/utils";
+import { useToast } from "@/components/ui/Toast";
 
 type DetailTab = "details" | "evidence" | "comments" | "ai-ocr" | "audit";
 type PageTab = "queue" | "status" | "platform";
@@ -904,6 +905,7 @@ function DetailPanel({
 }) {
   const [revisionOpen, setRevisionOpen] = useState(false);
   const [supplierOpen, setSupplierOpen] = useState(false);
+  const toast = useToast();
 
   const tabs: { key: DetailTab; label: string }[] = [
     { key: "details",  label: "Record details" },
@@ -938,13 +940,13 @@ function DetailPanel({
             <Badge tone="neutral"><Eye size={11} /> Read-only · {ROLE_LABEL[role]}</Badge>
           ) : (
             <div className="flex flex-wrap gap-2">
-              <button disabled={!canQuery} onClick={() => onAction("query")} className="btn-secondary disabled:opacity-40">
+              <button disabled={!canQuery} onClick={() => { onAction("query"); toast.info("Query sent to the maker"); }} className="btn-secondary disabled:opacity-40">
                 <MessageCircle size={14} /> Query
               </button>
-              <button disabled={!canReject} onClick={() => onAction("reject")} className="btn bg-bad text-white hover:bg-bad-700 disabled:opacity-40">
+              <button disabled={!canReject} onClick={() => { onAction("reject"); toast.warning("Record rejected", "The maker has been notified."); }} className="btn-secondary text-bad-700 border-bad/30 hover:bg-bad/10 disabled:opacity-40">
                 <X size={14} /> Reject
               </button>
-              <button disabled={!canApprove} onClick={() => onAction("approve")} className="btn-primary disabled:opacity-40">
+              <button disabled={!canApprove} onClick={() => { onAction("approve"); toast.success("Record approved"); }} className="btn-primary disabled:opacity-40">
                 <Check size={14} /> Approve
               </button>
             </div>
@@ -1681,7 +1683,7 @@ function RevisionRequestModal({
           <div className="rounded-xl bg-ink-50 border border-ink-200 p-3 text-[12px] text-ink-600 space-y-1">
             <div className="flex justify-between"><span className="text-ink-400">Requested by</span><span className="font-medium">Demo Maker (session)</span></div>
             <div className="flex justify-between"><span className="text-ink-400">Approval route</span><span className="font-medium">Checker → Property SM</span></div>
-            <div className="flex justify-between"><span className="text-ink-400">Audit trail</span><span className="font-medium text-brand-700 underline cursor-pointer">Record {record.id}</span></div>
+            <div className="flex justify-between"><span className="text-ink-400">Audit trail</span><span className="font-medium text-brand-700 underline cursor-pointer hover:text-brand-800">Record {record.id}</span></div>
           </div>
 
           <div className="flex justify-end gap-2 pt-2 border-t border-ink-200">

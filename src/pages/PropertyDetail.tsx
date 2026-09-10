@@ -52,6 +52,7 @@ import {
 import type { PillarKey } from "@/pages/performance/Shell";
 import { useAccount } from "@/lib/account";
 import { cn } from "@/lib/utils";
+import { useToast } from "@/components/ui/Toast";
 
 type TabKey =
   | "overview"
@@ -119,7 +120,7 @@ export default function PropertyDetail() {
             <button className="btn-secondary" onClick={() => setEditOpen(true)}>
               <Edit3 size={14} /> Edit configuration
             </button>
-            <button className="btn bg-bad text-white hover:bg-bad-700">
+            <button className="btn-secondary text-bad-700 border-bad/30 hover:bg-bad/10 hover:border-bad/40">
               <PowerOff size={14} /> Deactivate
             </button>
           </>
@@ -308,6 +309,7 @@ const EMPTY_METER: Omit<Meter, "id"> = { type: "Electricity", meterId: "", suppl
 
 function MeterRegistry({ property }: { property: RichProperty }) {
   const [meters, setMeters] = useState<Meter[]>(property.meters);
+  const toast = useToast();
   const [editing, setEditing] = useState<Meter | null>(null);
   const [open, setOpen] = useState(false);
 
@@ -315,6 +317,7 @@ function MeterRegistry({ property }: { property: RichProperty }) {
   function openEdit(m: Meter) { setEditing({ ...m }); setOpen(true); }
   function remove(id: string) { setMeters((ms) => ms.filter((m) => m.id !== id)); }
   function save(m: Meter) {
+    toast.success("Meter saved");
     if (m.id) setMeters((ms) => ms.map((x) => (x.id === m.id ? m : x)));
     else setMeters((ms) => [...ms, { ...m, id: `m-${Date.now()}` }]);
     setOpen(false);
