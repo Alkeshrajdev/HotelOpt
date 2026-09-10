@@ -15,7 +15,7 @@ const RANK = [...PROPERTIES].sort((a, b) => b.score - a.score);
 
 const PILLAR_LABEL: Record<PillarKey, string> = {
   energy: "Energy", water: "Water", waste: "Waste",
-  carbon: "Carbon", social: "Social", governance: "Governance",
+  carbon: "Carbon",
 };
 
 export default function Internal({ pillar }: { pillar: PillarKey }) {
@@ -24,7 +24,7 @@ export default function Internal({ pillar }: { pillar: PillarKey }) {
 
   return (
     <div className="space-y-5">
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 items-start">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <KpiTile
           icon={<Trophy size={18} />}
           iconBg="bg-pillar-energy/10 text-pillar-energy"
@@ -235,8 +235,6 @@ function PropertyProfile({ property }: { property: typeof PROPERTIES[number] }) 
               { name: "Water", value: Math.max(0, property.score - 4) },
               { name: "Waste", value: Math.max(0, property.score - 8) },
               { name: "Carbon", value: Math.max(0, property.score - 6) },
-              { name: "Social", value: Math.min(100, property.score + 3) },
-              { name: "Governance", value: Math.min(100, property.score + 6) },
             ]}
           />
         </div>

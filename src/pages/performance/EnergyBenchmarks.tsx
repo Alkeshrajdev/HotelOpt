@@ -154,7 +154,7 @@ export default function EnergyBenchmarks() {
     <div className="space-y-5">
 
       {/* ── Savings callout ────────────────────────────────────────────── */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-start">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="card p-6 flex flex-col gap-1">
           <div className="flex items-center gap-2 mb-1">
             <div className="w-8 h-8 rounded-full bg-brand-50 grid place-items-center shrink-0">
@@ -181,7 +181,7 @@ export default function EnergyBenchmarks() {
       </div>
 
       {/* ── Metric charts ──────────────────────────────────────────────── */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-start">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {METRIC_CONFIGS.map((m) => (
           <MetricChart key={m.key} metric={m} />
         ))}

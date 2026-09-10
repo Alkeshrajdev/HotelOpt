@@ -35,8 +35,6 @@ const PILLARS: { key: PillarKey; label: string; icon: any }[] = [
   { key: "water",      label: "Water",      icon: Droplet },
   { key: "waste",      label: "Waste",      icon: Recycle },
   { key: "carbon",     label: "Carbon",     icon: Cloud },
-  { key: "social",     label: "Social",     icon: UsersIcon },
-  { key: "governance", label: "Governance", icon: ShieldCheck },
 ];
 
 type Form = {
@@ -96,7 +94,7 @@ const INITIAL: Form = {
   ownership: "managed",
   baselineYear: String(new Date().getFullYear() - 1),
   reportingYear: String(new Date().getFullYear()),
-  enabledPillars: ["energy", "water", "waste", "carbon", "social", "governance"],
+  enabledPillars: ["energy", "water", "waste", "carbon"],
   certifications: [],
   poolEligible: true,
 };

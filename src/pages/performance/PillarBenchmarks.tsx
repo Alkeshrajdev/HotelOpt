@@ -149,7 +149,7 @@ export default function PillarBenchmarks({ pillar }: { pillar: "water"|"waste"|"
   return (
     <div className="space-y-5">
       {/* Callout */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-start">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="card p-6 flex flex-col gap-1">
           <div className="flex items-center gap-2 mb-1">
             <div className="w-8 h-8 rounded-full bg-brand-50 grid place-items-center shrink-0"><TrendingDown size={15} className="text-brand-700" /></div>
@@ -169,7 +169,7 @@ export default function PillarBenchmarks({ pillar }: { pillar: "water"|"waste"|"
       </div>
 
       {/* Metric charts */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-start">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {metrics.map(m => <MetricChart key={m.key} metric={m} peers={peers} />)}
       </div>
 

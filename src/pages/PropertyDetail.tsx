@@ -1063,8 +1063,6 @@ function PillarBadges({ pillars }: { pillars: PillarKey[] }) {
     water: Droplet,
     waste: Recycle,
     carbon: Cloud,
-    social: Users,
-    governance: ShieldCheck,
   };
   return (
     <div className="flex flex-wrap gap-1.5">

@@ -150,7 +150,7 @@ function ClientView() {
 
   return (
     <>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 items-start">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <StatTile label="Suppliers invited"    value="120" tone="info" />
         <StatTile label="Active responses"     value="68"  tone="good" hint="57% response rate" />
         <StatTile label="Attestations on file" value="312" tone="info" />
@@ -741,7 +741,7 @@ function InviteSupplierModal({ open, onClose }: { open: boolean; onClose: () => 
 function SupplierView() {
   return (
     <>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 items-start">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <StatTile label="Client requests open"  value="3"  tone="warn" hint="due within 14 days" />
         <StatTile label="Clients you supply"    value="12" tone="info" />
         <StatTile label="Products in catalogue" value="8"  tone="info" />

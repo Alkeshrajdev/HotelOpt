@@ -226,7 +226,7 @@ export default function AIAssistant() {
         }
       />
 
-      <div className="grid grid-cols-12 gap-4 items-start">
+      <div className="grid grid-cols-12 gap-4">
         {/* ---- History sidebar ---- */}
         <div className="col-span-12 lg:col-span-3">
           <Card className="h-[calc(100vh-15rem)] min-h-[520px] flex flex-col">

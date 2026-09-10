@@ -62,7 +62,8 @@ export default function StatTile({
       <div className={cn(panel ? "text-2xl" : "text-stat", "leading-none font-bold mt-1.5 tabular-nums", VALUE[tone])}>
         {value}
       </div>
-      {hint && <div className="text-[12px] text-ink-500 mt-1">{hint}</div>}
+      {/* The hint line is always reserved so tiles in a row share one baseline and one height. */}
+      <div className="text-[12px] text-ink-500 mt-1 min-h-[18px]">{hint}</div>
     </div>
   );
 }

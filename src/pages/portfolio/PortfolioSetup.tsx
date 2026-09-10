@@ -114,7 +114,7 @@ function HotelsTab() {
   return (
     <div className="space-y-5">
       {/* Scope summary */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 items-start">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
           { label: "In portfolio",  val: `${included} / ${HOTELS.length}`, colour: "text-ink-900" },
           { label: "Blocked",       val: blocked,  colour: blocked  > 0 ? "text-bad"  : "text-good" },
@@ -381,7 +381,7 @@ function RulesTab() {
 
   return (
     <div className="space-y-5">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
       {/* Reporting */}
       <section>
         <h3 className="text-[12px] font-bold uppercase tracking-wider text-ink-400 mb-3">Reporting Settings</h3>

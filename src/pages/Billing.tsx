@@ -138,13 +138,13 @@ function BillingTab() {
   return (
     <div className="space-y-4">
       {access === "grace" && (
-        <Card className="border-warn/25 bg-warn/10 card-pad flex items-start gap-3">
+        <Card className="border-warn/25 bg-warn/10 card-pad flex flex-row items-start gap-3">
           <AlertTriangle size={18} className="text-warn mt-0.5" />
           <div className="text-[13px] text-warn"><strong>Grace period.</strong> Payment failed on 22 May. Settle within 5 days to avoid suspension.</div>
         </Card>
       )}
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 items-start">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <StatTile label="Plan"        value={PLAN.tier}           hint={`${PLAN.cycle} · ${PLAN.type}`} tone="brand" />
         <StatTile label="Properties"  value={`${PLAN.propertiesUsed} / ${PLAN.propertiesIncluded}`} hint="under licence" tone="info" />
         <StatTile label="Renews"      value={PLAN.renewsOn}       hint="auto-renewal on" tone="info" />
@@ -262,7 +262,7 @@ function SeatsTab() {
 
   return (
     <>
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-start">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <StatTile label="Seats used"   value={`${seats.length} / 20`} hint="of plan limit" tone="info" />
         <StatTile label="Active"       value={String(activeCount)}      hint="currently active" tone="good" />
         <StatTile label="Pending"      value={String(pendingCount)}     hint="invite not accepted" tone="warn" />
@@ -516,7 +516,7 @@ function PaymentsTab() {
   return (
     <div className="space-y-4">
       {/* Dunning banner */}
-      <Card className="border-bad/25 bg-bad/5 card-pad flex items-start gap-3">
+      <Card className="border-bad/25 bg-bad/5 card-pad flex flex-row items-start gap-3">
         <AlertTriangle size={18} className="text-bad mt-0.5 shrink-0" />
         <div className="text-[13px] text-bad">
           <strong>Invoice INV-2026-Q2 is {overdueDays} days overdue</strong> (USD {outstanding.toLocaleString()}, due 30 May 2026).
@@ -526,7 +526,7 @@ function PaymentsTab() {
       </Card>
 
       {/* Summary */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 items-start">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <StatTile label="Outstanding"  value={`$${outstanding.toLocaleString()}`} hint={`overdue ${overdueDays}d`} tone="bad" />
         <StatTile label="Next charge"  value={`$${outstanding.toLocaleString()}`} hint="31 Dec 2026 · renewal" tone="info" />
         <StatTile label="Paid YTD"     value={`$${paidYtd.toLocaleString()}`}     hint="2026 to date" tone="good" />

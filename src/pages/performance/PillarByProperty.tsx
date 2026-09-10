@@ -76,7 +76,7 @@ export default function PillarByProperty({ pillar }: { pillar: "water"|"waste"|"
   return (
     <div className="space-y-5">
       {/* Summary tiles */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 items-start">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {[
           { label:"Best",       value:`${best}`,  unit, sub:rows[0].name,          color:"text-good"  },
           { label:"Portfolio avg",value:`${avg}`, unit, sub:"across all hotels",  color:"text-ink-900"},

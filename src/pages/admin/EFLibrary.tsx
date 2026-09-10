@@ -34,7 +34,7 @@ export default function AdminEFLibrary() {
         </>
       }
     >
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 items-start">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <StatTile label="Active EFs"    value={String(EFS.filter((e) => e.active).length)} hint={`${EFS.length} total`} />
         <StatTile label="Sources"        value="84"  hint="across regions" />
         <StatTile label="Supplier-specific" value="36" hint="Cat 1 / 2 / 4" />

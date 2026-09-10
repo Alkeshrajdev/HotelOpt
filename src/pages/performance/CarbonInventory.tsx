@@ -16,7 +16,7 @@ export default function CarbonInventory() {
 
   return (
     <div className="space-y-5">
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 items-start">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <KpiTile
           icon={<Cloud size={18} />} iconBg="bg-pillar-carbon/10 text-pillar-carbon"
           label="Scope 1" value="3,428" unit="tCO₂e" delta={-3.1}

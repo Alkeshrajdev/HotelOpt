@@ -96,7 +96,7 @@ export default function Admin() {
           <div className="text-[12px] font-semibold uppercase tracking-[0.06em] text-ink-500 mb-2">
             {g.group}
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 items-start">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
             {g.tiles.map((t) => {
               const Icon = t.icon;
               return (

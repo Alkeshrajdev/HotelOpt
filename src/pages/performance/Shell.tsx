@@ -6,9 +6,7 @@ import {
 import {
   Cloud,
   Droplet,
-  ShieldCheck,
   Trash2,
-  Users as UsersIcon,
   Zap,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
@@ -24,16 +22,13 @@ import PillarOverviewView from "./PillarOverview";
 import PillarPerformanceView from "./PillarPerformance";
 import PillarByPropertyView from "./PillarByProperty";
 import PillarBenchmarksView from "./PillarBenchmarks";
-import SocialOverviewView from "./SocialOverview";
-import GovernanceOverviewView from "./GovernanceOverview";
 
+/** The product covers the four environmental pillars only (owner decision, Sep 2026). */
 export type PillarKey =
   | "energy"
   | "water"
   | "waste"
-  | "carbon"
-  | "social"
-  | "governance";
+  | "carbon";
 
 export type ViewKey =
   | "overview"
@@ -53,8 +48,6 @@ const PILLAR_DEFS: { key: PillarKey; label: string; icon: LucideIcon; activeColo
   { key: "water",      label: "Water",      icon: Droplet,     activeColor: "text-pillar-water" },
   { key: "waste",      label: "Waste",      icon: Trash2,      activeColor: "text-pillar-waste" },
   { key: "carbon",     label: "Carbon",     icon: Cloud,       activeColor: "text-pillar-carbon" },
-  { key: "social",     label: "Social",     icon: UsersIcon,   activeColor: "text-pillar-social" },
-  { key: "governance", label: "Governance", icon: ShieldCheck, activeColor: "text-pillar-gov" },
 ];
 
 const VIEW_LABEL: Record<ViewKey, string> = {
@@ -75,8 +68,6 @@ const PILLAR_VIEWS: Record<PillarKey, ViewKey[]> = {
   water:      ["overview", "performance", "by-property", "benchmarks", "external-comparison"],
   waste:      ["overview", "performance", "by-property", "benchmarks", "external-comparison"],
   carbon:     ["overview", "performance", "by-property", "benchmarks", "external-comparison", "carbon-inventory"],
-  social:     ["overview"],
-  governance: ["overview"],
 };
 
 const PILLAR_DESCRIPTIONS: Record<PillarKey, string> = {
@@ -88,10 +79,6 @@ const PILLAR_DESCRIPTIONS: Record<PillarKey, string> = {
     "Is your diversion rate rising and food waste falling? Track performance by waste stream and property, and see where action will have the most impact.",
   carbon:
     "Are your total emissions falling in real terms? Review direct, indirect, and supplier emissions, and track progress against your net-zero pathway.",
-  social:
-    "Are your people practices improving year-on-year? Track headcount, diversity, training hours, and health & safety metrics aligned to GRI 401 / 403 / 404 / 405.",
-  governance:
-    "Are your governance commitments up to date? Review annual attestations, anti-corruption, whistleblowing, and supplier code of conduct adoption.",
 };
 
 /** Per-pillar workflow strip — pillar-scoped numbers from BRD §5 sufficiency rules. */
@@ -103,8 +90,6 @@ const PILLAR_WORKFLOW: Record<
   water:      { capture: "78% complete", pending: 12, quality: "78/100 · High",   gpReady: true,  reportsReady: "GRI 303 · CSRD E3" },
   waste:      { capture: "71% complete", pending: 18, quality: "71/100 · Fair",   gpReady: true,  reportsReady: "GRI 306 · CSRD E5" },
   carbon:     { capture: "86% complete", pending: 8,  quality: "80/100 · High",   gpReady: true,  reportsReady: "GHG · SBTi · CDP" },
-  social:     { capture: "74% complete", pending: 6,  quality: "86/100 · High",   gpReady: false, reportsReady: "GRI 401 / 403 / 404 / 405" },
-  governance: { capture: "92% complete", pending: 1,  quality: "92/100 · High",   gpReady: false, reportsReady: "GRI 205 · CSRD G1" },
 };
 
 const PILLAR_TITLE: Record<PillarKey, string> = {
@@ -112,12 +97,10 @@ const PILLAR_TITLE: Record<PillarKey, string> = {
   water: "Water Dashboard",
   waste: "Waste Dashboard",
   carbon: "Carbon Dashboard",
-  social: "Social Dashboard",
-  governance: "Governance Dashboard",
 };
 
 function isPillarKey(s: string): s is PillarKey {
-  return ["energy", "water", "waste", "carbon", "social", "governance"].includes(s);
+  return ["energy", "water", "waste", "carbon"].includes(s);
 }
 function isViewKey(s: string): s is ViewKey {
   return [
@@ -139,7 +122,7 @@ export default function PerformanceShell() {
     useParams();
   const navigate = useNavigate();
 
-  // Validate pillar
+  // Validate pillar (retired social/governance links land on energy)
   if (!isPillarKey(pillarParam)) {
     return <Navigate to="/performance/energy/overview" replace />;
   }
@@ -182,8 +165,6 @@ export default function PerformanceShell() {
 
       {/* View body */}
       {view === "overview" && pillar === "energy"     && <EnergyOverviewView />}
-      {view === "overview" && pillar === "social"     && <SocialOverviewView />}
-      {view === "overview" && pillar === "governance" && <GovernanceOverviewView />}
       {view === "overview" && (pillar === "water" || pillar === "waste" || pillar === "carbon") && <PillarOverviewView pillar={pillar} />}
 
       {view === "performance" && pillar === "energy"  && <EnergyPerformanceView />}

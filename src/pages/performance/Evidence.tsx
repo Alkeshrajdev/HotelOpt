@@ -1,7 +1,6 @@
 import { CheckCircle2, FileText, FolderOpen, ShieldAlert, Upload } from "lucide-react";
 import { Card, CardHeader } from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
-import { GOVERNANCE } from "@/lib/pillarData";
 import type { PillarKey } from "./Shell";
 
 const SOCIAL_EVIDENCE = [
@@ -16,59 +15,6 @@ const SOCIAL_EVIDENCE = [
 ];
 
 export default function Evidence({ pillar }: { pillar: PillarKey }) {
-  if (pillar === "governance") {
-    const items = GOVERNANCE.attestationItems;
-    const ready = items.filter((i) => i.status === "ready").length;
-    return (
-      <div className="space-y-5">
-        <Card>
-          <CardHeader
-            title="Annual attestations register"
-            hint={`${ready} of ${items.length} attested · 1 outstanding`}
-            right={
-              <button className="btn-primary">
-                <Upload size={14} /> Attach evidence
-              </button>
-            }
-          />
-          <ul className="p-5 grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
-            {items.map((a) => (
-              <li
-                key={a.name}
-                className="flex items-center justify-between rounded-xl border border-ink-200 p-3 bg-white"
-              >
-                <div className="flex items-center gap-2">
-                  {a.status === "ready" ? (
-                    <CheckCircle2 size={16} className="text-good" />
-                  ) : (
-                    <ShieldAlert size={16} className="text-bad" />
-                  )}
-                  <span className="text-ink-900 font-medium">{a.name}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-[11px] text-ink-500">{a.lastAttested}</span>
-                  {a.status === "ready" ? (
-                    <Badge tone="good">Attested</Badge>
-                  ) : (
-                    <Badge tone="bad">Gap</Badge>
-                  )}
-                </div>
-              </li>
-            ))}
-          </ul>
-        </Card>
-
-        <Card>
-          <CardHeader title="Audit trail of attestations" hint="Immutable · FR-2.5" />
-          <ul className="p-5 space-y-2 text-sm">
-            <Trail by="James Wilson" what="Attested Anti-corruption policy" when="2026-03-12" />
-            <Trail by="Lina Park" what="Re-signed Supplier code of conduct" when="2026-04-02" />
-            <Trail by="Erik Aksoy" what="Filed Conflict of interest register" when="2026-04-15" />
-          </ul>
-        </Card>
-      </div>
-    );
-  }
 
   // Social — evidence library
   return (

@@ -492,7 +492,7 @@ export default function Certifications() {
       </Card>
 
       {/* Programme-level summary */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 items-start">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <StatTile label={cert?.code ?? programme} value={`${summary.readyPct}% ready`} hint={cert?.name ?? ""} tone="brand" />
         <StatTile label="Ready"     value={String(summary.ready)}   hint={`of ${summary.total} criteria`} tone="good" />
         <StatTile label="Partial"   value={String(summary.partial)} hint="awaiting evidence"              tone="warn" />

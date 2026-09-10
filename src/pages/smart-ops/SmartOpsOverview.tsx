@@ -195,7 +195,7 @@ export default function SmartOpsOverview() {
       />
 
       {/* Row 1 — Top KPI drill-down tiles */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 items-start">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div
           className="card-interactive"
           onClick={() => navigate("/smart-ops/energy")}
@@ -276,7 +276,7 @@ export default function SmartOpsOverview() {
       </div>
 
       {/* Row 2 — System breakdown cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 items-start">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
         {/* Energy by system */}
         <Card level={2}>
           <CardHeader
@@ -343,7 +343,7 @@ export default function SmartOpsOverview() {
       </div>
 
       {/* Row 3 — Alerts, assets, maintenance */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-start">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Recent critical alerts — spans 2 cols */}
         <Card level={2} className="lg:col-span-2">
           <CardHeader
@@ -389,7 +389,7 @@ export default function SmartOpsOverview() {
         </Card>
 
         {/* Open maintenance actions */}
-        <Card level={2}>
+        <Card level={2} className="flex flex-col">
           <CardHeader
             title="Open maintenance actions"
             hint="3 open · 1 in progress"
@@ -402,7 +402,7 @@ export default function SmartOpsOverview() {
               </button>
             }
           />
-          <div className="px-6 pb-6 space-y-3 mt-3">
+          <div className="px-6 pb-6 mt-3 flex-1 flex flex-col gap-3">
             {OPEN_MAINTENANCE.map((action) => (
               <div key={action.id} className="py-2 border-b border-ink-50 last:border-0">
                 <div className="flex items-center justify-between gap-2 mb-1">
@@ -419,17 +419,21 @@ export default function SmartOpsOverview() {
                 </div>
               </div>
             ))}
+          <div className="mt-auto pt-3 border-t border-ink-100 flex items-center justify-between text-[11px] text-ink-500">
+            <span>Due today</span>
+            <span className="font-semibold text-ink-900">{OPEN_MAINTENANCE.filter((a) => /today/i.test(a.due)).length} of {OPEN_MAINTENANCE.length}</span>
+          </div>
           </div>
         </Card>
 
         {/* Top inefficient assets */}
-        <Card level={2}>
+        <Card level={2} className="flex flex-col">
           <CardHeader
             title="Top inefficient assets"
             hint={<DataSourcePill label="Sensor data" />}
             right={<LastUpdated text="15 min ago" />}
           />
-          <div className="px-6 pb-6 space-y-3 mt-3">
+          <div className="px-6 pb-6 mt-3 flex-1 flex flex-col gap-3">
             {TOP_INEFFICIENT_ASSETS.map((asset) => {
               const Icon = asset.icon;
               return (
@@ -445,12 +449,16 @@ export default function SmartOpsOverview() {
                 </div>
               );
             })}
+          <div className="mt-auto pt-3 border-t border-ink-100 flex items-center justify-between text-[11px] text-ink-500">
+            <span>Combined est. loss</span>
+            <span className="font-semibold text-bad-700">${TOP_INEFFICIENT_ASSETS.reduce((s, a) => s + parseInt(a.loss.replace(/[^0-9]/g, ""), 10), 0).toLocaleString()} / month</span>
+          </div>
           </div>
         </Card>
       </div>
 
       {/* Row 4 — status cards */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {/* Sensor health */}
           <Card level={2}>
             <CardHeader
@@ -544,7 +552,7 @@ export default function SmartOpsOverview() {
             <Info size={14} className="text-ink-400 shrink-0 mt-0.5" />
             <h4 className="text-[12px] font-semibold text-ink-700 uppercase tracking-wide">Data source key</h4>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-start">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="space-y-1">
               <div className="flex items-center gap-2">
                 <span className="w-5 h-5 rounded-md bg-brand-100 text-brand-700 flex items-center justify-center text-[10px] font-bold shrink-0">L1</span>
