@@ -7,13 +7,13 @@ import {
   CartesianGrid,
   Tooltip,
 } from "recharts";
-import { tokens } from "@/lib/tokens";
+import { CHART } from "@/lib/chartPalette";
 
 export default function AreaTrend({
   data,
   dataKey,
   xKey = "x",
-  color = tokens.brand[700],
+  color = CHART.olive,
   height = 240,
   format = (v: number) => v.toString(),
 }: {
@@ -34,15 +34,15 @@ export default function AreaTrend({
               <stop offset="100%" stopColor={color} stopOpacity={0} />
             </linearGradient>
           </defs>
-          <CartesianGrid stroke={tokens.ink[200]} vertical={false} />
+          <CartesianGrid stroke={CHART.grid} vertical={false} />
           <XAxis
             dataKey={xKey}
-            tick={{ fill: tokens.ink[500], fontSize: 11 }}
+            tick={{ fill: CHART.axis, fontSize: 11 }}
             tickLine={false}
-            axisLine={{ stroke: tokens.ink[200] }}
+            axisLine={{ stroke: CHART.grid }}
           />
           <YAxis
-            tick={{ fill: tokens.ink[500], fontSize: 11 }}
+            tick={{ fill: CHART.axis, fontSize: 11 }}
             tickLine={false}
             axisLine={false}
             tickFormatter={format}
@@ -51,7 +51,7 @@ export default function AreaTrend({
             formatter={(v: number) => format(v)}
             contentStyle={{
               borderRadius: 12,
-              border: `1px solid ${tokens.ink[200]}`,
+              border: `1px solid ${CHART.grid}`,
               fontSize: 12,
             }}
           />

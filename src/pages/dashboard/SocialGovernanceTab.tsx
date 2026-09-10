@@ -123,10 +123,10 @@ function PeopleSection() {
         <div className="px-4 pb-4 pt-2">
           <ResponsiveContainer width="100%" height={270}>
             <BarChart data={trainingData} layout="vertical" margin={{ top:0, right:40, bottom:0, left:100 }}>
-              <XAxis type="number" domain={[0,100]} tick={{ fontSize:10, fill:"#64748B" }} axisLine={false} tickLine={false} tickFormatter={v=>`${v}%`} />
-              <YAxis type="category" dataKey="name" width={96} tick={{ fontSize:10, fill:"#334155" }} axisLine={false} tickLine={false} />
+              <XAxis type="number" domain={[0,100]} tick={{ fontSize:10, fill:"#7B8285" }} axisLine={false} tickLine={false} tickFormatter={v=>`${v}%`} />
+              <YAxis type="category" dataKey="name" width={96} tick={{ fontSize:10, fill:"#383B3D" }} axisLine={false} tickLine={false} />
               <Tooltip content={<ShortTip suffix="%" />} />
-              <ReferenceLine x={avgTraining} stroke="#94A3B8" strokeDasharray="4 3" label={{ value:`Avg ${avgTraining}%`, position:"top", fontSize:10, fill:"#64748B" }} />
+              <ReferenceLine x={avgTraining} stroke="#9BA3A8" strokeDasharray="4 3" label={{ value:`Avg ${avgTraining}%`, position:"top", fontSize:10, fill:"#7B8285" }} />
               <ReferenceLine x={75} stroke="#B33650" strokeDasharray="3 3" opacity={0.3} />
               <Bar dataKey="val" radius={[0,4,4,0]} maxBarSize={16} isAnimationActive={false}>
                 {trainingData.map(d => <Cell key={d.name} fill={d.val>=85?"#807245":d.val>=70?"#CDB872":"#B33650"} />)}
@@ -142,10 +142,10 @@ function PeopleSection() {
         <div className="px-4 pb-4 pt-2">
           <ResponsiveContainer width="100%" height={270}>
             <BarChart data={turnoverData} layout="vertical" margin={{ top:0, right:40, bottom:0, left:100 }}>
-              <XAxis type="number" tick={{ fontSize:10, fill:"#64748B" }} axisLine={false} tickLine={false} tickFormatter={v=>`${v}%`} />
-              <YAxis type="category" dataKey="name" width={96} tick={{ fontSize:10, fill:"#334155" }} axisLine={false} tickLine={false} />
+              <XAxis type="number" tick={{ fontSize:10, fill:"#7B8285" }} axisLine={false} tickLine={false} tickFormatter={v=>`${v}%`} />
+              <YAxis type="category" dataKey="name" width={96} tick={{ fontSize:10, fill:"#383B3D" }} axisLine={false} tickLine={false} />
               <Tooltip content={<ShortTip suffix="%" />} />
-              <ReferenceLine x={avgTurnover} stroke="#94A3B8" strokeDasharray="4 3" label={{ value:`Avg ${avgTurnover}%`, position:"top", fontSize:10, fill:"#64748B" }} />
+              <ReferenceLine x={avgTurnover} stroke="#9BA3A8" strokeDasharray="4 3" label={{ value:`Avg ${avgTurnover}%`, position:"top", fontSize:10, fill:"#7B8285" }} />
               <Bar dataKey="val" radius={[0,4,4,0]} maxBarSize={16} isAnimationActive={false}>
                 {turnoverData.map(d => <Cell key={d.name} fill={d.val>25?"#B33650":d.val>18?"#CDB872":"#807245"} />)}
               </Bar>
@@ -160,9 +160,9 @@ function PeopleSection() {
         <div className="px-4 pb-4 pt-2">
           <ResponsiveContainer width="100%" height={160}>
             <LineChart data={SG_LTIFR_TREND} margin={{ top:4, right:8, bottom:0, left:0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" vertical={false} />
-              <XAxis dataKey="month" tick={{ fontSize:10, fill:"#64748B" }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize:10, fill:"#64748B" }} axisLine={false} tickLine={false} width={28} domain={[0,1.3]} />
+              <CartesianGrid strokeDasharray="3 3" stroke="#EDEFF0" vertical={false} />
+              <XAxis dataKey="month" tick={{ fontSize:10, fill:"#7B8285" }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fontSize:10, fill:"#7B8285" }} axisLine={false} tickLine={false} width={28} domain={[0,1.3]} />
               <Tooltip content={<ShortTip />} />
               <Line type="monotone" dataKey="ltifr" stroke="#CDB872" strokeWidth={2.5} dot={false} activeDot={{ r:4, strokeWidth:0 }} isAnimationActive={false} />
             </LineChart>
@@ -256,7 +256,7 @@ function GovernanceSection() {
                         className="h-full rounded-lg flex items-center px-3"
                         style={{
                           width:`${Math.max(step.pct,15)}%`,
-                          background: i===0?"#959891":i===1?"#959891":i===2?"#959891":"#C7D2FE",
+                          background: i===0?"#352E19":i===1?"#5B502F":i===2?"#807245":"#A4935A",
                         }}
                       >
                         <span className="text-[11px] font-bold text-white">{step.count}</span>

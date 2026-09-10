@@ -59,7 +59,7 @@ function MiniTrend({ data, color, title }: { data: {q:string;pct:number}[]; colo
       </div>
       <ResponsiveContainer width="100%" height={80}>
         <BarChart data={data} barCategoryGap="30%">
-          <XAxis dataKey="q" tick={{ fontSize:9, fill:"#9ca3af" }} axisLine={false} tickLine={false} />
+          <XAxis dataKey="q" tick={{ fontSize:9, fill:"#7B8285" }} axisLine={false} tickLine={false} />
           <YAxis domain={[60,100]} hide />
           <Tooltip content={<BarTip />} cursor={{ fill:"rgba(0,0,0,0.04)" }} />
           <Bar dataKey="pct" fill={color} radius={[2,2,0,0]} isAnimationActive={false} />

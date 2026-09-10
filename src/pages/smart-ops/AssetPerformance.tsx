@@ -677,7 +677,7 @@ function COPTrendChart() {
               <div
                 className={cn(
                   "w-full rounded-t",
-                  isLast ? "bg-warn" : val < 3.1 ? "bg-warn" : "bg-info"
+                  isLast ? "bg-chart-cocoa" : val < 3.1 ? "bg-chart-sand" : "bg-chart-olive"
                 )}
                 style={{ height: `${Math.max(heightPct, 6)}%` }}
                 title={`${COP_DAYS[i]}: COP ${val.toFixed(2)}`}
@@ -694,9 +694,9 @@ function COPTrendChart() {
         ))}
       </div>
       <div className="flex items-center gap-4 mt-2 text-xs text-ink-500">
-        <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-info inline-block" /> Above 3.1 COP</span>
-        <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-warn inline-block" /> Below 3.1 COP</span>
-        <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-warn inline-block" /> Current</span>
+        <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-chart-olive inline-block" /> Above 3.1 COP</span>
+        <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-chart-sand inline-block" /> Below 3.1 COP</span>
+        <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-chart-cocoa inline-block" /> Current</span>
       </div>
     </div>
   );
@@ -1000,9 +1000,9 @@ function AssetDetailModal({ asset, open, onClose }: { asset: Asset | null; open:
               </div>
               {isChiller01 && (
                 <>
-                  <div className="bg-orange-50 rounded-lg p-3 border border-orange-100">
-                    <div className="text-[11px] text-orange-600 mb-1">Excess Carbon</div>
-                    <div className="text-sm font-bold text-orange-800">1.8 tCO₂e/month</div>
+                  <div className="bg-warn/10 rounded-lg p-3 border border-warn/30">
+                    <div className="text-[11px] text-warn-700 mb-1">Excess Carbon</div>
+                    <div className="text-sm font-bold text-warn-700">1.8 tCO₂e/month</div>
                   </div>
                   <div className="bg-ink-50 rounded-lg p-3 border border-ink-200">
                     <div className="text-[11px] text-ink-500 mb-1">Confidence</div>
@@ -1225,9 +1225,9 @@ function AssetHealthTab() {
       label: "Poor",
       count: poorAssets.length,
       assets: poorAssets,
-      colour: "bg-orange-50 border-orange-200",
-      headerColour: "text-orange-700 bg-orange-100",
-      dotColour: "bg-orange-500",
+      colour: "bg-warn/10 border-warn/30",
+      headerColour: "text-warn-700 bg-warn/10",
+      dotColour: "bg-warn",
       tone: "warn" as const,
     },
     {
@@ -1248,7 +1248,7 @@ function AssetHealthTab() {
         <KpiTile icon={<Database className="w-5 h-5" />} iconBg="bg-info/10" label="Total Assets" value="14" />
         <KpiTile icon={<CheckCircle className="w-5 h-5" />} iconBg="bg-good/10" label="Assets Good Health" value="8" delta={57} deltaUnit="% of fleet" goodDirection="up" />
         <KpiTile icon={<AlertTriangle className="w-5 h-5" />} iconBg="bg-warn/10" label="Assets With Alerts" value="6" delta={43} deltaUnit="% of fleet" goodDirection="down" />
-        <KpiTile icon={<Clock className="w-5 h-5" />} iconBg="bg-orange-50" label="PM Overdue" value="2" caption="Avg asset age: 5.2 years" />
+        <KpiTile icon={<Clock className="w-5 h-5" />} iconBg="bg-warn/10" label="PM Overdue" value="2" caption="Avg asset age: 5.2 years" />
       </div>
 
       {/* Health breakdown */}

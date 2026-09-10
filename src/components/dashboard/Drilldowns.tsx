@@ -196,20 +196,20 @@ export function EnergyIntensityDrilldown() {
             totalValue="24.0"
             totalLabel="kWh / ORN"
             data={[
-              { name: "Grid electricity", value: 64, color: "#0F6A3C" },
-              { name: "District cooling", value: 12, color: "#0EA5E9" },
-              { name: "Natural gas", value: 14, color: "#F59E0B" },
-              { name: "Diesel", value: 2, color: "#DC2626" },
-              { name: "Solar PV (offset)", value: 8, color: "#16A34A" },
+              { name: "Grid electricity", value: 64, color: "#807245" },
+              { name: "District cooling", value: 12, color: "#AF8D84" },
+              { name: "Natural gas", value: 14, color: "#959891" },
+              { name: "Diesel", value: 2, color: "#8B6D66" },
+              { name: "Solar PV (offset)", value: 8, color: "#F6C8CC" },
             ]}
           />
           <ul className="mt-3 space-y-1.5 text-[12px]">
             {[
-              { c: "#0F6A3C", n: "Grid electricity", v: "64%" },
-              { c: "#0EA5E9", n: "District cooling", v: "12%" },
-              { c: "#F59E0B", n: "Natural gas", v: "14%" },
-              { c: "#DC2626", n: "Diesel", v: "2%" },
-              { c: "#16A34A", n: "Solar PV (offset)", v: "8%" },
+              { c: "#807245", n: "Grid electricity", v: "64%" },
+              { c: "#AF8D84", n: "District cooling", v: "12%" },
+              { c: "#959891", n: "Natural gas", v: "14%" },
+              { c: "#8B6D66", n: "Diesel", v: "2%" },
+              { c: "#F6C8CC", n: "Solar PV (offset)", v: "8%" },
             ].map((s) => (
               <li
                 key={s.n}
@@ -256,7 +256,7 @@ export function EnergyCostDrilldown() {
               { x: "Apr 26", v: 425 },
             ]}
             dataKey="v"
-            color="#7C3AED"
+            color="#634D48"
             format={(v) => `$${v}k`}
           />
         </div>
@@ -307,7 +307,7 @@ export function RenewableDrilldown() {
               { x: "Apr", v: 12 },
             ]}
             dataKey="v"
-            color="#EA580C"
+            color="#747771"
             format={(v) => `${v}%`}
           />
         </div>
@@ -319,9 +319,9 @@ export function RenewableDrilldown() {
             totalValue="12%"
             totalLabel="renewable"
             data={[
-              { name: "On-site solar PV", value: 8, color: "#EA580C" },
-              { name: "I-RECs purchased", value: 4, color: "#FBBF24" },
-              { name: "Conventional grid", value: 88, color: "#94A3B8" },
+              { name: "On-site solar PV", value: 8, color: "#807245" },
+              { name: "I-RECs purchased", value: 4, color: "#CDB872" },
+              { name: "Conventional grid", value: 88, color: "#C2C9CC" },
             ]}
           />
         </div>
@@ -359,7 +359,7 @@ export function ScopeDrilldown({
                 { x: "Apr", v: 298 },
               ]}
               dataKey="v"
-              color="#0F6A3C"
+              color="#8B6D66"
               format={(v) => `${v}t`}
             />
           </div>
@@ -371,9 +371,9 @@ export function ScopeDrilldown({
               totalValue="3,428"
               totalLabel="tCO₂e (12 mo)"
               data={[
-                { name: "Natural gas", value: 1846, color: "#0F6A3C" },
-                { name: "Diesel (back-up)", value: 1168, color: "#7C2D12" },
-                { name: "Refrigerants (R-410A)", value: 414, color: "#F59E0B" },
+                { name: "Natural gas", value: 1846, color: "#807245" },
+                { name: "Diesel (back-up)", value: 1168, color: "#AF8D84" },
+                { name: "Refrigerants (R-410A)", value: 414, color: "#959891" },
               ]}
             />
           </div>
@@ -414,9 +414,9 @@ export function ScopeDrilldown({
               totalValue="14,569"
               totalLabel="tCO₂e (12 mo)"
               data={[
-                { name: "Grid electricity", value: 12814, color: "#0EA5E9" },
-                { name: "District cooling", value: 1281, color: "#22D3EE" },
-                { name: "Steam (district heat)", value: 474, color: "#A5F3FC" },
+                { name: "Grid electricity", value: 12814, color: "#807245" },
+                { name: "District cooling", value: 1281, color: "#AF8D84" },
+                { name: "Steam (district heat)", value: 474, color: "#959891" },
               ]}
             />
             <div className="mt-3 text-[12px] text-ink-500">

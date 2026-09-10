@@ -93,7 +93,7 @@ function MetricChart({ metric }: { metric: MetricConfig }) {
             <XAxis
               type="number"
               domain={domain}
-              tick={{ fontSize: 10, fill: "#9ca3af" }}
+              tick={{ fontSize: 10, fill: "#7B8285" }}
               axisLine={false}
               tickLine={false}
               tickFormatter={metric.format}
@@ -108,7 +108,7 @@ function MetricChart({ metric }: { metric: MetricConfig }) {
                   dominantBaseline="middle"
                   fontSize={11}
                   fontWeight={payload.value === "You" ? 700 : 400}
-                  fill={payload.value === "You" ? "#807245" : "#6b7280"}
+                  fill={payload.value === "You" ? "#807245" : "#7B8285"}
                 >
                   {payload.value}
                 </text>
@@ -129,7 +129,7 @@ function MetricChart({ metric }: { metric: MetricConfig }) {
               {data.map((entry, i) => (
                 <Cell
                   key={i}
-                  fill={entry.isYou ? "#807245" : "#e2e8f0"}
+                  fill={entry.isYou ? "#807245" : "#EDEFF0"}
                 />
               ))}
             </Bar>

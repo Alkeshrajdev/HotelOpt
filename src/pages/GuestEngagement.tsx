@@ -755,7 +755,7 @@ function CampaignDetailModal({ campaign: c, onClose }: { campaign: Campaign | nu
                 <div key={s.label} className="flex items-center gap-3">
                   <span className="w-28 text-[12px] text-ink-700 shrink-0">{s.label}</span>
                   <div className="flex-1 h-7 rounded-lg bg-ink-100 overflow-hidden relative">
-                    <div className={cn("h-full rounded-lg", i === steps.length - 1 ? "bg-brand-700" : "bg-brand-400")} style={{ width: `${Math.max(pct, 3)}%` }} />
+                    <div className={cn("h-full rounded-lg", i === steps.length - 1 ? "bg-chart-olive" : "bg-chart-mauve")} style={{ width: `${Math.max(pct, 3)}%` }} />
                     <span className="absolute inset-y-0 left-2 flex items-center text-[11px] font-semibold text-ink-800">{s.count.toLocaleString()}</span>
                   </div>
                   <span className="w-16 text-right text-[11px] text-ink-500 shrink-0 tabular-nums">{pct}%{i > 0 && <span className="text-ink-400"> · {stepConv}%↓</span>}</span>
@@ -868,9 +868,9 @@ function SurveysTab({ property }: { property: string }) {
                 <div className={cn("text-5xl font-bold tabular-nums", npsColor)}>+{NPS_SCORE}</div>
                 <div className="flex-1">
                   <div className="relative h-4 rounded-full overflow-hidden flex">
-                    <div className="bg-bad   flex-1 h-full" style={{ flex: "0 0 33%" }} />
-                    <div className="bg-warn  flex-1 h-full" style={{ flex: "0 0 17%" }} />
-                    <div className="bg-good  flex-1 h-full" style={{ flex: "0 0 50%" }} />
+                    <div className="bg-chart-rose   flex-1 h-full" style={{ flex: "0 0 33%" }} />
+                    <div className="bg-chart-sand  flex-1 h-full" style={{ flex: "0 0 17%" }} />
+                    <div className="bg-chart-olive  flex-1 h-full" style={{ flex: "0 0 50%" }} />
                   </div>
                   {/* Pin */}
                   <div className="relative h-0">
@@ -880,9 +880,9 @@ function SurveysTab({ property }: { property: string }) {
                     <span>−100</span><span>0</span><span>+100</span>
                   </div>
                   <div className="flex gap-3 mt-1.5 text-[10px]">
-                    <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-bad inline-block" /> Detractor</span>
-                    <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-warn inline-block" /> Passive</span>
-                    <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-good inline-block" /> Promoter</span>
+                    <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-chart-rose inline-block" /> Detractor</span>
+                    <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-chart-sand inline-block" /> Passive</span>
+                    <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-chart-olive inline-block" /> Promoter</span>
                   </div>
                 </div>
               </div>
@@ -895,7 +895,7 @@ function SurveysTab({ property }: { property: string }) {
                 {RATING_DIST.map((pct, i) => (
                   <div key={i} className="flex-1 flex flex-col items-center gap-1">
                     <div
-                      className={cn("w-full rounded-t", i >= 3 ? "bg-good" : i === 2 ? "bg-warn" : "bg-bad")}
+                      className={cn("w-full rounded-t", i >= 3 ? "bg-chart-olive" : i === 2 ? "bg-chart-sand" : "bg-chart-rose")}
                       style={{ height: `${pct * 1.5}px` }}
                     />
                     <div className="text-[10px] text-ink-500 flex items-center gap-0.5">
@@ -934,18 +934,18 @@ function SurveysTab({ property }: { property: string }) {
                 <div key={d.m} className="flex items-center gap-2">
                   <span className="w-7 text-[10px] text-ink-400 shrink-0">{d.m}</span>
                   <div className="flex-1 flex h-3.5 rounded-full overflow-hidden">
-                    <div className="bg-good"  style={{ width: `${d.pos}%` }} title={`Positive ${d.pos}%`} />
-                    <div className="bg-ink-300" style={{ width: `${d.neu}%` }} title={`Neutral ${d.neu}%`} />
-                    <div className="bg-bad"   style={{ width: `${d.neg}%` }} title={`Negative ${d.neg}%`} />
+                    <div className="bg-chart-olive"  style={{ width: `${d.pos}%` }} title={`Positive ${d.pos}%`} />
+                    <div className="bg-chart-remainder" style={{ width: `${d.neu}%` }} title={`Neutral ${d.neu}%`} />
+                    <div className="bg-chart-rose"   style={{ width: `${d.neg}%` }} title={`Negative ${d.neg}%`} />
                   </div>
-                  <span className="w-9 text-[10px] text-good font-semibold text-right shrink-0 tabular-nums">{d.pos}%</span>
+                  <span className="w-9 text-[10px] text-ink-700 font-semibold text-right shrink-0 tabular-nums">{d.pos}%</span>
                 </div>
               ))}
             </div>
             <div className="flex gap-3 mt-2 text-[10px] text-ink-500">
-              <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-good inline-block" /> Positive</span>
-              <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-ink-300 inline-block" /> Neutral</span>
-              <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-bad inline-block" /> Negative</span>
+              <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-chart-olive inline-block" /> Positive</span>
+              <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-chart-remainder inline-block" /> Neutral</span>
+              <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-chart-rose inline-block" /> Negative</span>
             </div>
           </div>
         </div>
@@ -1053,7 +1053,7 @@ function EcoPointsTab() {
                     </div>
                   </div>
                   <div className="mt-2 h-1.5 rounded-full bg-ink-100 overflow-hidden">
-                    <div className="h-full rounded-full bg-brand-500" style={{ width: `${c.pct}%` }} />
+                    <div className="h-full rounded-full bg-chart-olive" style={{ width: `${c.pct}%` }} />
                   </div>
                 </div>
               );
@@ -1177,7 +1177,7 @@ function QrAnalyticsTab({ property }: { property: string }) {
                   </div>
                 </div>
                 <div className="mt-2 h-1.5 rounded-full bg-ink-100 overflow-hidden">
-                  <div className="h-full rounded-full bg-info" style={{ width: `${(p.scans / maxScans) * 100}%` }} />
+                  <div className="h-full rounded-full bg-chart-olive" style={{ width: `${(p.scans / maxScans) * 100}%` }} />
                 </div>
               </div>
             ))}

@@ -222,7 +222,7 @@ function PropertyProfile({ property }: { property: typeof PROPERTIES[number] }) 
               { x: "Jan", v: property.score - 1 }, { x: "Feb", v: property.score - 1 },
               { x: "Mar", v: property.score - 1 }, { x: "Apr", v: property.score },
             ]}
-            dataKey="v" color="#0F6A3C"
+            dataKey="v" color="#807245"
           />
         </div>
       </Card>

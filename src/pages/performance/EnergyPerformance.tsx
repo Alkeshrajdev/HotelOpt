@@ -27,7 +27,7 @@ const WATERFALL: WfStep[] = [
 ];
 
 const BAR_COLOR: Record<WfStep["type"], string> = {
-  base:           "#94a3b8",
+  base:           "#9BA3A8",
   up:             "#CDB872",
   "down-neutral": "#AF8D84",
   "down-good":    "#807245",
@@ -169,16 +169,16 @@ export default function EnergyPerformance() {
         <div className="px-6 pb-2 pt-4">
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={WATERFALL} barCategoryGap="28%">
-              <XAxis dataKey="name" tick={{ fontSize: 11, fill: "#6b7280" }} axisLine={false} tickLine={false} />
+              <XAxis dataKey="name" tick={{ fontSize: 11, fill: "#7B8285" }} axisLine={false} tickLine={false} />
               <YAxis
                 domain={[2500, 3400]}
-                tick={{ fontSize: 11, fill: "#6b7280" }}
+                tick={{ fontSize: 11, fill: "#7B8285" }}
                 tickFormatter={(v) => `${(v / 1000).toFixed(1)}k`}
                 axisLine={false} tickLine={false} width={40}
               />
               <Tooltip content={<WfTooltip />} cursor={{ fill: "rgba(0,0,0,0.03)" }} />
-              <ReferenceLine y={ADJUSTED_BASELINE} stroke="#94a3b8" strokeDasharray="4 3"
-                label={{ value: "Baseline  3,280", position: "insideTopRight", fontSize: 10, fill: "#94a3b8" }}
+              <ReferenceLine y={ADJUSTED_BASELINE} stroke="#9BA3A8" strokeDasharray="4 3"
+                label={{ value: "Baseline  3,280", position: "insideTopRight", fontSize: 10, fill: "#9BA3A8" }}
               />
               <Bar dataKey="spacer" stackId="wf" fill="transparent" stroke="none" isAnimationActive={false} />
               <Bar dataKey="delta"  stackId="wf" radius={[3, 3, 0, 0]} isAnimationActive={false}>
@@ -189,7 +189,7 @@ export default function EnergyPerformance() {
         </div>
         <div className="flex flex-wrap gap-4 px-6 pb-5 text-[11px] text-ink-500">
           {[
-            { color: "#94a3b8", label: "Reference" },
+            { color: "#9BA3A8", label: "Reference" },
             { color: "#CDB872", label: "External — up" },
             { color: "#AF8D84", label: "External — down" },
             { color: "#807245", label: "Net management change" },
@@ -209,19 +209,19 @@ export default function EnergyPerformance() {
           <ResponsiveContainer width="100%" height={240}>
             <LineChart data={INTENSITY}>
               <CartesianGrid vertical={false} stroke="#EDEFF0" />
-              <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#6b7280" }} axisLine={false} tickLine={false} />
+              <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#7B8285" }} axisLine={false} tickLine={false} />
               <YAxis
                 domain={[108, 147]}
-                tick={{ fontSize: 11, fill: "#6b7280" }}
+                tick={{ fontSize: 11, fill: "#7B8285" }}
                 axisLine={false} tickLine={false} width={28}
               />
               <Tooltip content={<IntensityTooltip />} cursor={{ stroke: "#EDEFF0" }} />
               <ReferenceLine y={annualAvgTY} stroke="#807245" strokeDasharray="3 3" strokeOpacity={0.35} />
               <Legend
                 wrapperStyle={{ fontSize: 11, paddingTop: 10 }}
-                formatter={(v) => <span style={{ color: "#6b7280" }}>{v === "ty" ? "This year" : "Prior year"}</span>}
+                formatter={(v) => <span style={{ color: "#7B8285" }}>{v === "ty" ? "This year" : "Prior year"}</span>}
               />
-              <Line dataKey="py" name="py" stroke="#cbd5e1" strokeWidth={2} strokeDasharray="5 3" dot={false} isAnimationActive={false} />
+              <Line dataKey="py" name="py" stroke="#BABEB5" strokeWidth={2} strokeDasharray="5 3" dot={false} isAnimationActive={false} />
               <Line dataKey="ty" name="ty" stroke="#807245" strokeWidth={2.5} dot={{ fill: "#807245", r: 3 }} activeDot={{ r: 5 }} isAnimationActive={false} />
             </LineChart>
           </ResponsiveContainer>

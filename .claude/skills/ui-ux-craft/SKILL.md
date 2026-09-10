@@ -70,6 +70,14 @@ repo's tokens. When in doubt, the rule wins over the existing code.
   for tracks/neutral; rose `#B33650` for negatives; sand `#CDB872` for warnings (sparingly).
   Hand-built bars and legend swatches use the matching `bg-chart-*` classes. Stacked series get a
   1px white separator. Pillars map via `CHART_PILLAR`, thresholds via `CHART_STATUS`.
+  **Assigning a breakdown:** rank items by share and walk `CHART_SERIES` in order (olive → mauve
+  → moss → blush → cocoa → sand → sage); "nothing happened" slices (landfill, other, conventional
+  grid) take `CHART.remainder`; genuinely bad slices (hazardous, overdue) take `CHART.rose`.
+  Prior-period bars `CHART.prior`, dashed baselines/averages `CHART.reference`, gridlines and
+  tooltip borders `CHART.grid`, ticks and legend text `CHART.axis`, category labels `CHART.label`.
+  Import from `chartPalette` — never from `tokens.ts` (those are UI hues) and never a literal
+  Tailwind hex. Tooltip labels get a `bg-chart-*` dot, not coloured text (mauve/blush can't
+  carry 12px text on white).
 - Tab rows are contained pill tracks (`Tabs` primitive, or `inline-flex … rounded-full bg-ink-100 p-1`
   with white active pills) — never an underline row floating on the page.
 

@@ -51,12 +51,12 @@ const SOURCES: {
   color: string;
   lightColor: string;
 }[] = [
-  { key: "grid",     label: "Grid",          fullLabel: "Grid Electricity",   color: "#807245", lightColor: "#dcfce7" },
-  { key: "boiler",   label: "Boiler fuel",   fullLabel: "Boiler Fuel (Gas)",  color: "#CDB872", lightColor: "#ffedd5" },
-  { key: "kitchen",  label: "Kitchen gas",   fullLabel: "Kitchen Gas",        color: "#CDB872", lightColor: "#fef3c7" },
-  { key: "distCool", label: "Dist. cooling", fullLabel: "District Cooling",   color: "#AF8D84", lightColor: "#e0f2fe" },
-  { key: "solar",    label: "Solar PV",      fullLabel: "Solar PV (on-site)", color: "#F6C8CC", lightColor: "#f0fdf4" },
-  { key: "diesel",   label: "Diesel",        fullLabel: "Diesel / Generator", color: "#78716c", lightColor: "#f5f5f4" },
+  { key: "grid",     label: "Grid",          fullLabel: "Grid Electricity",   color: "#807245", lightColor: "#F1DFA3" },
+  { key: "boiler",   label: "Boiler fuel",   fullLabel: "Boiler Fuel (Gas)",  color: "#AF8D84", lightColor: "#E8E0DE" },
+  { key: "kitchen",  label: "Kitchen gas",   fullLabel: "Kitchen Gas",        color: "#CDB872", lightColor: "#F1DFA3" },
+  { key: "distCool", label: "Dist. cooling", fullLabel: "District Cooling",   color: "#959891", lightColor: "#E0E5DA" },
+  { key: "solar",    label: "Solar PV",      fullLabel: "Solar PV (on-site)", color: "#F6C8CC", lightColor: "#F6C8CC" },
+  { key: "diesel",   label: "Diesel",        fullLabel: "Diesel / Generator", color: "#8B6D66", lightColor: "#E8E0DE" },
 ];
 
 /* ─── Custom tooltips ───────────────────────────────────────────────────────*/
@@ -154,7 +154,7 @@ function SourceChart({
         <BarChart data={chartData} barGap={1} barCategoryGap="30%">
           <XAxis
             dataKey="month"
-            tick={{ fontSize: 9, fill: "#9ca3af" }}
+            tick={{ fontSize: 9, fill: "#7B8285" }}
             axisLine={false}
             tickLine={false}
           />
@@ -248,7 +248,7 @@ export default function EnergyOverview() {
               <CartesianGrid vertical={false} stroke="#EDEFF0" />
               <XAxis
                 dataKey="month"
-                tick={{ fontSize: 11, fill: "#6b7280" }}
+                tick={{ fontSize: 11, fill: "#7B8285" }}
                 axisLine={false}
                 tickLine={false}
               />
@@ -256,13 +256,13 @@ export default function EnergyOverview() {
               <YAxis
                 yAxisId="mwh"
                 orientation="left"
-                tick={{ fontSize: 11, fill: "#6b7280" }}
+                tick={{ fontSize: 11, fill: "#7B8285" }}
                 tickFormatter={(v) => `${v}`}
                 axisLine={false}
                 tickLine={false}
                 width={40}
                 domain={[0, 10000]}
-                label={{ value: "MWh", angle: -90, position: "insideLeft", offset: 12, style: { fontSize: 10, fill: "#9ca3af" } }}
+                label={{ value: "MWh", angle: -90, position: "insideLeft", offset: 12, style: { fontSize: 10, fill: "#7B8285" } }}
               />
               {/* Right axis — $k */}
               {showCost && (
@@ -281,7 +281,7 @@ export default function EnergyOverview() {
               {/* TY bar */}
               <Bar yAxisId="mwh" dataKey="ty" name="This year" fill="#807245" radius={[3, 3, 0, 0]} isAnimationActive={false} />
               {/* PY bar */}
-              <Bar yAxisId="mwh" dataKey="py" name="Prior year" fill="#cbd5e1" radius={[3, 3, 0, 0]} isAnimationActive={false} />
+              <Bar yAxisId="mwh" dataKey="py" name="Prior year" fill="#BABEB5" radius={[3, 3, 0, 0]} isAnimationActive={false} />
               {/* Cost lines */}
               {showCost && (
                 <Line
@@ -309,7 +309,7 @@ export default function EnergyOverview() {
               <Legend
                 wrapperStyle={{ fontSize: 11, paddingTop: 12 }}
                 formatter={(value) => (
-                  <span style={{ color: "#6b7280" }}>{value}</span>
+                  <span style={{ color: "#7B8285" }}>{value}</span>
                 )}
               />
             </ComposedChart>

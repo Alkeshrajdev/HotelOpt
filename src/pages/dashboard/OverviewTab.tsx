@@ -243,7 +243,7 @@ function ChartTip({ active, payload, label, metric }: {
         {int && (
           <div className="flex justify-between gap-4">
             <span className="text-ink-500">Carbon intensity</span>
-            <span className="font-bold text-teal-700">{int.value} kgCO₂e/ORN</span>
+            <span className="font-bold text-ink-900">{int.value} kgCO₂e/ORN</span>
           </div>
         )}
         <div className="flex justify-between gap-4 mt-1 text-ink-400 text-[11px]">
@@ -267,9 +267,9 @@ function ChartTip({ active, payload, label, metric }: {
       <div className="bg-white border border-ink-200 rounded-xl shadow-pop px-3.5 py-3 text-[12px] min-w-[190px]">
         <div className="font-semibold text-ink-800 mb-2">{label}</div>
         <div className="space-y-0.5">
-          <div className="flex justify-between gap-4"><span className="text-warn-700">Energy</span><span className="font-medium">${eTY}k</span></div>
-          <div className="flex justify-between gap-4"><span className="text-info-700">Water</span><span className="font-medium">${wTY}k</span></div>
-          <div className="flex justify-between gap-4"><span className="text-violet-600">Waste</span><span className="font-medium">${dTY}k</span></div>
+          <div className="flex justify-between gap-4"><span className="flex items-center gap-1.5 text-ink-600"><span className="w-2 h-2 rounded-full bg-chart-olive inline-block" />Energy</span><span className="font-medium">${eTY}k</span></div>
+          <div className="flex justify-between gap-4"><span className="flex items-center gap-1.5 text-ink-600"><span className="w-2 h-2 rounded-full bg-chart-mauve inline-block" />Water</span><span className="font-medium">${wTY}k</span></div>
+          <div className="flex justify-between gap-4"><span className="flex items-center gap-1.5 text-ink-600"><span className="w-2 h-2 rounded-full bg-chart-blush inline-block" />Waste</span><span className="font-medium">${dTY}k</span></div>
         </div>
         <div className="border-t border-ink-100 mt-1.5 pt-1.5 space-y-0.5">
           <div className="flex justify-between gap-4 font-semibold"><span className="text-ink-700">Total TY</span><span>${tot}k</span></div>
@@ -523,8 +523,8 @@ export default function OverviewTab({ onNavigate }: Props) {
               )}
               {metric === "carbon" && (
                 <>
-                  <span className="flex items-center gap-1.5"><span className="w-5 border-t-2 border-teal-600 inline-block" />Intensity</span>
-                  <span className="flex items-center gap-1.5"><span className="w-5 border-t-2 border-dashed border-good inline-block" />2030 target</span>
+                  <span className="flex items-center gap-1.5"><span className="w-5 border-t-2 border-chart-mauve inline-block" />Intensity</span>
+                  <span className="flex items-center gap-1.5"><span className="w-5 border-t-2 border-dashed border-chart-olive inline-block" />2030 target</span>
                 </>
               )}
             </div>
@@ -533,13 +533,13 @@ export default function OverviewTab({ onNavigate }: Props) {
           <ResponsiveContainer width="100%" height={280}>
             <ComposedChart data={chartData} barCategoryGap={aggregation === "annually" ? "40%" : "28%"}>
               <CartesianGrid vertical={false} stroke="#EDEFF0" />
-              <XAxis dataKey={xKey} tick={{ fontSize:11, fill:"#6b7280" }} axisLine={false} tickLine={false} />
+              <XAxis dataKey={xKey} tick={{ fontSize:11, fill:"#7B8285" }} axisLine={false} tickLine={false} />
 
               {/* Cost Y-axis (non-carbon modes) */}
               {metric !== "carbon" && (
                 <YAxis
                   yAxisId="main" orientation="left"
-                  tick={{ fontSize:11, fill:"#6b7280" }}
+                  tick={{ fontSize:11, fill:"#7B8285" }}
                   tickFormatter={(v) => `$${v}k`}
                   axisLine={false} tickLine={false} width={52}
                 />
@@ -595,11 +595,11 @@ export default function OverviewTab({ onNavigate }: Props) {
                 <Line
                   yAxisId="main"
                   dataKey={metricCfg.pyKey}
-                  stroke="#94a3b8"
+                  stroke="#9BA3A8"
                   strokeWidth={1.5}
                   strokeDasharray="5 3"
                   dot={false}
-                  activeDot={{ r: 4, fill: "#94a3b8" }}
+                  activeDot={{ r: 4, fill: "#9BA3A8" }}
                   isAnimationActive={false}
                 />
               )}

@@ -59,7 +59,7 @@ const DATA: Record<"water"|"waste"|"carbon", { rows: PropRow[]; avg: number; uni
   },
 };
 
-const RAG_BAR = { green:"#16a34a", amber:"#f59e0b", red:"#ef4444" };
+const RAG_BAR = { green:"#807245", amber:"#CDB872", red:"#B33650" };
 const RAG_CHIP = {
   green:"bg-good/10 text-good border border-good/20",
   amber:"bg-warn/10 text-warn border border-warn/25",

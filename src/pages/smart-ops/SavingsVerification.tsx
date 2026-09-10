@@ -410,7 +410,7 @@ function SavingsDetailModal({ saving, open, onClose }: { saving: SavingRecord | 
                 <span className="font-medium text-ink-700">{saving.baselineConsumption}</span>
               </div>
               <div className="h-6 bg-ink-200 rounded-md overflow-hidden">
-                <div className="h-full bg-bad rounded-md" style={{ width: `${baselineWidth}%` }} />
+                <div className="h-full bg-chart-prior rounded-md" style={{ width: `${baselineWidth}%` }} />
               </div>
             </div>
             <div>
@@ -419,7 +419,7 @@ function SavingsDetailModal({ saving, open, onClose }: { saving: SavingRecord | 
                 <span className="font-medium text-ink-700">{saving.postActionConsumption}</span>
               </div>
               <div className="h-6 bg-ink-200 rounded-md overflow-hidden">
-                <div className="h-full bg-good rounded-md" style={{ width: `${postWidth}%` }} />
+                <div className="h-full bg-chart-olive rounded-md" style={{ width: `${postWidth}%` }} />
               </div>
             </div>
             <div className="pt-2 border-t border-ink-200">
@@ -854,7 +854,7 @@ function WaterSavingsTab() {
         />
         <KpiTile
           icon={<BarChart2 className="w-5 h-5" />}
-          iconBg="bg-teal-50"
+          iconBg="bg-ink-100"
           label="Equivalent CO₂ Avoided"
           value="1.2"
           unit="tCO₂e"

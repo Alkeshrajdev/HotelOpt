@@ -1,5 +1,5 @@
 import { LineChart, Line, ResponsiveContainer } from "recharts";
-import { tokens } from "@/lib/tokens";
+import { CHART_PILLAR } from "@/lib/chartPalette";
 
 type Props = {
   data: { x: string | number; y: number }[];
@@ -10,7 +10,7 @@ type Props = {
 
 export default function SparkLine({
   data,
-  color = tokens.pillar.energy,
+  color = CHART_PILLAR.energy,
   width = 110,
   height = 28,
 }: Props) {

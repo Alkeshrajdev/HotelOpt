@@ -21,7 +21,7 @@ export default function Donut({
             formatter={(v: number) => v.toLocaleString()}
             contentStyle={{
               borderRadius: 12,
-              border: "1px solid #E2E8F0",
+              border: "1px solid #EDEFF0",
               fontSize: 12,
             }}
           />

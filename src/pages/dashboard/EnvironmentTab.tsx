@@ -228,7 +228,7 @@ function DrilldownPanel({
             >
               <XAxis
                 type="number"
-                tick={{ fontSize: 10, fill: "#64748B" }}
+                tick={{ fontSize: 10, fill: "#7B8285" }}
                 axisLine={false}
                 tickLine={false}
                 tickFormatter={(v) =>
@@ -239,12 +239,12 @@ function DrilldownPanel({
                 type="category"
                 dataKey="name"
                 width={106}
-                tick={{ fontSize: 11, fill: "#334155" }}
+                tick={{ fontSize: 11, fill: "#383B3D" }}
                 axisLine={false}
                 tickLine={false}
               />
               <Tooltip
-                contentStyle={{ fontSize: 12, borderRadius: 8, border: "1px solid #E2E8F0" }}
+                contentStyle={{ fontSize: 12, borderRadius: 8, border: "1px solid #EDEFF0" }}
                 formatter={(v: number) => [`${v.toLocaleString()} ${data.unit}`, ""]}
               />
               <Bar isAnimationActive={false} dataKey="value" radius={[0, 4, 4, 0]} maxBarSize={20}>
@@ -352,10 +352,10 @@ function CarbonSection() {
           <div className="px-4 pb-4 pt-2 space-y-4">
             <ResponsiveContainer width="100%" height={160}>
               <BarChart data={SCOPE1_BREAKDOWN} layout="vertical" margin={{ top: 0, right: 40, bottom: 0, left: 0 }}>
-                <XAxis type="number" tick={{ fontSize: 9, fill: "#64748B" }} axisLine={false} tickLine={false} />
+                <XAxis type="number" tick={{ fontSize: 9, fill: "#7B8285" }} axisLine={false} tickLine={false} />
                 <YAxis type="category" dataKey="source" width={0} tick={false} axisLine={false} tickLine={false} />
                 <Tooltip
-                  contentStyle={{ fontSize: 11, borderRadius: 8, border: "1px solid #E2E8F0" }}
+                  contentStyle={{ fontSize: 11, borderRadius: 8, border: "1px solid #EDEFF0" }}
                   formatter={(v: number) => [`${v.toLocaleString()} tCO₂e`, ""]}
                 />
                 <Bar isAnimationActive={false} dataKey="tco2e" radius={[0, 4, 4, 0]} maxBarSize={14}>
@@ -497,9 +497,9 @@ function CarbonSection() {
             <ResponsiveContainer width="100%" height={170}>
               <BarChart data={PORTFOLIO_SCOPE3_CATEGORIES} layout="vertical"
                 margin={{ top: 0, right: 40, bottom: 0, left: 0 }}>
-                <XAxis type="number" tick={{ fontSize: 9, fill: "#64748B" }} axisLine={false} tickLine={false} />
+                <XAxis type="number" tick={{ fontSize: 9, fill: "#7B8285" }} axisLine={false} tickLine={false} />
                 <YAxis type="category" dataKey="category" width={0} tick={false} axisLine={false} tickLine={false} />
-                <Tooltip contentStyle={{ fontSize: 11, borderRadius: 8, border: "1px solid #E2E8F0" }}
+                <Tooltip contentStyle={{ fontSize: 11, borderRadius: 8, border: "1px solid #EDEFF0" }}
                   formatter={(v: number) => [`${v.toLocaleString()} tCO₂e`, ""]} />
                 <Bar isAnimationActive={false} dataKey="tco2e" fill="#807245" radius={[0, 4, 4, 0]} maxBarSize={14} />
               </BarChart>
@@ -549,12 +549,12 @@ function CarbonSection() {
         <div className="px-4 pb-4 pt-2">
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={hotelScopeData} layout="vertical" margin={{ top: 0, right: 16, bottom: 0, left: 110 }}>
-              <XAxis type="number" tick={{ fontSize: 10, fill: "#64748B" }} axisLine={false} tickLine={false}
+              <XAxis type="number" tick={{ fontSize: 10, fill: "#7B8285" }} axisLine={false} tickLine={false}
                 tickFormatter={(v) => v >= 1000 ? `${(v / 1000).toFixed(0)}k` : String(v)} />
-              <YAxis type="category" dataKey="name" width={106} tick={{ fontSize: 11, fill: "#334155" }} axisLine={false} tickLine={false} />
-              <Tooltip contentStyle={{ fontSize: 12, borderRadius: 8, border: "1px solid #E2E8F0" }}
+              <YAxis type="category" dataKey="name" width={106} tick={{ fontSize: 11, fill: "#383B3D" }} axisLine={false} tickLine={false} />
+              <Tooltip contentStyle={{ fontSize: 12, borderRadius: 8, border: "1px solid #EDEFF0" }}
                 formatter={(v: number, n: string) => [`${v.toLocaleString()} tCO₂e`, n === "scope1" ? "Scope 1" : n === "scope2" ? "Scope 2" : "Scope 3"]} />
-              <Legend iconSize={8} wrapperStyle={{ fontSize: 11 }} formatter={(v) => v === "scope1" ? "Scope 1" : v === "scope2" ? "Scope 2" : "Scope 3"} />
+              <Legend iconSize={8} wrapperStyle={{ fontSize: 11 }} formatter={(v) => <span style={{ color: "#7B8285" }}>{v === "scope1" ? "Scope 1" : v === "scope2" ? "Scope 2" : "Scope 3"}</span>} />
               <Bar isAnimationActive={false} dataKey="scope1" name="scope1" stackId="a" fill="#959891" maxBarSize={18} />
               <Bar isAnimationActive={false} dataKey="scope2" name="scope2" stackId="a" fill="#AF8D84" maxBarSize={18} />
               <Bar isAnimationActive={false} dataKey="scope3" name="scope3" stackId="a" fill="#F6C8CC" radius={[0, 4, 4, 0]} maxBarSize={18} />
@@ -576,11 +576,11 @@ function CarbonSection() {
         <div className="px-6 pb-6 pt-1">
           <ResponsiveContainer width="100%" height={200}>
             <LineChart data={PORTFOLIO_MONTHLY_TREND} margin={{ top: 4, right: 8, bottom: 0, left: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" vertical={false} />
-              <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#64748B" }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 11, fill: "#64748B" }} axisLine={false} tickLine={false} width={45}
+              <CartesianGrid strokeDasharray="3 3" stroke="#EDEFF0" vertical={false} />
+              <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#7B8285" }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fontSize: 11, fill: "#7B8285" }} axisLine={false} tickLine={false} width={45}
                 tickFormatter={(v) => `${(v / 1000).toFixed(1)}k`} />
-              <Tooltip contentStyle={{ fontSize: 12, borderRadius: 8, border: "1px solid #E2E8F0" }}
+              <Tooltip contentStyle={{ fontSize: 12, borderRadius: 8, border: "1px solid #EDEFF0" }}
                 formatter={(v: number, name: string) => [
                   `${v.toLocaleString()} tCO₂e`,
                   name === "carbonTarget" ? "2030 target" : "Actual"
@@ -631,10 +631,10 @@ function EnergySection() {
           <div className="px-4 pb-4 pt-2 space-y-4">
             <ResponsiveContainer width="100%" height={170}>
               <BarChart data={ENERGY_END_USE} layout="vertical" margin={{ top: 0, right: 50, bottom: 0, left: 0 }}>
-                <XAxis type="number" tick={{ fontSize: 9, fill: "#64748B" }} axisLine={false} tickLine={false}
+                <XAxis type="number" tick={{ fontSize: 9, fill: "#7B8285" }} axisLine={false} tickLine={false}
                   tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`} />
                 <YAxis type="category" dataKey="system" width={0} tick={false} axisLine={false} tickLine={false} />
-                <Tooltip contentStyle={{ fontSize: 11, borderRadius: 8, border: "1px solid #E2E8F0" }}
+                <Tooltip contentStyle={{ fontSize: 11, borderRadius: 8, border: "1px solid #EDEFF0" }}
                   formatter={(v: number) => [`${v.toLocaleString()} MWh`, ""]} />
                 <Bar isAnimationActive={false} dataKey="mwh" radius={[0, 4, 4, 0]} maxBarSize={16}>
                   {ENERGY_END_USE.map((s) => <Cell key={s.system} fill={s.color} />)}
@@ -686,7 +686,7 @@ function EnergySection() {
                   innerRadius={55} outerRadius={85} paddingAngle={2}>
                   {PORTFOLIO_ENERGY_SOURCES.map((s) => <Cell key={s.source} fill={s.color} />)}
                 </Pie>
-                <Tooltip contentStyle={{ fontSize: 12, borderRadius: 8, border: "1px solid #E2E8F0" }}
+                <Tooltip contentStyle={{ fontSize: 12, borderRadius: 8, border: "1px solid #EDEFF0" }}
                   formatter={(v: number) => [`${v}%`, ""]} />
               </PieChart>
             </ResponsiveContainer>
@@ -726,9 +726,9 @@ function EnergySection() {
         <div className="px-4 pb-4 pt-2">
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={intensityData} layout="vertical" margin={{ top: 0, right: 60, bottom: 0, left: 110 }}>
-              <XAxis type="number" tick={{ fontSize: 10, fill: "#64748B" }} axisLine={false} tickLine={false} />
-              <YAxis type="category" dataKey="name" width={106} tick={{ fontSize: 11, fill: "#334155" }} axisLine={false} tickLine={false} />
-              <Tooltip contentStyle={{ fontSize: 12, borderRadius: 8, border: "1px solid #E2E8F0" }}
+              <XAxis type="number" tick={{ fontSize: 10, fill: "#7B8285" }} axisLine={false} tickLine={false} />
+              <YAxis type="category" dataKey="name" width={106} tick={{ fontSize: 11, fill: "#383B3D" }} axisLine={false} tickLine={false} />
+              <Tooltip contentStyle={{ fontSize: 12, borderRadius: 8, border: "1px solid #EDEFF0" }}
                 formatter={(v: number, _n, p) => [`${v.toFixed(1)} kWh/RN · ${p.payload.total.toLocaleString()} MWh total`, "Intensity"]} />
               <Bar isAnimationActive={false} dataKey="intensity" radius={[0, 4, 4, 0]} maxBarSize={18}>
                 {intensityData.map((d) => (
@@ -753,11 +753,11 @@ function EnergySection() {
         <div className="px-6 pb-6 pt-1">
           <ResponsiveContainer width="100%" height={200}>
             <LineChart data={PORTFOLIO_MONTHLY_TREND} margin={{ top: 4, right: 8, bottom: 0, left: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" vertical={false} />
-              <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#64748B" }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 11, fill: "#64748B" }} axisLine={false} tickLine={false} width={50}
+              <CartesianGrid strokeDasharray="3 3" stroke="#EDEFF0" vertical={false} />
+              <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#7B8285" }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fontSize: 11, fill: "#7B8285" }} axisLine={false} tickLine={false} width={50}
                 tickFormatter={(v) => `${(v / 1000).toFixed(1)}k`} />
-              <Tooltip contentStyle={{ fontSize: 12, borderRadius: 8, border: "1px solid #E2E8F0" }}
+              <Tooltip contentStyle={{ fontSize: 12, borderRadius: 8, border: "1px solid #EDEFF0" }}
                 formatter={(v: number, name: string) => [
                   `${v.toLocaleString()} MWh`,
                   name === "energyTarget" ? "Target" : "Actual"
@@ -808,10 +808,10 @@ function WaterSection() {
           <div className="px-4 pb-4 pt-2 space-y-4">
             <ResponsiveContainer width="100%" height={170}>
               <BarChart data={WATER_END_USE} layout="vertical" margin={{ top: 0, right: 50, bottom: 0, left: 0 }}>
-                <XAxis type="number" tick={{ fontSize: 9, fill: "#64748B" }} axisLine={false} tickLine={false}
+                <XAxis type="number" tick={{ fontSize: 9, fill: "#7B8285" }} axisLine={false} tickLine={false}
                   tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`} />
                 <YAxis type="category" dataKey="use" width={0} tick={false} axisLine={false} tickLine={false} />
-                <Tooltip contentStyle={{ fontSize: 11, borderRadius: 8, border: "1px solid #E2E8F0" }}
+                <Tooltip contentStyle={{ fontSize: 11, borderRadius: 8, border: "1px solid #EDEFF0" }}
                   formatter={(v: number) => [`${v.toLocaleString()} m³`, ""]} />
                 <Bar isAnimationActive={false} dataKey="m3" radius={[0, 4, 4, 0]} maxBarSize={16}>
                   {WATER_END_USE.map((u) => <Cell key={u.use} fill={u.color} />)}
@@ -865,7 +865,7 @@ function WaterSection() {
                   innerRadius={55} outerRadius={85} paddingAngle={2}>
                   {PORTFOLIO_WATER_SOURCES.map((s) => <Cell key={s.source} fill={s.color} />)}
                 </Pie>
-                <Tooltip contentStyle={{ fontSize: 12, borderRadius: 8, border: "1px solid #E2E8F0" }}
+                <Tooltip contentStyle={{ fontSize: 12, borderRadius: 8, border: "1px solid #EDEFF0" }}
                   formatter={(v: number) => [`${v}%`, ""]} />
               </PieChart>
             </ResponsiveContainer>
@@ -911,9 +911,9 @@ function WaterSection() {
         <div className="px-4 pb-4 pt-2">
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={intensityData} layout="vertical" margin={{ top: 0, right: 60, bottom: 0, left: 110 }}>
-              <XAxis type="number" tick={{ fontSize: 10, fill: "#64748B" }} axisLine={false} tickLine={false} />
-              <YAxis type="category" dataKey="name" width={106} tick={{ fontSize: 11, fill: "#334155" }} axisLine={false} tickLine={false} />
-              <Tooltip contentStyle={{ fontSize: 12, borderRadius: 8, border: "1px solid #E2E8F0" }}
+              <XAxis type="number" tick={{ fontSize: 10, fill: "#7B8285" }} axisLine={false} tickLine={false} />
+              <YAxis type="category" dataKey="name" width={106} tick={{ fontSize: 11, fill: "#383B3D" }} axisLine={false} tickLine={false} />
+              <Tooltip contentStyle={{ fontSize: 12, borderRadius: 8, border: "1px solid #EDEFF0" }}
                 formatter={(v: number, _n, p) => [`${v.toFixed(0)} L/GN · ${p.payload.total.toLocaleString()} m³ total`, "Intensity"]} />
               <Bar isAnimationActive={false} dataKey="intensity" radius={[0, 4, 4, 0]} maxBarSize={18}>
                 {intensityData.map((d) => (
@@ -938,11 +938,11 @@ function WaterSection() {
         <div className="px-6 pb-6 pt-1">
           <ResponsiveContainer width="100%" height={200}>
             <LineChart data={PORTFOLIO_MONTHLY_TREND} margin={{ top: 4, right: 8, bottom: 0, left: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" vertical={false} />
-              <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#64748B" }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 11, fill: "#64748B" }} axisLine={false} tickLine={false} width={50}
+              <CartesianGrid strokeDasharray="3 3" stroke="#EDEFF0" vertical={false} />
+              <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#7B8285" }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fontSize: 11, fill: "#7B8285" }} axisLine={false} tickLine={false} width={50}
                 tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`} />
-              <Tooltip contentStyle={{ fontSize: 12, borderRadius: 8, border: "1px solid #E2E8F0" }}
+              <Tooltip contentStyle={{ fontSize: 12, borderRadius: 8, border: "1px solid #EDEFF0" }}
                 formatter={(v: number, name: string) => [
                   `${v.toLocaleString()} m³`,
                   name === "waterTarget" ? "Target" : "Actual"
@@ -1015,24 +1015,24 @@ function WasteSection() {
               margin={{ top: 10, right: 20, bottom: 0, left: 10 }}
               barCategoryGap="25%"
             >
-              <CartesianGrid vertical={false} stroke="#F1F5F9" />
-              <XAxis dataKey="name" tick={{ fontSize: 10, fill: "#64748B" }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 10, fill: "#64748B" }} axisLine={false} tickLine={false}
+              <CartesianGrid vertical={false} stroke="#EDEFF0" />
+              <XAxis dataKey="name" tick={{ fontSize: 10, fill: "#7B8285" }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fontSize: 10, fill: "#7B8285" }} axisLine={false} tickLine={false}
                 tickFormatter={(v) => `${v > 0 ? "+" : ""}${v}%`} />
               <Tooltip
-                contentStyle={{ fontSize: 11, borderRadius: 8, border: "1px solid #E2E8F0" }}
+                contentStyle={{ fontSize: 11, borderRadius: 8, border: "1px solid #EDEFF0" }}
                 formatter={(v: number, name: string) =>
                   name === "invisible" ? null : [`${v > 0 ? "+" : ""}${v}%`, "Diversion change"]
                 }
               />
-              <ReferenceLine y={0} stroke="#CBD5E1" />
+              <ReferenceLine y={0} stroke="#BABEB5" />
               {/* invisible base bar for waterfall stacking */}
               <Bar isAnimationActive={false} dataKey="base" stackId="wf" fill="transparent" radius={0} />
               <Bar isAnimationActive={false} dataKey="value" stackId="wf" radius={4} maxBarSize={40}>
                 <LabelList
                   dataKey="value"
                   position="top"
-                  style={{ fontSize: 10, fontWeight: 700, fill: "#334155" }}
+                  style={{ fontSize: 10, fontWeight: 700, fill: "#383B3D" }}
                   formatter={(v: number) => `${v > 0 ? "+" : ""}${v}%`}
                 />
                 {WASTE_WATERFALL.map((entry) => (
@@ -1059,10 +1059,10 @@ function WasteSection() {
           <div className="px-4 pb-4 pt-2 space-y-4">
             <ResponsiveContainer width="100%" height={200}>
               <BarChart data={sourceStackData} margin={{ top: 0, right: 8, bottom: 20, left: 0 }}>
-                <XAxis dataKey="source" tick={{ fontSize: 9, fill: "#64748B" }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fontSize: 9, fill: "#64748B" }} axisLine={false} tickLine={false} width={35}
+                <XAxis dataKey="source" tick={{ fontSize: 9, fill: "#7B8285" }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 9, fill: "#7B8285" }} axisLine={false} tickLine={false} width={35}
                   tickFormatter={(v) => `${(v / 1000).toFixed(1)}k`} />
-                <Tooltip contentStyle={{ fontSize: 11, borderRadius: 8, border: "1px solid #E2E8F0" }}
+                <Tooltip contentStyle={{ fontSize: 11, borderRadius: 8, border: "1px solid #EDEFF0" }}
                   formatter={(v: number, n: string) => [`${v.toLocaleString()} t`, n]} />
                 <Bar isAnimationActive={false} dataKey="recycled"  name="Recycled"     stackId="a" fill="#807245" maxBarSize={48} />
                 <Bar isAnimationActive={false} dataKey="composted" name="Composted"    stackId="a" fill="#F6C8CC" maxBarSize={48} />
@@ -1119,7 +1119,7 @@ function WasteSection() {
                   innerRadius={55} outerRadius={85} paddingAngle={2}>
                   {PORTFOLIO_WASTE_STREAMS.map((s) => <Cell key={s.stream} fill={s.color} />)}
                 </Pie>
-                <Tooltip contentStyle={{ fontSize: 12, borderRadius: 8, border: "1px solid #E2E8F0" }}
+                <Tooltip contentStyle={{ fontSize: 12, borderRadius: 8, border: "1px solid #EDEFF0" }}
                   formatter={(v: number) => [`${v.toLocaleString()} t`, ""]} />
               </PieChart>
             </ResponsiveContainer>
@@ -1165,10 +1165,10 @@ function WasteSection() {
         <div className="px-4 pb-4 pt-2">
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={diversionData} layout="vertical" margin={{ top: 0, right: 60, bottom: 0, left: 110 }}>
-              <XAxis type="number" domain={[0, 80]} tick={{ fontSize: 10, fill: "#64748B" }} axisLine={false} tickLine={false}
+              <XAxis type="number" domain={[0, 80]} tick={{ fontSize: 10, fill: "#7B8285" }} axisLine={false} tickLine={false}
                 tickFormatter={(v) => `${v}%`} />
-              <YAxis type="category" dataKey="name" width={106} tick={{ fontSize: 11, fill: "#334155" }} axisLine={false} tickLine={false} />
-              <Tooltip contentStyle={{ fontSize: 12, borderRadius: 8, border: "1px solid #E2E8F0" }}
+              <YAxis type="category" dataKey="name" width={106} tick={{ fontSize: 11, fill: "#383B3D" }} axisLine={false} tickLine={false} />
+              <Tooltip contentStyle={{ fontSize: 12, borderRadius: 8, border: "1px solid #EDEFF0" }}
                 formatter={(v: number, _n, p) => [`${v}% diversion · ${p.payload.total.toLocaleString()} t total`, "Diversion"]} />
               <Bar isAnimationActive={false} dataKey="diversion" radius={[0, 4, 4, 0]} maxBarSize={18}>
                 {diversionData.map((d) => (
@@ -1193,11 +1193,11 @@ function WasteSection() {
         <div className="px-6 pb-6 pt-1">
           <ResponsiveContainer width="100%" height={200}>
             <LineChart data={PORTFOLIO_MONTHLY_TREND} margin={{ top: 4, right: 8, bottom: 0, left: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" vertical={false} />
-              <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#64748B" }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 11, fill: "#64748B" }} axisLine={false} tickLine={false} width={35}
+              <CartesianGrid strokeDasharray="3 3" stroke="#EDEFF0" vertical={false} />
+              <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#7B8285" }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fontSize: 11, fill: "#7B8285" }} axisLine={false} tickLine={false} width={35}
                 tickFormatter={(v) => `${v}%`} domain={[35, 65]} />
-              <Tooltip contentStyle={{ fontSize: 12, borderRadius: 8, border: "1px solid #E2E8F0" }}
+              <Tooltip contentStyle={{ fontSize: 12, borderRadius: 8, border: "1px solid #EDEFF0" }}
                 formatter={(v: number, name: string) => [
                   `${v}%`,
                   name === "diversionTarget" ? "Target" : "Actual"

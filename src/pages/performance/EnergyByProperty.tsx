@@ -36,9 +36,9 @@ const RAG_STYLE = {
 };
 
 const RAG_BAR = {
-  green: "#16a34a",
-  amber: "#f59e0b",
-  red:   "#ef4444",
+  green: "#807245",
+  amber: "#CDB872",
+  red:   "#B33650",
 };
 
 export default function EnergyByProperty() {

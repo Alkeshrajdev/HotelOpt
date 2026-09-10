@@ -12,15 +12,15 @@ export const KPIS = {
   energyPerOccRoom: { value: 20.6, unit: "kWh/OR", delta: 3.3 },
 };
 
-import { tokens } from "./tokens";
+import { CHART_PILLAR } from "@/lib/chartPalette";
 
 export const PILLAR_SCORES = [
-  { pillar: "Energy",     score: 82, color: tokens.pillar.energy },
-  { pillar: "Water",      score: 69, color: tokens.pillar.water },
-  { pillar: "Waste",      score: 78, color: tokens.pillar.waste },
-  { pillar: "Carbon",     score: 76, color: tokens.pillar.carbon },
-  { pillar: "Social",     score: 74, color: tokens.pillar.social },
-  { pillar: "Governance", score: 81, color: tokens.pillar.governance },
+  { pillar: "Energy",     score: 82, color: CHART_PILLAR.energy },
+  { pillar: "Water",      score: 69, color: CHART_PILLAR.water },
+  { pillar: "Waste",      score: 78, color: CHART_PILLAR.waste },
+  { pillar: "Carbon",     score: 76, color: CHART_PILLAR.carbon },
+  { pillar: "Social",     score: 74, color: CHART_PILLAR.social },
+  { pillar: "Governance", score: 81, color: CHART_PILLAR.governance },
 ];
 
 export const MONTHLY_INTENSITY = [
@@ -364,23 +364,23 @@ export const PORTFOLIO_SCOPE3_CATEGORIES = [
 ];
 
 export const PORTFOLIO_ENERGY_SOURCES = [
-  { source: "Grid electricity", mwh: 58200, pct: 69.1, color: "#0EA5E9" },
-  { source: "Natural gas",      mwh: 16800, pct: 19.9, color: "#F59E0B" },
-  { source: "Diesel",           mwh: 5300,  pct: 6.3,  color: "#EF4444" },
-  { source: "Renewables",       mwh: 3900,  pct: 4.6,  color: "#22C55E" },
+  { source: "Grid electricity", mwh: 58200, pct: 69.1, color: "#807245" },
+  { source: "Natural gas",      mwh: 16800, pct: 19.9, color: "#AF8D84" },
+  { source: "Diesel",           mwh: 5300,  pct: 6.3,  color: "#959891" },
+  { source: "Renewables",       mwh: 3900,  pct: 4.6,  color: "#F6C8CC" },
 ];
 
 export const PORTFOLIO_WATER_SOURCES = [
-  { source: "Municipal supply", m3: 498000, pct: 90.2, color: "#0EA5E9" },
-  { source: "Borehole/well",    m3: 21000,  pct: 3.8,  color: "#6366F1" },
-  { source: "Recycled/reused",  m3: 33000,  pct: 6.0,  color: "#22C55E" },
+  { source: "Municipal supply", m3: 498000, pct: 90.2, color: "#807245" },
+  { source: "Borehole/well",    m3: 21000,  pct: 3.8,  color: "#AF8D84" },
+  { source: "Recycled/reused",  m3: 33000,  pct: 6.0,  color: "#959891" },
 ];
 
 export const PORTFOLIO_WASTE_STREAMS = [
-  { stream: "Recycled",   tonnes: 2170, pct: 25.8, color: "#22C55E" },
-  { stream: "Composted",  tonnes: 1360, pct: 16.2, color: "#84CC16" },
-  { stream: "Energy rec.",tonnes: 1007, pct: 12.0, color: "#F59E0B" },
-  { stream: "Landfill",   tonnes: 3883, pct: 46.1, color: "#EF4444" },
+  { stream: "Recycled",   tonnes: 2170, pct: 25.8, color: "#807245" },
+  { stream: "Composted",  tonnes: 1360, pct: 16.2, color: "#AF8D84" },
+  { stream: "Energy rec.",tonnes: 1007, pct: 12.0, color: "#959891" },
+  { stream: "Landfill",   tonnes: 3883, pct: 46.1, color: "#C2C9CC" },
 ];
 
 export const PORTFOLIO_SOCIAL_BY_HOTEL = [
@@ -431,37 +431,37 @@ export const SCOPE2_METHODS = {
 // ── Energy end-use breakdown ──────────────────────────────────────────────────
 
 export const ENERGY_END_USE = [
-  { system: "HVAC & Cooling",     mwh: 36800, pct: 43.7, note: "Chillers, AHUs, cooling towers",    color: "#0EA5E9", drilldownKey: "energy.hvac"     },
-  { system: "Kitchen & F&B",      mwh: 16800, pct: 19.9, note: "Ovens, refrigeration, dishwashers", color: "#F59E0B", drilldownKey: "energy.kitchen"  },
-  { system: "Guest Rooms",        mwh: 13500, pct: 16.0, note: "In-room AC, lighting, mini-bars",   color: "#6366F1", drilldownKey: "energy.rooms"    },
-  { system: "Laundry",            mwh: 7500,  pct: 8.9,  note: "Washers, dryers, ironing",          color: "#22C55E", drilldownKey: "energy.laundry"  },
-  { system: "Lighting (common)",  mwh: 5900,  pct: 7.0,  note: "Corridors, lobby, exterior",        color: "#FCD34D", drilldownKey: ""                },
-  { system: "Other / Plant",      mwh: 3700,  pct: 4.4,  note: "Pumps, lifts, IT, AV",              color: "#D1D5DB", drilldownKey: ""                },
+  { system: "HVAC & Cooling",     mwh: 36800, pct: 43.7, note: "Chillers, AHUs, cooling towers",    color: "#807245", drilldownKey: "energy.hvac"     },
+  { system: "Kitchen & F&B",      mwh: 16800, pct: 19.9, note: "Ovens, refrigeration, dishwashers", color: "#AF8D84", drilldownKey: "energy.kitchen"  },
+  { system: "Guest Rooms",        mwh: 13500, pct: 16.0, note: "In-room AC, lighting, mini-bars",   color: "#959891", drilldownKey: "energy.rooms"    },
+  { system: "Laundry",            mwh: 7500,  pct: 8.9,  note: "Washers, dryers, ironing",          color: "#F6C8CC", drilldownKey: "energy.laundry"  },
+  { system: "Lighting (common)",  mwh: 5900,  pct: 7.0,  note: "Corridors, lobby, exterior",        color: "#8B6D66", drilldownKey: ""                },
+  { system: "Other / Plant",      mwh: 3700,  pct: 4.4,  note: "Pumps, lifts, IT, AV",              color: "#E0E5DA", drilldownKey: ""                },
 ];
 // Total: 84,200 MWh ✓
 
 // ── Water end-use breakdown ───────────────────────────────────────────────────
 
 export const WATER_END_USE = [
-  { use: "Guest rooms & bathrooms",  m3: 193200, pct: 35.0, litresPerGN: 186, note: "Showers, baths, taps, toilets", color: "#0EA5E9", drilldownKey: "water.rooms"       },
-  { use: "Laundry",                  m3: 132480, pct: 24.0, litresPerGN: 128, note: "Linen, uniforms, towels",        color: "#38BDF8", drilldownKey: "water.laundry"     },
-  { use: "Kitchen & F&B",            m3: 99360,  pct: 18.0, litresPerGN: 96,  note: "Prep, dishwashing, ice",         color: "#7DD3FC", drilldownKey: "water.kitchen"    },
-  { use: "Pool, Spa & Recreation",   m3: 66240,  pct: 12.0, litresPerGN: 64,  note: "Top-up, backwash, splash zones", color: "#BAE6FD", drilldownKey: "water.pool"       },
-  { use: "Cooling towers & HVAC",    m3: 38640,  pct: 7.0,  litresPerGN: 37,  note: "Evaporative cooling, makeup",    color: "#6366F1", drilldownKey: "water.cooling"    },
-  { use: "Landscaping & irrigation", m3: 22080,  pct: 4.0,  litresPerGN: 21,  note: "Gardens, greens, outdoor areas", color: "#22C55E", drilldownKey: ""                 },
+  { use: "Guest rooms & bathrooms",  m3: 193200, pct: 35.0, litresPerGN: 186, note: "Showers, baths, taps, toilets", color: "#807245", drilldownKey: "water.rooms"       },
+  { use: "Laundry",                  m3: 132480, pct: 24.0, litresPerGN: 128, note: "Linen, uniforms, towels",        color: "#AF8D84", drilldownKey: "water.laundry"     },
+  { use: "Kitchen & F&B",            m3: 99360,  pct: 18.0, litresPerGN: 96,  note: "Prep, dishwashing, ice",         color: "#959891", drilldownKey: "water.kitchen"    },
+  { use: "Pool, Spa & Recreation",   m3: 66240,  pct: 12.0, litresPerGN: 64,  note: "Top-up, backwash, splash zones", color: "#F6C8CC", drilldownKey: "water.pool"       },
+  { use: "Cooling towers & HVAC",    m3: 38640,  pct: 7.0,  litresPerGN: 37,  note: "Evaporative cooling, makeup",    color: "#8B6D66", drilldownKey: "water.cooling"    },
+  { use: "Landscaping & irrigation", m3: 22080,  pct: 4.0,  litresPerGN: 21,  note: "Gardens, greens, outdoor areas", color: "#E0E5DA", drilldownKey: ""                 },
 ];
 // Total: 552,000 m³ ✓
 
 // ── Waste by source ───────────────────────────────────────────────────────────
 
 export const WASTE_BY_SOURCE = [
-  { source: "F&B & Kitchen",            tonnes: 3621, pct: 43.0, diversionPct: 58, color: "#F59E0B", drilldownKey: "waste.fb",
+  { source: "F&B & Kitchen",            tonnes: 3621, pct: 43.0, diversionPct: 58, color: "#807245", drilldownKey: "waste.fb",
     streams: { recycled: 1200, composted: 900, energyRec: 1000, landfill: 521 } },
-  { source: "Rooms & Housekeeping",     tonnes: 2190, pct: 26.0, diversionPct: 34, color: "#6366F1", drilldownKey: "waste.rooms",
+  { source: "Rooms & Housekeeping",     tonnes: 2190, pct: 26.0, diversionPct: 34, color: "#AF8D84", drilldownKey: "waste.rooms",
     streams: { recycled: 620, composted: 125, energyRec: 0, landfill: 1445 } },
-  { source: "Maintenance & Operations", tonnes: 1516, pct: 18.0, diversionPct: 28, color: "#6B7280", drilldownKey: "waste.maintenance",
+  { source: "Maintenance & Operations", tonnes: 1516, pct: 18.0, diversionPct: 28, color: "#959891", drilldownKey: "waste.maintenance",
     streams: { recycled: 350, composted: 0, energyRec: 75, landfill: 1091 } },
-  { source: "Events & Conferences",     tonnes: 1093, pct: 13.0, diversionPct: 20, color: "#EC4899", drilldownKey: "waste.events",
+  { source: "Events & Conferences",     tonnes: 1093, pct: 13.0, diversionPct: 20, color: "#F6C8CC", drilldownKey: "waste.events",
     streams: { recycled: 0, composted: 335, energyRec: 0, landfill: 758 } },
 ];
 // Total: 8,420 t | Weighted diversion ≈ 42% ✓
@@ -547,13 +547,13 @@ export const SG_SUPPLIER_FUNNEL = [
 ];
 
 export const SG_GOV_GAPS_BY_TYPE = [
-  { type:"Supplier ESG assessment",   count:31, color:"#EF4444" },
-  { type:"Supplier code not signed",  count:18, color:"#EF4444" },
-  { type:"Attestation overdue",       count:14, color:"#EF4444" },
-  { type:"Missing policy evidence",   count:11, color:"#F59E0B" },
-  { type:"Compliance training gap",   count:9,  color:"#F59E0B" },
-  { type:"Evidence pending approval", count:7,  color:"#F59E0B" },
-  { type:"Expired policy",            count:4,  color:"#EF4444" },
+  { type:"Supplier ESG assessment",   count:31, color:"#B33650" },
+  { type:"Supplier code not signed",  count:18, color:"#B33650" },
+  { type:"Attestation overdue",       count:14, color:"#B33650" },
+  { type:"Missing policy evidence",   count:11, color:"#CDB872" },
+  { type:"Compliance training gap",   count:9,  color:"#CDB872" },
+  { type:"Evidence pending approval", count:7,  color:"#CDB872" },
+  { type:"Expired policy",            count:4,  color:"#B33650" },
 ];
 
 export const SG_EVIDENCE_GAPS = [

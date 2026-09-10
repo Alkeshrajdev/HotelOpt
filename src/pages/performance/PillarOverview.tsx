@@ -102,7 +102,7 @@ const CONFIGS: Record<"water"|"waste"|"carbon", PillarCfg> = {
     monthly: WASTE_MONTHLY,
     sources: [
       { key:"recycling",  label:"Recycling",   fullLabel:"Recycling",         color:"#807245" },
-      { key:"landfill",   label:"Landfill",    fullLabel:"Landfill (general)", color:"#94a3b8" },
+      { key:"landfill",   label:"Landfill",    fullLabel:"Landfill (general)", color:"#C2C9CC" },
       { key:"composting", label:"Composting",  fullLabel:"Composting",         color:"#F6C8CC" },
       { key:"foodAD",     label:"Food / AD",   fullLabel:"Food waste (AD)",    color:"#CDB872" },
       { key:"hazardous",  label:"Hazardous",   fullLabel:"Hazardous waste",    color:"#B33650" },
@@ -195,7 +195,7 @@ function SourceChart({ source, data, unit }: { source: Source; data: MonthRow[];
       </div>
       <ResponsiveContainer width="100%" height={80}>
         <BarChart data={chartData} barGap={1} barCategoryGap="32%">
-          <XAxis dataKey="month" tick={{ fontSize: 9, fill: "#9ca3af" }} axisLine={false} tickLine={false} />
+          <XAxis dataKey="month" tick={{ fontSize: 9, fill: "#7B8285" }} axisLine={false} tickLine={false} />
           <YAxis hide />
           <Tooltip content={<SourceTooltip unit={unit} />} cursor={{ fill: "rgba(0,0,0,0.04)" }} />
           <Bar dataKey="py" fill="#EDEFF0" radius={[2,2,0,0]} isAnimationActive={false} />
@@ -246,17 +246,17 @@ export default function PillarOverview({ pillar }: { pillar: "water"|"waste"|"ca
           <ResponsiveContainer width="100%" height={280}>
             <ComposedChart data={cfg.monthly} barGap={2} barCategoryGap="25%">
               <CartesianGrid vertical={false} stroke="#EDEFF0" />
-              <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#6b7280" }} axisLine={false} tickLine={false} />
-              <YAxis yAxisId="vol" orientation="left" tick={{ fontSize: 11, fill: "#6b7280" }} axisLine={false} tickLine={false} width={40}
-                label={{ value: cfg.unit, angle: -90, position: "insideLeft", offset: 12, style: { fontSize: 10, fill: "#9ca3af" } }}
+              <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#7B8285" }} axisLine={false} tickLine={false} />
+              <YAxis yAxisId="vol" orientation="left" tick={{ fontSize: 11, fill: "#7B8285" }} axisLine={false} tickLine={false} width={40}
+                label={{ value: cfg.unit, angle: -90, position: "insideLeft", offset: 12, style: { fontSize: 10, fill: "#7B8285" } }}
               />
               <YAxis yAxisId="cost" orientation="right" tick={{ fontSize: 11, fill: "#CDB872" }} tickFormatter={v => `$${v}k`} axisLine={false} tickLine={false} width={48} />
               <Tooltip content={<MainTooltip unit={cfg.unit} />} cursor={{ fill: "rgba(0,0,0,0.03)" }} />
               <Bar yAxisId="vol" dataKey="ty" name="This year" fill="#807245" radius={[3,3,0,0]} isAnimationActive={false} />
-              <Bar yAxisId="vol" dataKey="py" name="Prior year" fill="#cbd5e1" radius={[3,3,0,0]} isAnimationActive={false} />
+              <Bar yAxisId="vol" dataKey="py" name="Prior year" fill="#BABEB5" radius={[3,3,0,0]} isAnimationActive={false} />
               <Line yAxisId="cost" dataKey="costTY" name="Cost (this year)" stroke="#CDB872" strokeWidth={2} dot={false} isAnimationActive={false} />
               <Line yAxisId="cost" dataKey="costPY" name="Cost (prior year)" stroke="#CDB872" strokeWidth={1.5} strokeDasharray="4 3" dot={false} isAnimationActive={false} />
-              <Legend wrapperStyle={{ fontSize: 11, paddingTop: 10 }} formatter={(v) => <span style={{ color: "#6b7280" }}>{v}</span>} />
+              <Legend wrapperStyle={{ fontSize: 11, paddingTop: 10 }} formatter={(v) => <span style={{ color: "#7B8285" }}>{v}</span>} />
             </ComposedChart>
           </ResponsiveContainer>
         </div>

@@ -322,7 +322,7 @@ function Co2Bar({ value, max = 1400 }: { value: number; max?: number }) {
   const color =
     value < 800 ? "bg-good" :
     value < 1000 ? "bg-warn" :
-    value < 1500 ? "bg-orange-500" :
+    value < 1500 ? "bg-warn" :
     "bg-bad";
   return (
     <div className="w-full bg-ink-100 rounded-full h-2">
@@ -361,7 +361,7 @@ function OverviewTab() {
         />
         <KpiTile
           icon={<Wind size={20} />}
-          iconBg="bg-violet-100"
+          iconBg="bg-ink-100"
           label="CO₂ Exceedance Hours"
           value="14"
           unit="hrs"
@@ -389,7 +389,7 @@ function OverviewTab() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 items-start">
         <KpiTile
           icon={<Gauge size={20} />}
-          iconBg="bg-orange-100"
+          iconBg="bg-warn/10"
           label="PM2.5 Exceedance"
           value="2"
           unit="hrs"
@@ -533,13 +533,13 @@ function ZoneMapTab() {
               {/* Temperature */}
               <div>
                 <p className="text-[10px] text-ink-400 uppercase tracking-wide font-medium mb-1">Temperature</p>
-                <p className={cn("text-sm font-semibold", z.tempFlag ? "text-orange-600" : "text-ink-800")}>
+                <p className={cn("text-sm font-semibold", z.tempFlag ? "text-warn-700" : "text-ink-800")}>
                   {z.temp}
-                  {z.tempFlag && <TrendingUp className="w-3 h-3 inline ml-1 text-orange-500" />}
+                  {z.tempFlag && <TrendingUp className="w-3 h-3 inline ml-1 text-warn-700" />}
                 </p>
                 <div className="w-full bg-ink-100 rounded-full h-2 mt-1">
                   <div
-                    className={cn("h-2 rounded-full", z.tempFlag ? "bg-orange-400" : "bg-info")}
+                    className={cn("h-2 rounded-full", z.tempFlag ? "bg-warn" : "bg-info")}
                     style={{ width: `${Math.min(100, Math.round(((parseFloat(z.temp) - 18) / 15) * 100))}%` }}
                   />
                 </div>
@@ -622,10 +622,10 @@ function Co2VentilationTab() {
             <p className="text-xs font-semibold text-warn-700">800–1,000 ppm</p>
             <p className="text-sm font-bold text-warn-700 mt-1">Acceptable</p>
           </div>
-          <div className="bg-orange-50 border border-orange-200 rounded-lg p-3 text-center">
-            <p className="text-xs font-semibold text-orange-700">1,000–1,500 ppm</p>
-            <p className="text-sm font-bold text-orange-800 mt-1">Action Recommended</p>
-            <p className="text-[10px] text-orange-600 mt-0.5">Increase ventilation</p>
+          <div className="bg-warn/10 border border-warn/30 rounded-lg p-3 text-center">
+            <p className="text-xs font-semibold text-warn-700">1,000–1,500 ppm</p>
+            <p className="text-sm font-bold text-warn-700 mt-1">Action Recommended</p>
+            <p className="text-[10px] text-warn-700 mt-0.5">Increase ventilation</p>
           </div>
           <div className="bg-bad/10 border border-bad/30 rounded-lg p-3 text-center">
             <p className="text-xs font-semibold text-bad-700">&gt; 1,500 ppm</p>
@@ -857,8 +857,8 @@ function TempHumidityTab() {
                     <td className="px-4 py-3 font-medium text-ink-800 text-xs whitespace-nowrap">{z.zone}</td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-1">
-                        <span className={cn("text-xs font-semibold", z.tempFlag ? "text-orange-600" : "text-ink-700")}>{z.temp}</span>
-                        {z.tempFlag && <TrendingUp className="w-3 h-3 text-orange-500" />}
+                        <span className={cn("text-xs font-semibold", z.tempFlag ? "text-warn-700" : "text-ink-700")}>{z.temp}</span>
+                        {z.tempFlag && <TrendingUp className="w-3 h-3 text-warn-700" />}
                       </div>
                     </td>
                     <td className="px-4 py-3">

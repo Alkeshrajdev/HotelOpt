@@ -92,7 +92,7 @@ const WATER_CFG: PillarConfig = {
   })),
   trendTitle: "Water intensity over time",
   trendHint: "m³ per ORN",
-  trend: { kind: "area", data: WATER.trend, color: "#0EA5E9", format: (v) => v.toFixed(2) },
+  trend: { kind: "area", data: WATER.trend, color: "#AF8D84", format: (v) => v.toFixed(2) },
 };
 
 const WASTE_CFG: PillarConfig = {
@@ -105,7 +105,7 @@ const WASTE_CFG: PillarConfig = {
   })),
   trendTitle: "Waste / ORN over time",
   trendHint: "kg per ORN",
-  trend: { kind: "area", data: WASTE.trend, color: "#0D9488", format: (v) => v.toFixed(2) },
+  trend: { kind: "area", data: WASTE.trend, color: "#959891", format: (v) => v.toFixed(2) },
 };
 
 const CARBON_CFG: PillarConfig = {
@@ -118,7 +118,7 @@ const CARBON_CFG: PillarConfig = {
   })),
   trendTitle: "Carbon intensity over time",
   trendHint: "tCO₂e per ORN",
-  trend: { kind: "area", data: CARBON.trend, color: "#134E4A", format: (v) => v.toFixed(3) },
+  trend: { kind: "area", data: CARBON.trend, color: "#8B6D66", format: (v) => v.toFixed(3) },
 };
 
 const SOCIAL_CFG: PillarConfig = {
@@ -130,7 +130,7 @@ const SOCIAL_CFG: PillarConfig = {
     goodDirection: k.goodDirection,
   })),
   trendTitle: "Headcount over time",
-  trend: { kind: "area", data: SOCIAL.headcountTrend, color: "#7C3AED" },
+  trend: { kind: "area", data: SOCIAL.headcountTrend, color: "#634D48" },
 };
 
 const GOV_CFG: PillarConfig = {
@@ -150,7 +150,7 @@ const GOV_CFG: PillarConfig = {
       { x: "Nov", v: 70 }, { x: "Dec", v: 71 }, { x: "Jan", v: 72 },
       { x: "Feb", v: 73 }, { x: "Mar", v: 74 }, { x: "Apr", v: 74 },
     ],
-    color: "#EA580C",
+    color: "#747771",
     format: (v) => `${v}%`,
   },
 };

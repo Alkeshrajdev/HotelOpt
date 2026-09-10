@@ -52,11 +52,11 @@ const DAILY_WATER_TREND = [
 ];
 
 const AREA_BREAKDOWN = [
-  { label: "Guestrooms", pct: 41, color: "bg-chart-mauve" },
-  { label: "Kitchen", pct: 22, color: "bg-chart-olive" },
-  { label: "Laundry", pct: 18, color: "bg-violet-500" },
-  { label: "Irrigation", pct: 11, color: "bg-chart-sand" },
-  { label: "Cooling Tower", pct: 8, color: "bg-chart-mauve" },
+  { label: "Guestrooms", pct: 41, color: "bg-chart-olive" },
+  { label: "Kitchen", pct: 22, color: "bg-chart-mauve" },
+  { label: "Laundry", pct: 18, color: "bg-chart-moss" },
+  { label: "Irrigation", pct: 11, color: "bg-chart-blush" },
+  { label: "Cooling Tower", pct: 8, color: "bg-chart-cocoa" },
 ];
 
 const NIGHT_FLOW = [
@@ -473,7 +473,7 @@ function OverviewTab() {
         />
         <KpiTile
           icon={<Gauge size={20} />}
-          iconBg="bg-violet-100"
+          iconBg="bg-ink-100"
           label="L / Guest Night"
           value="284"
           unit="L"
@@ -498,7 +498,7 @@ function OverviewTab() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 items-start">
         <KpiTile
           icon={<Filter size={20} />}
-          iconBg="bg-teal-100"
+          iconBg="bg-ink-100"
           label="L / kg Laundry"
           value="14.2"
           unit="L"
@@ -508,7 +508,7 @@ function OverviewTab() {
         />
         <KpiTile
           icon={<Thermometer size={20} />}
-          iconBg="bg-orange-100"
+          iconBg="bg-warn/10"
           label="L / F&B Cover"
           value="18.5"
           unit="L"
@@ -764,7 +764,7 @@ function WaterBalanceTab() {
               </div>
               <div className="w-full bg-ink-100 rounded-full h-3">
                 <div
-                  className="h-3 rounded-full bg-info transition-all"
+                  className="h-3 rounded-full bg-chart-mauve transition-all"
                   style={{ width: `${row.pct}%` }}
                 />
               </div>

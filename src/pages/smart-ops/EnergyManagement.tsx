@@ -434,12 +434,12 @@ const VS_OCC: { day: string; kwh: number; occ: number }[] = [
 const BALANCE_ROWS: { label: string; kwh: number; pct: number | null; color: string; isOffset?: boolean }[] = [
   { label: "HVAC", kwh: 164910, pct: 58.0, color: "bg-chart-olive" },
   { label: "Lighting", kwh: 39830, pct: 14.0, color: "bg-chart-mauve" },
-  { label: "Kitchen", kwh: 34140, pct: 12.0, color: "bg-chart-sand" },
-  { label: "Laundry", kwh: 22760, pct: 8.0, color: "bg-chart-moss" },
-  { label: "Guest Rooms", kwh: 14225, pct: 5.0, color: "bg-teal-400" },
-  { label: "BOH", kwh: 5690, pct: 2.0, color: "bg-ink-400" },
-  { label: "EV Charging", kwh: 2845, pct: 1.0, color: "bg-chart-olive" },
-  { label: "Solar Offset", kwh: -18200, pct: null, color: "bg-chart-olive", isOffset: true },
+  { label: "Kitchen", kwh: 34140, pct: 12.0, color: "bg-chart-moss" },
+  { label: "Laundry", kwh: 22760, pct: 8.0, color: "bg-chart-blush" },
+  { label: "Guest Rooms", kwh: 14225, pct: 5.0, color: "bg-chart-cocoa" },
+  { label: "BOH", kwh: 5690, pct: 2.0, color: "bg-chart-remainder" },
+  { label: "EV Charging", kwh: 2845, pct: 1.0, color: "bg-chart-sand" },
+  { label: "Solar Offset", kwh: -18200, pct: null, color: "bg-chart-sage", isOffset: true },
 ];
 
 // 24-hour load profile kW values (index 0 = 00:00, index 23 = 23:00)
@@ -636,7 +636,7 @@ function OverviewTab() {
         />
         <KpiTile
           icon={<Gauge className="w-5 h-5" />}
-          iconBg="bg-violet-50"
+          iconBg="bg-ink-100"
           label="Load factor"
           value="64"
           unit="%"
@@ -655,7 +655,7 @@ function OverviewTab() {
         />
         <KpiTile
           icon={<Wind className="w-5 h-5" />}
-          iconBg="bg-teal-50"
+          iconBg="bg-ink-100"
           label="Energy intensity"
           value="31.2"
           unit="kWh/m²"
@@ -685,7 +685,7 @@ function OverviewTab() {
                     <div
                       className={cn(
                         "w-full rounded-t-sm transition-all",
-                        isPeak ? "bg-bad" : "bg-brand-500"
+                        isPeak ? "bg-chart-rose" : "bg-chart-olive"
                       )}
                       style={{ height: `${hPct}%` }}
                       title={`${d.label}: ${d.value.toLocaleString()} kWh`}
@@ -1142,10 +1142,10 @@ function PeakDemandTab() {
                   className={cn(
                     "w-full rounded-t-sm transition-all",
                     isPeak
-                      ? "bg-bad"
+                      ? "bg-chart-rose"
                       : isAboveThreshold
-                      ? "bg-warn"
-                      : "bg-brand-400"
+                      ? "bg-chart-sand"
+                      : "bg-chart-olive"
                   )}
                   style={{ height: `${hPct}%` }}
                   title={`${h.hour}:00 — ${h.kw} kW`}

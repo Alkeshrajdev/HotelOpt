@@ -101,12 +101,12 @@ function MetricChart({ metric, peers }: { metric: MetricDef; peers: Peer[] }) {
       <div className="px-2 pb-4">
         <ResponsiveContainer width="100%" height={140}>
           <BarChart layout="vertical" data={sorted} barCategoryGap="22%">
-            <XAxis type="number" domain={[0, maxVal]} tick={{ fontSize:10, fill:"#9ca3af" }} axisLine={false} tickLine={false} tickFormatter={metric.format} />
+            <XAxis type="number" domain={[0, maxVal]} tick={{ fontSize:10, fill:"#7B8285" }} axisLine={false} tickLine={false} tickFormatter={metric.format} />
             <YAxis type="category" dataKey="name"
               tick={({ x, y, payload }) => (
                 <text x={x-4} y={y} textAnchor="end" dominantBaseline="middle"
                   fontSize={11} fontWeight={payload.value==="You"?700:400}
-                  fill={payload.value==="You"?"#807245":"#6b7280"}>
+                  fill={payload.value==="You"?"#807245":"#7B8285"}>
                   {payload.value}
                 </text>
               )}
@@ -115,7 +115,7 @@ function MetricChart({ metric, peers }: { metric: MetricDef; peers: Peer[] }) {
             <Tooltip content={<Tip format={metric.format} />} cursor={{ fill:"rgba(0,0,0,0.03)" }} />
             <ReferenceLine x={bestVal} stroke="#807245" strokeDasharray="3 3" strokeOpacity={0.5} />
             <Bar dataKey="value" radius={[0,3,3,0]} isAnimationActive={false}>
-              {sorted.map((e,i) => <Cell key={i} fill={e.isYou ? "#807245" : "#e2e8f0"} />)}
+              {sorted.map((e,i) => <Cell key={i} fill={e.isYou ? "#807245" : "#EDEFF0"} />)}
             </Bar>
           </BarChart>
         </ResponsiveContainer>

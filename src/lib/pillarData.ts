@@ -37,10 +37,10 @@ export const WATER = {
     { x: "Feb", v: 1.41 }, { x: "Mar", v: 1.41 }, { x: "Apr 26", v: 1.41 },
   ] as TrendPoint[],
   sources: [
-    { name: "Municipal supply",     value: 62, color: "#0EA5E9" },
-    { name: "Recycled / greywater", value: 22, color: "#22D3EE" },
-    { name: "Borewell",             value: 12, color: "#7DD3FC" },
-    { name: "Other",                value: 4,  color: "#A5F3FC" },
+    { name: "Municipal supply",     value: 62, color: "#807245" },
+    { name: "Recycled / greywater", value: 22, color: "#AF8D84" },
+    { name: "Borewell",             value: 12, color: "#959891" },
+    { name: "Other",                value: 4,  color: "#E0E5DA" },
   ],
   byProperty: [
     { name: "Skyline Dubai",  value: 1.38 },
@@ -69,12 +69,12 @@ export const WASTE = {
     { x: "Feb", v: 11.8 }, { x: "Mar", v: 11.8 }, { x: "Apr 26", v: 11.8 },
   ] as TrendPoint[],
   streams: [
-    { name: "Organic / food",   value: 38, color: "#0D9488" },
-    { name: "Mixed recyclable", value: 26, color: "#14B8A6" },
-    { name: "Landfill",         value: 22, color: "#94A3B8" },
-    { name: "Glass",            value: 8,  color: "#0EA5E9" },
-    { name: "Hazardous",        value: 4,  color: "#DC2626" },
-    { name: "E-waste",          value: 2,  color: "#7C3AED" },
+    { name: "Organic / food",   value: 38, color: "#807245" },
+    { name: "Mixed recyclable", value: 26, color: "#AF8D84" },
+    { name: "Landfill",         value: 22, color: "#C2C9CC" },
+    { name: "Glass",            value: 8,  color: "#959891" },
+    { name: "Hazardous",        value: 4,  color: "#B33650" },
+    { name: "E-waste",          value: 2,  color: "#8B6D66" },
   ],
   diversionByProperty: [
     { name: "Skyline Dubai",  value: 78 },
@@ -127,9 +127,9 @@ export const SOCIAL = {
     { x: "Feb", v: 3225 }, { x: "Mar", v: 3230 }, { x: "Apr 26", v: 3240 },
   ] as TrendPoint[],
   byGender: [
-    { name: "Female", value: 49, color: "#7C3AED" },
-    { name: "Male", value: 50, color: "#A78BFA" },
-    { name: "Non-binary / undisclosed", value: 1, color: "#C4B5FD" },
+    { name: "Female", value: 49, color: "#807245" },
+    { name: "Male", value: 50, color: "#959891" },
+    { name: "Non-binary / undisclosed", value: 1, color: "#E0E5DA" },
   ],
   byAge: [
     { name: "Under 30", value: 28 },
