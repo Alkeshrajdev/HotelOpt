@@ -26,6 +26,8 @@ import { Card, CardHeader } from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import ProgressBar from "@/components/ui/ProgressBar";
 import { CERTIFICATIONS } from "@/lib/mock";
+
+const PROGRAMME_SHORT: Record<string, string> = { GHG: "GHG", "GREEN-KEY": "Green Key", "GREEN-GLOBE": "Green Globe", "LEED-OM": "LEED O+M" };
 import { PROPERTIES } from "@/lib/propertiesData";
 import { cn } from "@/lib/utils";
 
@@ -48,14 +50,12 @@ type CertCard = {
 };
 
 const CERT_CARDS: CertCard[] = [
-  { id: "green-globe",   name: "Green Globe",        shortName: "GG",    level: "Certified",      expiry: "2026-09-30", renewalGapDays: 150, evidencePct: 88, status: "active",       body: "Green Globe International" },
-  { id: "leed",          name: "LEED O+M",            shortName: "LEED",  level: "Silver",         expiry: "2026-12-01", renewalGapDays: 212, evidencePct: 72, status: "active",       body: "USGBC" },
-  { id: "iso-14001",     name: "ISO 14001",           shortName: "ISO",   level: "Certified",      expiry: "2026-06-15", renewalGapDays:  43, evidencePct: 94, status: "expiring",     body: "BSI Group" },
-  { id: "earthcheck",    name: "EarthCheck",          shortName: "EC",    level: "Benchmarked",    expiry: "2027-01-31", renewalGapDays: 273, evidencePct: 61, status: "active",       body: "EarthCheck Pty" },
-  { id: "breeam",        name: "BREEAM In-Use",       shortName: "BREEAM",level: "Very Good",      expiry: "2025-12-31", renewalGapDays:   0, evidencePct: 40, status: "lapsed",       body: "BRE Global" },
-  { id: "greenkey",      name: "Green Key",           shortName: "GK",    level: "Awarded",        expiry: "2026-08-01", renewalGapDays: 119, evidencePct: 81, status: "active",       body: "FEE" },
-  { id: "custom",        name: "Custom / Internal",   shortName: "INT",   level: "—",              expiry: "—",          renewalGapDays:   0, evidencePct: 0,  status: "not-enrolled", body: "Internal" },
+  { id: "green-globe", name: "Green Globe",   shortName: "GG",   level: "Certified",              expiry: "2026-09-30", renewalGapDays: 150, evidencePct: 88, status: "active",   body: "Energy, water, waste and GHG criteria on track. Wastewater and hazardous-substance evidence still outstanding for the renewal audit." },
+  { id: "leed",        name: "LEED O+M",      shortName: "LEED", level: "Silver",                 expiry: "2026-12-01", renewalGapDays: 212, evidencePct: 72, status: "active",   body: "ENERGY STAR score needs three more months above 75 to hold Silver. Water and purchasing credits are complete." },
+  { id: "greenkey",    name: "Green Key",     shortName: "GK",   level: "Awarded",                expiry: "2026-08-01", renewalGapDays: 119, evidencePct: 81, status: "active",   body: "Energy and waste criteria complete; water flow-rate measurements and recycling evidence due before renewal." },
+  { id: "ghg",         name: "GHG Inventory", shortName: "GHG",  level: "Verified · ISO 14064-3", expiry: "2026-06-15", renewalGapDays: 43,  evidencePct: 94, status: "expiring", body: "Scope 1 and 2 verified for FY 2025. Scope 3 screening and 18 supplier emission factors are the open items for the FY 2026 verification." },
 ];
+
 
 /* ---------- Evidence checklist data ---------- */
 
@@ -63,59 +63,49 @@ type ChecklistItem = { doc: string; status: DocStatus; required: boolean };
 
 const EVIDENCE_CHECKLIST: Record<string, ChecklistItem[]> = {
   "green-globe": [
-    { doc: "Sustainability policy",            status: "uploaded", required: true  },
-    { doc: "Energy management plan",           status: "uploaded", required: true  },
-    { doc: "Water management plan",            status: "uploaded", required: true  },
-    { doc: "Waste diversion report",           status: "uploaded", required: true  },
-    { doc: "Staff training records",           status: "pending",  required: true  },
-    { doc: "Community engagement summary",     status: "missing",  required: true  },
-    { doc: "Supplier attestations (≥3)",       status: "missing",  required: true  },
-  ],
-  "iso-14001": [
-    { doc: "Environmental aspects register",   status: "uploaded", required: true  },
-    { doc: "Legal compliance register",        status: "uploaded", required: true  },
-    { doc: "Internal audit report",            status: "uploaded", required: true  },
-    { doc: "Management review minutes",        status: "pending",  required: true  },
-    { doc: "Corrective action log",            status: "uploaded", required: true  },
+    { doc: "Energy management plan",                 status: "uploaded", required: true  },
+    { doc: "Water management plan",                  status: "uploaded", required: true  },
+    { doc: "Waste diversion report",                 status: "uploaded", required: true  },
+    { doc: "GHG inventory — Scope 1 + 2",            status: "uploaded", required: true  },
+    { doc: "Chemicals & hazardous substances register", status: "pending", required: true },
+    { doc: "Wastewater treatment records",           status: "missing",  required: true  },
   ],
   "leed": [
-    { doc: "Energy star portfolio manager",    status: "uploaded", required: true  },
-    { doc: "Water efficiency data",            status: "uploaded", required: true  },
-    { doc: "IAQ monitoring log",               status: "missing",  required: false },
-    { doc: "Green cleaning policy",            status: "uploaded", required: true  },
-    { doc: "Site assessment report",           status: "pending",  required: true  },
-  ],
-  "earthcheck": [
-    { doc: "Benchmarking submission file",     status: "missing",  required: true  },
-    { doc: "12-month consumption data",        status: "uploaded", required: true  },
-    { doc: "Staff headcount data",             status: "uploaded", required: true  },
-    { doc: "Occupancy data",                   status: "uploaded", required: true  },
+    { doc: "ENERGY STAR Portfolio Manager score",    status: "uploaded", required: true  },
+    { doc: "Water efficiency data",                  status: "uploaded", required: true  },
+    { doc: "Waste stream audit",                     status: "pending",  required: true  },
+    { doc: "Purchasing log — ongoing consumables",   status: "uploaded", required: true  },
+    { doc: "Site assessment report",                 status: "pending",  required: true  },
+    { doc: "IAQ monitoring log",                     status: "missing",  required: false },
   ],
   "greenkey": [
-    { doc: "Application form",                 status: "uploaded", required: true  },
-    { doc: "Photo evidence — green measures",  status: "uploaded", required: true  },
-    { doc: "Guest communication materials",    status: "uploaded", required: true  },
-    { doc: "Recycling evidence",               status: "pending",  required: true  },
-    { doc: "Energy bill — 12 months",          status: "uploaded", required: true  },
+    { doc: "Application form",                       status: "uploaded", required: true  },
+    { doc: "Energy bill — 12 months",                status: "uploaded", required: true  },
+    { doc: "Water flow-rate measurements",           status: "pending",  required: true  },
+    { doc: "Recycling evidence",                     status: "pending",  required: true  },
+    { doc: "Photo evidence — green measures",        status: "uploaded", required: true  },
   ],
-  "breeam": [
-    { doc: "Asset data sheet",                 status: "missing",  required: true  },
-    { doc: "Licensed BREEAM assessor report",  status: "missing",  required: true  },
-    { doc: "Energy performance certificate",   status: "missing",  required: true  },
+  "ghg": [
+    { doc: "Organisational boundary statement",      status: "uploaded", required: true  },
+    { doc: "Scope 1 fuel & refrigerant logs",        status: "uploaded", required: true  },
+    { doc: "Scope 2 invoices + RECs",                status: "uploaded", required: true  },
+    { doc: "Scope 3 screening workbook",             status: "pending",  required: true  },
+    { doc: "Emission factor register export",        status: "uploaded", required: true  },
+    { doc: "Verifier data request responses",        status: "missing",  required: true  },
   ],
 };
+
 
 /* ---------- Renewal timeline data ---------- */
 
 // Each cert occupies a horizontal band. renewalStart / renewalEnd are month offsets (0=Jan 2026, 11=Dec 2026).
 const TIMELINE_CERTS = [
-  { id: "green-globe", label: "Green Globe", renewalStart: 7, renewalEnd: 9,  status: "active"   as CertStatus },
-  { id: "leed",        label: "LEED O+M",    renewalStart: 9, renewalEnd: 12, status: "active"   as CertStatus },
-  { id: "iso-14001",   label: "ISO 14001",   renewalStart: 4, renewalEnd: 6,  status: "expiring" as CertStatus },
-  { id: "earthcheck",  label: "EarthCheck",  renewalStart: 11,renewalEnd: 13, status: "active"   as CertStatus },
-  { id: "greenkey",    label: "Green Key",   renewalStart: 6, renewalEnd: 8,  status: "active"   as CertStatus },
-  { id: "breeam",      label: "BREEAM",      renewalStart: 0, renewalEnd: 2,  status: "lapsed"   as CertStatus },
+  { id: "green-globe", label: "Green Globe",   renewalStart: 7, renewalEnd: 9,  status: "active"   as CertStatus },
+  { id: "leed",        label: "LEED O+M",      renewalStart: 9, renewalEnd: 12, status: "active"   as CertStatus },
+  { id: "greenkey",    label: "Green Key",     renewalStart: 6, renewalEnd: 8,  status: "active"   as CertStatus },
+  { id: "ghg",         label: "GHG Inventory", renewalStart: 4, renewalEnd: 6,  status: "expiring" as CertStatus },
 ];
+
 
 const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec","Jan"];
 
@@ -125,19 +115,20 @@ type GapItem = { indicator: string; pillar: string; status: GapStatus; blocker: 
 
 const GAP_ANALYSIS: Record<string, GapItem[]> = {
   "green-globe": [
-    { indicator: "GRI 306-3 Waste generated",       pillar: "Waste",      status: "partial",    blocker: "3 properties missing Q4 data",        link: "/review-approval" },
-    { indicator: "GRI 401-1 Staff turnover",         pillar: "Social",     status: "not-ready",  blocker: "Social records not submitted",         link: "/data-capture" },
-    { indicator: "Supplier local sourcing %",        pillar: "Social",     status: "partial",    blocker: "2 supplier attestations outstanding",  link: "/supplier-portal" },
-  ],
-  "iso-14001": [
-    { indicator: "Legal compliance review",          pillar: "Governance", status: "partial",    blocker: "Annual review overdue by 14 days",     link: "/review-approval" },
-    { indicator: "Internal audit report",            pillar: "Governance", status: "partial",    blocker: "Audit scheduled for 2026-06-10",       link: "/review-approval" },
+    { indicator: "Waste generated — Q4 data",        pillar: "Waste",  status: "partial",   blocker: "3 properties missing Q4 data",          link: "/review-approval" },
+    { indicator: "Wastewater discharge volumes",     pillar: "Water",  status: "not-ready", blocker: "Treatment plant meter not connected",    link: "/data-capture" },
+    { indicator: "Hazardous substances register",    pillar: "Waste",  status: "partial",   blocker: "2 properties missing SDS files",         link: "/data-capture" },
   ],
   "leed": [
-    { indicator: "Energy Star score",                pillar: "Energy",     status: "partial",    blocker: "Score below 75 — need 3 more months",  link: "/review-approval" },
-    { indicator: "IAQ monitoring",                   pillar: "Social",     status: "not-ready",  blocker: "Sensor data not connected",            link: "/data-capture" },
+    { indicator: "ENERGY STAR score",                pillar: "Energy", status: "partial",   blocker: "Score below 75 — need 3 more months",    link: "/review-approval" },
+    { indicator: "IAQ monitoring",                   pillar: "Energy", status: "not-ready", blocker: "Sensor data not connected",              link: "/data-capture" },
+  ],
+  "ghg": [
+    { indicator: "Scope 3 Cat 1 supplier factors",   pillar: "Carbon", status: "partial",   blocker: "18 suppliers still on default factors",  link: "/supplier-portal" },
+    { indicator: "Refrigerant leak log",             pillar: "Carbon", status: "partial",   blocker: "2 HVAC units without leak checks",       link: "/data-capture" },
   ],
 };
+
 
 /* ---------- Status helpers ---------- */
 
@@ -182,31 +173,49 @@ type Criterion = {
 };
 
 const CRITERIA_BY_PROGRAMME: Record<string, Criterion[]> = {
-  GSTC: [
-    { code: "A1", title: "Sustainability management system",    requirement: "Documented SMS with policies, objectives, KPIs", status: "ready",     evidenceRequired: 3, evidenceUploaded: 3, owner: "Property SM" },
-    { code: "A2", title: "Legal compliance",                    requirement: "Annual legal compliance review",                  status: "ready",     evidenceRequired: 1, evidenceUploaded: 1, owner: "Compliance Officer" },
-    { code: "B6", title: "Local sourcing — F&B and amenities",  requirement: "% local sourcing + supplier attestations",        status: "partial",   evidenceRequired: 5, evidenceUploaded: 3, owner: "F&B Manager", dueDate: "2026-06-15", link: "/supplier-portal", note: "Need 2 more supplier attestations." },
-    { code: "B7", title: "Cultural & heritage protection",      requirement: "Cultural awareness training + community policies",status: "ready",     evidenceRequired: 2, evidenceUploaded: 2, owner: "HR Lead" },
-    { code: "C1", title: "Community engagement programme",      requirement: "Programme description + impact data",             status: "not-ready", evidenceRequired: 4, evidenceUploaded: 1, owner: "Property SM", dueDate: "2026-07-01", note: "Programme description required." },
-    { code: "D2", title: "Energy management plan",              requirement: "Energy plan + 12 months data",                   status: "ready",     evidenceRequired: 3, evidenceUploaded: 3, owner: "Engineering Lead" },
-    { code: "D7", title: "Water management plan",               requirement: "Water plan + leak detection",                    status: "partial",   evidenceRequired: 3, evidenceUploaded: 2, owner: "Engineering Lead", dueDate: "2026-06-30" },
-    { code: "D9", title: "Waste reduction & circular practices",requirement: "Waste plan + diversion rate",                    status: "ready",     evidenceRequired: 2, evidenceUploaded: 2, owner: "Operations Lead" },
-    { code: "E1", title: "Greenhouse gas emissions",            requirement: "Scope 1+2 inventory + reduction plan",           status: "ready",     evidenceRequired: 4, evidenceUploaded: 4, owner: "Property SM" },
-    { code: "E5", title: "Emissions evidence",                  requirement: "EF library + supplier-specific EFs",             status: "partial",   evidenceRequired: 5, evidenceUploaded: 3, owner: "Sustainability Manager", dueDate: "2026-07-15" },
+  GHG: [
+    { code: "E1", title: "Organisational boundary",          requirement: "Operational-control boundary statement + site list",        status: "ready",     evidenceRequired: 1, evidenceUploaded: 1, owner: "Sustainability Manager" },
+    { code: "E2", title: "Scope 1 — fuels",                  requirement: "Fuel stock accounting per tank + generator logs",           status: "ready",     evidenceRequired: 3, evidenceUploaded: 3, owner: "Engineering Lead" },
+    { code: "E3", title: "Scope 1 — refrigerants",           requirement: "Leak-check log + top-up records per HVAC unit",             status: "partial",   evidenceRequired: 2, evidenceUploaded: 1, owner: "Engineering Lead", dueDate: "2026-06-30", note: "2 HVAC units without leak checks." },
+    { code: "E4", title: "Scope 2 — location-based",         requirement: "12 months of utility invoices + grid factor version",       status: "ready",     evidenceRequired: 2, evidenceUploaded: 2, owner: "Property SM" },
+    { code: "E5", title: "Scope 2 — market-based",           requirement: "RECs / PPAs matched to the consumption period",             status: "ready",     evidenceRequired: 2, evidenceUploaded: 2, owner: "Property SM" },
+    { code: "E6", title: "Scope 3 screening",                requirement: "Cat 1, 4 and 6 workbook with method per category",         status: "partial",   evidenceRequired: 3, evidenceUploaded: 1, owner: "Sustainability Manager", dueDate: "2026-07-15", note: "18 suppliers still on default factors." },
+    { code: "E7", title: "Emission factor register",         requirement: "Versioned EF library export, factors locked for the period", status: "ready",    evidenceRequired: 1, evidenceUploaded: 1, owner: "Sustainability Manager" },
+    { code: "E8", title: "Verification evidence",            requirement: "Verifier data requests answered, sampling trail exported",  status: "not-ready", evidenceRequired: 2, evidenceUploaded: 0, owner: "Sustainability Manager", dueDate: "2026-06-10", note: "Verifier kick-off scheduled 2026-06-01." },
   ],
-  HSB: [
-    { code: "1.1", title: "Energy benchmarking",   requirement: "kWh per room night, tracked monthly",  status: "ready",   evidenceRequired: 1, evidenceUploaded: 1, owner: "Property SM" },
-    { code: "1.2", title: "Energy reduction plan", requirement: "Documented plan",           status: "ready",   evidenceRequired: 1, evidenceUploaded: 1, owner: "Property SM" },
-    { code: "2.1", title: "Water benchmarking",    requirement: "m³ per room night, tracked monthly",   status: "ready",   evidenceRequired: 1, evidenceUploaded: 1, owner: "Property SM" },
-    { code: "3.1", title: "Waste streams",         requirement: "All streams tracked",       status: "partial", evidenceRequired: 1, evidenceUploaded: 0, owner: "Operations", dueDate: "2026-06-01" },
-    { code: "4.1", title: "Single-use plastics",   requirement: "Reduction policy",          status: "ready",   evidenceRequired: 1, evidenceUploaded: 1, owner: "F&B Manager" },
+  "GREEN-KEY": [
+    { code: "3.1", title: "Water flow rates",                requirement: "Taps ≤ 8 L/min, showers ≤ 9 L/min — measured",             status: "partial",   evidenceRequired: 2, evidenceUploaded: 1, owner: "Engineering Lead", dueDate: "2026-06-30" },
+    { code: "3.4", title: "Leak detection",                  requirement: "Monthly meter checks + leak log",                            status: "ready",     evidenceRequired: 1, evidenceUploaded: 1, owner: "Engineering Lead" },
+    { code: "5.1", title: "Energy metering",                 requirement: "Monthly electricity & gas readings, 12 months",              status: "ready",     evidenceRequired: 1, evidenceUploaded: 1, owner: "Property SM" },
+    { code: "5.6", title: "Lighting efficiency",             requirement: "≥ 75% LED / low-energy lamps, inventory",                    status: "ready",     evidenceRequired: 1, evidenceUploaded: 1, owner: "Engineering Lead" },
+    { code: "6.1", title: "Waste separation",                requirement: "Separation at source for ≥ 4 streams, photo evidence",       status: "ready",     evidenceRequired: 2, evidenceUploaded: 2, owner: "Operations Lead" },
+    { code: "6.4", title: "Single-use plastics",             requirement: "Reduction plan + inventory of eliminated items",             status: "partial",   evidenceRequired: 1, evidenceUploaded: 0, owner: "F&B Manager", dueDate: "2026-07-01" },
+    { code: "8.2", title: "Eco-labelled products",           requirement: "Purchasing records for eco-labelled cleaning & paper products", status: "ready",  evidenceRequired: 1, evidenceUploaded: 1, owner: "Procurement" },
   ],
-  "GREEN-KEY": [], "GREEN-GLOBE": [], "LEED-OM": [], TRAVELIFE: [], "EU-ECO": [],
+  "GREEN-GLOBE": [
+    { code: "D1", title: "Energy consumption",               requirement: "Monthly consumption + reduction target + plan",             status: "ready",     evidenceRequired: 3, evidenceUploaded: 3, owner: "Property SM" },
+    { code: "D2", title: "Water conservation",               requirement: "Consumption, sources, efficiency measures",                  status: "ready",     evidenceRequired: 3, evidenceUploaded: 3, owner: "Engineering Lead" },
+    { code: "D3", title: "Waste management",                 requirement: "Diversion rate + contractor certificates",                   status: "partial",   evidenceRequired: 2, evidenceUploaded: 1, owner: "Operations Lead", dueDate: "2026-06-15", note: "Contractor waste-diversion certificates outstanding." },
+    { code: "D4", title: "GHG emissions",                    requirement: "Scope 1 + 2 inventory + reduction plan",                     status: "ready",     evidenceRequired: 4, evidenceUploaded: 4, owner: "Sustainability Manager" },
+    { code: "D5", title: "Wastewater",                       requirement: "Treatment method + discharge volumes",                        status: "not-ready", evidenceRequired: 2, evidenceUploaded: 0, owner: "Engineering Lead", dueDate: "2026-07-31", note: "Treatment plant meter not connected." },
+    { code: "D6", title: "Harmful substances",               requirement: "Chemicals register, SDS on file, storage checks",            status: "partial",   evidenceRequired: 2, evidenceUploaded: 1, owner: "Operations Lead", dueDate: "2026-06-30" },
+    { code: "D7", title: "Environmentally preferable purchasing", requirement: "Purchasing records for certified products",             status: "ready",     evidenceRequired: 1, evidenceUploaded: 1, owner: "Procurement" },
+  ],
+  "LEED-OM": [
+    { code: "EA p2", title: "Minimum energy performance",    requirement: "ENERGY STAR score ≥ 75 on 12 months of data",                status: "partial",   evidenceRequired: 1, evidenceUploaded: 0, owner: "Engineering Lead", dueDate: "2026-09-01", note: "Score below 75 — need 3 more months." },
+    { code: "EA c2", title: "Renewable energy",              requirement: "RECs / on-site generation matched to the period",             status: "ready",     evidenceRequired: 1, evidenceUploaded: 1, owner: "Property SM" },
+    { code: "WE p1", title: "Indoor water use",              requirement: "Fixture flow rates + 12 months consumption",                  status: "ready",     evidenceRequired: 2, evidenceUploaded: 2, owner: "Engineering Lead" },
+    { code: "WE c1", title: "Water metering",                requirement: "Sub-meters for cooling, irrigation, laundry",                 status: "ready",     evidenceRequired: 1, evidenceUploaded: 1, owner: "Engineering Lead" },
+    { code: "MR p1", title: "Ongoing purchasing",            requirement: "Purchasing log — ongoing consumables",                        status: "ready",     evidenceRequired: 1, evidenceUploaded: 1, owner: "Procurement" },
+    { code: "MR c1", title: "Solid waste management",        requirement: "Waste stream audit + diversion rate",                         status: "partial",   evidenceRequired: 2, evidenceUploaded: 1, owner: "Operations Lead", dueDate: "2026-08-15" },
+    { code: "EQ p1", title: "Indoor air quality",            requirement: "IAQ monitoring log — CO₂, PM2.5",                             status: "not-ready", evidenceRequired: 1, evidenceUploaded: 0, owner: "Engineering Lead", dueDate: "2026-07-31", note: "Sensor data not connected." },
+  ],
 };
 
+
 const DOSSIER_VERSIONS = [
-  { v: "v3.2", date: "2026-04-22", note: "Added supplier attestations for B6", by: "Demo Admin" },
-  { v: "v3.1", date: "2026-03-08", note: "Annual SMS update",                  by: "Demo SM" },
+  { v: "v3.2", date: "2026-04-22", note: "Added Scope 3 supplier EF evidence", by: "Demo Admin" },
+  { v: "v3.1", date: "2026-03-08", note: "Annual energy & water data refresh", by: "Demo SM" },
   { v: "v3.0", date: "2025-11-12", note: "Re-certification submission",        by: "Demo SM" },
 ];
 
@@ -217,7 +226,7 @@ const OLD_STATUS_TONE: Record<OldStatus, "good" | "warn" | "bad" | "neutral"> = 
 /* ================================================================== */
 export default function Certifications() {
   const [propertyId, setPropertyId]       = useState(PROPERTIES[0].id);
-  const [programme, setProgramme]          = useState<string>("GSTC");
+  const [programme, setProgramme]          = useState<string>("GHG");
   const [selectedCard, setSelectedCard]    = useState<string | null>(null);
   const [checklistOpen, setChecklistOpen]  = useState(false);
 
@@ -456,7 +465,7 @@ export default function Certifications() {
               onChange={(e) => {
                 const p = PROPERTIES.find((x) => x.id === e.target.value)!;
                 setPropertyId(p.id);
-                setProgramme(p.certifications[0] ?? "GSTC");
+                setProgramme(p.certifications[0] ?? "GHG");
               }}
             >
               {PROPERTIES.map((p) => (
@@ -482,7 +491,7 @@ export default function Certifications() {
                         : "border-ink-200 bg-ink-50/50 text-ink-400"
                   )}
                 >
-                  {c.code}
+                  {PROGRAMME_SHORT[c.code] ?? c.code}
                   {enrolled && !active && <span className="ml-1.5 text-[10px] text-good">●</span>}
                 </button>
               );
@@ -585,9 +594,9 @@ export default function Certifications() {
             right={<button className="btn-secondary"><Upload size={14} /> Upload evidence</button>}
           />
           <ul className="p-6 space-y-2 text-sm">
-            <EvidenceRow name="GSTC-B6 supplier attestations.pdf"              type="Local sourcing" uploaded="2026-04-22" />
+            <EvidenceRow name="Scope 3 supplier EF declarations — 2026-Q2.pdf" type="Carbon" uploaded="2026-04-22" />
             <EvidenceRow name="Energy management plan v4.docx"                  type="Energy"         uploaded="2026-03-08" />
-            <EvidenceRow name="Photo evidence — local market partnerships.zip"  type="Cultural"       uploaded="2026-02-12" />
+            <EvidenceRow name="Water flow-rate measurements.xlsx"                  type="Water"       uploaded="2026-02-12" />
             <EvidenceRow name="EF library export — 2026-Q2.xlsx"                type="Carbon"         uploaded="2026-04-15" />
           </ul>
         </Card>
@@ -643,20 +652,20 @@ type CertEvidenceRow = {
 const CERT_EVIDENCE_ROWS: CertEvidenceRow[] = [
   {
     certType: "I-REC", period: "Jan–Dec 2025", volume: "1,240 MWh",
-    programmes: ["GSTC", "LEED O+M", "Green Globe"],
-    criteria: ["GSTC E1 — GHG inventory (Scope 2 MB)", "LEED EA — renewable energy credit"],
+    programmes: ["GHG Inventory", "LEED O+M", "Green Globe"],
+    criteria: ["GHG E5 — Scope 2 market-based", "LEED EA c2 — renewable energy"],
     status: "Available",
   },
   {
     certType: "EAC", period: "Q1 2026", volume: "320 MWh",
-    programmes: ["GSTC", "Green Globe"],
-    criteria: ["GSTC E1 — GHG inventory (Scope 2 MB partial)"],
+    programmes: ["GHG Inventory", "Green Globe"],
+    criteria: ["GHG E5 — Scope 2 market-based (partial)"],
     status: "Available",
   },
   {
     certType: "VCS", period: "FY 2025", volume: "38 tCO₂e",
-    programmes: ["GSTC", "EarthCheck"],
-    criteria: ["GSTC E5 — emissions evidence (residual Scope 1 offset)"],
+    programmes: ["GHG Inventory", "Green Globe"],
+    criteria: ["GHG E2 — residual Scope 1 offset", "Green Globe D4 — GHG emissions"],
     status: "Used",
   },
 ];
@@ -672,7 +681,7 @@ function CertCertificatePanel() {
     <Card>
       <CardHeader
         title="Renewable Energy & Carbon Credit certificates available as evidence"
-        hint="I-REC / EAC and carbon credit retirements can satisfy energy and emissions criteria across GSTC, LEED, Green Globe, and EarthCheck."
+        hint="I-REC / EAC and carbon credit retirements can satisfy energy and emissions criteria across the GHG inventory, LEED, Green Globe and Green Key."
         right={
           <Link to="/marketplace" className="btn-ghost h-7 px-2 text-[11px] text-brand-700 flex items-center gap-1">
             Get more in Solutions Hub <ExternalLink size={11} />
@@ -694,7 +703,7 @@ function CertCertificatePanel() {
             <span className="text-[11px] font-semibold text-ink-500 uppercase tracking-wide">Carbon credit retirements</span>
           </div>
           <div className="text-2xl font-bold text-ink-900">1</div>
-          <div className="text-[12px] text-ink-500">38 tCO₂e · used for GSTC E5 & EarthCheck</div>
+          <div className="text-[12px] text-ink-500">38 tCO₂e · used for GHG E2 & Green Globe D4</div>
         </div>
       </div>
       <div className="overflow-x-auto border-t border-ink-100">

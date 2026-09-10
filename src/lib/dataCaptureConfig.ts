@@ -29,8 +29,6 @@ export type DataTypeKey =
   | "travel-commute"
   | "refrigerants"
   | "ops-events"
-  | "social"
-  | "governance"
   | "cert-evidence"
   | "custom";
 
@@ -73,7 +71,7 @@ export type DataTypeConfig = {
   description: string;
   icon: LucideIcon;
   iconBg: string;
-  pillar: "energy" | "water" | "waste" | "carbon" | "social" | "governance" | "operations";
+  pillar: "energy" | "water" | "waste" | "carbon" | "operations";
   /** Methods supported per BRD §6.1 — order = priority. */
   methods: Method[];
   /** Fields shown in the manual entry form. */
@@ -274,7 +272,7 @@ export const DATA_TYPES: DataTypeConfig[] = [
     label: "Purchases & Supplier Invoices",
     description: "Purchased goods, capital goods, upstream transport — spend or supplier-specific.",
     icon: Truck,
-    iconBg: "bg-pillar-social/10 text-pillar-social",
+    iconBg: "bg-pillar-carbon/10 text-pillar-carbon",
     pillar: "carbon",
     methods: ["manual", "ocr", "bulk", "api", "survey", "ai-assist"],
     brdRef: "FR-1.2.5",
@@ -447,10 +445,10 @@ export const DATA_TYPES: DataTypeConfig[] = [
   {
     key: "cert-evidence",
     label: "Certification evidence",
-    description: "Per-criterion evidence files for GSTC, HSB, Green Key, Green Globe, LEED O+M, Travelife, EU Ecolabel.",
+    description: "Per-criterion evidence files for the GHG inventory, LEED O+M, Green Key and Green Globe.",
     icon: Award,
     iconBg: "bg-warn/10 text-warn",
-    pillar: "governance",
+    pillar: "carbon",
     methods: ["manual"],
     brdRef: "FR-12",
     fields: [
@@ -460,16 +458,13 @@ export const DATA_TYPES: DataTypeConfig[] = [
         type: "select",
         required: true,
         options: [
-          { value: "GSTC",        label: "GSTC" },
-          { value: "HSB",         label: "Hotel Sustainability Basics" },
+          { value: "GHG",         label: "GHG Inventory" },
           { value: "GREEN-KEY",   label: "Green Key" },
           { value: "GREEN-GLOBE", label: "Green Globe" },
           { value: "LEED-OM",     label: "LEED O+M" },
-          { value: "TRAVELIFE",   label: "Travelife" },
-          { value: "EU-ECO",      label: "EU Ecolabel" },
         ],
       },
-      { key: "criterion", label: "Criterion / clause", type: "text", required: true, help: "e.g. GSTC B6, Travelife 7.4" },
+      { key: "criterion", label: "Criterion / clause", type: "text", required: true, help: "e.g. LEED EA c2, Green Key 5.1" },
       { key: "title",     label: "Document title",     type: "text", required: true, full: true },
       COMMON_EVIDENCE,
       COMMON_NOTES,
@@ -479,7 +474,7 @@ export const DATA_TYPES: DataTypeConfig[] = [
   {
     key: "custom",
     label: "Custom / Other",
-    description: "Bespoke metrics not covered above — biodiversity, noise, local sourcing, or client-specific KPIs.",
+    description: "Bespoke metrics not covered above — biodiversity, noise or client-specific KPIs.",
     icon: Puzzle,
     iconBg: "bg-ink-100 text-ink-600",
     pillar: "operations",
@@ -535,8 +530,6 @@ export const INTEGRATIONS: Integration[] = [
   { key: "bms",       name: "BMS / SCADA receiver", scope: "Real-time energy & water from building systems", status: "configured",     lastSync: "Today 08:14", category: "bms" },
   { key: "qbo",       name: "QuickBooks Online",   scope: "Vendor invoices — Cat 1/2/4 line items",         status: "action-needed",  lastSync: "—",            category: "accounting" },
   { key: "xero",      name: "Xero",                scope: "Vendor invoices — Cat 1/2/4 line items",         status: "not-configured", category: "accounting" },
-  { key: "workday",   name: "Workday HCM",         scope: "HR — headcount, demographics, training, H&S",    status: "active",         lastSync: "Today 04:30", category: "hr" },
-  { key: "bamboo",    name: "BambooHR",            scope: "HR — headcount, demographics, training, H&S",    status: "not-configured", category: "hr" },
   { key: "hauler",    name: "Hauler API",          scope: "Waste hauler weight tickets",                    status: "active",         lastSync: "Today 02:55", category: "hauler" },
   { key: "leanpath",  name: "LeanPath",            scope: "Food waste by meal period",                      status: "optional",       category: "food" },
   { key: "traytracker", name: "Traytracker",       scope: "Food waste by meal period",                      status: "optional",       category: "food" },

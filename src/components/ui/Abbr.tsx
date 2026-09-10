@@ -5,7 +5,6 @@ export const GLOSSARY: Record<string, string> = {
   ORN: "Occupied Room Night — one room sold for one night; the standard denominator for intensity metrics.",
   GP: "Genuine Performance — weather- and occupancy-normalised performance, so improvements reflect real efficiency gains rather than demand swings.",
   EF: "Emission Factor — the coefficient that converts an activity (kWh, litres, km) into greenhouse-gas emissions.",
-  LTIFR: "Lost Time Injury Frequency Rate — lost-time injuries per million hours worked.",
   COP: "Coefficient of Performance — heating/cooling output divided by energy input; higher is more efficient.",
   GN: "Guest Night — one guest staying one night.",
   ORN_SHORT: "Occupied Room Night",

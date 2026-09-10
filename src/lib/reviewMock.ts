@@ -3,7 +3,7 @@
 // yet carry (anomaly flags, AI confidence, OCR field-level confidence,
 // supplier submissions, query rounds, due / SLA, audit trail).
 
-export type Pillar = "energy" | "water" | "waste" | "carbon" | "social" | "governance";
+export type Pillar = "energy" | "water" | "waste" | "carbon";
 export type Method = "manual" | "ocr" | "bulk" | "qr" | "api" | "supplier";
 export type Status =
   | "draft"

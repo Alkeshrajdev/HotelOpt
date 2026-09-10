@@ -53,8 +53,6 @@ const TARGETS = [
   { id: "t2", name: "Carbon Intensity Reduction",  area: "Carbon",     baseYear: 2019, targetYear: 2030, targetVal: "1.5 kg CO₂e / room night", current: "2.9 kg",    gap: "1.4 kg",  hotels: "Bay View Singapore",             status: "on-track",  owner: "Sarah Chen"     },
   { id: "t3", name: "Water Intensity Reduction",   area: "Water",      baseYear: 2019, targetYear: 2030, targetVal: "310 L / guest night",       current: "392 L",     gap: "82 L",    hotels: "Airport Dubai, Grand Harbour",   status: "at-risk",   owner: "Marco Rossi"    },
   { id: "t4", name: "Waste Diversion Rate",        area: "Waste",      baseYear: 2019, targetYear: 2028, targetVal: "90% diverted",              current: "61%",       gap: "29%",     hotels: "Marina Barcelona, Peaks Zermatt",status: "at-risk",   owner: "Sophie Müller"  },
-  { id: "t5", name: "Fair Wage Compliance",        area: "Social",     baseYear: 2022, targetYear: 2030, targetVal: "100% compliant",            current: "89%",       gap: "11%",     hotels: "Riverside Bangkok",              status: "on-track",  owner: "Jin Park"       },
-  { id: "t6", name: "Policy Attestations",         area: "Governance", baseYear: 2022, targetYear: 2030, targetVal: "100% complete",             current: "85%",       gap: "15%",     hotels: "Oceanfront Cape Town",           status: "on-track",  owner: "Sarah Chen"     },
   { id: "t7", name: "Approved Data Coverage",      area: "Data",       baseYear: 2023, targetYear: 2025, targetVal: "95% every month",           current: "86%",       gap: "9%",      hotels: "Airport Dubai, Bay View",        status: "at-risk",   owner: "Layla Al-Hassan"},
   { id: "t8", name: "Hotels Certified",            area: "Certification",baseYear:2024,targetYear: 2027, targetVal: "8 of 10 hotels",            current: "6 hotels",  gap: "2 hotels","hotels": "Peaks Zermatt, Riverside Bangkok",status:"at-risk", owner: "Sarah Chen"     },
 ];
@@ -84,7 +82,7 @@ const ESCALATIONS = [
 
 const AREA_COLOUR: Record<string, string> = {
   Energy: "text-pillar-energy", Carbon: "text-pillar-carbon", Water: "text-pillar-water",
-  Waste: "text-pillar-waste", Social: "text-pillar-social", Governance: "text-pillar-gov",
+  Waste: "text-pillar-waste", Certifications: "text-brand-700",
   Data: "text-info", Certification: "text-brand-600",
 };
 

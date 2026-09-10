@@ -33,57 +33,41 @@ type Tab = "status" | "generate" | "certification" | "evidence" | "calendar" | "
 const REPORTING_STATUS = [
   { name: "Portfolio Sustainability Summary", status: "Ready",   coverage: 94, hotels: 8, missing: 0,  gaps: 0,  owner: "Sarah Chen",     lastGen: "2 days ago", blocker: null },
   { name: "GHG Inventory",                   status: "Ready",   coverage: 92, hotels: 8, missing: 1,  gaps: 2,  owner: "Sarah Chen",     lastGen: "4 days ago", blocker: null },
-  { name: "GRI Standards",                   status: "Mapped",  coverage: 86, hotels: 8, missing: 3,  gaps: 4,  owner: "Marco Rossi",    lastGen: "1 week ago", blocker: null },
   { name: "SBTi Net-Zero",                   status: "Draft",   coverage: 71, hotels: 6, missing: 8,  gaps: 6,  owner: "Sarah Chen",     lastGen: "—",          blocker: "Scope 3 travel & logistics data incomplete for 3 hotels" },
   { name: "HCMI Guest Footprint",            status: "Ready",   coverage: 88, hotels: 8, missing: 2,  gaps: 1,  owner: "Jin Park",       lastGen: "3 days ago", blocker: null },
-  { name: "CSRD / ESRS Draft",               status: "Draft",   coverage: 61, hotels: 5, missing: 14, gaps: 9,  owner: "Sophie Müller",  lastGen: "—",          blocker: "Social indicators gap — 3 KPIs missing across 4 hotels" },
-  { name: "GRESB",                           status: "Mapped",  coverage: 81, hotels: 8, missing: 4,  gaps: 3,  owner: "Sarah Chen",     lastGen: "2 weeks ago",blocker: null },
   { name: "Certification Evidence Pack",     status: "Blocked", coverage: 74, hotels: 8, missing: 6,  gaps: 18, owner: "Layla Al-Hassan",lastGen: "—",          blocker: "Green Globe evidence pack 12% short — 18 gaps across 3 hotels" },
 ];
 
 const CERTIFICATIONS_DETAIL = [
   { hotel: "The Pavilion London",         programme: "Green Key",      readiness: 91, ready: 38, partial: 5, notReady: 2,  gaps: 2,  owner: "Sarah Chen",     nextAudit: "Aug 2025", status: "current"    },
-  { hotel: "Grand Harbour Lisbon",        programme: "Travelife",      readiness: 84, ready: 29, partial: 8, notReady: 5,  gaps: 5,  owner: "Marco Rossi",    nextAudit: "Dec 2025", status: "current"    },
+  { hotel: "Grand Harbour Lisbon",        programme: "Green Key",      readiness: 84, ready: 29, partial: 8, notReady: 5,  gaps: 5,  owner: "Marco Rossi",    nextAudit: "Dec 2025", status: "current"    },
   { hotel: "Skyline Dubai",               programme: "Green Key",      readiness: 76, ready: 26, partial: 12,notReady: 7,  gaps: 7,  owner: "Layla Al-Hassan",nextAudit: "Mar 2026", status: "current"    },
-  { hotel: "Bay View Singapore",          programme: "EarthCheck",     readiness: 79, ready: 22, partial: 9, notReady: 8,  gaps: 8,  owner: "Jin Park",       nextAudit: "Jan 2026", status: "current"    },
-  { hotel: "The Montrose Paris",          programme: "EU Ecolabel",    readiness: 88, ready: 42, partial: 6, notReady: 3,  gaps: 3,  owner: "Sophie Müller",  nextAudit: "Sep 2025", status: "renew-soon" },
-  { hotel: "Marina Residences Barcelona", programme: "Travelife",      readiness: 82, ready: 31, partial: 10,notReady: 7,  gaps: 7,  owner: "Marco Rossi",    nextAudit: "Jun 2025", status: "renew-soon" },
-  { hotel: "Oceanfront Cape Town",        programme: "Fair Trade",     readiness: 85, ready: 28, partial: 7, notReady: 5,  gaps: 5,  owner: "Thabo Nkosi",    nextAudit: "Feb 2026", status: "current"    },
+  { hotel: "Bay View Singapore",          programme: "LEED O+M",       readiness: 79, ready: 22, partial: 9, notReady: 8,  gaps: 8,  owner: "Jin Park",       nextAudit: "Jan 2026", status: "current"    },
+  { hotel: "The Montrose Paris",          programme: "Green Globe",    readiness: 88, ready: 42, partial: 6, notReady: 3,  gaps: 3,  owner: "Sophie Müller",  nextAudit: "Sep 2025", status: "renew-soon" },
+  { hotel: "Marina Residences Barcelona", programme: "Green Key",      readiness: 82, ready: 31, partial: 10,notReady: 7,  gaps: 7,  owner: "Marco Rossi",    nextAudit: "Jun 2025", status: "renew-soon" },
+  { hotel: "Oceanfront Cape Town",        programme: "GHG Inventory",  readiness: 85, ready: 28, partial: 7, notReady: 5,  gaps: 5,  owner: "Thabo Nkosi",    nextAudit: "Feb 2026", status: "current"    },
   { hotel: "Peaks Resort Zermatt",        programme: "Green Key",      readiness: 63, ready: 18, partial: 8, notReady: 19, gaps: 19, owner: "Sophie Müller",  nextAudit: "—",        status: "expired"    },
   { hotel: "Airport Hotel Dubai",         programme: "Green Globe",    readiness: 44, ready: 14, partial: 8, notReady: 22, gaps: 22, owner: "Layla Al-Hassan",nextAudit: "—",        status: "at-risk"    },
 ];
 
 const EVIDENCE_GAPS = [
   { hotel: "Airport Hotel Dubai",         programme: "Green Globe",   evidence: "Diesel consumption certificates (Scope 1)", area: "Carbon",     priority: "Critical", owner: "Layla Al-Hassan", due: "15 Jun 2025", status: "open"       },
-  { hotel: "Marina Residences Barcelona", programme: "Travelife",     evidence: "Contractor waste-diversion certificates",   area: "Waste",      priority: "High",     owner: "Marco Rossi",    due: "30 Jun 2025", status: "in-progress"},
+  { hotel: "Marina Residences Barcelona", programme: "Green Key",      evidence: "Contractor waste-diversion certificates",   area: "Waste",      priority: "High",     owner: "Marco Rossi",    due: "30 Jun 2025", status: "in-progress"},
   { hotel: "Grand Harbour Lisbon",        programme: "GHG Inventory", evidence: "Scope 3 business travel records Q4",        area: "Carbon",     priority: "Critical", owner: "Marco Rossi",    due: "20 Jun 2025", status: "open"       },
-  { hotel: "Bay View Singapore",          programme: "EarthCheck",    evidence: "Third-party labour audit report",           area: "Social",     priority: "High",     owner: "Jin Park",       due: "31 Jul 2025", status: "open"       },
   { hotel: "Peaks Resort Zermatt",        programme: "Green Key",     evidence: "Renewable energy certificates (RECs)",      area: "Energy",     priority: "Medium",   owner: "Sophie Müller",  due: "—",           status: "open"       },
-  { hotel: "All properties",             programme: "GRI Standards", evidence: "Board sustainability sign-off letter",      area: "Governance", priority: "High",     owner: "Sarah Chen",     due: "30 Jun 2025", status: "open"       },
   { hotel: "Skyline Dubai",               programme: "Green Key",     evidence: "Water recycling system verification",       area: "Water",      priority: "Medium",   owner: "Layla Al-Hassan",due: "31 Jul 2025", status: "in-progress"},
-  { hotel: "Airport Hotel Dubai",         programme: "CSRD / ESRS",   evidence: "Social KPI — staff training hours log",    area: "Social",     priority: "High",     owner: "Layla Al-Hassan",due: "15 Jun 2025", status: "open"       },
 ];
 
 const AUDIT_EVENTS = [
-  { date: "2025-05-15", hotel: "Portfolio",               event: "GRI Data Freeze",                  type: "deadline", owner: "Sarah Chen",     status: "upcoming", notes: "All property data must be approved by this date" },
-  { date: "2025-06-01", hotel: "Portfolio",               event: "CDP Portal Opens",                 type: "action",   owner: "Sarah Chen",     status: "upcoming", notes: "Start upload of verified data to CDP platform" },
   { date: "2025-06-15", hotel: "The Pavilion London",     event: "Green Key Renewal",                type: "cert",     owner: "Sarah Chen",     status: "upcoming", notes: "Submit renewal documentation to Green Key foundation" },
-  { date: "2025-06-30", hotel: "Portfolio",               event: "GRI Report Deadline",              type: "deadline", owner: "Marco Rossi",    status: "upcoming", notes: "Final GRI Standards submission" },
-  { date: "2025-06-30", hotel: "Marina Residences",       event: "Travelife Renewal Deadline",       type: "cert",     owner: "Marco Rossi",    status: "upcoming", notes: "Submit self-assessment questionnaire" },
-  { date: "2025-07-15", hotel: "Portfolio",               event: "EU Taxonomy Verification",         type: "action",   owner: "Sophie Müller",  status: "upcoming", notes: "External verifier review scheduled" },
-  { date: "2025-07-31", hotel: "Portfolio",               event: "CDP Submission Deadline",          type: "deadline", owner: "Sarah Chen",     status: "upcoming", notes: "All scores finalised and submitted" },
-  { date: "2025-08-10", hotel: "The Montrose Paris",      event: "EU Ecolabel Renewal Audit",        type: "cert",     owner: "Sophie Müller",  status: "upcoming", notes: "On-site audit by national authority" },
-  { date: "2025-09-15", hotel: "Portfolio",               event: "UNGC COP Deadline",                type: "deadline", owner: "Sarah Chen",     status: "upcoming", notes: "Annual Communication on Progress" },
+  { date: "2025-06-30", hotel: "Marina Residences",       event: "Green Key Renewal Deadline",       type: "cert",     owner: "Marco Rossi",    status: "upcoming", notes: "Submit self-assessment questionnaire" },
+  { date: "2025-08-10", hotel: "The Montrose Paris",      event: "Green Globe Renewal Audit",  type: "cert",     owner: "Sophie Müller",  status: "upcoming", notes: "On-site audit by national authority" },
 ];
 
 const REPORT_HISTORY = [
-  { id: "rh1", name: "GRI Standards Report 2023",        framework: "GRI",        version: "v2.1", year: 2023, hotels: 8, dataBasis: "Approved only",        genBy: "Sarah Chen",     genDate: "30 Jun 2024", status: "published", evidencePack: true  },
-  { id: "rh2", name: "CDP Climate Disclosure 2023",      framework: "CDP",        version: "v1.0", year: 2023, hotels: 6, dataBasis: "Approved only",        genBy: "Sarah Chen",     genDate: "31 Jul 2024", status: "published", evidencePack: false },
-  { id: "rh3", name: "EU Taxonomy Report 2024",          framework: "EU Taxonomy",version: "v1.0", year: 2024, hotels: 3, dataBasis: "Approved only",        genBy: "Sophie Müller",  genDate: "31 Mar 2025", status: "published", evidencePack: true  },
-  { id: "rh4", name: "UNGC COP 2023",                    framework: "UNGC",       version: "v1.0", year: 2023, hotels: 4, dataBasis: "Approved only",        genBy: "Sarah Chen",     genDate: "15 Sep 2024", status: "published", evidencePack: false },
-  { id: "rh5", name: "GRI Standards Report 2022",        framework: "GRI",        version: "v1.0", year: 2022, hotels: 7, dataBasis: "Approved only",        genBy: "Sarah Chen",     genDate: "30 Jun 2023", status: "published", evidencePack: true  },
   { id: "rh6", name: "HCMI Guest Footprint 2023",        framework: "HCMI",       version: "v1.2", year: 2023, hotels: 8, dataBasis: "Approved only",        genBy: "Jin Park",       genDate: "15 Aug 2024", status: "published", evidencePack: false },
-  { id: "rh7", name: "GRI Standards Report 2024 (Draft)",framework: "GRI",        version: "v0.3", year: 2024, hotels: 8, dataBasis: "Approved + provisional",genBy: "Sarah Chen",     genDate: "—",           status: "draft",     evidencePack: false },
+  { id: "rh1", name: "GHG Inventory 2024",        framework: "GHG",       version: "v2.0", year: 2024, hotels: 8, dataBasis: "Approved only",        genBy: "Jin Park",       genDate: "15 Aug 2024", status: "published", evidencePack: false },
+  { id: "rh2", name: "Green Key evidence pack 2024",        framework: "Green Key",       version: "v1.0", year: 2024, hotels: 8, dataBasis: "Approved only",        genBy: "Jin Park",       genDate: "15 Aug 2024", status: "published", evidencePack: false },
 ];
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -132,7 +116,7 @@ const EVENT_LABEL: Record<string, string> = {
 
 const PILLAR_COLOUR: Record<string, string> = {
   Energy: "text-pillar-energy", Carbon: "text-pillar-carbon", Water: "text-pillar-water",
-  Waste: "text-pillar-waste", Social: "text-pillar-social", Governance: "text-pillar-gov",
+  Waste: "text-pillar-waste",
 };
 
 // ── Sub-pages ─────────────────────────────────────────────────────────────────
@@ -199,7 +183,7 @@ function ReportingStatusTab() {
 
 // ── Generate Report — multi-step ──────────────────────────────────────────────
 
-const FRAMEWORKS = ["GHG Inventory", "GRI Standards", "HCMI Guest Footprint", "SBTi Net-Zero", "CSRD / ESRS Draft", "GRESB", "Certification Evidence Pack", "Internal Management Report"];
+const FRAMEWORKS = ["GHG Inventory", "HCMI Guest Footprint", "SBTi Net-Zero", "Certification Evidence Pack"];
 const OUTPUT_FORMATS = ["PDF", "Excel", "PowerPoint", "Evidence ZIP"];
 const REPORT_SECTIONS = [
   "Executive Summary", "Portfolio Operating Context", "Performance by Area",
@@ -221,7 +205,7 @@ function GenerateReportTab() {
   const [scope, setScope]       = useState("all");
   const [period, setPeriod]     = useState("2024 Full Year");
   const [format, setFormat]     = useState("PDF");
-  const [framework, setFramework] = useState("GRI Standards");
+  const [framework, setFramework] = useState("GHG Inventory");
   const [dataBasis, setDataBasis] = useState("approved");
 
   const steps = ["Scope", "Period", "Format", "Framework", "Readiness", "Preview"];
@@ -411,7 +395,7 @@ function GenerateReportTab() {
 
 // ── Certification Readiness ───────────────────────────────────────────────────
 
-const CERT_PROGRAMMES = ["All", "Green Key", "Travelife", "EarthCheck", "EU Ecolabel", "Fair Trade", "Green Globe", "GSTC"];
+const CERT_PROGRAMMES = ["All", "GHG Inventory", "Green Key", "Green Globe", "LEED O+M"];
 const CERT_STATUSES   = ["All", "Current", "Renew Soon", "At Risk", "Expired"];
 
 function CertificationTab() {

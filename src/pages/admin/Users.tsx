@@ -15,7 +15,7 @@ const ROLES = [
   { key: "client_admin", label: "Client Admin",           count: 1,  scope: "Client-scoped",    description: "White-label client management" },
   { key: "super_admin",  label: "Super Admin",            count: 2,  scope: "Platform-scoped",  description: "Full administration" },
   { key: "auditor",      label: "Auditor",                count: 4,  scope: "Read-only",         description: "Third-party verifier · immutable trail access" },
-  { key: "supplier",     label: "Supplier",               count: 120,scope: "Supplier-scoped",  description: "Maintains EFs, certifications, attestations" },
+  { key: "supplier",     label: "Supplier",               count: 120,scope: "Supplier-scoped",  description: "Maintains EFs and certificates" },
   { key: "curator",      label: "Knowledge Curator",       count: 1,  scope: "Platform-scoped",  description: "AI knowledge base author" },
 ];
 
@@ -25,7 +25,7 @@ const USERS = [
   { id: "u-3",  name: "Demo Maker",          email: "maker@demo.test",        role: "maker",        properties: "Skyline Dubai, Peaks Resort Zermatt",     mfa: false, lastActive: "Today 07:30" },
   { id: "u-4",  name: "L. Park",              email: "lpark@hotel.com",         role: "maker",        properties: "Oceanfront Cape Town",                 mfa: true,  lastActive: "Yesterday" },
   { id: "u-5",  name: "F. Setiawan",          email: "fsetiawan@greenview.id",  role: "maker",        properties: "Skyline Dubai",              mfa: true,  lastActive: "Today 11:02" },
-  { id: "u-6",  name: "Aurora Linens Co.",   email: "esg@aurora-linens.eu",   role: "supplier",     properties: "—",                              mfa: true,  lastActive: "Yesterday" },
+  { id: "u-6",  name: "Aurora Linens Co.",   email: "sustainability@aurora-linens.eu",   role: "supplier",     properties: "—",                              mfa: true,  lastActive: "Yesterday" },
   { id: "u-7",  name: "Verifier — DNV",      email: "audit-team@dnv.com",     role: "auditor",      properties: "All (read-only)",               mfa: true,  lastActive: "3 days ago" },
 ];
 

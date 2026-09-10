@@ -46,7 +46,7 @@ export default function Login() {
             Genuine Performance.<br />Verified data.<br />Action that compounds.
           </div>
           <div className="text-sm opacity-80 mt-4 max-w-md">
-            Six pillars · four-layer performance story · maker–checker governance · framework-aligned reporting.
+            Four pillars · four-layer performance story · maker–checker review · certification-aligned reporting.
           </div>
         </div>
         <div className="text-[12px] opacity-70">© 2026 Hotel Optimizer</div>

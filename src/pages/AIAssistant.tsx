@@ -74,10 +74,10 @@ type Thread = {
 
 const SUGGESTED_PROMPTS = [
   "Summarise my biggest emission sources this period",
-  "Draft Scope 3 narrative for GRI 305-3",
+  "Draft the Scope 3 narrative for the GHG Inventory",
   "Which properties are off-track for net-zero?",
   "Explain the CDD/HDD occupancy adjustment",
-  "What evidence do I need for ISO 14001 renewal?",
+  "What evidence do I need for the Green Globe renewal?",
   "Identify top 5 actions by CO₂e saving potential",
 ];
 
@@ -115,14 +115,14 @@ const INITIAL_MESSAGES: Message[] = [
 const THREADS: Thread[] = [
   { id: "t-1", title: "Energy intensity anomaly — Apr 2026", updatedAt: "Today 09:41", messages: INITIAL_MESSAGES },
   { id: "t-2", title: "GHG Protocol Cat 1 vs Cat 4 split",   updatedAt: "Today 10:50", messages: [] },
-  { id: "t-3", title: "CSRD applicability 2024",             updatedAt: "Yesterday",   messages: [] },
+  { id: "t-3", title: "GHG inventory boundary 2024",             updatedAt: "Yesterday",   messages: [] },
   { id: "t-4", title: "How to close a queried record",       updatedAt: "Yesterday",   messages: [] },
 ];
 
 const RECENT_LOG = [
   { at: "2026-05-02 11:14", role: "Sustainability Manager", q: "Explain why GP-E rose this month",                resp: "answered", conf: 86 },
   { at: "2026-05-02 10:50", role: "Sustainability Manager", q: "What is the GHG Protocol Cat 1 vs Cat 4 split?",  resp: "answered", conf: 92 },
-  { at: "2026-05-02 09:40", role: "Property SM",            q: "Should we report 2024 in CSRD?",                  resp: "refused",  conf: 0  },
+  { at: "2026-05-02 09:40", role: "Property SM",            q: "Should we restate 2024 in the GHG inventory?",                  resp: "refused",  conf: 0  },
   { at: "2026-05-01 16:30", role: "Property SM",            q: "How do I close out a queried record?",            resp: "answered", conf: 88 },
 ];
 
@@ -200,7 +200,7 @@ export default function AIAssistant() {
             { title: "Setting an SBTi-aligned target", version: "v1.8", date: "2026-01-22" },
           ],
           suggestions: [{ label: "Save this to a checker comment draft", requiresApproval: true }],
-          actionCards: [{ type: "schedule-report", label: "Schedule report", detail: "Add to next ESG disclosure cycle" }],
+          actionCards: [{ type: "schedule-report", label: "Schedule report", detail: "Add to the next reporting cycle" }],
         };
     setMessages(activeId, [...active.messages, userMsg, aiMsg]);
     setDraft("");

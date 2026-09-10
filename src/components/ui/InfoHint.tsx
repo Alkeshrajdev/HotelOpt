@@ -23,4 +23,4 @@ export default function InfoHint({ text, className }: { text: string; className?
 
 /** Canonical explanation of the 0–100 sustainability score, reused wherever it shows. */
 export const SUSTAINABILITY_SCORE_EXPLAINER =
-  "Composite of the six pillar scores (energy, water, waste, carbon, social, governance), weighted by materiality and adjusted for data confidence. 0–100; higher is better.";
+  "Composite of the four pillar scores (energy, water, waste, carbon), weighted by materiality and adjusted for data confidence. 0–100; higher is better.";

@@ -53,7 +53,7 @@ const DEFS: TargetDef[] = [
   { key: "waste", label: "Waste Diversion (excl WtE)", area: "Waste", icon: "recycle", unit: "%", owner: "Marco Rossi",
     baseYear: 2022, targetYear: 2030, baseVal: 24, targetVal: 60, current: wasteDiversionExclWte, higherIsBetter: true,
     actualRate: 3.0, hotelsNote: "TRUE diversion — WtE excluded" },
-  { key: "cert", label: "Certification Coverage", area: "Governance", icon: "award", unit: "%", owner: "Layla Al-Hassan",
+  { key: "cert", label: "Certification Coverage", area: "Certifications", icon: "award", unit: "%", owner: "Layla Al-Hassan",
     baseYear: 2023, targetYear: 2027, baseVal: 50, targetVal: 100, current: () => 75, higherIsBetter: true,
     actualRate: 12.5, hotelsNote: "share of hotels with a current scheme" },
   { key: "data", label: "Data Approval", area: "Data", icon: "shield", unit: "%", owner: "Sarah Chen",

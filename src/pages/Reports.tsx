@@ -48,29 +48,11 @@ const REPORT_TYPES = [
     badge: "Mapped",
   },
   {
-    id: "esg",
-    label: "ESG Report",
-    icon: <Globe size={20} />,
-    framework: "GRI Standards",
-    desc: "Environmental, social and governance disclosure for investors.",
-    tone: "good" as const,
-    badge: "Mapped",
-  },
-  {
     id: "water",
     label: "Water Stewardship",
     icon: <BarChart2 size={20} />,
-    framework: "GRI 303",
+    framework: "Water balance",
     desc: "Consumption, intensity, stress-area risk and reduction targets.",
-    tone: "good" as const,
-    badge: "Mapped",
-  },
-  {
-    id: "gri",
-    label: "GRI Index",
-    icon: <Link2 size={20} />,
-    framework: "GRI 2021",
-    desc: "Full content index table mapping every indicator to a disclosure.",
     tone: "good" as const,
     badge: "Mapped",
   },
@@ -78,7 +60,7 @@ const REPORT_TYPES = [
     id: "carbon",
     label: "Carbon Reduction Plan",
     icon: <Zap size={20} />,
-    framework: "SBTi / TCFD",
+    framework: "SBTi",
     desc: "Net-zero pathway, milestones, abatement actions and progress.",
     tone: "warn" as const,
     badge: "Draft",
@@ -104,23 +86,17 @@ const DISCLOSURE_LOG: {
   version: string;
 }[] = [
   { id: "d-1", type: "GHG Inventory",         period: "FY 2025",           generatedBy: "A. Smits",   generatedAt: "2026-04-30", status: "submitted",  version: "v3.0" },
-  { id: "d-2", type: "ESG Report",             period: "May 2025–Apr 2026", generatedBy: "J. Park",    generatedAt: "2026-04-28", status: "published",  version: "v2.1" },
   { id: "d-3", type: "Water Stewardship",      period: "Q1 2026",           generatedBy: "F. Setiawan",generatedAt: "2026-04-15", status: "draft",      version: "v1.0" },
-  { id: "d-4", type: "GRI Index",              period: "FY 2024",           generatedBy: "A. Smits",   generatedAt: "2025-12-10", status: "published",  version: "v1.2" },
   { id: "d-5", type: "Carbon Reduction Plan",  period: "2026–2030",         generatedBy: "J. Park",    generatedAt: "2026-03-01", status: "draft",      version: "v0.9" },
 ];
 
-const GRI_TCFD_INDICATORS = [
-  { ref: "GRI 302-1", name: "Energy consumption",        pillar: "Energy",     completeness: 96, framework: "GRI" },
-  { ref: "GRI 303-3", name: "Water withdrawal",          pillar: "Water",      completeness: 84, framework: "GRI" },
-  { ref: "GRI 305-1", name: "Direct GHG (Scope 1)",      pillar: "Carbon",     completeness: 92, framework: "GHG" },
-  { ref: "GRI 305-2", name: "Energy indirect GHG (Sc.2)",pillar: "Carbon",     completeness: 88, framework: "GHG" },
-  { ref: "GRI 305-3", name: "Other indirect GHG (Sc.3)", pillar: "Carbon",     completeness: 61, framework: "GHG" },
-  { ref: "GRI 306-3", name: "Waste generated",           pillar: "Waste",      completeness: 71, framework: "GRI" },
-  { ref: "GRI 401-1", name: "New hires & turnover",      pillar: "Social",     completeness: 88, framework: "GRI" },
-  { ref: "GRI 403-9", name: "Work-related injuries",     pillar: "Social",     completeness: 95, framework: "GRI" },
-  { ref: "TCFD E1",   name: "Climate risk / transition", pillar: "Governance", completeness: 72, framework: "TCFD" },
-  { ref: "TCFD E2",   name: "Physical climate risk",     pillar: "Governance", completeness: 65, framework: "TCFD" },
+const MAPPED_INDICATORS = [
+  { ref: "E-1",     name: "Energy consumption",        pillar: "Energy",     completeness: 96, framework: "Inventory" },
+  { ref: "W-1",     name: "Water withdrawal",          pillar: "Water",      completeness: 84, framework: "Inventory" },
+  { ref: "GHG-1",   name: "Direct GHG (Scope 1)",      pillar: "Carbon",     completeness: 92, framework: "GHG" },
+  { ref: "GHG-2",   name: "Energy indirect GHG (Sc.2)",pillar: "Carbon",     completeness: 88, framework: "GHG" },
+  { ref: "GHG-3",   name: "Other indirect GHG (Sc.3)", pillar: "Carbon",     completeness: 61, framework: "GHG" },
+  { ref: "WS-1",    name: "Waste generated",           pillar: "Waste",      completeness: 71, framework: "Inventory" },
 ];
 
 const INTENSITY_LABELS: Record<IntensityMode, string> = {
@@ -131,7 +107,6 @@ const INTENSITY_LABELS: Record<IntensityMode, string> = {
 
 const SCHEDULES = [
   { id: "s-1", name: "GHG Inventory — quarterly",  framework: "GHG Protocol", cadence: "Quarterly", next: "01 Jul 2026", recipients: 4 },
-  { id: "s-2", name: "GRESB submission package",   framework: "GRESB",        cadence: "Annual",    next: "31 Mar 2027", recipients: 6 },
   { id: "s-3", name: "Internal management report", framework: "Internal",     cadence: "Monthly",   next: "01 Jun 2026", recipients: 12 },
 ];
 
@@ -160,10 +135,7 @@ const REPORT_TRACKER: {
   { id: "t-2", name: "GHG Inventory (Scope 1/2/3)", cadence: "Quarterly", owner: "Sarah Chen", status: "pending", nextDue: "due 15 Jul 2026",
     periods: [ {label:"Q3'25",status:"available"},{label:"Q4'25",status:"available"},{label:"Q1'26",status:"available"},{label:"Q2'26",status:"pending"} ] },
   { id: "t-3", name: "Board sustainability pack", cadence: "Quarterly", owner: "Sarah Chen", status: "available", nextDue: "next Q3 '26",
-    periods: [ {label:"Q3'25",status:"available"},{label:"Q4'25",status:"available"},{label:"Q1'26",status:"available"},{label:"Q2'26",status:"available"} ] },
-  { id: "t-4", name: "ESG / GRI disclosure", cadence: "Annual", owner: "Layla Al-Hassan", status: "pending", nextDue: "due 30 Sep 2026",
-    periods: [ {label:"2022",status:"available"},{label:"2023",status:"available"},{label:"2024",status:"available"},{label:"2025",status:"pending"} ] },
-  { id: "t-5", name: "Water stewardship (GRI 303)", cadence: "Annual", owner: "Jin Park", status: "na", nextDue: "from FY2026",
+    periods: [ {label:"Q3'25",status:"available"},{label:"Q4'25",status:"available"},{label:"Q1'26",status:"available"},{label:"Q2'26",status:"available"} ] },  { id: "t-5", name: "Water stewardship", cadence: "Annual", owner: "Jin Park", status: "na", nextDue: "from FY2026",
     periods: [ {label:"2022",status:"na"},{label:"2023",status:"available"},{label:"2024",status:"available"},{label:"2025",status:"pending"} ] },
 ];
 
@@ -299,7 +271,7 @@ export default function Reports() {
   return (
     <div className="space-y-5">
       <PageHeader
-        eyebrow="Disclosure & assurance"
+        eyebrow="Reporting & assurance"
         title="Reports"
         subtitle="5 of 7 frameworks are ready to export. 2 have blocking issues — resolve data gaps before your next disclosure deadline. AI drafts reports; sustainability managers review and finalise before any export."
         actions={
@@ -316,7 +288,7 @@ export default function Reports() {
       {/* Report type cards */}
       <Card>
         <CardHeader title="Report types" />
-        <div className="p-5 grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3">
+        <div className="p-5 grid grid-cols-2 xl:grid-cols-4 gap-4">
           {REPORT_TYPES.map((rt) => (
             <button
               key={rt.id}
@@ -351,13 +323,13 @@ export default function Reports() {
       {/* RE&O Certificate evidence panel */}
       <CertificateEvidencePanel />
 
-      {/* Main 2-column: frameworks + GRI/TCFD sidebar */}
+      {/* Main 2-column: frameworks + indicator sidebar */}
       <div className="grid grid-cols-12 gap-4">
         {/* Frameworks table with intensity toggle */}
         <Card className={cn("col-span-12", mappingOpen ? "lg:col-span-7" : "lg:col-span-12")}>
           <CardHeader
             title="Framework coverage"
-            hint="GRI · GHG Protocol · SBTi · HCMI · Green Globe · CSRD/ESRS · GRESB · CDP"
+            hint="GHG Protocol · SBTi · HCMI · Green Globe · LEED O+M · Green Key"
             right={
               <div className="flex items-center gap-2">
                 <span className="text-[11px] text-ink-500">Intensity:</span>
@@ -413,12 +385,12 @@ export default function Reports() {
           </div>
         </Card>
 
-        {/* GRI/TCFD mapping sidebar */}
+        {/* Indicator mapping sidebar */}
         {mappingOpen && (
           <Card className="col-span-12 lg:col-span-5">
             <CardHeader
-              title="GRI / TCFD indicator mapping"
-              hint="Traffic-light completeness per disclosure indicator."
+              title="Indicator mapping"
+              hint="Traffic-light completeness per reported indicator."
               right={
                 <button
                   onClick={() => setMappingOpen(false)}
@@ -429,7 +401,7 @@ export default function Reports() {
               }
             />
             <div className="p-4 space-y-1.5">
-              {GRI_TCFD_INDICATORS.map((ind) => {
+              {MAPPED_INDICATORS.map((ind) => {
                 const tone = ind.completeness >= 90 ? "good" : ind.completeness >= 70 ? "warn" : "bad";
                 const color = tone === "good" ? "bg-good" : tone === "warn" ? "bg-warn" : "bg-bad";
                 return (
@@ -464,7 +436,7 @@ export default function Reports() {
               onClick={() => setMappingOpen(true)}
               className="btn-secondary text-[12px]"
             >
-              <ChevronDown size={13} /> Show GRI/TCFD mapping
+              <ChevronDown size={13} /> Show indicator mapping
             </button>
           </div>
         )}
@@ -771,7 +743,7 @@ function CertificateEvidencePanel() {
           </table>
           <div className="px-5 py-3 border-t border-ink-100 rounded-b-xl bg-ink-50 text-[11px] text-ink-500 flex items-start gap-2">
             <Zap size={12} className="text-brand-700 mt-0.5 shrink-0" />
-            I-REC / EAC certificates automatically populate the <strong>market-based (MB) Scope 2</strong> row in all GHG Inventory and CSRD E1 exports. Retired carbon credits appear in the <strong>residual emissions offset</strong> section of the Carbon Reduction Plan.
+            I-REC / EAC certificates automatically populate the <strong>market-based (MB) Scope 2</strong> row in all GHG Inventory exports. Retired carbon credits appear in the <strong>residual emissions offset</strong> section of the Carbon Reduction Plan.
           </div>
         </div>
       )}

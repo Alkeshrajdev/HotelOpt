@@ -87,14 +87,14 @@ const NOTIF_CATEGORIES: NotifCategory[] = [
   {
     key: "certifications", label: "Certifications", icon: ShieldCheck, href: "/certifications",
     items: [
-      { id: "c1", title: "Green Key evidence due in 12 days", detail: "Criterion 3.4 — Energy policy",        priority: "medium", href: "/certifications?status=evidence-due" },
-      { id: "c2", title: "GSTC certificate expires in 45 days", detail: "Grand Hyatt Dubai",                  priority: "medium", href: "/certifications" },
+      { id: "c1", title: "Green Key evidence due in 12 days", detail: "Criterion 5.1 — Energy metering",        priority: "medium", href: "/certifications?status=evidence-due" },
+      { id: "c2", title: "GHG verification expires in 45 days", detail: "Grand Hyatt Dubai",                  priority: "medium", href: "/certifications" },
     ],
   },
   {
     key: "reports", label: "Reports", icon: FileText, href: "/reports",
     items: [
-      { id: "rp1", title: "CSRD report generation blocked",   detail: "Missing S1/Supplier data for Scope 3", priority: "high",   href: "/reports" },
+      { id: "rp1", title: "GHG Inventory generation blocked",   detail: "Missing supplier data for Scope 3", priority: "high",   href: "/reports" },
     ],
   },
   {
@@ -121,7 +121,7 @@ const SEARCH_RESULTS: SearchResult[] = [
   { id: "p3", category: "Properties", title: "Peaks Resort Zermatt",          subtitle: "4★ · Zermatt, CH · 95 rooms",        href: "/properties"     },
   { id: "p4", category: "Properties", title: "Aurora Hotels HQ",        subtitle: "Corporate · London, UK",            href: "/properties"     },
   { id: "r1", category: "Reports",    title: "GHG Inventory 2025",      subtitle: "Published · Carbon",                href: "/reports"        },
-  { id: "r2", category: "Reports",    title: "CSRD Draft 2025",         subtitle: "In-progress · ESRS",                href: "/reports"        },
+  { id: "r2", category: "Reports",    title: "GHG Inventory FY 2025",         subtitle: "In-progress · GHG Protocol",                href: "/reports"        },
   { id: "r3", category: "Reports",    title: "Green Key Evidence Pack", subtitle: "Pending · Certifications",          href: "/certifications" },
   { id: "a1", category: "Actions",    title: "BMS schedule review",     subtitle: "Open · Energy · Grand Hyatt Dubai", href: "/actions"        },
   { id: "a2", category: "Actions",    title: "LED retrofit — Phase 2",  subtitle: "In-progress · Energy",              href: "/actions"        },
@@ -136,7 +136,7 @@ const HELP_TOPICS: HelpTopic[] = [
   { icon: BookOpen,   label: "Getting started",          description: "Set up properties, data capture flows, and your first report." },
   { icon: Database,   label: "Data capture & review",    description: "How to import, validate, and approve consumption data." },
   { icon: BarChart3,  label: "Performance & benchmarks", description: "Understanding GP scores, pillars, and comparable pools." },
-  { icon: FileText,   label: "Reporting & disclosure",   description: "CSRD, GRI, CDP, TCFD — generating and publishing reports." },
+  { icon: FileText,   label: "Reporting",   description: "GHG inventory, carbon reduction plan, certification packs — generating and publishing reports." },
   { icon: ShieldCheck,label: "Certifications",           description: "Tracking criteria, evidence packages, and renewals." },
   { icon: Zap,        label: "Integrations",             description: "Connecting BMS, accounting, and sustainability platforms." },
 ];

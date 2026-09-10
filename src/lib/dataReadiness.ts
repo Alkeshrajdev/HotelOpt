@@ -28,7 +28,7 @@ import { SENSITIVITY, type GpUtility } from "./genuinePerformance";
 
 export type ReadinessStatus = "approved" | "submitted" | "draft" | "missing" | "na";
 
-export type Pillar = "Energy" | "Water" | "Waste" | "Carbon" | "Activity" | "Social";
+export type Pillar = "Energy" | "Water" | "Waste" | "Carbon" | "Activity";
 
 export type Contact = { name: string; email: string; role: string };
 
@@ -181,14 +181,9 @@ const DATA_TYPES: DataTypeDef[] = [
     annual: (h) => h.orn },
   { key: "covers",         label: "F&B covers",         pillar: "Activity", unit: "covers", gpUtility: null,  season: "occupancy", role: "F&B Manager",
     annual: (h) => h.gn * 0.8 },
-  // Social
-  { key: "headcount",      label: "Headcount (FTE)",    pillar: "Social", unit: "FTE",   gpUtility: null,     season: "flat",    role: "HR Manager",
-    annual: (h) => Math.round(h.rooms * 0.9) * 12 },
-  { key: "training",       label: "Training hours",     pillar: "Social", unit: "hrs",   gpUtility: null,     season: "occupancy", role: "HR Manager",
-    annual: (h) => Math.round(h.rooms * 0.9) * 14 },
 ];
 
-export const PILLAR_ORDER: Pillar[] = ["Energy", "Water", "Waste", "Carbon", "Activity", "Social"];
+export const PILLAR_ORDER: Pillar[] = ["Energy", "Water", "Waste", "Carbon", "Activity"];
 
 // ── Responsible contacts (deterministic per hotel + role) ────────────────────
 const FIRST = ["Priya", "James", "Sophie", "Carlos", "Anita", "Yuki", "Fatima", "Nina", "Diego", "Mei", "Omar", "Lena"];

@@ -757,10 +757,6 @@ function ManualWorkflow({
     [selectedProperty]
   );
 
-  // For social: use sub-type-specific fields alongside the base ones
-  const isSocial = cfg.key === "social";
-  const isGovernance = cfg.key === "governance";
-  const subType = values["subType"] ?? "";
 
   const consumption = parseFloat(
     values["consumption"] ?? values["quantity"] ?? values["amount"] ?? values["value"] ?? ""
@@ -828,10 +824,6 @@ function ManualWorkflow({
     });
   }
 
-  if (isGovernance) {
-    return <GovernanceWorkflow onPreview={onPreview} properties={properties} propertyId={propertyId} setPropertyId={setPropertyId} />;
-  }
-
   return (
     <Card>
       <CardHeader
@@ -869,32 +861,6 @@ function ManualWorkflow({
           />
         ))}
 
-        {/* Social sub-type-specific fields */}
-        {isSocial && subType && SOCIAL_SUB_FIELDS[subType] && (
-          <>
-            <div className="col-span-2 border-t border-ink-200 pt-4">
-              <div className="text-[12px] font-semibold text-ink-700 uppercase tracking-wide mb-3">
-                {cfg.fields.find((f) => f.key === "subType")?.options?.find((o) => o.value === subType)?.label ?? subType} — details
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                {SOCIAL_SUB_FIELDS[subType].map((f) => (
-                  <FormField
-                    key={f.key}
-                    f={f}
-                    value={values[f.key] ?? ""}
-                    onChange={(v) => set(f.key, v)}
-                    onBlur={() => handleBlur(f)}
-                    files={files}
-                    setFiles={setFiles}
-                    currency={currency}
-                    error={attempted ? errors[f.key] : undefined}
-                  />
-                ))}
-              </div>
-            </div>
-          </>
-        )}
-
         {/* Anomaly preview pane */}
         {(anomalies.length > 0 || evidenceMissing) && (
           <div className="col-span-2 rounded-xl border border-warn/25 bg-warn/10 p-3">
@@ -923,7 +889,7 @@ function ManualWorkflow({
           <button
             type="button"
             className="btn-primary"
-            onClick={() => handleContinue(isSocial && subType ? SOCIAL_SUB_FIELDS[subType] : undefined)}
+            onClick={() => handleContinue()}
           >
             Preview &amp; submit <ArrowRight size={14} />
           </button>
@@ -933,253 +899,6 @@ function ManualWorkflow({
   );
 }
 
-/* =================================================================== */
-/* Social sub-type fields                                               */
-/* =================================================================== */
-
-const SOCIAL_SUB_FIELDS: Record<string, FieldDef[]> = {
-  headcount: [
-    { key: "totalEmployees", label: "Total employees", type: "number", required: true },
-    { key: "fte", label: "Full-time (FTE)", type: "number" },
-    { key: "pte", label: "Part-time (PTE)", type: "number" },
-    { key: "femalePct", label: "Female %", type: "number", help: "% of total headcount who identify as female." },
-    { key: "localPct", label: "Local hire %", type: "number", help: "% employees from the property's host country." },
-    { key: "managementFemalePct", label: "Female in management %", type: "number" },
-  ],
-  training: [
-    { key: "headcountTrained", label: "Headcount trained", type: "number", required: true },
-    { key: "totalHours", label: "Total training hours", type: "number", required: true },
-    { key: "hoursPerEmployee", label: "Hours per employee", type: "number", help: "Auto-calculated if blank." },
-    {
-      key: "trainingType", label: "Training type", type: "select",
-      options: [
-        { value: "sustainability", label: "Sustainability" },
-        { value: "safety", label: "Health & Safety" },
-        { value: "skills", label: "Skills development" },
-        { value: "compliance", label: "Compliance / ethics" },
-        { value: "leadership", label: "Leadership" },
-        { value: "other", label: "Other" },
-      ],
-    },
-  ],
-  "hs-incident": [
-    {
-      key: "incidentType", label: "Incident type", type: "select", required: true,
-      options: [
-        { value: "lti", label: "Lost Time Injury (LTI)" },
-        { value: "mtc", label: "Medical Treatment Case" },
-        { value: "fac", label: "First Aid Case" },
-        { value: "near-miss", label: "Near miss / dangerous occurrence" },
-      ],
-    },
-    {
-      key: "severity", label: "Severity", type: "select", required: true,
-      options: [
-        { value: "minor", label: "Minor" },
-        { value: "moderate", label: "Moderate" },
-        { value: "serious", label: "Serious" },
-        { value: "fatal", label: "Fatal" },
-      ],
-    },
-    { key: "lostDays", label: "Lost time days", type: "number" },
-    {
-      key: "affectedParty", label: "Affected party", type: "select",
-      options: [
-        { value: "employee", label: "Employee" },
-        { value: "contractor", label: "Contractor" },
-        { value: "guest", label: "Guest" },
-      ],
-    },
-    { key: "correctiveAction", label: "Corrective action taken", type: "textarea", full: true },
-  ],
-  community: [
-    {
-      key: "engagementType", label: "Engagement type", type: "select", required: true,
-      options: [
-        { value: "donation", label: "Monetary donation" },
-        { value: "volunteering", label: "Staff volunteering" },
-        { value: "in-kind", label: "In-kind contribution" },
-        { value: "partnership", label: "Community partnership" },
-      ],
-    },
-    { key: "beneficiaries", label: "Beneficiaries (count)", type: "number" },
-    { key: "amountCommitted", label: "Amount committed", type: "currency" },
-    { key: "organisation", label: "Organisation / cause", type: "text" },
-  ],
-  "local-sourcing": [
-    { key: "totalProcurementSpend", label: "Total procurement spend", type: "currency", required: true },
-    { key: "localSpendPct", label: "Local spend %", type: "number", required: true, help: "% of total spend with local / in-country suppliers." },
-    {
-      key: "localDefinition", label: "Local definition", type: "select",
-      options: [
-        { value: "city", label: "Same city / district" },
-        { value: "country", label: "Same country" },
-        { value: "region", label: "Same region" },
-      ],
-    },
-    { key: "verifiedBy", label: "Verified by", type: "text" },
-  ],
-};
-
-/* =================================================================== */
-/* Governance attestation form                                          */
-/* =================================================================== */
-
-const GOV_ITEMS = [
-  { key: "ac-policy",       label: "Anti-corruption policy in place",          gri: "GRI 205-1" },
-  { key: "code-conduct",    label: "Code of conduct in place",                 gri: "GRI 102-16" },
-  { key: "whistleblowing",  label: "Whistleblowing / speak-up channel in place", gri: "GRI 102-16" },
-  { key: "supplier-code",   label: "Supplier code of conduct in place",        gri: "GRI 414-1" },
-  { key: "board-oversight", label: "Board sustainability oversight in place",  gri: "GRI 102-19" },
-];
-
-function GovernanceWorkflow({
-  onPreview, properties, propertyId, setPropertyId,
-}: {
-  onPreview: (r: CaptureResult) => void;
-  properties: Property[];
-  propertyId: string;
-  setPropertyId: (id: string) => void;
-}) {
-  const [responses, setResponses] = useState<Record<string, "yes" | "no" | "na">>({});
-  const [attestedBy, setAttestedBy] = useState("");
-  const [attestedDate, setAttestedDate] = useState("");
-  const [files, setFiles] = useState<File[]>([]);
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const [attempted, setAttempted] = useState(false);
-
-  function handleContinue() {
-    setAttempted(true);
-    const errs: Record<string, string> = {};
-    if (!propertyId) errs["propertyId"] = "Required.";
-    for (const item of GOV_ITEMS) {
-      if (!responses[item.key]) errs[item.key] = "Select Yes, No, or N/A.";
-    }
-    if (!attestedBy.trim()) errs["attestedBy"] = "Required.";
-    if (!attestedDate.trim()) errs["attestedDate"] = "Required.";
-    if (Object.keys(errs).length > 0) { setErrors(errs); return; }
-
-    const property = properties.find((p) => p.id === propertyId);
-    const displayRows = [
-      ...GOV_ITEMS.map((item) => ({
-        label: item.label,
-        value: responses[item.key] === "yes" ? "Yes" : responses[item.key] === "no" ? "No" : "N/A",
-      })),
-      { label: "Attested by", value: attestedBy },
-      { label: "Attested date", value: attestedDate },
-    ];
-
-    onPreview({
-      propertyId,
-      propertyName: property?.name ?? "",
-      currency: getCurrencyFromCountry(property?.country ?? null),
-      values: { ...responses, attestedBy, attestedDate },
-      files,
-      anomalies: [],
-      displayRows,
-    });
-  }
-
-  return (
-    <Card>
-      <CardHeader title="Governance attestation" hint="GRI 102/205/414 · annual" />
-      <div className="px-5 pt-4 pb-5 space-y-5">
-        <Field label="Property" required error={attempted ? errors["propertyId"] : undefined}>
-          <select
-            className={cn("input", attempted && errors["propertyId"] && "border-bad")}
-            value={propertyId}
-            onChange={(e) => setPropertyId(e.target.value)}
-          >
-            {properties.length === 0 && <option value="">No properties available</option>}
-            {properties.map((p) => (
-              <option key={p.id} value={p.id}>{p.name}</option>
-            ))}
-          </select>
-        </Field>
-
-        <div className="space-y-2">
-          <div className="grid grid-cols-[1fr_auto] items-center bg-ink-50 rounded-t-xl border border-ink-200 px-4 py-2">
-            <div className="text-[11px] font-semibold text-ink-500 uppercase tracking-wide">Policy / attestation item</div>
-            <div className="flex gap-3 text-[11px] font-semibold text-ink-500 uppercase tracking-wide">
-              <span className="w-10 text-center">Yes</span>
-              <span className="w-10 text-center">No</span>
-              <span className="w-10 text-center">N/A</span>
-            </div>
-          </div>
-          {GOV_ITEMS.map((item, idx) => (
-            <div
-              key={item.key}
-              className={cn(
-                "grid grid-cols-[1fr_auto] items-center border border-ink-200 px-4 py-3 rounded-xl",
-                idx === GOV_ITEMS.length - 1 && "rounded-b-xl",
-                attempted && errors[item.key] && "border-bad/50 bg-bad/5"
-              )}
-            >
-              <div>
-                <div className="text-sm text-ink-900">{item.label}</div>
-                <div className="text-[11px] text-ink-400 mt-0.5">{item.gri}</div>
-                {attempted && errors[item.key] && (
-                  <div className="text-[11px] text-bad mt-0.5">{errors[item.key]}</div>
-                )}
-              </div>
-              <div className="flex gap-3">
-                {(["yes", "no", "na"] as const).map((v) => (
-                  <button
-                    key={v}
-                    type="button"
-                    onClick={() => {
-                      setResponses((r) => ({ ...r, [item.key]: v }));
-                      setErrors((e) => { const n = { ...e }; delete n[item.key]; return n; });
-                    }}
-                    className={cn(
-                      "w-10 h-10 rounded-lg border text-xs font-bold transition-all",
-                      responses[item.key] === v
-                        ? v === "yes"
-                          ? "bg-good text-white border-good"
-                          : v === "no"
-                            ? "bg-bad text-white border-bad"
-                            : "bg-ink-400 text-white border-ink-400"
-                        : "border-ink-200 bg-white text-ink-500 hover:border-ink-400"
-                    )}
-                  >
-                    {v.toUpperCase()}
-                  </button>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
-          <Field label="Attested by" required error={attempted ? errors["attestedBy"] : undefined}>
-            <input
-              className={cn("input", attempted && errors["attestedBy"] && "border-bad")}
-              value={attestedBy}
-              onChange={(e) => { setAttestedBy(e.target.value); setErrors((e2) => { const n = { ...e2 }; delete n["attestedBy"]; return n; }); }}
-              placeholder="Full name / role"
-            />
-          </Field>
-          <Field label="Attestation date" required error={attempted ? errors["attestedDate"] : undefined}>
-            <input
-              className={cn("input", attempted && errors["attestedDate"] && "border-bad")}
-              type="date"
-              value={attestedDate}
-              onChange={(e) => { setAttestedDate(e.target.value); setErrors((e2) => { const n = { ...e2 }; delete n["attestedDate"]; return n; }); }}
-            />
-          </Field>
-        </div>
-
-        <FileDrop files={files} setFiles={setFiles} />
-
-        <div className="flex justify-end">
-          <button onClick={handleContinue} className="btn-primary">
-            Preview &amp; submit <ArrowRight size={14} />
-          </button>
-        </div>
-      </div>
-    </Card>
-  );
-}
 
 /* =================================================================== */
 /* FormField                                                            */
@@ -1961,12 +1680,6 @@ const MOCK_FIELD_MAPPING: Record<string, { source: string; target: string; notes
     { source: "opera.conferenceGuests",   target: "conferenceGuests" },
     { source: "opera.fbCovers",           target: "fbCovers" },
   ],
-  workday: [
-    { source: "workday.headcount.total",  target: "totalEmployees" },
-    { source: "workday.headcount.fte",    target: "fte" },
-    { source: "workday.training.hours",   target: "totalHours", notes: "Sum of all training events" },
-    { source: "workday.incidents.lti",    target: "value", notes: "LTI count" },
-  ],
 };
 
 const MOCK_SYNC_LOG = [
@@ -1983,7 +1696,6 @@ function ApiWorkflow({ cfg }: { cfg: DataTypeConfig }) {
     if (cfg.key === "energy" || cfg.key === "water") return ["weather", "bms", "accounting"].includes(i.category);
     if (cfg.key === "occupancy") return i.category === "pms";
     if (cfg.key === "procurement" || cfg.key === "travel-commute") return i.category === "accounting";
-    if (cfg.key === "social") return i.category === "hr";
     if (cfg.key === "waste") return ["hauler", "food"].includes(i.category);
     return true;
   });
@@ -2117,7 +1829,6 @@ function SurveyWorkflow({ cfg }: { cfg: DataTypeConfig }) {
             <select className="input">
               <option>Suppliers</option>
               <option>Employees (commute)</option>
-              <option>Employees (general / social)</option>
               <option>Managers</option>
               <option>Guests (opt-in)</option>
             </select>
@@ -2219,10 +1930,6 @@ const AI_QUESTIONS: Record<string, QaPair[]> = {
     { key: "category", question: "Is this business travel or employee commute data?",           chips: ["Business travel (Cat 6)", "Employee commute (Cat 7)", "Both"] },
     { key: "period",   question: "Does Apr 2026 look correct as the report period?",            chips: ["Yes, Apr 2026", "No — different period"] },
   ],
-  social: [
-    { key: "subtype", question: "What kind of social data does this report contain?",           chips: ["Headcount / HR", "Training records", "H&S incidents", "Community engagement"] },
-    { key: "period",  question: "Is Apr 2026 the correct period for this report?",              chips: ["Yes, Apr 2026", "No — different period"] },
-  ],
   generic: [
     { key: "period",  question: "Does the extracted period — Apr 2026 — look correct?",        chips: ["Yes, confirmed", "No — I'll correct it", "Not sure"] },
     { key: "confirm", question: "Should I proceed with these extracted values?",                chips: ["Yes — looks right", "I want to review first"] },
@@ -2271,13 +1978,6 @@ const AI_EXTRACTED: Record<string, AiExtractedField[]> = {
     { key: "period",    label: "Period",      value: "2026-04",                  conf: "high",   reasoning: "Report period stated in header" },
     { key: "distance",  label: "Distance",    value: "24800",                    conf: "low",    reasoning: "Sum of route distances — verify against booking system" },
     { key: "unit",      label: "Unit",        value: "pkm",                      conf: "medium", reasoning: "Passenger-km assumed from person × km data" },
-  ],
-  social: [
-    { key: "subType",   label: "Sub-type",    value: "Headcount snapshot",       conf: "high",   reasoning: "Report title: 'Monthly HR Headcount Report'" },
-    { key: "period",    label: "Period",      value: "2026-04",                  conf: "high",   reasoning: "Report date field" },
-    { key: "value",     label: "Value",       value: "248",                      conf: "high",   reasoning: "Total headcount figure on summary page" },
-    { key: "unit",      label: "Unit",        value: "count",                    conf: "high",   reasoning: "Headcount is a count" },
-    { key: "breakdown", label: "Breakdown",   value: "FTE: 198, PTE: 50",        conf: "medium", reasoning: "Sub-totals found on page 2 — verify against HR system" },
   ],
   generic: [
     { key: "period",      label: "Period",      value: "2026-04",                conf: "high",   reasoning: "Date extracted from document header" },
