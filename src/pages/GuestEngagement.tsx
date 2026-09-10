@@ -278,8 +278,8 @@ function PublicPageTab({ property }: { property: string }) {
           </div>
           <div className="flex items-center gap-2 flex-wrap">
             {status === "draft"    && <button className="btn-primary" onClick={() => setStatus("pending")}><Send size={14} /> Submit for approval</button>}
-            {status === "pending"  && <><button className="btn bg-bad text-white hover:bg-bad-700" onClick={() => setStatus("draft")}>Reject</button><button className="btn-primary" onClick={() => setStatus("live")}><CheckCircle2 size={14} /> Approve &amp; publish</button></>}
-            {status === "live"     && <button className="btn bg-bad text-white hover:bg-bad-700" onClick={() => setStatus("disabled")}><PowerOff size={14} /> Disable</button>}
+            {status === "pending"  && <><button className="btn-secondary text-bad-700 border-bad/30 hover:bg-bad/10" onClick={() => setStatus("draft")}>Reject</button><button className="btn-primary" onClick={() => setStatus("live")}><CheckCircle2 size={14} /> Approve &amp; publish</button></>}
+            {status === "live"     && <button className="btn-secondary text-bad-700 border-bad/30 hover:bg-bad/10" onClick={() => setStatus("disabled")}><PowerOff size={14} /> Disable</button>}
             {status === "disabled" && <button className="btn-primary" onClick={() => setStatus("pending")}>Re-publish</button>}
           </div>
         </div>
@@ -533,7 +533,7 @@ function RenewableClaimsPanel() {
                     : "Sustainability Manager — please approve public visibility. Once approved, this claim will appear on the guest page and in campaign templates."}
                 </div>
                 <button
-                  className="btn bg-bad text-white hover:bg-bad-700 h-8 px-3 text-[12px] shrink-0"
+                  className="btn-secondary text-bad-700 border-bad/30 hover:bg-bad/10 h-8 px-3 text-[12px] shrink-0"
                   onClick={() => reject(claim.id)}
                 >
                   Reject
