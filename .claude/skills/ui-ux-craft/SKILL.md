@@ -10,8 +10,11 @@ Source material: Kole Jain's dashboard/UI series — *Every UI/UX Concept Explai
 feedback & states, micro-interactions, overlays), *EVERYTHING you need to know to build a Dashboard UI*
 (sidebars, main layout, modals/popovers/pages, the core dashboard components, micro-interactions) and
 *The 3 dashboard UI flaws that give away you've never built one* (data drives the UI, progressive
-disclosure, "UI is what you can't see"). The rules below are the standard practice for each of those
-topics, expressed in this repo's tokens. When in doubt, the rule wins over the existing code.
+disclosure, "UI is what you can't see"). Visual target: RonDesignLab's *Sugar CRM SaaS Dashboard*
+(dribbble.com/shots/26629031) — soft layered light surfaces, big radii, pills, geometric sans, one
+accent. User decisions: emerald stays the accent; light sidebar with the existing navigation tree;
+Plus Jakarta Sans. The rules below are the standard practice for each topic, expressed in this
+repo's tokens. When in doubt, the rule wins over the existing code.
 
 ## 1. Data drives the UI
 - Design for real data shapes: long hotel names (`truncate`/`min-w-0`), large numbers
@@ -39,6 +42,8 @@ topics, expressed in this repo's tokens. When in doubt, the rule wins over the e
   `text-ink-400`.
 
 ## 4. Typography
+- Typeface: **Plus Jakarta Sans** (Google Fonts, 400–800; loaded in index.html). Page title 600,
+  numbers 700, body 400/500. Keep `tabular-nums` on any column of figures.
 - Scale: 10 / 11 / 12 / 13 / 14 (sm) / 16 / 20 (xl) / 24 (2xl) / 26 (stat) / 32 (kpi).
   **Nothing below 10px.** Prefer 12–13px for body-in-cards, 11px for micro-labels.
 - Line-height `leading-snug` for multi-line 12px; `leading-none` on big numbers.
@@ -55,11 +60,16 @@ topics, expressed in this repo's tokens. When in doubt, the rule wins over the e
 ## 6. Elevation & shadows
 - `shadow-card` (resting card), `shadow-card-lg` (primary card), `shadow-pop` (menus, popovers,
   hovered cards), `shadow-pop-lg` (modals, drawers). No `shadow-sm/md/lg/xl/2xl`.
-- Borders are hairlines: `border-ink-200/70` on cards, `border-ink-100` between table rows.
+- Surfaces are layered by tone, not lines: page `#ECEEF3` → tinted panel `bg-ink-50` → white card.
+  Cards are **borderless** (`card` = white + `shadow-card`), radius `rounded-xl2` (20px) /
+  `rounded-xl3` (24px). Table rows keep `border-ink-100` hairlines; inputs keep `border-ink-200`.
+- Shapes: chips, badges, tabs and segmented controls are pills (`rounded-full`); buttons and inputs
+  `rounded-xl`; icon-only buttons `rounded-full`.
 
 ## 7. Sidebar & navigation
-- Dark emerald `sidebar-shell`, 252px, icon + label, grouped, one active pill (`nav-item-active`),
-  collapsible to an icon rail. No decorative footer content. Section context lives in the eyebrow.
+- Light `sidebar-shell` (white panel, ink text, hairline right border), 252px, icon + label,
+  grouped, one emerald active pill (`nav-item-active`), collapsible to an icon rail. Brand lockup:
+  emerald icon chip + ink wordmark. No decorative footer content. Section context lives in the eyebrow.
 
 ## 8. Icons & buttons
 - lucide only; 14px inside buttons/chips, 16–18px standalone. `btn` is h-9; compact contexts h-7/h-8.
