@@ -55,8 +55,6 @@ export const CHART_PILLAR = {
   water:      CHART.mauve,
   waste:      CHART.moss,
   carbon:     CHART.cocoa,
-  social:     "#634D48", // mauve ramp 5 — plum
-  governance: "#747771", // sage ramp 4 — stone
 } as const;
 
 /** Threshold / status colouring inside charts (good → warn → bad). */

@@ -50,8 +50,8 @@ const DETAIL_ACTIONS: Record<string, string[]> = {
   ],
   cert: [
     "Upload missing certification evidence for Airport Hotel Dubai",
-    "Schedule Green Globe and Travelife renewals before deadline",
-    "Close governance gaps identified in 3 hotels",
+    "Schedule Green Globe and Green Key renewals before deadline",
+    "Close certification evidence gaps in 3 hotels",
   ],
   data: [
     "Resolve 31 missing data submissions — chase Airport Dubai and Riverside Bangkok",

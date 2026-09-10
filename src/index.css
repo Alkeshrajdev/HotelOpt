@@ -44,8 +44,6 @@
   --pillar-water-hex: #0EA5E9;
   --pillar-waste-hex: #14B8A6;
   --pillar-carbon-hex:#0F766E;
-  --pillar-social-hex:#7C3AED;
-  --pillar-governance-hex:#EA580C;
   --status-good-hex:  #16A34A;
   --status-warn-hex:  #F59E0B;
   --status-bad-hex:   #DC2626;
@@ -69,8 +67,6 @@
   --pillar-water:  14 165 233;   /* #0EA5E9 */
   --pillar-waste:  20 184 166;   /* #14B8A6 */
   --pillar-carbon: 15 118 110;   /* #0F766E */
-  --pillar-social: 124 58 237;   /* #7C3AED */
-  --pillar-gov:    234 88 12;    /* #EA580C */
 }
 
 @layer base {

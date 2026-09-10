@@ -33,7 +33,7 @@ export default function CarbonInventory() {
           onClick={() => setDrill(2)}
         />
         <KpiTile
-          icon={<Cloud size={18} />} iconBg="bg-pillar-social/10 text-pillar-social"
+          icon={<Cloud size={18} />} iconBg="bg-pillar-carbon/10 text-pillar-carbon"
           label="Scope 3 (Cat 1–7)" value="24,853" unit="tCO₂e" delta={-2.2}
           onClick={() => setDrill(3)}
         />

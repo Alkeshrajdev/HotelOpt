@@ -29,8 +29,7 @@ type ProductCategory =
   | "hvac"
   | "lighting"
   | "renewables"
-  | "carbon"
-  | "training";
+  | "carbon";
 
 type ClaimStatus =
   | "verified"       // third-party verified, evidence attached
@@ -92,7 +91,6 @@ const CATEGORIES: { id: ProductCategory | "all"; label: string; icon: React.Elem
   { id: "lighting",   label: "Lighting",        icon: Lightbulb },
   { id: "renewables", label: "Renewables",      icon: Sun },
   { id: "carbon",     label: "Carbon",          icon: Leaf },
-  { id: "training",   label: "Training",        icon: BookOpen },
 ];
 
 const SCOPE_LABELS: Record<ScopeCategory, string> = {
@@ -426,32 +424,6 @@ const PRODUCTS: Product[] = [
     tags: ["carbon offset", "VCS", "REDD+"],
   },
 
-  // Training
-  {
-    id: "p-trn-001",
-    name: "GreenOps Staff Training Suite",
-    supplier: "Greengage Hospitality",
-    supplierCountry: "GB",
-    category: "training",
-    tagline: "Accredited sustainability training for hotel teams",
-    description: "eLearning and in-person sustainability training designed for hotel operations teams. Covers energy, water, waste, supply chain, and guest communication. CPD-accredited. Multilingual (EN/FR/DE/ES/AR). Includes manager train-the-trainer kit.",
-    claimStatus: "certified",
-    certifications: ["CPD Certified", "ISO 14001 aligned"],
-    verificationLevel: 3,
-    impactHighlight: "CPD accredited",
-    impactMetric: "Staff upskilling",
-    scopeCategory: "na",
-    hotelArea: "all",
-    priceRange: "£45–120 / staff / yr",
-    leadTimeDays: 5,
-    moq: "10 licences",
-    documents: [
-      { label: "CPD Accreditation Letter", type: "cert" },
-      { label: "Course Catalogue", type: "datasheet" },
-    ],
-    tags: ["training", "staff", "CPD", "eLearning"],
-    newBadge: true,
-  },
   {
     id: "p-chp-001",
     name: "MicroCHP Hotel Unit",
@@ -522,29 +494,6 @@ const PRODUCTS: Product[] = [
       { label: "LCA Summary", type: "lca" },
     ],
     tags: ["linen", "recycled", "bedding", "GOTS"],
-  },
-  {
-    id: "p-lca-001",
-    name: "EcoFolio LCA Tool",
-    supplier: "PRé Sustainability",
-    supplierCountry: "NL",
-    category: "training",
-    tagline: "Hotel-specific lifecycle assessment platform",
-    description: "SimaPro-based LCA tool pre-loaded with hospitality-specific processes and ecoinvent 3.10 background database. Covers FF&E, F&B, energy, water, and transport. GHG Protocol and EN 15978 compliant output reports.",
-    claimStatus: "self-declared",
-    certifications: ["ISO 14040 aligned"],
-    verificationLevel: 2,
-    impactHighlight: "Hotspot analysis",
-    impactMetric: "Decision support",
-    scopeCategory: "na",
-    hotelArea: "all",
-    priceRange: "£8,000–15,000 / yr licence",
-    leadTimeDays: 10,
-    moq: "1 licence",
-    documents: [
-      { label: "Methodology White Paper", type: "report" },
-    ],
-    tags: ["LCA", "tool", "reporting", "measurement"],
   },
   {
     id: "p-flt-001",

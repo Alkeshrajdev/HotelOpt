@@ -349,8 +349,6 @@ export default function ReviewApproval() {
               { value: "water", label: "Water" },
               { value: "waste", label: "Waste" },
               { value: "carbon", label: "Carbon" },
-              { value: "social", label: "Social" },
-              { value: "governance", label: "Governance" },
             ]} />
             <SelectField label="Input method" value={filters.method} onChange={(v) => setFilters((f) => ({ ...f, method: v as any }))} options={[
               { value: "all", label: "Any" }, { value: "manual", label: "Manual" }, { value: "ocr", label: "OCR" },
@@ -429,11 +427,11 @@ export default function ReviewApproval() {
                       <td className="table-td">{r.period}</td>
                       <td className="table-td"><FlagsCell flags={r.flags} /></td>
                       <td className="table-td">
-                        <div className={cn("font-medium", r.supplierSubmitted && "text-pillar-social")}>
+                        <div className={cn("font-medium", r.supplierSubmitted && "text-info-700")}>
                           {r.submittedBy}
                         </div>
                         {r.supplierSubmitted && (
-                          <div className="text-[11px] text-pillar-social inline-flex items-center gap-1">
+                          <div className="text-[11px] text-info-700 inline-flex items-center gap-1">
                             <Truck size={10} /> Supplier
                           </div>
                         )}
@@ -1048,16 +1046,16 @@ function DetailsTab({
       </ul>
 
       {record.supplierSubmitted && (
-        <div className="rounded-xl border border-pillar-social/25 bg-pillar-social/5 p-3 flex items-start gap-2 text-sm">
-          <Truck size={14} className="text-pillar-social mt-0.5" />
+        <div className="rounded-xl border border-info/25 bg-info/5 p-3 flex items-start gap-2 text-sm">
+          <Truck size={14} className="text-info-700 mt-0.5" />
           <div>
-            <div className="text-pillar-social font-semibold">
+            <div className="text-info-700 font-semibold">
               Supplier submission — {record.supplierName}
             </div>
-            <div className="text-[12px] text-pillar-social">
+            <div className="text-[12px] text-info-700">
               Data submitted via the Supplier Portal. Supplier corrections to previously approved records re-trigger Maker–Checker review.
             </div>
-            <button onClick={onOpenSupplier} className="text-[12px] font-semibold text-pillar-social underline mt-1">
+            <button onClick={onOpenSupplier} className="text-[12px] font-semibold text-info-700 underline mt-1">
               Open supplier profile
             </button>
           </div>
@@ -1385,12 +1383,12 @@ function AiOcrTab({ record }: { record: ReviewRecord }) {
 
   return (
     <div className="space-y-4">
-      {/* Three-column comparison table — GHG Protocol / GRI assurance-ready */}
+      {/* Three-column comparison table — GHG Protocol assurance-ready */}
       {hasOcr && (
         <div>
           <div className="text-sm font-semibold text-ink-900 mb-2">
             OCR extraction decision chain
-            <span className="ml-2 text-[11px] font-normal text-ink-400">GHG Protocol · GRI assurance</span>
+            <span className="ml-2 text-[11px] font-normal text-ink-400">GHG Protocol · assurance-ready</span>
           </div>
           <div className="overflow-x-auto rounded-xl border border-ink-200">
             <table className="min-w-full text-[12px]">
@@ -1725,7 +1723,7 @@ function SupplierProfileDrawer({
           </button>
         </div>
         <div className="p-5 space-y-4">
-          <div className="w-12 h-12 rounded-full bg-pillar-social/10 grid place-items-center text-pillar-social">
+          <div className="w-12 h-12 rounded-full bg-info/10 grid place-items-center text-info-700">
             <Truck size={20} />
           </div>
 
@@ -1739,7 +1737,7 @@ function SupplierProfileDrawer({
             <KV label="Linked record"     value={record.id} />
           </ul>
 
-          <div className="rounded-xl bg-pillar-social/5 border border-pillar-social/20 p-3 text-[12px] text-pillar-social">
+          <div className="rounded-xl bg-info/5 border border-info/20 p-3 text-[12px] text-info-700">
             Supplier data submitted via the Supplier Portal. Corrections to approved records re-trigger the full Maker–Checker review.
           </div>
 

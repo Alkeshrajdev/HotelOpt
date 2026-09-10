@@ -15,7 +15,7 @@
 // never forced into a misleading "0 tCO₂e".
 // ─────────────────────────────────────────────────────────────────────────────
 
-export type Pillar = "energy" | "water" | "waste" | "carbon" | "social" | "governance";
+export type Pillar = "energy" | "water" | "waste" | "carbon";
 
 export type ActionType =
   | "operational-efficiency"
@@ -23,8 +23,6 @@ export type ActionType =
   | "waste"
   | "renewable-procurement"   // market instrument
   | "carbon-offset"           // market instrument
-  | "behaviour-training"
-  | "policy-governance"
   | "smartops-maintenance";
 
 export type Source =
@@ -73,7 +71,7 @@ export type Action = {
 
   // ── Action fields (req. 8) ──
   impact: ImpactMetric[];     // pillar-specific; [0] = headline
-  co2e?: number;              // tCO₂e/yr — omitted for social/governance
+  co2e?: number;              // tCO₂e/yr
   costUsd: number;
   capexClass: Capex;
   paybackYears?: number;      // omitted when not financially framed
@@ -110,8 +108,6 @@ export const ACTION_TYPE_META: Record<ActionType, { label: string; pillar: Pilla
   "operational-efficiency": { label: "Operational efficiency", pillar: "energy",      market: false },
   "water":                  { label: "Water measure",          pillar: "water",       market: false },
   "waste":                  { label: "Waste measure",          pillar: "waste",       market: false },
-  "behaviour-training":     { label: "Behaviour / training",   pillar: "social",      market: false },
-  "policy-governance":      { label: "Policy / governance",    pillar: "governance",  market: false },
   "smartops-maintenance":   { label: "Smart Ops maintenance",  pillar: "energy",      market: false },
   "renewable-procurement":  { label: "Renewable procurement",  pillar: "carbon",      market: true  },
   "carbon-offset":          { label: "Carbon compensation",    pillar: "carbon",      market: true  },
@@ -128,7 +124,7 @@ export const SOURCE_META: Record<Source, { label: string }> = {
 };
 
 export const PILLAR_TONE: Record<Pillar, "good" | "info" | "brand" | "warn" | "neutral"> = {
-  energy: "good", water: "info", waste: "info", carbon: "brand", social: "warn", governance: "neutral",
+  energy: "good", water: "info", waste: "info", carbon: "brand",
 };
 export const PRIORITY_TONE: Record<Priority, "bad" | "warn" | "info" | "neutral"> = {
   critical: "bad", high: "warn", medium: "info", low: "neutral",
@@ -309,50 +305,6 @@ export const ACTIONS: Action[] = [
       { at: "2026-05-28", by: "Performance Engine", action: "Flagged from SBTi shortfall" },
     ],
   },
-  // Behaviour / training · Social (NO tCO₂e headline)
-  {
-    id: "a9", code: "SOC-001", name: "Sustainability training rollout",
-    description: "12-hour online + 4-hour in-person training for all operational staff; supports GRI 404.",
-    actionType: "behaviour-training", pillar: "social", property: "Peaks Resort Zermatt",
-    source: "certification-gap", sourceRef: "GSTC A7 — staff training criterion", triggerLink: "/performance/social/overview",
-    priority: "medium",
-    impact: [
-      { key: "people_trained",  label: "Staff trained",        value: 168, unit: "of 240" },
-      { key: "completion_pct",  label: "Completion",           value: 70, unit: "%" },
-      { key: "criteria",        label: "GRI 404 evidence",     value: 1, unit: "supported" },
-    ],
-    costUsd: 8000, capexClass: "opex", ease: "easy", confidence: 88,
-    owner: "HR Lead", dueDate: "2026-07-31", requiredApproval: "Sustainability Manager",
-    evidenceStatus: "partial", verificationStatus: "monitoring", stage: "in-progress",
-    calculationNote: "168 of 240 staff completed (70%). Supports GSTC A7 + GRI 404-1 disclosure; no direct tCO₂e — behaviour enabler.",
-    approvalLog: [
-      { at: "2026-05-01", by: "Certification Lead", action: "Raised from GSTC gap" },
-      { at: "2026-05-06", by: "Sustainability Manager", action: "Approved" },
-      { at: "2026-05-20", by: "HR Lead", action: "Rollout in progress" },
-    ],
-  },
-  // Policy / governance · Governance (NO tCO₂e headline)
-  {
-    id: "a10", code: "GOV-001", name: "Sustainable procurement policy",
-    description: "Adopt portfolio sustainable-procurement policy with supplier ESG screening thresholds.",
-    actionType: "policy-governance", pillar: "governance", property: "Portfolio",
-    source: "audit", sourceRef: "Internal audit finding AF-2026-03", triggerLink: "/reports",
-    priority: "high",
-    impact: [
-      { key: "policies",  label: "Policies adopted",   value: 1, unit: "of 1" },
-      { key: "criteria",  label: "Criteria supported", value: 3, unit: "GRI/CSRD" },
-    ],
-    costUsd: 0, capexClass: "opex", ease: "moderate", confidence: 90,
-    owner: "Sustainability Manager", dueDate: "2026-05-31", requiredApproval: "Board",
-    evidenceStatus: "complete", verificationStatus: "verified", stage: "completed",
-    calculationNote: "Closes audit finding AF-2026-03; supports GRI 308, CSRD ESRS G1 governance disclosures.",
-    verificationNote: "Policy ratified by board 2026-05-29; published to supplier portal.",
-    approvalLog: [
-      { at: "2026-03-15", by: "Internal Audit", action: "Finding AF-2026-03 raised" },
-      { at: "2026-04-30", by: "Sustainability Manager", action: "Draft policy submitted" },
-      { at: "2026-05-29", by: "Board", action: "Ratified" },
-    ],
-  },
 
   // ── MARKET INSTRUMENTS (separate tab) ──
   {
@@ -505,15 +457,6 @@ export function pillarProgress(): PillarProgress[] {
       case "carbon":
         metrics = [
           { label: "Carbon avoided", value: delivered.reduce((s, a) => s + (a.co2e ?? 0), 0), unit: "tCO₂e" },
-        ]; break;
-      case "social":
-        metrics = [
-          { label: "Staff trained", value: Math.round(sumMetric(active, "people_trained")), unit: "people" },
-          { label: "Completion", value: active.length ? Math.round(sumMetric(active, "completion_pct") / active.length) : 0, unit: "% avg" },
-        ]; break;
-      case "governance":
-        metrics = [
-          { label: "Policies / actions", value: Math.round(sumMetric(active, "policies")), unit: "completed" },
         ]; break;
     }
     return { pillar: p, metrics, delivered: delivered.length, total };

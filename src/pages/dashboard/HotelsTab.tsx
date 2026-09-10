@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { TrendingDown, TrendingUp, ExternalLink, ArrowUpDown } from "lucide-react";
 import Badge from "@/components/ui/Badge";
 import { Card, CardHeader } from "@/components/ui/Card";
-import { PORTFOLIO_HOTELS, PORTFOLIO_GOVERNANCE_BY_HOTEL } from "@/lib/mock";
+import { PORTFOLIO_HOTELS, PORTFOLIO_CERTS_BY_HOTEL } from "@/lib/mock";
 import { cn } from "@/lib/utils";
 
 type Region = "All" | "EMEA" | "APAC" | "Africa";
@@ -22,10 +22,10 @@ const SORT_OPTIONS: { field: SortField; label: string }[] = [
 ];
 
 const CERT_MAP = Object.fromEntries(
-  PORTFOLIO_GOVERNANCE_BY_HOTEL.map((g) => {
+  PORTFOLIO_CERTS_BY_HOTEL.map((g) => {
     const status: "certified" | "in-progress" | "gap" =
       g.certifications.length > 0 ? "certified" :
-      g.attestationsPct >= 60 ? "in-progress" : "gap";
+      g.enrolling ? "in-progress" : "gap";
     return [g.hotel, status];
   })
 );

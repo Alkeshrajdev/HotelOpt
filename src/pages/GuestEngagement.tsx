@@ -323,7 +323,7 @@ function PublicPageTab({ property }: { property: string }) {
               </div>
               <div className="px-4 pb-3 flex flex-wrap gap-2">
                 <Badge tone="brand">Green Globe certified</Badge>
-                <Badge tone="brand">GSTC criteria 78%</Badge>
+                <Badge tone="brand">Green Globe criteria 78%</Badge>
               </div>
               <div className="px-4 pb-3 text-[11px] text-ink-500 inline-flex items-center gap-1">
                 <Lock size={11} /> Provenance signed · last refreshed 2026-04-29
@@ -1277,7 +1277,7 @@ function OverviewTab({ property, onJump }: { property: string; onJump: (t: Tab) 
           </div>
         </div>
         <div className="px-5 pb-4 text-[11px] text-ink-400 flex items-center gap-1.5">
-          <Users size={11} /> Aggregated from anonymised guest eco-actions · use in marketing and ESG reporting with the "Share impact" pack.
+          <Users size={11} /> Aggregated from anonymised guest eco-actions · use in marketing and sustainability reporting with the "Share impact" pack.
         </div>
       </Card>
 

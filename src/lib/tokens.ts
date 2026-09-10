@@ -37,8 +37,6 @@ export const tokens = {
     water:      "#0EA5E9", // blue
     waste:      "#14B8A6", // teal
     carbon:     "#0F766E", // deep teal
-    social:     "#7C3AED", // purple
-    governance: "#EA580C", // orange
   },
 
   /** Status semantics — never overridden. */

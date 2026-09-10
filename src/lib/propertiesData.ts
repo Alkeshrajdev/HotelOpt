@@ -26,13 +26,10 @@ export type Meter = {
 };
 
 export type CertificationProgramme =
-  | "GSTC"
-  | "HSB"
+  | "GHG"
   | "GREEN-KEY"
   | "GREEN-GLOBE"
-  | "LEED-OM"
-  | "TRAVELIFE"
-  | "EU-ECO";
+  | "LEED-OM";
 
 export type RichProperty = {
   // Identity
@@ -187,7 +184,7 @@ const BASE_PROPERTIES: BaseProperty[] = [
     baselineYear: 2022,
     reportingYear: 2025,
     enabledPillars: ["energy", "water", "waste", "carbon"],
-    certifications: ["GSTC", "GREEN-GLOBE", "TRAVELIFE"],
+    certifications: ["GHG", "GREEN-GLOBE", "GREEN-KEY"],
     poolEligible: true,
     status: "active",
     score: 78,
@@ -259,7 +256,7 @@ const BASE_PROPERTIES: BaseProperty[] = [
     baselineYear: 2022,
     reportingYear: 2025,
     enabledPillars: ["energy", "water", "waste", "carbon"],
-    certifications: ["GSTC", "EU-ECO"],
+    certifications: ["GHG", "GREEN-GLOBE"],
     poolEligible: true,
     status: "active",
     score: 85,
@@ -295,7 +292,7 @@ const BASE_PROPERTIES: BaseProperty[] = [
     baselineYear: 2022,
     reportingYear: 2025,
     enabledPillars: ["energy", "water", "waste", "carbon"],
-    certifications: ["GREEN-KEY", "TRAVELIFE"],
+    certifications: ["GREEN-KEY"],
     poolEligible: true,
     status: "active",
     score: 84,
@@ -331,7 +328,7 @@ const BASE_PROPERTIES: BaseProperty[] = [
     baselineYear: 2022,
     reportingYear: 2025,
     enabledPillars: ["energy", "water", "waste", "carbon"],
-    certifications: ["GSTC", "GREEN-GLOBE"],
+    certifications: ["GHG", "GREEN-GLOBE"],
     poolEligible: true,
     status: "active",
     score: 66,
@@ -367,7 +364,7 @@ const BASE_PROPERTIES: BaseProperty[] = [
     baselineYear: 2024,
     reportingYear: 2025,
     enabledPillars: ["energy", "water", "waste", "carbon"],
-    certifications: ["HSB"],
+    certifications: ["GHG"],
     poolEligible: false,
     poolReason: "Onboarding — under 12 months of approved data",
     status: "onboarding",
@@ -404,7 +401,7 @@ const BASE_PROPERTIES: BaseProperty[] = [
     baselineYear: 2022,
     reportingYear: 2025,
     enabledPillars: ["energy", "water", "waste", "carbon"],
-    certifications: ["TRAVELIFE"],
+    certifications: ["GREEN-KEY"],
     poolEligible: true,
     status: "active",
     score: 80,
@@ -440,7 +437,7 @@ const BASE_PROPERTIES: BaseProperty[] = [
     baselineYear: 2024,
     reportingYear: 2025,
     enabledPillars: ["energy", "water", "waste", "carbon"],
-    certifications: ["HSB"],
+    certifications: ["GHG"],
     poolEligible: false,
     poolReason: "Onboarding — under 12 months of approved data",
     status: "onboarding",
@@ -477,7 +474,7 @@ const BASE_PROPERTIES: BaseProperty[] = [
     baselineYear: 2022,
     reportingYear: 2025,
     enabledPillars: ["energy", "water", "waste", "carbon"],
-    certifications: ["GSTC"],
+    certifications: ["GHG"],
     poolEligible: true,
     status: "active",
     score: 78,
@@ -634,24 +631,23 @@ export function getAssignedUsers(propertyId: string): AssignedUser[] {
 
 export const PROPERTY_CERT_READINESS: Record<string, Partial<Record<CertificationProgramme, CertReadiness>>> = {
   "p-001": {
-    "GSTC":        { readinessPct: 82, readyCriteria: 31, totalCriteria: 38, gapCount: 7,  missingEvidence: 4, owner: "F. Setiawan", dueDate: "2026-06-30" },
+    "GHG":        { readinessPct: 82, readyCriteria: 6, totalCriteria: 8, gapCount: 2, missingEvidence: 1, owner: "F. Setiawan", dueDate: "2026-06-30" },
     "GREEN-GLOBE": { readinessPct: 78, readyCriteria: 34, totalCriteria: 44, gapCount: 10, missingEvidence: 6, owner: "F. Setiawan", dueDate: "2026-08-15" },
-    "TRAVELIFE":   { readinessPct: 91, readyCriteria: 148, totalCriteria: 163, gapCount: 15, missingEvidence: 8, owner: "F. Setiawan", dueDate: "2026-09-01" },
+    "GREEN-KEY":   { readinessPct: 91, readyCriteria: 41, totalCriteria: 45, gapCount: 4, missingEvidence: 3, owner: "F. Setiawan", dueDate: "2026-09-01" },
   },
   "p-002": {
     "GREEN-KEY": { readinessPct: 74, readyCriteria: 33, totalCriteria: 45, gapCount: 12, missingEvidence: 5, owner: "Demo Maker", dueDate: "2026-07-20" },
     "LEED-OM":   { readinessPct: 68, readyCriteria: 34, totalCriteria: 50, gapCount: 16, missingEvidence: 9, owner: "Demo Maker", dueDate: "2026-10-01" },
   },
   "p-003": {
-    "GSTC":   { readinessPct: 89, readyCriteria: 34, totalCriteria: 38, gapCount: 4, missingEvidence: 2, owner: "Demo Checker", dueDate: "2026-05-30" },
-    "EU-ECO": { readinessPct: 72, readyCriteria: 48, totalCriteria: 67, gapCount: 19, missingEvidence: 11, owner: "Demo Checker", dueDate: "2026-09-15" },
+    "GHG":   { readinessPct: 89, readyCriteria: 7, totalCriteria: 8, gapCount: 1, missingEvidence: 1, owner: "Demo Checker", dueDate: "2026-05-30" },
+    "GREEN-GLOBE": { readinessPct: 72, readyCriteria: 32, totalCriteria: 44, gapCount: 12, missingEvidence: 7, owner: "Demo Checker", dueDate: "2026-09-15" },
   },
   "p-004": {
     "GREEN-KEY": { readinessPct: 80, readyCriteria: 36, totalCriteria: 45, gapCount: 9, missingEvidence: 3, owner: "Demo Maker", dueDate: "2026-06-15" },
-    "TRAVELIFE": { readinessPct: 77, readyCriteria: 125, totalCriteria: 163, gapCount: 38, missingEvidence: 14, owner: "Demo Maker", dueDate: "2026-11-01" },
   },
   "p-005": {
-    "GSTC":        { readinessPct: 71, readyCriteria: 27, totalCriteria: 38, gapCount: 11, missingEvidence: 7, owner: "Demo Maker", dueDate: "2026-07-01" },
+    "GHG":        { readinessPct: 71, readyCriteria: 6, totalCriteria: 8, gapCount: 2, missingEvidence: 2, owner: "Demo Maker", dueDate: "2026-07-01" },
     "GREEN-GLOBE": { readinessPct: 65, readyCriteria: 29, totalCriteria: 44, gapCount: 15, missingEvidence: 9, owner: "Demo Maker", dueDate: "2026-08-30" },
   },
 };
@@ -771,11 +767,8 @@ export const LAUNDRY_TYPES: { key: LaundryType; label: string }[] = [
   { key: "hybrid",      label: "Hybrid" },
 ];
 export const CERTIFICATIONS: { key: CertificationProgramme; label: string }[] = [
-  { key: "GSTC",        label: "GSTC" },
-  { key: "HSB",         label: "Hotel Sustainability Basics" },
+  { key: "GHG",         label: "GHG Inventory (verified)" },
   { key: "GREEN-KEY",   label: "Green Key" },
   { key: "GREEN-GLOBE", label: "Green Globe" },
   { key: "LEED-OM",     label: "LEED O+M" },
-  { key: "TRAVELIFE",   label: "Travelife" },
-  { key: "EU-ECO",      label: "EU Ecolabel" },
 ];

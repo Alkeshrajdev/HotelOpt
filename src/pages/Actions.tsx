@@ -15,7 +15,6 @@ import {
   Droplet,
   FileCheck2,
   FileText,
-  GraduationCap,
   Layers,
   Leaf,
   Lightbulb,
@@ -76,8 +75,6 @@ const TYPE_ICON: Record<ActionType, any> = {
   waste: Recycle,
   "renewable-procurement": Sun,
   "carbon-offset": Leaf,
-  "behaviour-training": GraduationCap,
-  "policy-governance": ScrollText,
   "smartops-maintenance": Wrench,
 };
 const SOURCE_ICON: Record<Source, any> = {

@@ -22,13 +22,9 @@ type Step = 1 | 2 | 3 | 4 | 5;
 type Format = "pdf" | "pptx" | "xlsx" | "docx";
 
 const FRAMEWORKS = [
-  { value: "gri",       label: "GRI Standards (2021)",            tone: "good"  as const },
   { value: "ghg",       label: "GHG Protocol (Corporate)",        tone: "good"  as const },
   { value: "sbti",      label: "SBTi Corporate Net-Zero",         tone: "warn"  as const },
   { value: "hcmi",      label: "HCMI v1.2 (per-stay)",            tone: "good"  as const },
-  { value: "csrd",      label: "CSRD / ESRS draft support",       tone: "warn"  as const },
-  { value: "gresb",     label: "GRESB 2024",                       tone: "good"  as const },
-  { value: "cdp",       label: "CDP Climate / Water",              tone: "warn"  as const },
   { value: "internal",  label: "Internal management report",       tone: "info"  as const },
   { value: "cert",      label: "Certification dossier",            tone: "info"  as const },
 ];
@@ -57,7 +53,7 @@ type Form = {
   recipients: string;
 };
 
-const ALL_PILLARS = ["energy", "water", "waste", "carbon", "social", "governance"] as const;
+const ALL_PILLARS = ["energy", "water", "waste", "carbon"] as const;
 
 const SECTION_SKELETONS: Record<string, { title: string; pages: string; note?: string }[]> = {
   executive: [
@@ -72,8 +68,6 @@ const SECTION_SKELETONS: Record<string, { title: string; pages: string; note?: s
     { title: "Water consumption",            pages: "3–4" },
     { title: "Waste & recycling",            pages: "3–4" },
     { title: "Carbon inventory",             pages: "5–7" },
-    { title: "Social metrics",               pages: "3–4" },
-    { title: "Governance attestations",      pages: "2–3" },
     { title: "Anomaly log & actions",        pages: "3–5" },
   ],
   audit: [
@@ -104,7 +98,7 @@ const INITIAL: Form = {
   scope: "portfolio",
   property: "",
   period: "May 2025 — Apr 2026",
-  pillars: ["energy", "water", "waste", "carbon", "social", "governance"],
+  pillars: ["energy", "water", "waste", "carbon"],
   framework: "ghg",
   template: "executive",
   tone: "formal",
@@ -140,8 +134,6 @@ export default function GenerateReportModal({
       water:     { records: 178, missing: 4,  approved: 84 },
       waste:     { records: 296, missing: 7,  approved: 71 },
       carbon:    { records: 142, missing: 0,  approved: 92 },
-      social:    { records:  84, missing: 1,  approved: 88 },
-      governance:{ records:  48, missing: 0,  approved: 96 },
     };
   }, []);
 
@@ -156,7 +148,7 @@ export default function GenerateReportModal({
         onClose();
       }}
       title="Generate report"
-      subtitle="Reports map approved data to the framework's disclosure points and produce a draft response. Sustainability managers review and finalise."
+      subtitle="Reports map approved data to the framework's reporting points and produce a draft response. Sustainability managers review and finalise."
       size="xl"
       tabs={
         <div className="flex flex-wrap items-center gap-1">
@@ -291,7 +283,7 @@ export default function GenerateReportModal({
       )}
 
       {step === 3 && (
-        <Section title="Framework & template" hint="Mapping engine generates a draft aligned to the chosen disclosure framework.">
+        <Section title="Framework & template" hint="Mapping engine generates a draft aligned to the chosen framework.">
           <div className="grid grid-cols-2 gap-3">
             <div>
               <div className="text-[12px] font-medium text-ink-600 mb-2">Framework</div>

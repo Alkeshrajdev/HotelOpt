@@ -61,11 +61,11 @@ type SupplierExt = {
 };
 
 const SUPPLIER_EXT: Record<string, SupplierExt> = {
-  "S-201": { id: "S-201", efStatus: "submitted", dataFreshness: "2026-04-22", linkedRecords: 38, contact: "Marco Rossi", email: "esg@aurora-linens.eu", product: "Linen laundry — standard", efValue: "0.92", efUnit: "kgCO₂e/kg", efMethodology: "Tier 1 — supplier-specific", certificate: "ISO 14001 · EU Ecolabel", reusePermission: true },
+  "S-201": { id: "S-201", efStatus: "submitted", dataFreshness: "2026-04-22", linkedRecords: 38, contact: "Marco Rossi", email: "sustainability@aurora-linens.eu", product: "Linen laundry — standard", efValue: "0.92", efUnit: "kgCO₂e/kg", efMethodology: "Tier 1 — supplier-specific", certificate: "ISO 14001 · EU Ecolabel", reusePermission: true },
   "S-202": { id: "S-202", efStatus: "overdue",   dataFreshness: "2025-11-30", linkedRecords: 12, contact: "Ana García",  email: "sustainability@freshleaf.es", product: "Fresh produce — apples", efValue: "1.80", efUnit: "kgCO₂e/kg", efMethodology: "Tier 2 — database proxy", certificate: "GlobalG.A.P.", reusePermission: false },
-  "S-203": { id: "S-203", efStatus: "submitted", dataFreshness: "2026-03-01", linkedRecords: 7,  contact: "Ji-ho Kim",   email: "esg@koreatextile.kr", product: "Uniforms — cotton blend", efValue: "3.20", efUnit: "kgCO₂e/kg", efMethodology: "Tier 1 — supplier-specific", certificate: "OEKO-TEX · Fair Wear", reusePermission: true },
+  "S-203": { id: "S-203", efStatus: "submitted", dataFreshness: "2026-03-01", linkedRecords: 7,  contact: "Ji-ho Kim",   email: "sustainability@koreatextile.kr", product: "Uniforms — cotton blend", efValue: "3.20", efUnit: "kgCO₂e/kg", efMethodology: "Tier 1 — supplier-specific", certificate: "OEKO-TEX · Fair Wear", reusePermission: true },
   "S-204": { id: "S-204", efStatus: "pending",   dataFreshness: "2026-01-15", linkedRecords: 21, contact: "Lena Berg",   email: "csr@nordicfresh.se", product: "Breakfast ingredients", efValue: "—",    efUnit: "—",           efMethodology: "Pending submission", certificate: "Organic cert EU", reusePermission: false },
-  "S-205": { id: "S-205", efStatus: "submitted", dataFreshness: "2026-04-10", linkedRecords: 4,  contact: "Sara Yıldız", email: "esg@azureclean.tr", product: "Cleaning chemicals",    efValue: "0.14", efUnit: "kgCO₂e/L", efMethodology: "Tier 1 — supplier-specific", certificate: "Ecolabel · ISO 14001", reusePermission: true },
+  "S-205": { id: "S-205", efStatus: "submitted", dataFreshness: "2026-04-10", linkedRecords: 4,  contact: "Sara Yıldız", email: "sustainability@azureclean.tr", product: "Cleaning chemicals",    efValue: "0.14", efUnit: "kgCO₂e/L", efMethodology: "Tier 1 — supplier-specific", certificate: "Ecolabel · ISO 14001", reusePermission: true },
 };
 
 const EF_STATUS_TONE: Record<EFStatus, "good" | "warn" | "bad"> = {
@@ -513,7 +513,6 @@ function DataRequestModal({
                 <option>Volume reconciliation</option>
                 <option>Certificate renewal</option>
                 <option>Modern slavery statement</option>
-                <option>Social audit results</option>
               </select>
             </label>
             <label className="block">
@@ -564,10 +563,8 @@ const DATA_CATEGORIES = [
   "Scope 3 Cat 1 — purchased goods",
   "Scope 3 Cat 4 — upstream transport",
   "Scope 3 Cat 6 — business travel",
-  "Certificates & attestations",
+  "Certificates",
   "Volume reconciliation",
-  "Social audit data",
-  "Modern slavery statement",
 ];
 
 function InviteSupplierModal({ open, onClose }: { open: boolean; onClose: () => void }) {
@@ -677,7 +674,7 @@ function InviteSupplierModal({ open, onClose }: { open: boolean; onClose: () => 
           </div>
           <label className="block">
             <span className="text-[12px] font-medium text-ink-600">Email <span className="text-bad">*</span></span>
-            <input className="input mt-1" type="email" placeholder="esg@supplier.com" value={form.email} onChange={(e) => set("email", e.target.value)} />
+            <input className="input mt-1" type="email" placeholder="sustainability@supplier.com" value={form.email} onChange={(e) => set("email", e.target.value)} />
           </label>
         </div>
       ) : step === 2 ? (
@@ -770,7 +767,7 @@ function SupplierView() {
             <ProfileRow label="Country"              value="Italy" />
             <ProfileRow label="Primary category"     value="Linen / Laundry services" />
             <ProfileRow label="Tax ID"               value="IT-09887112" sensitive />
-            <ProfileRow label="ESG contact"          value="esg@aurora-linens.eu" />
+            <ProfileRow label="Sustainability contact"          value="sustainability@aurora-linens.eu" />
             <ProfileRow label="Profile completeness" value="92%" />
           </ul>
         </Card>
@@ -806,24 +803,12 @@ function SupplierView() {
       </Card>
 
       <div className="grid grid-cols-12 gap-4">
-        <Card className="col-span-12 lg:col-span-6">
+        <Card className="col-span-12">
           <CardHeader title="Certifications" hint="Visible to every client that subscribes to your products" right={<button className="btn-secondary"><Upload size={14} /> Upload</button>} />
           <ul className="p-5 space-y-2 text-sm">
             <CertRow name="ISO 14001 — environmental management" expires="2027-03-12" status="ready" />
             <CertRow name="EU Ecolabel — laundry detergents"     expires="2026-08-30" status="ready" />
-            <CertRow name="Fair Wear Foundation membership"      expires="2026-12-01" status="ready" />
             <CertRow name="ISO 50001 — energy management"        expires="2026-05-20" status="warn" hint="Expiring in 18 days" />
-          </ul>
-        </Card>
-        <Card className="col-span-12 lg:col-span-6">
-          <CardHeader title="Code-of-conduct attestations" hint="Required for GRI 414 (supplier social assessment)" />
-          <ul className="p-5 space-y-2 text-sm">
-            <AttRow label="Supplier code of conduct"    signed="2026-04-02" />
-            <AttRow label="Modern slavery statement"    signed="2026-03-30" />
-            <AttRow label="Anti-bribery declaration"    signed="2026-02-15" />
-            <AttRow label="Data privacy attestation"    signed="2026-04-22" />
-            <AttRow label="GRI 414 social assessment"   signed="2026-03-12" />
-            <AttRow label="Conflict-mineral declaration" signed="—" missing />
           </ul>
         </Card>
       </div>
@@ -918,22 +903,6 @@ function CertRow({ name, expires, status, hint }: { name: string; expires: strin
         <div className="text-[11px] text-ink-500">Expires {expires} {hint && `· ${hint}`}</div>
       </div>
       <Badge tone={status === "ready" ? "good" : "warn"}>{status === "ready" ? "Current" : "Expiring soon"}</Badge>
-    </li>
-  );
-}
-
-function AttRow({ label, signed, missing }: { label: string; signed: string; missing?: boolean }) {
-  return (
-    <li className="flex items-center justify-between gap-3 rounded-xl border border-ink-200 p-3">
-      <div className="flex items-center gap-2">
-        <FileText size={13} className={missing ? "text-bad" : "text-brand-700"} />
-        <div className="font-medium text-ink-900">{label}</div>
-      </div>
-      <div className="flex items-center gap-2">
-        <span className="text-[11px] text-ink-500">{missing ? "Not signed" : `Signed ${signed}`}</span>
-        {missing ? <button className="btn-secondary h-7 px-2 text-[12px]"><Upload size={12} /> Sign</button>
-          : <Badge tone="good"><CheckCircle2 size={11} /> Filed</Badge>}
-      </div>
     </li>
   );
 }

@@ -64,7 +64,7 @@ export default function DataQuality({ pillar }: { pillar: PillarKey }) {
 
       <div className="grid grid-cols-12 gap-4">
         <Card className="col-span-12 lg:col-span-7">
-          <CardHeader title={`${PILLAR_LABEL[pillar]} data quality`} hint="GHG Protocol / GRI / certification expectations" />
+          <CardHeader title={`${PILLAR_LABEL[pillar]} data quality`} hint="GHG Protocol / certification expectations" />
           <div className="p-6">
             <HBar
               data={[

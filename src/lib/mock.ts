@@ -19,8 +19,6 @@ export const PILLAR_SCORES = [
   { pillar: "Water",      score: 69, color: CHART_PILLAR.water },
   { pillar: "Waste",      score: 78, color: CHART_PILLAR.waste },
   { pillar: "Carbon",     score: 76, color: CHART_PILLAR.carbon },
-  { pillar: "Social",     score: 74, color: CHART_PILLAR.social },
-  { pillar: "Governance", score: 81, color: CHART_PILLAR.governance },
 ];
 
 export const MONTHLY_INTENSITY = [
@@ -65,7 +63,7 @@ export const ACTION_CENTRE = [
 export const RECOMMENDED_MEASURES = [
   { measure: "LED retrofit",           impact: "Medium",       cost: "AED 120k",  priority: "High", rationale: "Back-of-house lighting is 18% of total energy — LED swap pays back in 1.8 yrs and improves GP by est. 2.4%." },
   { measure: "Insulation & recovery",  impact: "High",         cost: "AED 250k",  priority: "High", rationale: "Heat recovery on laundry exhaust reduces energy per ORN by est. 4.2% and supports SBTi trajectory." },
-  { measure: "Food waste segregation", impact: "Medium",       cost: "Low",       priority: "High", rationale: "3 properties missing segregation data — resolving unlocks GSTC Criterion D3 and reduces waste score gap." },
+  { measure: "Food waste segregation", impact: "Medium",       cost: "Low",       priority: "High", rationale: "3 properties missing segregation data — resolving unlocks Green Globe D3 and reduces the waste score gap." },
   { measure: "Supplier EF alignment",  impact: "Data quality", cost: "Low",       priority: "High", rationale: "18 high-impact suppliers still on default EFs; switching raises Scope 3 accuracy by ~12% and GP reliability." },
 ];
 
@@ -77,12 +75,12 @@ export const APPROVAL_STATUS = [
 ];
 
 export const REVIEW_BREAKDOWN = [
-  { name: "Green Hotel", value: 82 },
+  { name: "GHG Inventory", value: 88 },
+  { name: "Green Key", value: 82 },
   { name: "Green Globe", value: 74 },
-  { name: "EarthCheck", value: 65 },
-  { name: "Travelife", value: 75 },
-  { name: "Hotel Sustainability Basics", value: 59 },
+  { name: "LEED O+M", value: 65 },
 ];
+
 
 export const SUPPLIER_DATA_STATUS = [
   { label: "Suppliers invited", value: 120 },
@@ -171,14 +169,12 @@ export const REVIEW_QUEUE = [
 ];
 
 export const CERTIFICATIONS = [
-  { code: "GSTC", name: "Global Sustainable Tourism Council", criteria: 38, ready: 22, partial: 10, gap: 6 },
-  { code: "HSB", name: "Hotel Sustainability Basics (WTTC)", criteria: 12, ready: 11, partial: 1, gap: 0 },
+  { code: "GHG", name: "GHG Inventory (verified)", criteria: 8, ready: 6, partial: 2, gap: 0 },
   { code: "GREEN-KEY", name: "Green Key", criteria: 45, ready: 28, partial: 12, gap: 5 },
   { code: "GREEN-GLOBE", name: "Green Globe", criteria: 44, ready: 30, partial: 8, gap: 6 },
   { code: "LEED-OM", name: "LEED O+M", criteria: 50, ready: 26, partial: 14, gap: 10 },
-  { code: "TRAVELIFE", name: "Travelife", criteria: 163, ready: 92, partial: 41, gap: 30 },
-  { code: "EU-ECO", name: "EU Ecolabel", criteria: 67, ready: 38, partial: 18, gap: 11 },
 ];
+
 
 export const SUPPLIERS = [
   { id: "S-201", name: "Aurora Linens Co.", category: "Linen / Laundry", country: "Italy", attestations: 5, response: 92, lastUpdate: "2024-04-22" },
@@ -198,21 +194,18 @@ export const MEASURES = [
 ];
 
 export const REPORTS = [
-  { framework: "GRI Standards", version: "2021", status: "Mapped", coverage: 86 },
   { framework: "GHG Protocol", version: "Corporate Standard", status: "Mapped", coverage: 92 },
   { framework: "SBTi", version: "Corporate Net-Zero", status: "Draft", coverage: 71 },
   { framework: "HCMI", version: "v1.2", status: "Mapped", coverage: 88 },
   { framework: "Green Globe", version: "2024", status: "Mapped", coverage: 78 },
-  { framework: "CSRD / ESRS", version: "ESRS E1–S4", status: "Draft support", coverage: 64 },
-  { framework: "GRESB", version: "2024 Real Estate", status: "Mapped", coverage: 81 },
-  { framework: "CDP", version: "Climate / Water", status: "Draft", coverage: 73 },
+  { framework: "LEED O+M", version: "v4.1", status: "Mapped", coverage: 72 },
+  { framework: "Green Key", version: "2025", status: "Mapped", coverage: 81 },
 ];
 
+
 export const RECENT_REPORTS = [
-  { name: "GRESB submission package — Q1 2024", type: "PDF + Excel", owner: "Corporate Sustainability", date: "2024-04-25" },
-  { name: "CSRD ESRS E1 draft", type: "Word", owner: "Corporate Sustainability", date: "2024-04-21" },
   { name: "GHG Protocol inventory — Skyline Dubai", type: "PDF", owner: "Property SM", date: "2024-04-19" },
-  { name: "GSTC readiness dossier — Peaks Resort Zermatt", type: "PDF", owner: "Property SM", date: "2024-04-18" },
+  { name: "Green Key readiness dossier — Peaks Resort Zermatt", type: "PDF", owner: "Property SM", date: "2024-04-18" },
 ];
 
 export const GUEST_PAGE_METRICS = [
@@ -226,7 +219,7 @@ export const KNOWLEDGE_TOPICS = [
   { topic: "How GP normalises occupancy", category: "Genuine Performance" },
   { topic: "Reading your CDD/HDD adjustment", category: "Genuine Performance" },
   { topic: "GHG Protocol Scope 3 Cat 1 vs Cat 4", category: "Carbon" },
-  { topic: "GSTC Criterion B6 — local sourcing evidence", category: "Certifications" },
+  { topic: "Green Globe D4 — GHG emissions evidence", category: "Certifications" },
   { topic: "Setting an SBTi-aligned carbon target", category: "Targets" },
   { topic: "Supplier portal onboarding script", category: "Supplier" },
 ];
@@ -277,13 +270,11 @@ export const CERTIFICATIONS_OVERVIEW = {
 
 // ── Dashboard tab data ────────────────────────────────────────────────────────
 
-export const ESG_TOTALS = {
+export const PORTFOLIO_TOTALS = {
   carbon:     { total: 42850,   displayTotal: "42,850",  unit: "tCO₂e",    delta: -4.2,  scope1: 12400, scope2: 18200, scope3: 12250, intensity: 2.9,  intensityUnit: "kgCO₂e / room night" },
   energy:     { total: 84200,   displayTotal: "84.2",    unit: "GWh",      delta: -6.1,  intensity: 20.6, intensityUnit: "kWh / room night",   renewablePct: 28 },
   water:      { total: 1250000, displayTotal: "1.25M",   unit: "m³",       delta: -3.8,  intensity: 342,  intensityUnit: "L / guest night",     recycledPct: 12 },
   waste:      { total: 8420,    displayTotal: "8,420",   unit: "tonnes",   delta:  1.4,  diversionPct: 42, foodWastePerCover: 82 },
-  social:     { trainingHoursPerFTE: 24, ltifr: 0.82, turnoverPct: 18, localSourcingPct: 34 },
-  governance: { attestationsPct: 81, supplierCodeAdoption: 74, openGaps: 34 },
 };
 
 // baseVal / baseLabel = the start of the journey; higherIsBetter flips the
@@ -294,7 +285,7 @@ export const PORTFOLIO_TARGETS = [
   { key: "energy", label: "Energy Target",       area: "Energy",     icon: "zap",    currentLabel: "18.4 kWh/RN",  currentVal: 18.4, targetVal: 16.5, baseVal: 22.5, baseLabel: "22.5 kWh/RN", higherIsBetter: false, unit: "kWh/RN", baseYear: 2022, targetYear: 2025, gap: "1.9 kWh above target", status: "warn" as const, hotelCount: 5,  hotelsNote: "5 hotels above intensity target",   owner: "Sarah Chen"      },
   { key: "water",  label: "Water Target",        area: "Water",      icon: "droplet",currentLabel: "342 L/GN",      currentVal: 342, targetVal: 310, baseVal: 374,  baseLabel: "374 L/GN",    higherIsBetter: false, unit: "L/GN", baseYear: 2022, targetYear: 2025, gap: "32 L above target",  status: "warn" as const, hotelCount: 7,  hotelsNote: "7 hotels above intensity target",   owner: "Jin Park"        },
   { key: "waste",  label: "Waste Diversion",     area: "Waste",      icon: "recycle",currentLabel: "42% diversion", currentVal: 42, targetVal: 60,  baseVal: 24,   baseLabel: "24% diversion", higherIsBetter: true,  unit: "%",      baseYear: 2022, targetYear: 2025, gap: "18 pp below target",   status: "bad"  as const, hotelCount: 9,  hotelsNote: "9 hotels below diversion target",   owner: "Marco Rossi"     },
-  { key: "cert",   label: "Certification Target",area: "Governance", icon: "award",  currentLabel: "6 of 8 active", currentVal: 75, targetVal: 100, baseVal: 50,   baseLabel: "50% certified", higherIsBetter: true,  unit: "%",      baseYear: 2023, targetYear: 2025, gap: "2 hotels uncertified",status: "warn" as const, hotelCount: 2,  hotelsNote: "2 hotels without current cert",     owner: "Layla Al-Hassan" },
+  { key: "cert",   label: "Certification Target",area: "Certifications", icon: "award",  currentLabel: "3 of 4 active", currentVal: 75, targetVal: 100, baseVal: 50,   baseLabel: "50% certified", higherIsBetter: true,  unit: "%",      baseYear: 2023, targetYear: 2025, gap: "2 hotels uncertified",status: "warn" as const, hotelCount: 2,  hotelsNote: "2 hotels without current cert",     owner: "Layla Al-Hassan" },
   { key: "data",   label: "Data Approval Target",area: "Data",       icon: "shield", currentLabel: "86% approved",  currentVal: 86, targetVal: 95,  baseVal: 77,   baseLabel: "77% approved",  higherIsBetter: true,  unit: "%",      baseYear: 2024, targetYear: 2025, gap: "9 pp below target",    status: "warn" as const, hotelCount: 4,  hotelsNote: "4 hotels with approval <80%",       owner: "Sarah Chen"      },
 ];
 
@@ -319,11 +310,10 @@ export const PORTFOLIO_ACTIONS = [
   { id:"A-005", action:"Food waste segregation",            hotel:"The Pavilion London",         area:"Waste",      status:"in-progress", owner:"Sarah Chen",     due:"2025-06-01", capex:"AED 12k",  expected:"AED 6k/yr",   verified:"AED 4k/yr"},
   { id:"A-006", action:"On-site solar PV — phase 2",        hotel:"Oceanfront Cape Town",        area:"Carbon",     status:"proposed",    owner:"Thabo Nkosi",    due:"2025-12-31", capex:"AED 480k", expected:"AED 95k/yr",  verified:"—"        },
   { id:"A-007", action:"Supplier EF alignment — Scope 3",   hotel:"Portfolio",                   area:"Carbon",     status:"overdue",     owner:"Sarah Chen",     due:"2025-04-30", capex:"—",        expected:"—",           verified:"—"        },
-  { id:"A-008", action:"Certification evidence upload",     hotel:"Airport Hotel Dubai",         area:"Governance", status:"overdue",     owner:"Layla Al-Hassan", due:"2025-05-01", capex:"—",        expected:"—",           verified:"—"        },
+  { id:"A-008", action:"Certification evidence upload",     hotel:"Airport Hotel Dubai",         area:"Carbon"    , status:"overdue",     owner:"Layla Al-Hassan", due:"2025-05-01", capex:"—",        expected:"—",           verified:"—"        },
   { id:"A-009", action:"Heat recovery on chillers",         hotel:"Bay View Singapore",          area:"Energy",     status:"proposed",    owner:"Jin Park",       due:"2025-10-31", capex:"AED 250k", expected:"AED 58k/yr",  verified:"—"        },
-  { id:"A-010", action:"Staff sustainability training",     hotel:"Riverside Bangkok",           area:"Social",     status:"in-progress", owner:"Sarah Chen",     due:"2025-06-30", capex:"AED 8k",   expected:"—",           verified:"—"        },
   { id:"A-011", action:"Scope 3 travel data collection",    hotel:"Portfolio",                   area:"Carbon",     status:"overdue",     owner:"Sophie Müller",  due:"2025-05-15", capex:"—",        expected:"—",           verified:"—"        },
-  { id:"A-012", action:"Green Key renewal documentation",   hotel:"The Pavilion London",         area:"Governance", status:"in-progress", owner:"Sarah Chen",     due:"2025-06-15", capex:"—",        expected:"—",           verified:"—"        },
+  { id:"A-012", action:"Green Key renewal documentation",   hotel:"The Pavilion London",         area:"Energy"    , status:"in-progress", owner:"Sarah Chen",     due:"2025-06-15", capex:"—",        expected:"—",           verified:"—"        },
 ];
 
 export const DATA_ASSURANCE_BY_HOTEL = [
@@ -383,31 +373,19 @@ export const PORTFOLIO_WASTE_STREAMS = [
   { stream: "Landfill",   tonnes: 3883, pct: 46.1, color: "#C2C9CC" },
 ];
 
-export const PORTFOLIO_SOCIAL_BY_HOTEL = [
-  { hotel:"Skyline Dubai",               trainingHrs:28, ltifr:0.62, turnoverPct:14, localSourcingPct:38, fte:320 },
-  { hotel:"Airport Hotel Dubai",         trainingHrs:12, ltifr:1.84, turnoverPct:32, localSourcingPct:18, fte:280 },
-  { hotel:"Bay View Singapore",          trainingHrs:31, ltifr:0.41, turnoverPct:18, localSourcingPct:45, fte:260 },
-  { hotel:"The Pavilion London",         trainingHrs:38, ltifr:0.28, turnoverPct:21, localSourcingPct:54, fte:240 },
-  { hotel:"Grand Harbour Lisbon",        trainingHrs:24, ltifr:0.55, turnoverPct:24, localSourcingPct:42, fte:210 },
-  { hotel:"Marina Residences Barcelona", trainingHrs:16, ltifr:1.10, turnoverPct:28, localSourcingPct:28, fte:195 },
-  { hotel:"Oceanfront Cape Town",        trainingHrs:22, ltifr:0.72, turnoverPct:19, localSourcingPct:61, fte:155 },
-  { hotel:"The Montrose Paris",          trainingHrs:42, ltifr:0.18, turnoverPct:12, localSourcingPct:68, fte:120 },
-  { hotel:"Peaks Resort Zermatt",        trainingHrs:18, ltifr:0.90, turnoverPct:38, localSourcingPct:72, fte:65  },
-  { hotel:"Riverside Bangkok",           trainingHrs:8,  ltifr:0.00, turnoverPct:15, localSourcingPct:35, fte:140 },
+export const PORTFOLIO_CERTS_BY_HOTEL: { hotel: string; certifications: string[]; enrolling?: boolean }[] = [
+  { hotel:"Skyline Dubai",               certifications:["Green Globe","GHG Inventory"] },
+  { hotel:"Airport Hotel Dubai",         certifications:[], enrolling:true                              },
+  { hotel:"Bay View Singapore",          certifications:["Green Key"]                   },
+  { hotel:"The Pavilion London",         certifications:["Green Globe","Green Key"]     },
+  { hotel:"Grand Harbour Lisbon",        certifications:["LEED O+M"]                    },
+  { hotel:"Marina Residences Barcelona", certifications:[], enrolling:true                              },
+  { hotel:"Oceanfront Cape Town",        certifications:["Green Globe"]                 },
+  { hotel:"The Montrose Paris",          certifications:["Green Key","GHG Inventory"]   },
+  { hotel:"Peaks Resort Zermatt",        certifications:[], enrolling:true                              },
+  { hotel:"Riverside Bangkok",           certifications:[]                              },
 ];
 
-export const PORTFOLIO_GOVERNANCE_BY_HOTEL = [
-  { hotel:"Skyline Dubai",               attestationsPct:88, supplierCodePct:82, openGaps:1, certifications:["Green Globe","Travelife"] },
-  { hotel:"Airport Hotel Dubai",         attestationsPct:52, supplierCodePct:44, openGaps:6, certifications:[]                         },
-  { hotel:"Bay View Singapore",          attestationsPct:76, supplierCodePct:68, openGaps:3, certifications:["Green Key"]              },
-  { hotel:"The Pavilion London",         attestationsPct:95, supplierCodePct:91, openGaps:0, certifications:["Green Globe","Green Key"] },
-  { hotel:"Grand Harbour Lisbon",        attestationsPct:82, supplierCodePct:74, openGaps:2, certifications:["Travelife"]              },
-  { hotel:"Marina Residences Barcelona", attestationsPct:61, supplierCodePct:52, openGaps:5, certifications:[]                         },
-  { hotel:"Oceanfront Cape Town",        attestationsPct:84, supplierCodePct:78, openGaps:1, certifications:["Green Globe"]            },
-  { hotel:"The Montrose Paris",          attestationsPct:97, supplierCodePct:94, openGaps:0, certifications:["Green Key","EU Ecolabel"] },
-  { hotel:"Peaks Resort Zermatt",        attestationsPct:44, supplierCodePct:38, openGaps:4, certifications:[]                         },
-  { hotel:"Riverside Bangkok",           attestationsPct:22, supplierCodePct:15, openGaps:8, certifications:[]                         },
-];
 
 // ── Carbon sub-category breakdowns ───────────────────────────────────────────
 
@@ -483,101 +461,4 @@ export const PORTFOLIO_MONTHLY_TREND = [
   { month:"Feb",   carbon:3010, energy:6000, waterM3:39600, diversion:44, carbonTarget:2747, energyTarget:6317, waterTarget:41333, diversionTarget:60 },
   { month:"Mar",   carbon:3220, energy:6300, waterM3:42300, diversion:44, carbonTarget:2747, energyTarget:6317, waterTarget:41333, diversionTarget:60 },
   { month:"Apr",   carbon:3220, energy:6150, waterM3:46500, diversion:44, carbonTarget:2747, energyTarget:6317, waterTarget:41333, diversionTarget:60 },
-];
-
-// ── Social & Governance Dashboard data ───────────────────────────────────────
-
-export const SG_TRAINING_BY_HOTEL = [
-  { hotel:"Skyline Dubai",               shortName:"Skyline Dubai",    general:88, sustainability:72, hs:91, coc:84, overall:84 },
-  { hotel:"Airport Hotel Dubai",         shortName:"Airport Dubai",    general:54, sustainability:38, hs:72, coc:48, overall:53 },
-  { hotel:"Bay View Singapore",          shortName:"Bay View SG",      general:92, sustainability:81, hs:96, coc:88, overall:89 },
-  { hotel:"The Pavilion London",         shortName:"Pavilion London",  general:97, sustainability:91, hs:98, coc:95, overall:95 },
-  { hotel:"Grand Harbour Lisbon",        shortName:"Grand Lisbon",     general:84, sustainability:68, hs:88, coc:79, overall:80 },
-  { hotel:"Marina Residences Barcelona", shortName:"Marina Barcelona", general:62, sustainability:44, hs:71, coc:58, overall:59 },
-  { hotel:"Oceanfront Cape Town",        shortName:"Cape Town",        general:78, sustainability:65, hs:82, coc:74, overall:75 },
-  { hotel:"The Montrose Paris",          shortName:"Montrose Paris",   general:99, sustainability:96, hs:100, coc:98, overall:98 },
-  { hotel:"Peaks Resort Zermatt",        shortName:"Zermatt",          general:71, sustainability:52, hs:78, coc:64, overall:66 },
-  { hotel:"Riverside Bangkok",           shortName:"Bangkok",          general:34, sustainability:22, hs:48, coc:31, overall:34 },
-];
-
-export const SG_LTIFR_TREND = [
-  { month:"May",  ltifr:1.12, incidents:6 },
-  { month:"Jun",  ltifr:0.98, incidents:5 },
-  { month:"Jul",  ltifr:1.05, incidents:6 },
-  { month:"Aug",  ltifr:0.91, incidents:5 },
-  { month:"Sep",  ltifr:0.88, incidents:4 },
-  { month:"Oct",  ltifr:0.85, incidents:4 },
-  { month:"Nov",  ltifr:0.82, incidents:4 },
-  { month:"Dec",  ltifr:0.78, incidents:4 },
-  { month:"Jan",  ltifr:0.80, incidents:4 },
-  { month:"Feb",  ltifr:0.82, incidents:4 },
-  { month:"Mar",  ltifr:0.84, incidents:4 },
-  { month:"Apr",  ltifr:0.82, incidents:4 },
-];
-
-export const SG_INCIDENTS_BY_HOTEL = [
-  { shortName:"Airport Dubai",    total:8,  minor:5, major:3, lostTime:2 },
-  { shortName:"Marina Barcelona", total:6,  minor:4, major:1, lostTime:1 },
-  { shortName:"Zermatt",          total:5,  minor:3, major:1, lostTime:1 },
-  { shortName:"Cape Town",        total:4,  minor:3, major:1, lostTime:0 },
-  { shortName:"Grand Lisbon",     total:3,  minor:2, major:1, lostTime:0 },
-  { shortName:"Bay View SG",      total:2,  minor:2, major:0, lostTime:0 },
-  { shortName:"Skyline Dubai",    total:2,  minor:1, major:1, lostTime:0 },
-  { shortName:"Pavilion London",  total:1,  minor:1, major:0, lostTime:0 },
-  { shortName:"Montrose Paris",   total:1,  minor:1, major:0, lostTime:0 },
-  { shortName:"Bangkok",          total:0,  minor:0, major:0, lostTime:0 },
-];
-
-export const SG_POLICY_MATRIX = [
-  { policy:"Code of Conduct",         category:"Ethics",       status:"current",  expiryDays:320, missingEvidence:1, owner:"HR"            },
-  { policy:"Anti-Corruption",         category:"Ethics",       status:"current",  expiryDays:280, missingEvidence:2, owner:"Compliance"    },
-  { policy:"Human Rights",            category:"Social",       status:"expiring", expiryDays:42,  missingEvidence:0, owner:"HR"            },
-  { policy:"Health & Safety",         category:"Safety",       status:"current",  expiryDays:180, missingEvidence:0, owner:"H&S Manager"   },
-  { policy:"Data Privacy",            category:"Governance",   status:"current",  expiryDays:210, missingEvidence:0, owner:"Legal"         },
-  { policy:"Sustainable Procurement", category:"Governance",   status:"expiring", expiryDays:28,  missingEvidence:3, owner:"Procurement"   },
-  { policy:"Environmental Policy",    category:"Environment",  status:"current",  expiryDays:365, missingEvidence:0, owner:"Sustainability" },
-  { policy:"Supplier Code",           category:"Governance",   status:"expired",  expiryDays:-14, missingEvidence:4, owner:"Procurement"   },
-];
-
-export const SG_SUPPLIER_FUNNEL = [
-  { stage:"Invited",        count:120, pct:100 },
-  { stage:"Code signed",    count:89,  pct:74  },
-  { stage:"ESG assessment", count:62,  pct:52  },
-  { stage:"Approved",       count:51,  pct:43  },
-];
-
-export const SG_GOV_GAPS_BY_TYPE = [
-  { type:"Supplier ESG assessment",   count:31, color:"#B33650" },
-  { type:"Supplier code not signed",  count:18, color:"#B33650" },
-  { type:"Attestation overdue",       count:14, color:"#B33650" },
-  { type:"Missing policy evidence",   count:11, color:"#CDB872" },
-  { type:"Compliance training gap",   count:9,  color:"#CDB872" },
-  { type:"Evidence pending approval", count:7,  color:"#CDB872" },
-  { type:"Expired policy",            count:4,  color:"#B33650" },
-];
-
-export const SG_EVIDENCE_GAPS = [
-  { id:"EG-01", gap:"H&S training log missing",         hotel:"Airport Hotel Dubai",         area:"Social",      owner:"HR",          due:"15 Jul", impact:"GRI / Certification", status:"missing"  },
-  { id:"EG-02", gap:"Supplier code not signed ×8",      hotel:"Riverside Bangkok",           area:"Governance",  owner:"Procurement", due:"30 Jul", impact:"Supplier governance", status:"overdue"  },
-  { id:"EG-03", gap:"Human Rights policy expiring",     hotel:"Portfolio",                   area:"Governance",  owner:"Compliance",  due:"10 Aug", impact:"Audit risk",          status:"expiring" },
-  { id:"EG-04", gap:"Training records incomplete",      hotel:"Marina Residences Barcelona", area:"Social",      owner:"HR",          due:"20 Jul", impact:"GRI / GSTC",          status:"missing"  },
-  { id:"EG-05", gap:"Sustainable Procurement expiring", hotel:"Portfolio",                   area:"Governance",  owner:"Procurement", due:"28 Jul", impact:"Certification",       status:"expiring" },
-  { id:"EG-06", gap:"Supplier ESG assessment missing",  hotel:"Peaks Resort Zermatt",        area:"Governance",  owner:"Procurement", due:"31 Aug", impact:"Supplier governance", status:"missing"  },
-  { id:"EG-07", gap:"Attestation overdue ×3",           hotel:"Riverside Bangkok",           area:"Governance",  owner:"Compliance",  due:"1 Jul",  impact:"Compliance audit",    status:"overdue"  },
-  { id:"EG-08", gap:"Local sourcing data missing Q2",   hotel:"Airport Hotel Dubai",         area:"Social",      owner:"Procurement", due:"15 Aug", impact:"GRI 204",             status:"missing"  },
-  { id:"EG-09", gap:"Supplier code not signed ×4",      hotel:"Peaks Resort Zermatt",        area:"Governance",  owner:"Procurement", due:"31 Jul", impact:"Supplier governance", status:"overdue"  },
-  { id:"EG-10", gap:"Anti-corruption training gap",     hotel:"Marina Residences Barcelona", area:"Social",      owner:"HR",          due:"1 Sep",  impact:"GRI / Compliance",    status:"missing"  },
-];
-
-export const SG_HOTEL_GAP_TABLE = [
-  { hotel:"Skyline Dubai",               shortName:"Skyline Dubai",    workforce:"complete",     training:"partial",  hs:"complete",     localSourcing:"complete",  policies:"complete",  attestations:88, supplierGov:"partial",       gaps:1,  overall:"partial"      },
-  { hotel:"Airport Hotel Dubai",         shortName:"Airport Dubai",    workforce:"partial",      training:"missing",  hs:"needs-review", localSourcing:"missing",   policies:"missing",   attestations:52, supplierGov:"needs-review",  gaps:6,  overall:"needs-review" },
-  { hotel:"Bay View Singapore",          shortName:"Bay View SG",      workforce:"complete",     training:"complete", hs:"complete",     localSourcing:"complete",  policies:"complete",  attestations:76, supplierGov:"partial",       gaps:3,  overall:"partial"      },
-  { hotel:"The Pavilion London",         shortName:"Pavilion London",  workforce:"complete",     training:"complete", hs:"complete",     localSourcing:"complete",  policies:"complete",  attestations:95, supplierGov:"complete",      gaps:0,  overall:"complete"     },
-  { hotel:"Grand Harbour Lisbon",        shortName:"Grand Lisbon",     workforce:"complete",     training:"partial",  hs:"complete",     localSourcing:"complete",  policies:"partial",   attestations:82, supplierGov:"partial",       gaps:2,  overall:"partial"      },
-  { hotel:"Marina Residences Barcelona", shortName:"Marina Barcelona", workforce:"partial",      training:"missing",  hs:"partial",      localSourcing:"partial",   policies:"missing",   attestations:61, supplierGov:"needs-review",  gaps:5,  overall:"needs-review" },
-  { hotel:"Oceanfront Cape Town",        shortName:"Cape Town",        workforce:"complete",     training:"partial",  hs:"complete",     localSourcing:"complete",  policies:"complete",  attestations:84, supplierGov:"complete",      gaps:1,  overall:"partial"      },
-  { hotel:"The Montrose Paris",          shortName:"Montrose Paris",   workforce:"complete",     training:"complete", hs:"complete",     localSourcing:"complete",  policies:"complete",  attestations:97, supplierGov:"complete",      gaps:0,  overall:"complete"     },
-  { hotel:"Peaks Resort Zermatt",        shortName:"Zermatt",          workforce:"partial",      training:"partial",  hs:"partial",      localSourcing:"complete",  policies:"missing",   attestations:44, supplierGov:"missing",       gaps:4,  overall:"needs-review" },
-  { hotel:"Riverside Bangkok",           shortName:"Bangkok",          workforce:"missing",      training:"missing",  hs:"partial",      localSourcing:"partial",   policies:"missing",   attestations:22, supplierGov:"missing",       gaps:8,  overall:"needs-review" },
 ];
