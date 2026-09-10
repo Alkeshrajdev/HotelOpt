@@ -108,7 +108,7 @@ function MetricChart({ metric }: { metric: MetricConfig }) {
                   dominantBaseline="middle"
                   fontSize={11}
                   fontWeight={payload.value === "You" ? 700 : 400}
-                  fill={payload.value === "You" ? "#0F6A3C" : "#6b7280"}
+                  fill={payload.value === "You" ? "#807245" : "#6b7280"}
                 >
                   {payload.value}
                 </text>
@@ -121,7 +121,7 @@ function MetricChart({ metric }: { metric: MetricConfig }) {
             {/* Reference line at best peer value */}
             <ReferenceLine
               x={bestVal}
-              stroke="#16a34a"
+              stroke="#807245"
               strokeDasharray="3 3"
               strokeOpacity={0.5}
             />
@@ -129,7 +129,7 @@ function MetricChart({ metric }: { metric: MetricConfig }) {
               {data.map((entry, i) => (
                 <Cell
                   key={i}
-                  fill={entry.isYou ? "#0F6A3C" : "#e2e8f0"}
+                  fill={entry.isYou ? "#807245" : "#e2e8f0"}
                 />
               ))}
             </Bar>

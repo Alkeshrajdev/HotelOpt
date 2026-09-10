@@ -28,10 +28,10 @@ const WATERFALL: WfStep[] = [
 
 const BAR_COLOR: Record<WfStep["type"], string> = {
   base:           "#94a3b8",
-  up:             "#fb923c",
-  "down-neutral": "#7dd3fc",
-  "down-good":    "#16a34a",
-  total:          "#0F6A3C",
+  up:             "#CDB872",
+  "down-neutral": "#AF8D84",
+  "down-good":    "#807245",
+  total:          "#807245",
 };
 
 const ADJUSTED_BASELINE  = 3280;
@@ -190,9 +190,9 @@ export default function EnergyPerformance() {
         <div className="flex flex-wrap gap-4 px-6 pb-5 text-[11px] text-ink-500">
           {[
             { color: "#94a3b8", label: "Reference" },
-            { color: "#fb923c", label: "External — up" },
-            { color: "#7dd3fc", label: "External — down" },
-            { color: "#16a34a", label: "Net management change" },
+            { color: "#CDB872", label: "External — up" },
+            { color: "#AF8D84", label: "External — down" },
+            { color: "#807245", label: "Net management change" },
           ].map((l) => (
             <span key={l.label} className="flex items-center gap-1.5">
               <span className="w-3 h-3 rounded-sm inline-block shrink-0" style={{ background: l.color }} />
@@ -208,21 +208,21 @@ export default function EnergyPerformance() {
         <div className="px-6 pb-6 pt-4">
           <ResponsiveContainer width="100%" height={240}>
             <LineChart data={INTENSITY}>
-              <CartesianGrid vertical={false} stroke="#f3f4f6" />
+              <CartesianGrid vertical={false} stroke="#EDEFF0" />
               <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#6b7280" }} axisLine={false} tickLine={false} />
               <YAxis
                 domain={[108, 147]}
                 tick={{ fontSize: 11, fill: "#6b7280" }}
                 axisLine={false} tickLine={false} width={28}
               />
-              <Tooltip content={<IntensityTooltip />} cursor={{ stroke: "#e5e7eb" }} />
-              <ReferenceLine y={annualAvgTY} stroke="#0F6A3C" strokeDasharray="3 3" strokeOpacity={0.35} />
+              <Tooltip content={<IntensityTooltip />} cursor={{ stroke: "#EDEFF0" }} />
+              <ReferenceLine y={annualAvgTY} stroke="#807245" strokeDasharray="3 3" strokeOpacity={0.35} />
               <Legend
                 wrapperStyle={{ fontSize: 11, paddingTop: 10 }}
                 formatter={(v) => <span style={{ color: "#6b7280" }}>{v === "ty" ? "This year" : "Prior year"}</span>}
               />
               <Line dataKey="py" name="py" stroke="#cbd5e1" strokeWidth={2} strokeDasharray="5 3" dot={false} isAnimationActive={false} />
-              <Line dataKey="ty" name="ty" stroke="#0F6A3C" strokeWidth={2.5} dot={{ fill: "#0F6A3C", r: 3 }} activeDot={{ r: 5 }} isAnimationActive={false} />
+              <Line dataKey="ty" name="ty" stroke="#807245" strokeWidth={2.5} dot={{ fill: "#807245", r: 3 }} activeDot={{ r: 5 }} isAnimationActive={false} />
             </LineChart>
           </ResponsiveContainer>
         </div>

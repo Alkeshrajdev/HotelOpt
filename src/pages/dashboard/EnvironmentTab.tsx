@@ -181,7 +181,7 @@ function DrilldownPanel({
   const total = sorted.reduce((s, h) => s + h.value, 0);
 
   const barColor = (flag?: "bad" | "warn" | "good") =>
-    flag === "bad" ? "#EF4444" : flag === "warn" ? "#F59E0B" : flag === "good" ? "#22C55E" : data.color;
+    flag === "bad" ? "#B33650" : flag === "warn" ? "#CDB872" : flag === "good" ? "#807245" : data.color;
 
   return (
     <div ref={panelRef} className="rounded-2xl border-2 border-brand-200 bg-white shadow-card overflow-hidden">
@@ -256,9 +256,9 @@ function DrilldownPanel({
           </ResponsiveContainer>
           {/* Legend */}
           <div className="flex items-center gap-4 mt-2 text-[10px] text-ink-400">
-            <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-bad inline-block" />Action required</span>
-            <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-warn inline-block" />Monitor</span>
-            <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-good inline-block" />On track</span>
+            <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-chart-rose inline-block" />Action required</span>
+            <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-chart-sand inline-block" />Monitor</span>
+            <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-chart-olive inline-block" />On track</span>
           </div>
         </div>
 
@@ -273,7 +273,7 @@ function DrilldownPanel({
               return (
                 <div
                   key={h.name}
-                  className="flex items-start gap-2.5 rounded-lg px-3 py-2.5 bg-ink-50 border border-transparent hover:border-ink-100"
+                  className="flex items-start gap-2.5 rounded-lg px-3 py-2.5 bg-ink-50 border"
                 >
                   <span
                     className="w-2.5 h-2.5 rounded-full shrink-0 mt-1"
@@ -428,7 +428,7 @@ function CarbonSection() {
                 <span className="font-bold text-ink-900">{SCOPE2_METHODS.recCoverage.pct}%</span>
               </div>
               <div className="h-2 bg-ink-100 rounded-full overflow-hidden">
-                <div className="h-full bg-good rounded-full" style={{ width: `${SCOPE2_METHODS.recCoverage.pct}%` }} />
+                <div className="h-full bg-chart-olive rounded-full" style={{ width: `${SCOPE2_METHODS.recCoverage.pct}%` }} />
               </div>
               <div className="mt-1.5 text-[10px] text-ink-400">
                 {SCOPE2_METHODS.recCoverage.mwh.toLocaleString()} MWh covered · target: 100% by 2030
@@ -475,7 +475,7 @@ function CarbonSection() {
                 <YAxis type="category" dataKey="category" width={0} tick={false} axisLine={false} tickLine={false} />
                 <Tooltip contentStyle={{ fontSize: 11, borderRadius: 8, border: "1px solid #E2E8F0" }}
                   formatter={(v: number) => [`${v.toLocaleString()} tCO₂e`, ""]} />
-                <Bar isAnimationActive={false} dataKey="tco2e" fill="#6EE7B7" radius={[0, 4, 4, 0]} maxBarSize={14} />
+                <Bar isAnimationActive={false} dataKey="tco2e" fill="#807245" radius={[0, 4, 4, 0]} maxBarSize={14} />
               </BarChart>
             </ResponsiveContainer>
             <ul className="space-y-1">
@@ -493,7 +493,7 @@ function CarbonSection() {
                   </span>
                   <div className="flex items-center gap-2 shrink-0">
                     <div className="w-12 h-1 bg-ink-100 rounded-full overflow-hidden">
-                      <div className="h-full bg-pillar-carbon rounded-full" style={{ width: `${c.pct}%` }} />
+                      <div className="h-full bg-chart-mauve rounded-full" style={{ width: `${c.pct}%` }} />
                     </div>
                     <span className="font-semibold text-ink-900 w-8 text-right">{c.pct}%</span>
                     {c.drilldownKey && <ChevronRight size={10} className="text-ink-300 group-hover:text-brand-600" />}
@@ -529,9 +529,9 @@ function CarbonSection() {
               <Tooltip contentStyle={{ fontSize: 12, borderRadius: 8, border: "1px solid #E2E8F0" }}
                 formatter={(v: number, n: string) => [`${v.toLocaleString()} tCO₂e`, n === "scope1" ? "Scope 1" : n === "scope2" ? "Scope 2" : "Scope 3"]} />
               <Legend iconSize={8} wrapperStyle={{ fontSize: 11 }} formatter={(v) => v === "scope1" ? "Scope 1" : v === "scope2" ? "Scope 2" : "Scope 3"} />
-              <Bar isAnimationActive={false} dataKey="scope1" name="scope1" stackId="a" fill="#7C3AED" maxBarSize={18} />
-              <Bar isAnimationActive={false} dataKey="scope2" name="scope2" stackId="a" fill="#0F766E" maxBarSize={18} />
-              <Bar isAnimationActive={false} dataKey="scope3" name="scope3" stackId="a" fill="#6EE7B7" radius={[0, 4, 4, 0]} maxBarSize={18} />
+              <Bar isAnimationActive={false} dataKey="scope1" name="scope1" stackId="a" fill="#959891" maxBarSize={18} />
+              <Bar isAnimationActive={false} dataKey="scope2" name="scope2" stackId="a" fill="#AF8D84" maxBarSize={18} />
+              <Bar isAnimationActive={false} dataKey="scope3" name="scope3" stackId="a" fill="#F6C8CC" radius={[0, 4, 4, 0]} maxBarSize={18} />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -559,13 +559,13 @@ function CarbonSection() {
                   `${v.toLocaleString()} tCO₂e`,
                   name === "carbonTarget" ? "2030 target" : "Actual"
                 ]} />
-              <Line isAnimationActive={false} type="monotone" dataKey="carbon" name="carbon" stroke="#0F766E" strokeWidth={2.5} dot={false} activeDot={{ r: 5, strokeWidth: 0 }} />
-              <Line isAnimationActive={false} type="monotone" dataKey="carbonTarget" name="carbonTarget" stroke="#0F766E" strokeWidth={1.5} strokeDasharray="5 4" dot={false} activeDot={{ r: 4, strokeWidth: 0 }} opacity={0.5} />
+              <Line isAnimationActive={false} type="monotone" dataKey="carbon" name="carbon" stroke="#AF8D84" strokeWidth={2.5} dot={false} activeDot={{ r: 5, strokeWidth: 0 }} />
+              <Line isAnimationActive={false} type="monotone" dataKey="carbonTarget" name="carbonTarget" stroke="#AF8D84" strokeWidth={1.5} strokeDasharray="5 4" dot={false} activeDot={{ r: 4, strokeWidth: 0 }} opacity={0.5} />
             </LineChart>
           </ResponsiveContainer>
           <div className="flex items-center gap-5 mt-1 text-[10px] text-ink-400 justify-center">
-            <span className="flex items-center gap-1.5"><span className="inline-block w-6 h-0.5 bg-[#0F766E] rounded" />Actual</span>
-            <span className="flex items-center gap-1.5"><span className="inline-block w-6 h-0.5 bg-[#0F766E] rounded opacity-50" style={{ backgroundImage: "repeating-linear-gradient(90deg,#0F766E 0,#0F766E 4px,transparent 4px,transparent 8px)" }} />Target trajectory</span>
+            <span className="flex items-center gap-1.5"><span className="inline-block w-6 h-0.5 bg-[#AF8D84] rounded" />Actual</span>
+            <span className="flex items-center gap-1.5"><span className="inline-block w-6 h-0.5 bg-[#AF8D84] rounded opacity-50" style={{ backgroundImage: "repeating-linear-gradient(90deg,#AF8D84 0,#AF8D84 4px,transparent 4px,transparent 8px)" }} />Target trajectory</span>
           </div>
         </div>
       </Card>
@@ -706,7 +706,7 @@ function EnergySection() {
                 formatter={(v: number, _n, p) => [`${v.toFixed(1)} kWh/RN · ${p.payload.total.toLocaleString()} MWh total`, "Intensity"]} />
               <Bar isAnimationActive={false} dataKey="intensity" radius={[0, 4, 4, 0]} maxBarSize={18}>
                 {intensityData.map((d) => (
-                  <Cell key={d.name} fill={d.intensity > 150 ? "#EF4444" : d.intensity > 100 ? "#F59E0B" : "#22C55E"} />
+                  <Cell key={d.name} fill={d.intensity > 150 ? "#B33650" : d.intensity > 100 ? "#CDB872" : "#807245"} />
                 ))}
               </Bar>
             </BarChart>
@@ -736,13 +736,13 @@ function EnergySection() {
                   `${v.toLocaleString()} MWh`,
                   name === "energyTarget" ? "Target" : "Actual"
                 ]} />
-              <Line isAnimationActive={false} type="monotone" dataKey="energy" name="energy" stroke="#CA8A04" strokeWidth={2.5} dot={false} activeDot={{ r: 5, strokeWidth: 0 }} />
-              <Line isAnimationActive={false} type="monotone" dataKey="energyTarget" name="energyTarget" stroke="#CA8A04" strokeWidth={1.5} strokeDasharray="5 4" dot={false} activeDot={{ r: 4, strokeWidth: 0 }} opacity={0.5} />
+              <Line isAnimationActive={false} type="monotone" dataKey="energy" name="energy" stroke="#CDB872" strokeWidth={2.5} dot={false} activeDot={{ r: 5, strokeWidth: 0 }} />
+              <Line isAnimationActive={false} type="monotone" dataKey="energyTarget" name="energyTarget" stroke="#CDB872" strokeWidth={1.5} strokeDasharray="5 4" dot={false} activeDot={{ r: 4, strokeWidth: 0 }} opacity={0.5} />
             </LineChart>
           </ResponsiveContainer>
           <div className="flex items-center gap-5 mt-1 text-[10px] text-ink-400 justify-center">
-            <span className="flex items-center gap-1.5"><span className="inline-block w-6 h-0.5 bg-[#CA8A04] rounded" />Actual</span>
-            <span className="flex items-center gap-1.5"><span className="inline-block w-6 h-0.5 bg-[#CA8A04] rounded opacity-50" style={{ backgroundImage: "repeating-linear-gradient(90deg,#CA8A04 0,#CA8A04 4px,transparent 4px,transparent 8px)" }} />Target</span>
+            <span className="flex items-center gap-1.5"><span className="inline-block w-6 h-0.5 bg-[#CDB872] rounded" />Actual</span>
+            <span className="flex items-center gap-1.5"><span className="inline-block w-6 h-0.5 bg-[#CDB872] rounded opacity-50" style={{ backgroundImage: "repeating-linear-gradient(90deg,#CDB872 0,#CDB872 4px,transparent 4px,transparent 8px)" }} />Target</span>
           </div>
         </div>
       </Card>
@@ -863,7 +863,7 @@ function WaterSection() {
                 <span className="font-semibold text-warn">6% · target 20% by 2027</span>
               </div>
               <div className="h-2 bg-ink-100 rounded-full overflow-hidden">
-                <div className="h-full bg-warn rounded-full" style={{ width: "6%" }} />
+                <div className="h-full bg-chart-sand rounded-full" style={{ width: "6%" }} />
               </div>
               <div className="mt-1 text-[10px] text-ink-400">Greywater reuse at Skyline Dubai (approved, AED 120k) will add ~3%</div>
             </div>
@@ -891,7 +891,7 @@ function WaterSection() {
                 formatter={(v: number, _n, p) => [`${v.toFixed(0)} L/GN · ${p.payload.total.toLocaleString()} m³ total`, "Intensity"]} />
               <Bar isAnimationActive={false} dataKey="intensity" radius={[0, 4, 4, 0]} maxBarSize={18}>
                 {intensityData.map((d) => (
-                  <Cell key={d.name} fill={d.intensity > 700 ? "#EF4444" : d.intensity > 500 ? "#F59E0B" : "#22C55E"} />
+                  <Cell key={d.name} fill={d.intensity > 700 ? "#B33650" : d.intensity > 500 ? "#CDB872" : "#807245"} />
                 ))}
               </Bar>
             </BarChart>
@@ -921,13 +921,13 @@ function WaterSection() {
                   `${v.toLocaleString()} m³`,
                   name === "waterTarget" ? "Target" : "Actual"
                 ]} />
-              <Line isAnimationActive={false} type="monotone" dataKey="waterM3" name="waterM3" stroke="#0EA5E9" strokeWidth={2.5} dot={false} activeDot={{ r: 5, strokeWidth: 0 }} />
-              <Line isAnimationActive={false} type="monotone" dataKey="waterTarget" name="waterTarget" stroke="#0EA5E9" strokeWidth={1.5} strokeDasharray="5 4" dot={false} activeDot={{ r: 4, strokeWidth: 0 }} opacity={0.5} />
+              <Line isAnimationActive={false} type="monotone" dataKey="waterM3" name="waterM3" stroke="#AF8D84" strokeWidth={2.5} dot={false} activeDot={{ r: 5, strokeWidth: 0 }} />
+              <Line isAnimationActive={false} type="monotone" dataKey="waterTarget" name="waterTarget" stroke="#AF8D84" strokeWidth={1.5} strokeDasharray="5 4" dot={false} activeDot={{ r: 4, strokeWidth: 0 }} opacity={0.5} />
             </LineChart>
           </ResponsiveContainer>
           <div className="flex items-center gap-5 mt-1 text-[10px] text-ink-400 justify-center">
-            <span className="flex items-center gap-1.5"><span className="inline-block w-6 h-0.5 bg-[#0EA5E9] rounded" />Actual</span>
-            <span className="flex items-center gap-1.5"><span className="inline-block w-6 h-0.5 bg-[#0EA5E9] rounded opacity-50" style={{ backgroundImage: "repeating-linear-gradient(90deg,#0EA5E9 0,#0EA5E9 4px,transparent 4px,transparent 8px)" }} />Target</span>
+            <span className="flex items-center gap-1.5"><span className="inline-block w-6 h-0.5 bg-[#AF8D84] rounded" />Actual</span>
+            <span className="flex items-center gap-1.5"><span className="inline-block w-6 h-0.5 bg-[#AF8D84] rounded opacity-50" style={{ backgroundImage: "repeating-linear-gradient(90deg,#AF8D84 0,#AF8D84 4px,transparent 4px,transparent 8px)" }} />Target</span>
           </div>
         </div>
       </Card>
@@ -1012,7 +1012,7 @@ function WasteSection() {
                 {WASTE_WATERFALL.map((entry) => (
                   <Cell
                     key={entry.name}
-                    fill={entry.name === "Net Change" ? "#0F766E" : entry.value >= 0 ? "#22C55E" : "#EF4444"}
+                    fill={entry.name === "Net Change" ? "#AF8D84" : entry.value >= 0 ? "#807245" : "#B33650"}
                     fillOpacity={entry.name === "Net Change" ? 1 : 0.75}
                   />
                 ))}
@@ -1038,10 +1038,10 @@ function WasteSection() {
                   tickFormatter={(v) => `${(v / 1000).toFixed(1)}k`} />
                 <Tooltip contentStyle={{ fontSize: 11, borderRadius: 8, border: "1px solid #E2E8F0" }}
                   formatter={(v: number, n: string) => [`${v.toLocaleString()} t`, n]} />
-                <Bar isAnimationActive={false} dataKey="recycled"  name="Recycled"     stackId="a" fill="#22C55E" maxBarSize={48} />
-                <Bar isAnimationActive={false} dataKey="composted" name="Composted"    stackId="a" fill="#84CC16" maxBarSize={48} />
-                <Bar isAnimationActive={false} dataKey="energyRec" name="Energy rec."  stackId="a" fill="#F59E0B" maxBarSize={48} />
-                <Bar isAnimationActive={false} dataKey="landfill"  name="Landfill"     stackId="a" fill="#EF4444" radius={[4, 4, 0, 0]} maxBarSize={48} />
+                <Bar isAnimationActive={false} dataKey="recycled"  name="Recycled"     stackId="a" fill="#807245" maxBarSize={48} />
+                <Bar isAnimationActive={false} dataKey="composted" name="Composted"    stackId="a" fill="#F6C8CC" maxBarSize={48} />
+                <Bar isAnimationActive={false} dataKey="energyRec" name="Energy rec."  stackId="a" fill="#CDB872" maxBarSize={48} />
+                <Bar isAnimationActive={false} dataKey="landfill"  name="Landfill"     stackId="a" fill="#B33650" radius={[4, 4, 0, 0]} maxBarSize={48} />
               </BarChart>
             </ResponsiveContainer>
             <ul className="space-y-1">
@@ -1117,7 +1117,7 @@ function WasteSection() {
                 <span className="font-semibold text-bad">42% · target 60% by 2025</span>
               </div>
               <div className="h-2 bg-ink-100 rounded-full overflow-hidden">
-                <div className="h-full rounded-full" style={{ width: "42%", background: "linear-gradient(to right, #22C55E, #84CC16, #F59E0B)" }} />
+                <div className="h-full rounded-full" style={{ width: "42%", background: "linear-gradient(to right, #807245, #F6C8CC, #CDB872)" }} />
               </div>
               <div className="mt-1 text-[10px] text-ink-400">9 hotels below target · biggest gap: Zermatt 18%, Airport Dubai 24%</div>
             </div>
@@ -1146,7 +1146,7 @@ function WasteSection() {
                 formatter={(v: number, _n, p) => [`${v}% diversion · ${p.payload.total.toLocaleString()} t total`, "Diversion"]} />
               <Bar isAnimationActive={false} dataKey="diversion" radius={[0, 4, 4, 0]} maxBarSize={18}>
                 {diversionData.map((d) => (
-                  <Cell key={d.name} fill={d.diversion >= 50 ? "#22C55E" : d.diversion >= 35 ? "#F59E0B" : "#EF4444"} />
+                  <Cell key={d.name} fill={d.diversion >= 50 ? "#807245" : d.diversion >= 35 ? "#CDB872" : "#B33650"} />
                 ))}
               </Bar>
             </BarChart>
@@ -1176,13 +1176,13 @@ function WasteSection() {
                   `${v}%`,
                   name === "diversionTarget" ? "Target" : "Actual"
                 ]} />
-              <Line isAnimationActive={false} type="monotone" dataKey="diversion" name="diversion" stroke="#9333EA" strokeWidth={2.5} dot={false} activeDot={{ r: 5, strokeWidth: 0 }} />
-              <Line isAnimationActive={false} type="monotone" dataKey="diversionTarget" name="diversionTarget" stroke="#9333EA" strokeWidth={1.5} strokeDasharray="5 4" dot={false} activeDot={{ r: 4, strokeWidth: 0 }} opacity={0.5} />
+              <Line isAnimationActive={false} type="monotone" dataKey="diversion" name="diversion" stroke="#959891" strokeWidth={2.5} dot={false} activeDot={{ r: 5, strokeWidth: 0 }} />
+              <Line isAnimationActive={false} type="monotone" dataKey="diversionTarget" name="diversionTarget" stroke="#959891" strokeWidth={1.5} strokeDasharray="5 4" dot={false} activeDot={{ r: 4, strokeWidth: 0 }} opacity={0.5} />
             </LineChart>
           </ResponsiveContainer>
           <div className="flex items-center gap-5 mt-1 text-[10px] text-ink-400 justify-center">
-            <span className="flex items-center gap-1.5"><span className="inline-block w-6 h-0.5 bg-[#9333EA] rounded" />Actual</span>
-            <span className="flex items-center gap-1.5"><span className="inline-block w-6 h-0.5 bg-[#9333EA] rounded opacity-50" style={{ backgroundImage: "repeating-linear-gradient(90deg,#9333EA 0,#9333EA 4px,transparent 4px,transparent 8px)" }} />Target (60%)</span>
+            <span className="flex items-center gap-1.5"><span className="inline-block w-6 h-0.5 bg-[#959891] rounded" />Actual</span>
+            <span className="flex items-center gap-1.5"><span className="inline-block w-6 h-0.5 bg-[#959891] rounded opacity-50" style={{ backgroundImage: "repeating-linear-gradient(90deg,#959891 0,#959891 4px,transparent 4px,transparent 8px)" }} />Target (60%)</span>
           </div>
         </div>
       </Card>
@@ -1197,16 +1197,16 @@ export default function EnvironmentTab() {
 
   return (
     <div className="space-y-5">
-      <div className="flex gap-0.5 border-b border-ink-100 -mx-1">
+      <div className="inline-flex max-w-full items-center gap-1 rounded-full bg-ink-100 p-1 overflow-x-auto">
         {SECTIONS.map((s) => (
           <button
             key={s.key}
             onClick={() => setSection(s.key)}
             className={cn(
-              "px-4 py-2 text-[13px] font-medium border-b-2 -mb-px whitespace-nowrap transition-colors",
+              "px-4 py-2 text-[13px] font-medium rounded-full whitespace-nowrap transition-colors",
               section === s.key
-                ? "border-brand-600 text-brand-700"
-                : "border-transparent text-ink-500 hover:text-ink-800 hover:border-ink-200"
+                ? "bg-white shadow-card text-ink-900"
+                : "text-ink-500 hover:text-ink-900"
             )}
           >
             {s.label}

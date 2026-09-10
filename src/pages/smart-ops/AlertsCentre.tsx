@@ -480,7 +480,7 @@ export default function AlertsCentre() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 overflow-x-auto border-b border-ink-100 pb-0">
+      <div className="inline-flex max-w-full items-center gap-1 rounded-full bg-ink-100 p-1 overflow-x-auto">
         {TABS.map((tab) => {
           const count = tabCount(tab.id, ALERTS);
           const isActive = activeTab === tab.id;
@@ -489,10 +489,10 @@ export default function AlertsCentre() {
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={cn(
-                "flex items-center gap-1.5 px-4 py-2.5 text-[13px] font-medium whitespace-nowrap border-b-2 transition-colors",
+                "flex items-center gap-1.5 px-4 py-2.5 text-[13px] font-medium rounded-full whitespace-nowrap transition-colors",
                 isActive
-                  ? "border-brand-600 text-brand-700"
-                  : "border-transparent text-ink-500 hover:text-ink-800 hover:border-ink-200"
+                  ? "bg-white shadow-card text-ink-900"
+                  : "text-ink-500 hover:text-ink-900"
               )}
             >
               {tab.label}
@@ -521,7 +521,7 @@ export default function AlertsCentre() {
           <select
             value={severityFilter}
             onChange={(e) => setSeverityFilter(e.target.value)}
-            className="appearance-none pl-3 pr-7 py-1.5 text-[12px] rounded-lg border border-ink-200 bg-white text-ink-700 focus:outline-none focus:ring-2 focus:ring-brand-300 cursor-pointer hover:border-ink-300"
+            className="appearance-none pl-3 pr-7 py-1.5 text-[12px] rounded-lg border border-ink-200 bg-white text-ink-700 focus:outline-none focus:ring-2 focus:ring-brand-300 cursor-pointer"
           >
             <option value="all">All severities</option>
             {SEVERITY_ORDER.map((s) => (
@@ -536,7 +536,7 @@ export default function AlertsCentre() {
           <select
             value={categoryFilter}
             onChange={(e) => setCategoryFilter(e.target.value)}
-            className="appearance-none pl-3 pr-7 py-1.5 text-[12px] rounded-lg border border-ink-200 bg-white text-ink-700 focus:outline-none focus:ring-2 focus:ring-brand-300 cursor-pointer hover:border-ink-300"
+            className="appearance-none pl-3 pr-7 py-1.5 text-[12px] rounded-lg border border-ink-200 bg-white text-ink-700 focus:outline-none focus:ring-2 focus:ring-brand-300 cursor-pointer"
           >
             <option value="all">All categories</option>
             {(["Energy", "Water", "IAQ", "Asset", "Data Quality", "Maintenance"] as AlertCategory[]).map((c) => (
@@ -551,7 +551,7 @@ export default function AlertsCentre() {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="appearance-none pl-3 pr-7 py-1.5 text-[12px] rounded-lg border border-ink-200 bg-white text-ink-700 focus:outline-none focus:ring-2 focus:ring-brand-300 cursor-pointer hover:border-ink-300"
+            className="appearance-none pl-3 pr-7 py-1.5 text-[12px] rounded-lg border border-ink-200 bg-white text-ink-700 focus:outline-none focus:ring-2 focus:ring-brand-300 cursor-pointer"
           >
             <option value="all">All statuses</option>
             {STATUS_FLOW.map((s) => (

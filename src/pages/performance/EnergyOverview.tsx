@@ -51,11 +51,11 @@ const SOURCES: {
   color: string;
   lightColor: string;
 }[] = [
-  { key: "grid",     label: "Grid",          fullLabel: "Grid Electricity",   color: "#0F6A3C", lightColor: "#dcfce7" },
-  { key: "boiler",   label: "Boiler fuel",   fullLabel: "Boiler Fuel (Gas)",  color: "#ea580c", lightColor: "#ffedd5" },
-  { key: "kitchen",  label: "Kitchen gas",   fullLabel: "Kitchen Gas",        color: "#f59e0b", lightColor: "#fef3c7" },
-  { key: "distCool", label: "Dist. cooling", fullLabel: "District Cooling",   color: "#0ea5e9", lightColor: "#e0f2fe" },
-  { key: "solar",    label: "Solar PV",      fullLabel: "Solar PV (on-site)", color: "#84cc16", lightColor: "#f0fdf4" },
+  { key: "grid",     label: "Grid",          fullLabel: "Grid Electricity",   color: "#807245", lightColor: "#dcfce7" },
+  { key: "boiler",   label: "Boiler fuel",   fullLabel: "Boiler Fuel (Gas)",  color: "#CDB872", lightColor: "#ffedd5" },
+  { key: "kitchen",  label: "Kitchen gas",   fullLabel: "Kitchen Gas",        color: "#CDB872", lightColor: "#fef3c7" },
+  { key: "distCool", label: "Dist. cooling", fullLabel: "District Cooling",   color: "#AF8D84", lightColor: "#e0f2fe" },
+  { key: "solar",    label: "Solar PV",      fullLabel: "Solar PV (on-site)", color: "#F6C8CC", lightColor: "#f0fdf4" },
   { key: "diesel",   label: "Diesel",        fullLabel: "Diesel / Generator", color: "#78716c", lightColor: "#f5f5f4" },
 ];
 
@@ -160,7 +160,7 @@ function SourceChart({
           />
           <YAxis hide domain={[0, "auto"]} />
           <Tooltip content={<SourceTooltip />} cursor={{ fill: "rgba(0,0,0,0.04)" }} />
-          <Bar dataKey="py" fill="#e5e7eb" radius={[2, 2, 0, 0]} isAnimationActive={false} name="Prior year" />
+          <Bar dataKey="py" fill="#EDEFF0" radius={[2, 2, 0, 0]} isAnimationActive={false} name="Prior year" />
           <Bar dataKey="ty" fill={source.color} radius={[2, 2, 0, 0]} isAnimationActive={false} name="This year" />
         </BarChart>
       </ResponsiveContainer>
@@ -245,7 +245,7 @@ export default function EnergyOverview() {
         <div className="px-6 pb-6 pt-4">
           <ResponsiveContainer width="100%" height={300}>
             <ComposedChart data={MONTHLY} barGap={2} barCategoryGap="25%">
-              <CartesianGrid vertical={false} stroke="#f3f4f6" />
+              <CartesianGrid vertical={false} stroke="#EDEFF0" />
               <XAxis
                 dataKey="month"
                 tick={{ fontSize: 11, fill: "#6b7280" }}
@@ -269,7 +269,7 @@ export default function EnergyOverview() {
                 <YAxis
                   yAxisId="cost"
                   orientation="right"
-                  tick={{ fontSize: 11, fill: "#b45309" }}
+                  tick={{ fontSize: 11, fill: "#CDB872" }}
                   tickFormatter={(v) => `$${v}k`}
                   axisLine={false}
                   tickLine={false}
@@ -279,7 +279,7 @@ export default function EnergyOverview() {
               )}
               <Tooltip content={<ConsolidatedTooltip />} cursor={{ fill: "rgba(0,0,0,0.03)" }} />
               {/* TY bar */}
-              <Bar yAxisId="mwh" dataKey="ty" name="This year" fill="#0F6A3C" radius={[3, 3, 0, 0]} isAnimationActive={false} />
+              <Bar yAxisId="mwh" dataKey="ty" name="This year" fill="#807245" radius={[3, 3, 0, 0]} isAnimationActive={false} />
               {/* PY bar */}
               <Bar yAxisId="mwh" dataKey="py" name="Prior year" fill="#cbd5e1" radius={[3, 3, 0, 0]} isAnimationActive={false} />
               {/* Cost lines */}
@@ -288,7 +288,7 @@ export default function EnergyOverview() {
                   yAxisId="cost"
                   dataKey="costTY"
                   name="Cost (this year)"
-                  stroke="#d97706"
+                  stroke="#CDB872"
                   strokeWidth={2}
                   dot={false}
                   isAnimationActive={false}
@@ -299,7 +299,7 @@ export default function EnergyOverview() {
                   yAxisId="cost"
                   dataKey="costPY"
                   name="Cost (prior year)"
-                  stroke="#fcd34d"
+                  stroke="#CDB872"
                   strokeWidth={1.5}
                   strokeDasharray="4 3"
                   dot={false}

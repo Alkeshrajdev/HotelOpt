@@ -1153,10 +1153,10 @@ export default function Marketplace() {
           <button
             key={t.id}
             className={cn(
-              "flex items-center gap-1.5 px-4 py-2.5 text-[13px] font-medium border-b-2 transition-colors",
+              "flex items-center gap-1.5 px-4 py-2.5 text-[13px] font-medium rounded-full transition-colors",
               tab === t.id
-                ? "border-brand-500 text-brand-700"
-                : "border-transparent text-ink-500 hover:text-ink-800"
+                ? "bg-white shadow-card text-ink-900"
+                : "text-ink-500 hover:text-ink-900"
             )}
             onClick={() => setTab(t.id)}
           >

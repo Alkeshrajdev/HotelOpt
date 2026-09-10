@@ -52,11 +52,11 @@ const DAILY_WATER_TREND = [
 ];
 
 const AREA_BREAKDOWN = [
-  { label: "Guestrooms", pct: 41, color: "bg-info" },
-  { label: "Kitchen", pct: 22, color: "bg-good" },
+  { label: "Guestrooms", pct: 41, color: "bg-chart-mauve" },
+  { label: "Kitchen", pct: 22, color: "bg-chart-olive" },
   { label: "Laundry", pct: 18, color: "bg-violet-500" },
-  { label: "Irrigation", pct: 11, color: "bg-warn" },
-  { label: "Cooling Tower", pct: 8, color: "bg-info" },
+  { label: "Irrigation", pct: 11, color: "bg-chart-sand" },
+  { label: "Cooling Tower", pct: 8, color: "bg-chart-mauve" },
 ];
 
 const NIGHT_FLOW = [
@@ -382,7 +382,7 @@ function MeterModal({ meter, open, onClose }: { meter: Meter | null; open: boole
                   <span className="text-[10px] text-ink-400">{v}</span>
                   <div className="w-full flex-1 flex items-end">
                     <div
-                      className={cn("w-full rounded-t", isAlert ? "bg-bad" : "bg-info")}
+                      className={cn("w-full rounded-t", isAlert ? "bg-chart-rose" : "bg-chart-mauve")}
                       style={{ height: `${pct}%` }}
                     />
                   </div>
@@ -545,7 +545,7 @@ function OverviewTab() {
                   {/* Track fills the column so the bar's % height resolves against a definite size */}
                   <div className="w-full flex-1 flex items-end">
                     <div
-                      className="w-full rounded-t bg-info hover:bg-info transition-colors"
+                      className="w-full rounded-t bg-chart-mauve hover:bg-chart-mauve transition-colors"
                       style={{ height: `${pct}%` }}
                       title={`${v} m³`}
                     />
@@ -606,7 +606,7 @@ function OverviewTab() {
                 <span className="text-[10px] text-ink-500">{d.value}</span>
                 <div className="w-full flex-1 flex items-end">
                   <div
-                    className={cn("w-full rounded-t transition-colors", d.alert ? "bg-bad" : "bg-info")}
+                    className={cn("w-full rounded-t transition-colors", d.alert ? "bg-chart-rose" : "bg-chart-mauve")}
                     style={{ height: `${pct}%` }}
                     title={`${d.day}: ${d.value} m³/hr`}
                   />
@@ -618,11 +618,11 @@ function OverviewTab() {
         </div>
         <div className="flex items-center gap-4 mt-3">
           <div className="flex items-center gap-1.5">
-            <div className="w-3 h-3 rounded-sm bg-info" />
+            <div className="w-3 h-3 rounded-sm bg-chart-mauve" />
             <span className="text-xs text-ink-500">Normal</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <div className="w-3 h-3 rounded-sm bg-bad" />
+            <div className="w-3 h-3 rounded-sm bg-chart-rose" />
             <span className="text-xs text-ink-500">Alert (above 8 m³/hr baseline)</span>
           </div>
         </div>
@@ -870,7 +870,7 @@ function LeakDetectionTab() {
                   return (
                     <div key={i} className="flex-1 h-full flex items-end">
                       <div
-                        className={cn("w-full rounded-sm", isAlert ? "bg-bad" : "bg-info/25")}
+                        className={cn("w-full rounded-sm", isAlert ? "bg-chart-rose" : "bg-chart-mauve/25")}
                         style={{ height: `${pct}%` }}
                         title={`${dayLabels[i]} ${row.hour}: ${v} m³/hr`}
                       />

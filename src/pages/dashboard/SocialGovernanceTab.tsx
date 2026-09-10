@@ -127,9 +127,9 @@ function PeopleSection() {
               <YAxis type="category" dataKey="name" width={96} tick={{ fontSize:10, fill:"#334155" }} axisLine={false} tickLine={false} />
               <Tooltip content={<ShortTip suffix="%" />} />
               <ReferenceLine x={avgTraining} stroke="#94A3B8" strokeDasharray="4 3" label={{ value:`Avg ${avgTraining}%`, position:"top", fontSize:10, fill:"#64748B" }} />
-              <ReferenceLine x={75} stroke="#EF4444" strokeDasharray="3 3" opacity={0.3} />
+              <ReferenceLine x={75} stroke="#B33650" strokeDasharray="3 3" opacity={0.3} />
               <Bar dataKey="val" radius={[0,4,4,0]} maxBarSize={16} isAnimationActive={false}>
-                {trainingData.map(d => <Cell key={d.name} fill={d.val>=85?"#22C55E":d.val>=70?"#F59E0B":"#EF4444"} />)}
+                {trainingData.map(d => <Cell key={d.name} fill={d.val>=85?"#807245":d.val>=70?"#CDB872":"#B33650"} />)}
               </Bar>
             </BarChart>
           </ResponsiveContainer>
@@ -147,7 +147,7 @@ function PeopleSection() {
               <Tooltip content={<ShortTip suffix="%" />} />
               <ReferenceLine x={avgTurnover} stroke="#94A3B8" strokeDasharray="4 3" label={{ value:`Avg ${avgTurnover}%`, position:"top", fontSize:10, fill:"#64748B" }} />
               <Bar dataKey="val" radius={[0,4,4,0]} maxBarSize={16} isAnimationActive={false}>
-                {turnoverData.map(d => <Cell key={d.name} fill={d.val>25?"#EF4444":d.val>18?"#F59E0B":"#22C55E"} />)}
+                {turnoverData.map(d => <Cell key={d.name} fill={d.val>25?"#B33650":d.val>18?"#CDB872":"#807245"} />)}
               </Bar>
             </BarChart>
           </ResponsiveContainer>
@@ -164,7 +164,7 @@ function PeopleSection() {
               <XAxis dataKey="month" tick={{ fontSize:10, fill:"#64748B" }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fontSize:10, fill:"#64748B" }} axisLine={false} tickLine={false} width={28} domain={[0,1.3]} />
               <Tooltip content={<ShortTip />} />
-              <Line type="monotone" dataKey="ltifr" stroke="#F59E0B" strokeWidth={2.5} dot={false} activeDot={{ r:4, strokeWidth:0 }} isAnimationActive={false} />
+              <Line type="monotone" dataKey="ltifr" stroke="#CDB872" strokeWidth={2.5} dot={false} activeDot={{ r:4, strokeWidth:0 }} isAnimationActive={false} />
             </LineChart>
           </ResponsiveContainer>
         </div>
@@ -256,7 +256,7 @@ function GovernanceSection() {
                         className="h-full rounded-lg flex items-center px-3"
                         style={{
                           width:`${Math.max(step.pct,15)}%`,
-                          background: i===0?"#6366F1":i===1?"#818CF8":i===2?"#A5B4FC":"#C7D2FE",
+                          background: i===0?"#959891":i===1?"#959891":i===2?"#959891":"#C7D2FE",
                         }}
                       >
                         <span className="text-[11px] font-bold text-white">{step.count}</span>
@@ -425,9 +425,9 @@ function EvidenceSection() {
           </tbody>
         </table>
         <div className="px-4 py-2 border-t border-ink-50 flex flex-wrap gap-4 text-[10px] text-ink-400">
-          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-good inline-block" />Complete</span>
-          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-warn inline-block" />Partial</span>
-          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-bad inline-block" />Missing / Review</span>
+          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-chart-olive inline-block" />Complete</span>
+          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-chart-sand inline-block" />Partial</span>
+          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-chart-rose inline-block" />Missing / Review</span>
         </div>
       </div>
     </div>

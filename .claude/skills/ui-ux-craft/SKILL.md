@@ -59,6 +59,14 @@ repo's tokens. When in doubt, the rule wins over the existing code.
   as template/AI decoration (user feedback, Sep 2026). Carry pillar/status colour in the icon chip,
   a `Badge`, or the value colour instead.
 - Tints: `bg-good/10` + `border-good/30` + `text-good-700` is the status-callout recipe.
+- **Charts use their own palette, never UI status hues or raw Tailwind colours.** It is
+  `src/lib/chartPalette.ts` ("A Bridesmaid's Touch", chosen by the owner): olive `#807245`
+  primary → mauve `#AF8D84` → moss `#959891` → blush `#F6C8CC` → cocoa `#8B6D66`; sage `#E0E5DA`
+  for tracks/neutral; rose `#B33650` for negatives; sand `#CDB872` for warnings (sparingly).
+  Hand-built bars and legend swatches use the matching `bg-chart-*` classes. Stacked series get a
+  1px white separator. Pillars map via `CHART_PILLAR`, thresholds via `CHART_STATUS`.
+- Tab rows are contained pill tracks (`Tabs` primitive, or `inline-flex … rounded-full bg-ink-100 p-1`
+  with white active pills) — never an underline row floating on the page.
 
 ## 6. Elevation & shadows
 - `shadow-card` (resting card), `shadow-card-lg` (primary card), `shadow-pop` (menus, popovers,

@@ -1057,7 +1057,7 @@ function AssetRegistryTab() {
             placeholder="Search assets..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-9 pr-3 py-2 text-sm border border-ink-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-info focus:border-transparent"
+            className="w-full pl-9 pr-3 py-2 text-sm border border-ink-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-info focus:"
           />
           {search && (
             <button onClick={() => setSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2">
@@ -1205,7 +1205,7 @@ function AssetHealthTab() {
       label: "Good",
       count: goodAssets.length,
       assets: goodAssets,
-      colour: "bg-good/10 border-good/30",
+      colour: "bg-chart-olive/10 border-good/30",
       headerColour: "text-good-700 bg-good/15",
       dotColour: "bg-good",
       tone: "good" as const,
@@ -1214,7 +1214,7 @@ function AssetHealthTab() {
       label: "Warning",
       count: warningAssets.length,
       assets: warningAssets,
-      colour: "bg-warn/10 border-warn/30",
+      colour: "bg-chart-sand/10 border-warn/30",
       headerColour: "text-warn-700 bg-warn/15",
       dotColour: "bg-warn",
       tone: "warn" as const,
@@ -1232,7 +1232,7 @@ function AssetHealthTab() {
       label: "Critical",
       count: criticalAssets.length,
       assets: criticalAssets,
-      colour: "bg-bad/10 border-bad/30",
+      colour: "bg-chart-rose/10 border-bad/30",
       headerColour: "text-bad-700 bg-bad/15",
       dotColour: "bg-bad",
       tone: "bad" as const,
@@ -1562,8 +1562,8 @@ export default function AssetPerformance() {
         />
 
         {/* Tab navigation */}
-        <div className="border-b border-ink-200">
-          <nav className="flex gap-0 overflow-x-auto">
+        <div>
+          <nav className="inline-flex max-w-full items-center gap-1 rounded-full bg-ink-100 p-1 overflow-x-auto">
             {TABS.map(({ id, label, icon: Icon }) => {
               const isActive = activeTab === id;
               const alertBadge = id === "faults" ? FAULTS.length : id === "maintenance" ? MAINTENANCE_ACTIONS.filter((a) => a.status === "In Progress").length : 0;
@@ -1572,10 +1572,10 @@ export default function AssetPerformance() {
                   key={id}
                   onClick={() => setActiveTab(id)}
                   className={cn(
-                    "flex items-center gap-2 px-5 py-3.5 text-sm font-medium border-b-2 transition-colors whitespace-nowrap",
+                    "flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-full transition-colors whitespace-nowrap",
                     isActive
-                      ? "border-info text-info-700"
-                      : "border-transparent text-ink-500 hover:text-ink-700 hover:border-ink-300"
+                      ? "bg-white shadow-card text-ink-900"
+                      : "text-ink-500 hover:text-ink-900"
                   )}
                 >
                   <Icon className="w-4 h-4" />

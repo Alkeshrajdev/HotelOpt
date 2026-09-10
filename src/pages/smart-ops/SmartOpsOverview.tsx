@@ -26,19 +26,19 @@ import KpiTile from "@/components/ui/KpiTile";
 import { cn } from "@/lib/utils";
 
 const ENERGY_BY_SYSTEM = [
-  { label: "HVAC", pct: 58, color: "bg-info" },
-  { label: "Lighting", pct: 14, color: "bg-warn" },
+  { label: "HVAC", pct: 58, color: "bg-chart-mauve" },
+  { label: "Lighting", pct: 14, color: "bg-chart-sand" },
   { label: "Kitchen", pct: 12, color: "bg-orange-500" },
   { label: "Laundry", pct: 8, color: "bg-purple-500" },
   { label: "Other", pct: 8, color: "bg-ink-400" },
 ];
 
 const WATER_BY_AREA = [
-  { label: "Guestrooms", pct: 41, color: "bg-info" },
+  { label: "Guestrooms", pct: 41, color: "bg-chart-mauve" },
   { label: "Kitchen", pct: 22, color: "bg-orange-500" },
   { label: "Laundry", pct: 18, color: "bg-purple-500" },
-  { label: "Irrigation", pct: 11, color: "bg-good" },
-  { label: "Cooling tower", pct: 8, color: "bg-info" },
+  { label: "Irrigation", pct: 11, color: "bg-chart-olive" },
+  { label: "Cooling tower", pct: 8, color: "bg-chart-mauve" },
 ];
 
 const ALERT_SEVERITY = [

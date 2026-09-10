@@ -732,10 +732,10 @@ function DualBarChart({ data, leftLabel, leftColour, rightLabel, rightColour, un
 function SavingsPipelineStrip() {
   const pipelineSteps: { label: string; status: SavingRecord["status"]; count: number; colour: string }[] = [
     { label: "Estimated", status: "Estimated", count: SAVINGS.filter((s) => s.status === "Estimated").length, colour: "bg-ink-400" },
-    { label: "Implemented", status: "Implemented", count: SAVINGS.filter((s) => s.status === "Implemented").length, colour: "bg-info" },
-    { label: "Monitoring", status: "Monitoring", count: SAVINGS.filter((s) => s.status === "Monitoring").length, colour: "bg-warn" },
-    { label: "Verified", status: "Verified", count: SAVINGS.filter((s) => s.status === "Verified").length, colour: "bg-good" },
-    { label: "Reported", status: "Reported", count: SAVINGS.filter((s) => s.status === "Reported").length, colour: "bg-info" },
+    { label: "Implemented", status: "Implemented", count: SAVINGS.filter((s) => s.status === "Implemented").length, colour: "bg-chart-mauve" },
+    { label: "Monitoring", status: "Monitoring", count: SAVINGS.filter((s) => s.status === "Monitoring").length, colour: "bg-chart-sand" },
+    { label: "Verified", status: "Verified", count: SAVINGS.filter((s) => s.status === "Verified").length, colour: "bg-chart-olive" },
+    { label: "Reported", status: "Reported", count: SAVINGS.filter((s) => s.status === "Reported").length, colour: "bg-chart-mauve" },
   ];
 
   return (
@@ -893,7 +893,7 @@ const REPORTING_CATEGORIES = [
     reportReady: "Yes",
     frameworks: "GHG Inventory, Sustainability Report, LEED O+M, Green Key",
     notes: "Eligible for use in official sustainability reports and GHG inventory reductions section.",
-    colour: "bg-good/10 border-good/30",
+    colour: "bg-chart-olive/10 border-good/30",
     headerColour: "text-good-700 bg-good/15",
   },
   {
@@ -903,7 +903,7 @@ const REPORTING_CATEGORIES = [
     reportReady: "No",
     frameworks: "Not eligible",
     notes: "Pending verification period. Cannot be included in official reporting until monitoring is complete and data is approved.",
-    colour: "bg-warn/10 border-warn/30",
+    colour: "bg-chart-sand/10 border-warn/30",
     headerColour: "text-warn-700 bg-warn/15",
   },
   {
@@ -923,7 +923,7 @@ const REPORTING_CATEGORIES = [
     reportReady: "Yes — Already reported",
     frameworks: "Included in period sustainability reports",
     notes: "Already included in sustainability reports and/or GHG inventory for the applicable period.",
-    colour: "bg-info/10 border-info/30",
+    colour: "bg-chart-mauve/10 border-info/30",
     headerColour: "text-info-700 bg-info/15",
   },
 ];
@@ -1150,8 +1150,8 @@ export default function SavingsVerification() {
         </div>
 
         {/* Tab navigation */}
-        <div className="border-b border-ink-200">
-          <nav className="flex gap-0 overflow-x-auto">
+        <div>
+          <nav className="inline-flex max-w-full items-center gap-1 rounded-full bg-ink-100 p-1 overflow-x-auto">
             {TABS.map(({ id, label, icon: Icon }) => {
               const isActive = activeTab === id;
               return (
@@ -1159,10 +1159,10 @@ export default function SavingsVerification() {
                   key={id}
                   onClick={() => setActiveTab(id)}
                   className={cn(
-                    "flex items-center gap-2 px-5 py-3.5 text-sm font-medium border-b-2 transition-colors whitespace-nowrap",
+                    "flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-full transition-colors whitespace-nowrap",
                     isActive
-                      ? "border-info text-info-700"
-                      : "border-transparent text-ink-500 hover:text-ink-700 hover:border-ink-300"
+                      ? "bg-white shadow-card text-ink-900"
+                      : "text-ink-500 hover:text-ink-900"
                   )}
                 >
                   <Icon className="w-4 h-4" />

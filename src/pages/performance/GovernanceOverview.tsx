@@ -82,9 +82,9 @@ export default function GovernanceOverview() {
 
       {/* Trend charts */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <MiniTrend data={ATTESTATION_TREND} color="#ea580c" title="Annual attestations" />
-        <MiniTrend data={TRAINING_TREND}    color="#0F6A3C" title="Anti-corruption training" />
-        <MiniTrend data={SUPPLIER_TREND}    color="#7c3aed" title="Supplier code adoption" />
+        <MiniTrend data={ATTESTATION_TREND} color="#CDB872" title="Annual attestations" />
+        <MiniTrend data={TRAINING_TREND}    color="#807245" title="Anti-corruption training" />
+        <MiniTrend data={SUPPLIER_TREND}    color="#959891" title="Supplier code adoption" />
       </div>
 
       {/* Outstanding items */}

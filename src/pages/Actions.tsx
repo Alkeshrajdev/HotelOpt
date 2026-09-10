@@ -198,7 +198,7 @@ export default function Actions() {
       />
 
       {/* Tabs */}
-      <div className="flex items-center gap-1 border-b border-ink-200">
+      <div className="inline-flex max-w-full items-center gap-1 rounded-full bg-ink-100 p-1 overflow-x-auto">
         <TabBtn active={tab === "reduction"} onClick={() => { setTab("reduction"); setLens(null); }} icon={<Target size={14} />}>
           Reduction actions <Badge tone="neutral" className="ml-1">{reduction.length}</Badge>
         </TabBtn>
@@ -688,7 +688,7 @@ function NewActionModal({ open, onClose, initial }: { open: boolean; onClose: ()
 
 function TabBtn({ active, onClick, icon, children }: { active: boolean; onClick: () => void; icon: React.ReactNode; children: React.ReactNode }) {
   return (
-    <button onClick={onClick} className={cn("inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium -mb-px border-b-2 transition-colors", active ? "text-ink-900 border-brand-700" : "text-ink-500 hover:text-ink-900 border-transparent")}>
+    <button onClick={onClick} className={cn("inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-full transition-colors", active ? "bg-white shadow-card text-ink-900" : "text-ink-500 hover:text-ink-900")}>
       <span className={active ? "text-brand-700" : "text-ink-400"}>{icon}</span>{children}
     </button>
   );

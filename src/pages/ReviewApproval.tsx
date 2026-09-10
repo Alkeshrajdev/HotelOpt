@@ -986,16 +986,16 @@ function DetailPanel({
       )}
 
       {/* Tabs */}
-      <div className="px-6 mt-4 flex items-center gap-1 border-b border-ink-200 overflow-x-auto -mb-px">
+      <div className="mx-6 mt-4 inline-flex max-w-full items-center gap-1 rounded-full bg-ink-100 p-1 overflow-x-auto">
         {tabs.map((t) => (
           <button
             key={t.key}
             onClick={() => setTab(t.key)}
             className={cn(
-              "inline-flex items-center gap-2 px-3.5 py-2.5 text-sm font-medium border-b-2 -mb-px",
+              "inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-full",
               tab === t.key
-                ? "text-ink-900 border-brand-700"
-                : "text-ink-500 hover:text-ink-900 border-transparent"
+                ? "bg-white shadow-card text-ink-900"
+                : "text-ink-500 hover:text-ink-900"
             )}
           >
             {t.label}

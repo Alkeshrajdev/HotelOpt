@@ -84,10 +84,10 @@ const CONFIGS: Record<"water"|"waste"|"carbon", PillarCfg> = {
     intensityLabel: "Water intensity", intensityUnit: "m³/ORN",
     monthly: WATER_MONTHLY,
     sources: [
-      { key:"mains",    label:"Mains",          fullLabel:"Mains water",         color:"#0ea5e9" },
-      { key:"recycled", label:"Recycled",        fullLabel:"Recycled / grey water",color:"#22c55e" },
-      { key:"pool",     label:"Pool & spa",      fullLabel:"Pool & Spa",           color:"#a78bfa" },
-      { key:"irrig",    label:"Irrigation",      fullLabel:"Irrigation",           color:"#fb923c" },
+      { key:"mains",    label:"Mains",          fullLabel:"Mains water",         color:"#AF8D84" },
+      { key:"recycled", label:"Recycled",        fullLabel:"Recycled / grey water",color:"#807245" },
+      { key:"pool",     label:"Pool & spa",      fullLabel:"Pool & Spa",           color:"#959891" },
+      { key:"irrig",    label:"Irrigation",      fullLabel:"Irrigation",           color:"#CDB872" },
     ],
     kpis: [
       { label:"Total consumption", value:"552,000",unit:"m³",    delta:-7.8, goodDir:"down", iconBg:"bg-pillar-water/10 text-pillar-water" },
@@ -101,11 +101,11 @@ const CONFIGS: Record<"water"|"waste"|"carbon", PillarCfg> = {
     intensityLabel: "Waste intensity", intensityUnit: "kg/ORN",
     monthly: WASTE_MONTHLY,
     sources: [
-      { key:"recycling",  label:"Recycling",   fullLabel:"Recycling",         color:"#22c55e" },
+      { key:"recycling",  label:"Recycling",   fullLabel:"Recycling",         color:"#807245" },
       { key:"landfill",   label:"Landfill",    fullLabel:"Landfill (general)", color:"#94a3b8" },
-      { key:"composting", label:"Composting",  fullLabel:"Composting",         color:"#84cc16" },
-      { key:"foodAD",     label:"Food / AD",   fullLabel:"Food waste (AD)",    color:"#f59e0b" },
-      { key:"hazardous",  label:"Hazardous",   fullLabel:"Hazardous waste",    color:"#ef4444" },
+      { key:"composting", label:"Composting",  fullLabel:"Composting",         color:"#F6C8CC" },
+      { key:"foodAD",     label:"Food / AD",   fullLabel:"Food waste (AD)",    color:"#CDB872" },
+      { key:"hazardous",  label:"Hazardous",   fullLabel:"Hazardous waste",    color:"#B33650" },
     ],
     kpis: [
       { label:"Total generated",  value:"8,420", unit:"t",      delta:-9.7, goodDir:"down", iconBg:"bg-pillar-waste/10 text-pillar-waste" },
@@ -119,8 +119,8 @@ const CONFIGS: Record<"water"|"waste"|"carbon", PillarCfg> = {
     intensityLabel: "Carbon intensity", intensityUnit: "kgCO₂e/ORN",
     monthly: CARBON_MONTHLY,
     sources: [
-      { key:"scope1", label:"Scope 1", fullLabel:"Scope 1 — direct",          color:"#dc2626" },
-      { key:"scope2", label:"Scope 2", fullLabel:"Scope 2 — purchased energy", color:"#f97316" },
+      { key:"scope1", label:"Scope 1", fullLabel:"Scope 1 — direct",          color:"#B33650" },
+      { key:"scope2", label:"Scope 2", fullLabel:"Scope 2 — purchased energy", color:"#CDB872" },
     ],
     kpis: [
       { label:"Scope 1+2 total",  value:"17,997",unit:"tCO₂e",    delta:-9.4, goodDir:"down", iconBg:"bg-pillar-carbon/10 text-pillar-carbon" },
@@ -198,7 +198,7 @@ function SourceChart({ source, data, unit }: { source: Source; data: MonthRow[];
           <XAxis dataKey="month" tick={{ fontSize: 9, fill: "#9ca3af" }} axisLine={false} tickLine={false} />
           <YAxis hide />
           <Tooltip content={<SourceTooltip unit={unit} />} cursor={{ fill: "rgba(0,0,0,0.04)" }} />
-          <Bar dataKey="py" fill="#e5e7eb" radius={[2,2,0,0]} isAnimationActive={false} />
+          <Bar dataKey="py" fill="#EDEFF0" radius={[2,2,0,0]} isAnimationActive={false} />
           <Bar dataKey="ty" fill={source.color} radius={[2,2,0,0]} isAnimationActive={false} />
         </BarChart>
       </ResponsiveContainer>
@@ -245,17 +245,17 @@ export default function PillarOverview({ pillar }: { pillar: "water"|"waste"|"ca
         <div className="px-6 pb-6 pt-4">
           <ResponsiveContainer width="100%" height={280}>
             <ComposedChart data={cfg.monthly} barGap={2} barCategoryGap="25%">
-              <CartesianGrid vertical={false} stroke="#f3f4f6" />
+              <CartesianGrid vertical={false} stroke="#EDEFF0" />
               <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#6b7280" }} axisLine={false} tickLine={false} />
               <YAxis yAxisId="vol" orientation="left" tick={{ fontSize: 11, fill: "#6b7280" }} axisLine={false} tickLine={false} width={40}
                 label={{ value: cfg.unit, angle: -90, position: "insideLeft", offset: 12, style: { fontSize: 10, fill: "#9ca3af" } }}
               />
-              <YAxis yAxisId="cost" orientation="right" tick={{ fontSize: 11, fill: "#b45309" }} tickFormatter={v => `$${v}k`} axisLine={false} tickLine={false} width={48} />
+              <YAxis yAxisId="cost" orientation="right" tick={{ fontSize: 11, fill: "#CDB872" }} tickFormatter={v => `$${v}k`} axisLine={false} tickLine={false} width={48} />
               <Tooltip content={<MainTooltip unit={cfg.unit} />} cursor={{ fill: "rgba(0,0,0,0.03)" }} />
-              <Bar yAxisId="vol" dataKey="ty" name="This year" fill="#0F6A3C" radius={[3,3,0,0]} isAnimationActive={false} />
+              <Bar yAxisId="vol" dataKey="ty" name="This year" fill="#807245" radius={[3,3,0,0]} isAnimationActive={false} />
               <Bar yAxisId="vol" dataKey="py" name="Prior year" fill="#cbd5e1" radius={[3,3,0,0]} isAnimationActive={false} />
-              <Line yAxisId="cost" dataKey="costTY" name="Cost (this year)" stroke="#d97706" strokeWidth={2} dot={false} isAnimationActive={false} />
-              <Line yAxisId="cost" dataKey="costPY" name="Cost (prior year)" stroke="#fcd34d" strokeWidth={1.5} strokeDasharray="4 3" dot={false} isAnimationActive={false} />
+              <Line yAxisId="cost" dataKey="costTY" name="Cost (this year)" stroke="#CDB872" strokeWidth={2} dot={false} isAnimationActive={false} />
+              <Line yAxisId="cost" dataKey="costPY" name="Cost (prior year)" stroke="#CDB872" strokeWidth={1.5} strokeDasharray="4 3" dot={false} isAnimationActive={false} />
               <Legend wrapperStyle={{ fontSize: 11, paddingTop: 10 }} formatter={(v) => <span style={{ color: "#6b7280" }}>{v}</span>} />
             </ComposedChart>
           </ResponsiveContainer>

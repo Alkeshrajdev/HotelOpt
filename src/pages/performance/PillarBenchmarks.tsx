@@ -106,16 +106,16 @@ function MetricChart({ metric, peers }: { metric: MetricDef; peers: Peer[] }) {
               tick={({ x, y, payload }) => (
                 <text x={x-4} y={y} textAnchor="end" dominantBaseline="middle"
                   fontSize={11} fontWeight={payload.value==="You"?700:400}
-                  fill={payload.value==="You"?"#0F6A3C":"#6b7280"}>
+                  fill={payload.value==="You"?"#807245":"#6b7280"}>
                   {payload.value}
                 </text>
               )}
               width={48} axisLine={false} tickLine={false}
             />
             <Tooltip content={<Tip format={metric.format} />} cursor={{ fill:"rgba(0,0,0,0.03)" }} />
-            <ReferenceLine x={bestVal} stroke="#16a34a" strokeDasharray="3 3" strokeOpacity={0.5} />
+            <ReferenceLine x={bestVal} stroke="#807245" strokeDasharray="3 3" strokeOpacity={0.5} />
             <Bar dataKey="value" radius={[0,3,3,0]} isAnimationActive={false}>
-              {sorted.map((e,i) => <Cell key={i} fill={e.isYou ? "#0F6A3C" : "#e2e8f0"} />)}
+              {sorted.map((e,i) => <Cell key={i} fill={e.isYou ? "#807245" : "#e2e8f0"} />)}
             </Bar>
           </BarChart>
         </ResponsiveContainer>
