@@ -108,7 +108,14 @@ repo's tokens. When in doubt, the rule wins over the existing code.
 - Every interactive element has hover, focus-visible (global), active, disabled. Clickable cards use
   `card-interactive`; clickable rows use `hover:bg-ink-50/60 cursor-pointer`.
 - Every save/submit/approve/delete gives feedback: `useToast().success("Saved")` / `.error(...)`.
-- Empty (`EmptyState`), loading, and error states exist for every data surface.
+- Every filtered list/table has an empty state, and it is always the same one: `EmptyState`
+  (icon + short title + one-line hint + a way out, usually "Clear filters"). Inside a table use
+  `<tr><td colSpan={n} className="p-0"><EmptyState inset … /></td></tr>`; standalone (grid of
+  cards) use the non-inset card form. Never an inline "No results" `<td>` or `<li>`.
+- Loading is `PageSkeleton` (route Suspense in AppShell) or `Skeleton` blocks shaped like the
+  content — no spinners in the shell. Route errors are caught by `ErrorBoundary` (Reload +
+  Dashboard); don't add per-page try/catch UI.
+- A search box that doesn't filter is a lie — wire it or remove it.
 - Transitions 100–150ms (`transition-colors` / `transition-all duration-150`); hover lift is
   `-translate-y-0.5` + `shadow-pop`.
 
@@ -126,5 +133,5 @@ repo's tokens. When in doubt, the rule wins over the existing code.
 - [ ] tokens only (no raw palette), status text uses `*-700`
 - [ ] no text under 10px; numbers on `kpi`/`stat`
 - [ ] hover + focus on everything clickable; toast on every action
-- [ ] charts render with data; empty state without
+- [ ] charts render with data; every list/table has an `EmptyState` (inset in tables) with a way out
 - [ ] one primary button; destructive demoted; no subtitle paragraphs
