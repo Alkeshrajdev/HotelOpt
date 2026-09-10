@@ -195,7 +195,7 @@ export default function SmartOpsOverview() {
       />
 
       {/* Row 1 — Top KPI drill-down tiles */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 items-start">
         <div
           className="card-interactive"
           onClick={() => navigate("/smart-ops/energy")}
@@ -276,7 +276,7 @@ export default function SmartOpsOverview() {
       </div>
 
       {/* Row 2 — System breakdown cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 items-start">
         {/* Energy by system */}
         <Card level={2}>
           <CardHeader
@@ -340,35 +340,10 @@ export default function SmartOpsOverview() {
           </div>
         </Card>
 
-        {/* Top inefficient assets */}
-        <Card level={2}>
-          <CardHeader
-            title="Top inefficient assets"
-            hint={<DataSourcePill label="Sensor data" />}
-            right={<LastUpdated text="15 min ago" />}
-          />
-          <div className="px-6 pb-6 space-y-3 mt-3">
-            {TOP_INEFFICIENT_ASSETS.map((asset) => {
-              const Icon = asset.icon;
-              return (
-                <div key={asset.name} className="flex items-start gap-3 py-2 border-b border-ink-50 last:border-0">
-                  <div className="shrink-0 w-7 h-7 rounded-lg bg-bad/10 flex items-center justify-center">
-                    <Icon size={13} className="text-bad" />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-[12px] font-semibold text-ink-900">{asset.name}</p>
-                    <p className="text-[11px] text-ink-500 mt-0.5 leading-snug">{asset.issue}</p>
-                    <p className="text-[11px] font-medium text-bad mt-1">{asset.loss} est. loss</p>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </Card>
       </div>
 
-      {/* Row 3 — Alerts, maintenance, sensor health, savings */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* Row 3 — Alerts, assets, maintenance */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-start">
         {/* Recent critical alerts — spans 2 cols */}
         <Card level={2} className="lg:col-span-2">
           <CardHeader
@@ -447,8 +422,35 @@ export default function SmartOpsOverview() {
           </div>
         </Card>
 
-        {/* Sensor health + savings verification stacked */}
-        <div className="space-y-4">
+        {/* Top inefficient assets */}
+        <Card level={2}>
+          <CardHeader
+            title="Top inefficient assets"
+            hint={<DataSourcePill label="Sensor data" />}
+            right={<LastUpdated text="15 min ago" />}
+          />
+          <div className="px-6 pb-6 space-y-3 mt-3">
+            {TOP_INEFFICIENT_ASSETS.map((asset) => {
+              const Icon = asset.icon;
+              return (
+                <div key={asset.name} className="flex items-start gap-3 py-2 border-b border-ink-50 last:border-0">
+                  <div className="shrink-0 w-7 h-7 rounded-lg bg-bad/10 flex items-center justify-center">
+                    <Icon size={13} className="text-bad" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[12px] font-semibold text-ink-900">{asset.name}</p>
+                    <p className="text-[11px] text-ink-500 mt-0.5 leading-snug">{asset.issue}</p>
+                    <p className="text-[11px] font-medium text-bad mt-1">{asset.loss} est. loss</p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </Card>
+      </div>
+
+      {/* Row 4 — status cards */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
           {/* Sensor health */}
           <Card level={2}>
             <CardHeader
@@ -533,7 +535,6 @@ export default function SmartOpsOverview() {
               </div>
             </div>
           </Card>
-        </div>
       </div>
 
       {/* Data source key legend */}
@@ -543,7 +544,7 @@ export default function SmartOpsOverview() {
             <Info size={14} className="text-ink-400 shrink-0 mt-0.5" />
             <h4 className="text-[12px] font-semibold text-ink-700 uppercase tracking-wide">Data source key</h4>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-start">
             <div className="space-y-1">
               <div className="flex items-center gap-2">
                 <span className="w-5 h-5 rounded-md bg-brand-100 text-brand-700 flex items-center justify-center text-[10px] font-bold shrink-0">L1</span>

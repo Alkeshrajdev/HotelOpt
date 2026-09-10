@@ -115,7 +115,7 @@ function PeopleSection() {
   const avgTraining = Math.round(trainingData.reduce((s, d) => s + d.val, 0) / trainingData.length);
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
 
       {/* Training */}
       <Card>
@@ -181,7 +181,7 @@ function GovernanceSection() {
   );
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
 
       {/* Policy status */}
       <Card>
@@ -454,7 +454,7 @@ export default function SocialGovernanceTab() {
       </div>
 
       {/* KPI tiles — 6 practical tracking metrics */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 items-start mb-4">
         <KpiCard icon={TrendingUp}    iconBg="bg-pillar-social/10 text-pillar-social" label="Turnover"         value="22%"  tone="warn" sub="portfolio avg" />
         <KpiCard icon={BookOpen}      iconBg="bg-pillar-social/10 text-pillar-social" label="Training"         value="76%"  tone="warn" sub="completion" />
         <KpiCard icon={AlertTriangle} iconBg="bg-warn/10 text-warn"                   label="LTIFR"            value="0.82" tone="good" sub="improving ↓" />

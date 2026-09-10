@@ -412,11 +412,11 @@ export const PORTFOLIO_GOVERNANCE_BY_HOTEL = [
 // ── Carbon sub-category breakdowns ───────────────────────────────────────────
 
 export const SCOPE1_BREAKDOWN = [
-  { source: "Natural gas (boilers & heating)", tco2e: 1440, pct: 42.0, note: "Space & water heating",         color: "#F59E0B", drilldownKey: "scope1.gas"          },
-  { source: "Refrigerants (HVAC / chillers)",  tco2e: 960,  pct: 28.0, note: "Fugitive leaks — R-410A, R-32", color: "#8B5CF6", drilldownKey: "scope1.refrigerants" },
-  { source: "Diesel (backup generators)",      tco2e: 720,  pct: 21.0, note: "Peak demand & outages",         color: "#EF4444", drilldownKey: "scope1.diesel"       },
-  { source: "Company vehicles & fleet",        tco2e: 205,  pct: 6.0,  note: "Shuttles, service vehicles",    color: "#6B7280", drilldownKey: "scope1.vehicles"     },
-  { source: "Other direct combustion",         tco2e: 103,  pct: 3.0,  note: "Biomass, LPG, cooking gas",     color: "#D1D5DB", drilldownKey: "scope1.other"        },
+  { source: "Natural gas (boilers & heating)", tco2e: 1440, pct: 42.0, note: "Space & water heating",         color: "#807245", drilldownKey: "scope1.gas"          },
+  { source: "Refrigerants (HVAC / chillers)",  tco2e: 960,  pct: 28.0, note: "Fugitive leaks — R-410A, R-32", color: "#AF8D84", drilldownKey: "scope1.refrigerants" },
+  { source: "Diesel (backup generators)",      tco2e: 720,  pct: 21.0, note: "Peak demand & outages",         color: "#B33650", drilldownKey: "scope1.diesel"       },
+  { source: "Company vehicles & fleet",        tco2e: 205,  pct: 6.0,  note: "Shuttles, service vehicles",    color: "#959891", drilldownKey: "scope1.vehicles"     },
+  { source: "Other direct combustion",         tco2e: 103,  pct: 3.0,  note: "Biomass, LPG, cooking gas",     color: "#E0E5DA", drilldownKey: "scope1.other"        },
 ];
 // Total: 3,428 tCO₂e = Scope 1
 

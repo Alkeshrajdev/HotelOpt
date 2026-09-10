@@ -212,7 +212,7 @@ export default function Overview({ pillar }: { pillar: PillarKey }) {
   return (
     <div className="space-y-5">
       {/* KPI tiles */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 items-start">
         {cfg.kpis.map((k) => (
           <KpiTile
             key={k.id}

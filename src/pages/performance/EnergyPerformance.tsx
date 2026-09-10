@@ -134,7 +134,7 @@ export default function EnergyPerformance() {
     <div className="space-y-5">
 
       {/* ── Headlines ───────────────────────────────────────────────────── */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-start">
         <div className="card p-6 flex flex-col gap-1">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-full bg-good/10 grid place-items-center shrink-0"><TrendingDown size={15} className="text-good" /></div>

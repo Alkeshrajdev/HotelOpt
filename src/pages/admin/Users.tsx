@@ -45,7 +45,7 @@ export default function AdminUsers() {
         </>
       }
     >
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 items-start">
         <Tile label="Total users"   value={String(USERS.length)} />
         <Tile label="Roles defined"  value={String(ROLES.length)} hint="per BRD §4" />
         <Tile label="MFA enforced"   value="86%" hint="6 of 7 active" />

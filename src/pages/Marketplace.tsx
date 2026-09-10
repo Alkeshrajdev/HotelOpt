@@ -1335,7 +1335,7 @@ export default function Marketplace() {
                 </button>
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 items-start">
                 {filtered.map((p) => (
                   <ProductCard
                     key={p.id}
@@ -1377,7 +1377,7 @@ export default function Marketplace() {
                   RFQ all shortlisted
                 </button>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 items-start">
                 {shortlistedProducts.map((p) => (
                   <ProductCard
                     key={p.id}

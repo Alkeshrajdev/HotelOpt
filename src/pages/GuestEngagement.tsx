@@ -311,7 +311,7 @@ function PublicPageTab({ property }: { property: string }) {
                 <div className="text-2xl font-bold">A more sustainable stay</div>
                 <div className="text-sm opacity-90">All metrics independently verified through Hotel Optimizer.</div>
               </div>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 p-4">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 items-start p-4">
                 {metrics.filter((m) => m.isPublic).slice(0, 4).map((m) => (
                   <div key={m.name} className="rounded-xl border border-ink-200 p-3">
                     <div className="text-[11px] text-ink-500">{m.name}</div>
@@ -616,7 +616,7 @@ function CampaignsTab({ property }: { property: string }) {
   return (
     <>
       {/* Summary row — mirrors the Overview / Eco-points tile rows so the tabs read as one system */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 items-start">
         <Tile label="Active campaigns" value={String(activeCount)} hint={`${campaigns.length} total`} tone="good" />
         <Tile label="Total reach" value={totalReach.toLocaleString()} hint="guests across campaigns" tone="info" />
         <Tile label="Avg open rate" value={`${avgOpen}%`} hint="of delivered" tone={avgOpen >= 40 ? "good" : "warn"} />
@@ -984,7 +984,7 @@ function EcoPointsTab() {
       {/* Eco actions catalogue */}
       <Card>
         <CardHeader title="Eco-points catalogue" hint="Points awarded per qualifying guest action" />
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 p-5">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 items-start p-5">
           {ECO_ACTIONS.map((a) => (
             <div key={a.id} className="rounded-xl border border-ink-200 p-4 text-center hover:bg-ink-50/60">
               <div className="w-8 h-8 rounded-full bg-brand-50 text-brand-700 grid place-items-center mx-auto mb-2">
@@ -1008,7 +1008,7 @@ function EcoPointsTab() {
       {/* Rewards catalogue — what points redeem for */}
       <Card>
         <CardHeader title="Rewards catalogue" hint="What guests can redeem their points for" right={<button className="btn-secondary text-[12px] h-8"><Plus size={13} /> Add reward</button>} />
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 p-5">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 items-start p-5">
           {REWARDS.map((r) => {
             const Icon = r.icon;
             return (
@@ -1139,7 +1139,7 @@ function QrAnalyticsTab({ property }: { property: string }) {
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 items-start">
         <Tile label="Scans · 30d" value={totalScans.toLocaleString()} hint="in-room + public points" tone="info" />
         <Tile label="Scan → action" value={`${weightedConv}%`} hint="led to an eco-action" tone="good" />
         <Tile label="Active QR points" value={String(QR_POINTS.length)} hint={property} tone="info" />

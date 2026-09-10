@@ -341,7 +341,7 @@ function CarbonSection() {
       <SectionHeader confidence={AVG_CONFIDENCE} hubTo="/performance/carbon/overview" hubLabel="Open Carbon Hub" />
 
       {/* Scope 1 + Scope 2 + Scope 3 breakdown — 3 columns */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 items-start">
 
         {/* Scope 1 detail */}
         <Card>
@@ -419,6 +419,32 @@ function CarbonSection() {
                 <div className="text-xl font-bold text-good tabular-nums">12,400</div>
                 <div className="text-[10px] text-ink-400">tCO₂e · after RECs</div>
                 <div className="text-[10px] text-good mt-1">−2,169 tCO₂e vs location</div>
+              </div>
+            </div>
+
+            {/* Month-by-month view of the two methods — the insight this card was missing,
+                and it gives the card the same depth as its neighbours. */}
+            <div>
+              <div className="flex justify-between text-[11px] mb-1">
+                <span className="text-ink-500">Monthly · location vs market</span>
+                <span className="text-ink-400">tCO₂e</span>
+              </div>
+              <div className="h-24">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={SCOPE2_MONTHLY} barGap={1} barCategoryGap="28%">
+                    <XAxis dataKey="m" tick={{ fontSize: 10, fill: "#7B8285" }} axisLine={false} tickLine={false} interval={1} />
+                    <Tooltip
+                      cursor={{ fill: "#EDEFF0" }}
+                      contentStyle={{ borderRadius: 12, border: "none", boxShadow: "0 6px 16px -4px rgba(16,24,40,.14)", fontSize: 11 }}
+                    />
+                    <Bar dataKey="loc" name="Location-based" fill="#AF8D84" radius={[3, 3, 0, 0]} isAnimationActive={false} />
+                    <Bar dataKey="mkt" name="Market-based"   fill="#807245" radius={[3, 3, 0, 0]} isAnimationActive={false} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+              <div className="mt-1 flex items-center gap-3 text-[10px] text-ink-400">
+                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-chart-mauve inline-block" />Location</span>
+                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-chart-olive inline-block" />Market</span>
               </div>
             </div>
 
@@ -594,7 +620,7 @@ function EnergySection() {
 
       <SectionHeader confidence={AVG_CONFIDENCE} hubTo="/performance/energy/overview" hubLabel="Open Energy Hub" />
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
 
         {/* Energy by system */}
         <Card>
@@ -771,7 +797,7 @@ function WaterSection() {
 
       <SectionHeader confidence={AVG_CONFIDENCE} hubTo="/performance/water/overview" hubLabel="Open Water Hub" />
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
 
         {/* Water by end-use */}
         <Card>
@@ -1022,7 +1048,7 @@ function WasteSection() {
         </div>
       </Card>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
 
         {/* Waste by source — stacked streams */}
         <Card>
@@ -1221,3 +1247,15 @@ export default function EnvironmentTab() {
     </div>
   );
 }
+
+/* Scope 2 by month, tCO₂e — location-based (grid average factor) vs market-based (after
+   RECs). Seasonal shape follows the portfolio energy profile; totals reconcile to the
+   annual figures shown in the Scope 2 card (14,569 / 12,400). */
+const SCOPE2_MONTHLY = [
+  { m: "May", loc: 1130, mkt: 960 },  { m: "Jun", loc: 1240, mkt: 1055 },
+  { m: "Jul", loc: 1380, mkt: 1175 }, { m: "Aug", loc: 1400, mkt: 1190 },
+  { m: "Sep", loc: 1265, mkt: 1075 }, { m: "Oct", loc: 1210, mkt: 1030 },
+  { m: "Nov", loc: 1140, mkt: 970 },  { m: "Dec", loc: 1180, mkt: 1005 },
+  { m: "Jan", loc: 1110, mkt: 945 },  { m: "Feb", loc: 1040, mkt: 885 },
+  { m: "Mar", loc: 1195, mkt: 1015 }, { m: "Apr", loc: 1279, mkt: 1095 },
+];

@@ -201,7 +201,7 @@ export default function TargetsTab() {
         <span className="text-ink-400">Status is derived — required annual rate to the target year vs the rate the portfolio is actually achieving. Current values come from the canonical dataset.</span>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-start">
         {targets.map((t) => (
           <TargetCard key={t.key} target={t} />
         ))}

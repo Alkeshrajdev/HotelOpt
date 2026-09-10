@@ -325,7 +325,7 @@ function NeedsAttention() {
   return (
     <div>
       <SectionLabel title="Needs attention" />
-      <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-4 items-start">
         {ACTION_CENTRE.map((it) => (
           <Link
             key={it.label}
@@ -368,7 +368,7 @@ export default function OverviewTab({ onNavigate }: Props) {
 
       {/* ── 1. Executive Snapshot ─────────────────────────────────────────── */}
       <div>
-        <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-7 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-7 gap-4 items-start">
           {SNAP_TILES.map((t) => {
             const Icon = t.icon;
             const pct = isPctDelta(t.delta);
@@ -638,7 +638,7 @@ export default function OverviewTab({ onNavigate }: Props) {
           action="View performance"
           onClick={() => onNavigate("environment")}
         />
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 items-start">
           {EFF_TILES.map((t) => {
             const Icon = t.icon;
             const isGood = t.delta < 0 ? true : t.label.includes("diversion");

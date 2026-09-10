@@ -143,7 +143,7 @@ function BillingTab() {
         </Card>
       )}
 
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 items-start">
         <Tile label="Plan"        value={PLAN.name}           hint={`${PLAN.cycle} · ${PLAN.type}`} tone="brand" />
         <Tile label="Properties"  value={`${PLAN.propertiesUsed} / ${PLAN.propertiesIncluded}`} hint="under licence" tone="info" />
         <Tile label="Renews"      value={PLAN.renewsOn}       hint="auto-renewal on" tone="info" />
@@ -525,7 +525,7 @@ function PaymentsTab() {
       </Card>
 
       {/* Summary */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 items-start">
         <Tile label="Outstanding"  value={`$${outstanding.toLocaleString()}`} hint={`overdue ${overdueDays}d`} tone="bad" />
         <Tile label="Next charge"  value={`$${outstanding.toLocaleString()}`} hint="31 Dec 2026 · renewal" tone="info" />
         <Tile label="Paid YTD"     value={`$${paidYtd.toLocaleString()}`}     hint="2026 to date" tone="good" />

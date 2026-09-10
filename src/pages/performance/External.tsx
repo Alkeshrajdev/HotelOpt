@@ -41,7 +41,7 @@ export default function External({ pillar }: { pillar: PillarKey }) {
 
   return (
     <div className="space-y-5">
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 items-start">
         <KpiTile
           icon={<Users2 size={18} />}
           iconBg="bg-brand-50 text-brand-700"

@@ -46,7 +46,7 @@ export default function EnergyByProperty() {
     <div className="space-y-5">
 
       {/* ── Summary tiles ──────────────────────────────────────────────── */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 items-start">
         {[
           { label: "Best",            value: `${BEST}`, unit: "kWh/ORN", sub: PROPERTIES[0].name,      color: "text-good" },
           { label: "Portfolio avg",   value: `${PORTFOLIO_AVG}`, unit: "kWh/ORN", sub: "across all hotels",    color: "text-ink-900" },

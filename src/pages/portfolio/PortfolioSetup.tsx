@@ -114,7 +114,7 @@ function HotelsTab() {
   return (
     <div className="space-y-5">
       {/* Scope summary */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 items-start">
         {[
           { label: "In portfolio",  val: `${included} / ${HOTELS.length}`, colour: "text-ink-900" },
           { label: "Blocked",       val: blocked,  colour: blocked  > 0 ? "text-bad"  : "text-good" },

@@ -386,7 +386,7 @@ function OverviewTab() {
       </div>
 
       {/* secondary KPIs */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 items-start">
         <KpiTile
           icon={<Gauge size={20} />}
           iconBg="bg-orange-100"
@@ -485,7 +485,7 @@ function ZoneMapTab() {
   return (
     <div className="space-y-4">
       <p className="text-sm text-ink-500">Detailed sensor readings by zone — {ZONES.length} zones monitored</p>
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 items-start">
         {ZONES.map((z) => (
           <div
             key={z.zone}
@@ -613,7 +613,7 @@ function Co2VentilationTab() {
       {/* CO₂ threshold guide */}
       <Card className="p-5">
         <p className="text-sm font-semibold text-ink-700 mb-4">CO₂ Threshold Reference</p>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 items-start">
           <div className="bg-good/10 border border-good/30 rounded-lg p-3 text-center">
             <p className="text-xs font-semibold text-good-700">&lt; 800 ppm</p>
             <p className="text-sm font-bold text-good-700 mt-1">Excellent</p>
@@ -913,7 +913,7 @@ function TempHumidityTab() {
       {/* comfort band summary cards */}
       <div className="space-y-3">
         <p className="text-sm font-semibold text-ink-700">Comfort Bands by Area Type</p>
-        <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 items-start">
           {COMFORT_BANDS.map((band) => (
             <Card key={band.area} className="p-4">
               <p className="text-xs font-semibold text-ink-700 mb-2">{band.area}</p>

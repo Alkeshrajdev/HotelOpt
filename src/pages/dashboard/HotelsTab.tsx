@@ -395,7 +395,7 @@ export default function HotelsTab() {
 
       {/* Hotel cards */}
       {sorted.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 items-start">
           {sorted.map((h) => <HotelCard key={h.id} h={h} />)}
         </div>
       ) : (

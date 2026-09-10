@@ -23,7 +23,7 @@ export default function AdminPools() {
       subtitle="Pools are isolated per client deployment. A property in one client's pool is never compared against any other client's properties (BRD §2.3). Display level is set automatically by pool size."
       actions={<button className="btn-primary"><Plus size={14} /> New pool</button>}
     >
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 items-start">
         <Tile label="Total pools"          value={String(POOLS.length)} />
         <Tile label="Properties pooled"    value={String(POOLS.reduce((s, p) => s + p.properties, 0))} />
         <Tile label="Full-display pools"   value={String(POOLS.filter((p) => p.level === "Full").length)} hint="≥ 10 properties" />

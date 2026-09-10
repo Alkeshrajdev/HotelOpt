@@ -383,7 +383,7 @@ function SavingsDetailModal({ saving, open, onClose }: { saving: SavingRecord | 
         {/* Identity */}
         <div>
           <h4 className="text-xs font-semibold text-ink-500 uppercase tracking-wider mb-3">Saving Details</h4>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3 items-start">
             {[
               { label: "Record ID", value: saving.id },
               { label: "Category", value: saving.category },
@@ -944,7 +944,7 @@ function ReportingStatusTab() {
   return (
     <div className="space-y-6">
       {/* Framework eligibility cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
         {REPORTING_CATEGORIES.map((cat) => {
           const records = countByStatus[cat.status] ?? [];
           return (
@@ -1117,7 +1117,7 @@ export default function SavingsVerification() {
         </div>
 
         {/* KPI bar */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 items-start">
           <KpiTile
             icon={<CheckCircle className="w-5 h-5 text-good-700" />}
             iconBg="bg-good/10"

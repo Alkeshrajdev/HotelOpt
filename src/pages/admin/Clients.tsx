@@ -24,7 +24,7 @@ export default function AdminClients() {
     >
       <ProvisioningCard />
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 items-start">
         <Tile label="Total clients"           value="5"  hint="across 4 deployment types" />
         <Tile label="White-label"             value="3"  />
         <Tile label="Sovereign hosting"       value="1"  />

@@ -140,7 +140,7 @@ export default function Properties() {
       />
 
       {/* Summary strip */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 items-start mb-4">
         <SummaryTile label="Total properties" value={String(summary.total)} hint={`${PROPERTIES.length} on platform`} />
         <SummaryTile label="At/above CHSB median" value={`${summary.total - summary.belowMedian} / ${summary.total}`} hint="carbon/ORN vs cohort" tone="good" />
         <SummaryTile label="Data completeness" value={`${summary.avgCompleteness}%`} hint="approved records" tone="info" />

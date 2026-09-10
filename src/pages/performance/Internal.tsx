@@ -24,7 +24,7 @@ export default function Internal({ pillar }: { pillar: PillarKey }) {
 
   return (
     <div className="space-y-5">
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 items-start">
         <KpiTile
           icon={<Trophy size={18} />}
           iconBg="bg-pillar-energy/10 text-pillar-energy"

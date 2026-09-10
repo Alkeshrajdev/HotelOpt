@@ -148,7 +148,7 @@ function ClientView() {
 
   return (
     <>
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 items-start">
         <Tile label="Suppliers invited"    value="120" tone="info" />
         <Tile label="Active responses"     value="68"  tone="good" hint="57% response rate" />
         <Tile label="Attestations on file" value="312" tone="info" />
@@ -732,7 +732,7 @@ function InviteSupplierModal({ open, onClose }: { open: boolean; onClose: () => 
 function SupplierView() {
   return (
     <>
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 items-start">
         <Tile label="Client requests open"  value="3"  tone="warn" hint="due within 14 days" />
         <Tile label="Clients you supply"    value="12" tone="info" />
         <Tile label="Products in catalogue" value="8"  tone="info" />
