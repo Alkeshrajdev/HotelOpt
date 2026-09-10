@@ -1,6 +1,8 @@
 import { useState, useMemo } from "react";
+import { SearchX } from "lucide-react";
 import { Wrench, AlertTriangle, Activity, FileText, Database, ChevronRight, Search, Filter, X, CheckCircle, Clock, Zap, Thermometer, Droplets, Sun, Car, Waves } from "lucide-react";
 import PageHeader from "@/components/ui/PageHeader";
+import EmptyState from "@/components/ui/EmptyState";
 import { Card } from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import KpiTile from "@/components/ui/KpiTile";
@@ -1170,8 +1172,8 @@ function AssetRegistryTab() {
               ))}
               {filtered.length === 0 && (
                 <tr>
-                  <td colSpan={10} className="px-4 py-12 text-center text-ink-400 text-sm">
-                    No assets match the current filters.
+                  <td colSpan={10} className="p-0">
+                    <EmptyState inset icon={<SearchX size={20} />} title="No assets match" description="Try a different system or health filter." />
                   </td>
                 </tr>
               )}

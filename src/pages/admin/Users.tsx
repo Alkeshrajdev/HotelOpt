@@ -1,6 +1,8 @@
+import { useState } from "react";
 import { Plus, Search, ShieldCheck, UserCog, UserMinus } from "lucide-react";
 import { Card, CardHeader } from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
+import EmptyState from "@/components/ui/EmptyState";
 import AdminShell from "./AdminShell";
 
 const ROLES = [
@@ -33,6 +35,10 @@ const ROLE_TONE: Record<string, "good"|"info"|"warn"|"brand"|"neutral"> = {
 };
 
 export default function AdminUsers() {
+  const [search, setSearch] = useState("");
+  const q = search.trim().toLowerCase();
+  const filtered = USERS.filter((u) => !q || [u.name, u.email, u.role, u.properties].some((v) => v.toLowerCase().includes(q)));
+
   return (
     <AdminShell
       eyebrow="Identity"
@@ -71,7 +77,7 @@ export default function AdminUsers() {
       <div className="flex items-center gap-2">
         <div className="relative w-72">
           <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-400" />
-          <input className="input pl-9" placeholder="Search users, emails, roles…" />
+          <input className="input pl-9" placeholder="Search users, emails, roles…" value={search} onChange={(e) => setSearch(e.target.value)} />
         </div>
         <select className="input max-w-[160px]"><option>All roles</option></select>
         <select className="input max-w-[160px]"><option>MFA: any</option></select>
@@ -93,7 +99,14 @@ export default function AdminUsers() {
               </tr>
             </thead>
             <tbody>
-              {USERS.map((u) => (
+              {filtered.length === 0 && (
+                <tr>
+                  <td colSpan={7} className="p-0">
+                    <EmptyState inset icon={<Search size={20} />} title="No users match" description="Try a different name, email or role." action={<button className="btn-secondary" onClick={() => setSearch("")}>Clear search</button>} />
+                  </td>
+                </tr>
+              )}
+              {filtered.map((u) => (
                 <tr key={u.id} className="hover:bg-ink-50/60">
                   <td className="table-td font-medium text-ink-900">{u.name}</td>
                   <td className="table-td">{u.email}</td>

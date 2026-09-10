@@ -1,6 +1,8 @@
+import { useState } from "react";
 import { Building2, Globe2, Lock, Plus, Search, RotateCcw } from "lucide-react";
 import { Card, CardHeader } from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
+import EmptyState from "@/components/ui/EmptyState";
 import AdminShell from "./AdminShell";
 import { useAccount, ALL_MODULES, MODULE_LABELS, type ModuleKey } from "@/lib/account";
 import { PROPERTIES } from "@/lib/propertiesData";
@@ -15,6 +17,10 @@ const CLIENTS = [
 ];
 
 export default function AdminClients() {
+  const [search, setSearch] = useState("");
+  const q = search.trim().toLowerCase();
+  const filtered = CLIENTS.filter((c) => !q || [c.name, c.brand, c.region, c.type].some((v) => v.toLowerCase().includes(q)));
+
   return (
     <AdminShell
       eyebrow="Tenancy"
@@ -34,7 +40,7 @@ export default function AdminClients() {
       <div className="flex items-center gap-2">
         <div className="relative w-72">
           <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-400" />
-          <input className="input pl-9" placeholder="Search by client, brand, region…" />
+          <input className="input pl-9" placeholder="Search by client, brand, region…" value={search} onChange={(e) => setSearch(e.target.value)} />
         </div>
         <select className="input max-w-[180px]"><option>All deployment types</option></select>
         <select className="input max-w-[150px]"><option>All regions</option></select>
@@ -56,7 +62,14 @@ export default function AdminClients() {
               </tr>
             </thead>
             <tbody>
-              {CLIENTS.map((c) => (
+              {filtered.length === 0 && (
+                <tr>
+                  <td colSpan={7} className="p-0">
+                    <EmptyState inset icon={<Search size={20} />} title="No clients match" description="Try a different client, brand or region." action={<button className="btn-secondary" onClick={() => setSearch("")}>Clear search</button>} />
+                  </td>
+                </tr>
+              )}
+              {filtered.map((c) => (
                 <tr key={c.id} className="hover:bg-ink-50/60 cursor-pointer">
                   <td className="table-td font-medium text-ink-900">
                     <div className="flex items-center gap-2"><Building2 size={14} className="text-brand-700" /> {c.name}</div>

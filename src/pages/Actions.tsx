@@ -34,6 +34,7 @@ import {
   Zap,
 } from "lucide-react";
 import PageHeader from "@/components/ui/PageHeader";
+import EmptyState from "@/components/ui/EmptyState";
 import { PORTFOLIO_HOTELS } from "@/lib/mock";
 import { Card, CardHeader } from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
@@ -284,7 +285,7 @@ export default function Actions() {
             <CardHeader title="Actions" hint={`${filtered.length} of ${reduction.length}`} />
             <ul className="p-2 space-y-2">
               {filtered.map((a) => <ActionCard key={a.id} action={a} />)}
-              {filtered.length === 0 && <li className="p-8 text-center text-sm text-ink-500">No actions match the selected filters.</li>}
+              {filtered.length === 0 && <li><EmptyState inset icon={<Target size={20} />} title="No actions match" description="Try a different lens, pillar or source filter." /></li>}
             </ul>
           </Card>
 
@@ -316,6 +317,7 @@ export default function Actions() {
             <CardHeader title="Market instruments" hint={`${filtered.length} of ${market.length} · excluded from verified reduction`} />
             <ul className="p-2 space-y-2">
               {filtered.map((a) => <ActionCard key={a.id} action={a} />)}
+              {filtered.length === 0 && <li><EmptyState inset icon={<Target size={20} />} title="No market instruments match" description="Try a different filter." /></li>}
               {filtered.length === 0 && <li className="p-8 text-center text-sm text-ink-500">No instruments match the selected filters.</li>}
             </ul>
           </Card>

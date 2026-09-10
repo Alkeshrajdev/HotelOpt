@@ -10,6 +10,7 @@ import {
   X,
 } from "lucide-react";
 import PageHeader from "@/components/ui/PageHeader";
+import EmptyState from "@/components/ui/EmptyState";
 import { Card, CardHeader } from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import ProgressBar from "@/components/ui/ProgressBar";
@@ -294,8 +295,14 @@ export default function Properties() {
               ))}
               {filtered.length === 0 && (
                 <tr>
-                  <td colSpan={10} className="table-td text-center py-10 text-ink-500">
-                    No properties match these filters.
+                  <td colSpan={11} className="p-0">
+                    <EmptyState
+                      inset
+                      icon={<Search size={20} />}
+                      title="No properties match"
+                      description="Try a different search, or clear the active filters."
+                      action={<button className="btn-secondary" onClick={() => setFilters(INITIAL_FILTERS)}>Clear filters</button>}
+                    />
                   </td>
                 </tr>
               )}

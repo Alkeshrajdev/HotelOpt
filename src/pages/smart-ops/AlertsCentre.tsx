@@ -17,6 +17,7 @@ import {
   Database,
 } from "lucide-react";
 import PageHeader from "@/components/ui/PageHeader";
+import EmptyState from "@/components/ui/EmptyState";
 import { Card, CardHeader } from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import Modal from "@/components/ui/Modal";
@@ -607,8 +608,8 @@ export default function AlertsCentre() {
             <tbody>
               {filteredAlerts.length === 0 ? (
                 <tr>
-                  <td colSpan={10} className="px-4 py-10 text-center text-[13px] text-ink-400">
-                    No alerts match the current filters.
+                  <td colSpan={10} className="p-0">
+                    <EmptyState inset icon={<Filter size={20} />} title="No alerts match" description="Try widening the severity, category or status filters." />
                   </td>
                 </tr>
               ) : (

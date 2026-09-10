@@ -1,6 +1,8 @@
+import { useState } from "react";
 import { History, Plus, Search, Upload } from "lucide-react";
 import { Card, CardHeader } from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
+import EmptyState from "@/components/ui/EmptyState";
 import AdminShell from "./AdminShell";
 
 const EFS = [
@@ -15,6 +17,10 @@ const EFS = [
 ];
 
 export default function AdminEFLibrary() {
+  const [search, setSearch] = useState("");
+  const q = search.trim().toLowerCase();
+  const filtered = EFS.filter((e) => !q || [e.source, e.region, e.version, e.scope, e.origin].some((v) => v.toLowerCase().includes(q)));
+
   return (
     <AdminShell
       eyebrow="Reference data"
@@ -37,7 +43,7 @@ export default function AdminEFLibrary() {
       <div className="flex items-center gap-2 flex-wrap">
         <div className="relative w-72">
           <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-400" />
-          <input className="input pl-9" placeholder="Search by source, region, version…" />
+          <input className="input pl-9" placeholder="Search by source, region, version…" value={search} onChange={(e) => setSearch(e.target.value)} />
         </div>
         <select className="input max-w-[160px]"><option>All scopes</option></select>
         <select className="input max-w-[160px]"><option>All regions</option></select>
@@ -62,7 +68,14 @@ export default function AdminEFLibrary() {
               </tr>
             </thead>
             <tbody>
-              {EFS.map((e) => (
+              {filtered.length === 0 && (
+                <tr>
+                  <td colSpan={9} className="p-0">
+                    <EmptyState inset icon={<Search size={20} />} title="No emission factors match" description="Try a different source, region or version." action={<button className="btn-secondary" onClick={() => setSearch("")}>Clear search</button>} />
+                  </td>
+                </tr>
+              )}
+              {filtered.map((e) => (
                 <tr key={e.id} className="hover:bg-ink-50/60">
                   <td className="table-td font-medium">{e.source}</td>
                   <td className="table-td">{e.scope}</td>

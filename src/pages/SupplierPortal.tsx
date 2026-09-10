@@ -30,6 +30,7 @@ import {
   XCircle,
 } from "lucide-react";
 import PageHeader from "@/components/ui/PageHeader";
+import EmptyState from "@/components/ui/EmptyState";
 import { Card, CardHeader } from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import ProgressBar from "@/components/ui/ProgressBar";
@@ -204,6 +205,13 @@ function ClientView() {
               </tr>
             </thead>
             <tbody>
+              {filtered.length === 0 && (
+                <tr>
+                  <td colSpan={9} className="p-0">
+                    <EmptyState inset icon={<Inbox size={20} />} title="No suppliers match" description="Adjust the search or the status filter." />
+                  </td>
+                </tr>
+              )}
               {filtered.map((s) => {
                 const ext = SUPPLIER_EXT[s.id];
                 return (
