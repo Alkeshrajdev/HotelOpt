@@ -66,6 +66,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const demoActive =
       typeof localStorage !== "undefined" && localStorage.getItem("ho_demo") === "1";
     if (!SUPABASE_CONFIGURED || !supabase || demoActive) {
+      // The demo never talks to Supabase — stop the client's token-refresh timer so it
+      // doesn't retry against an unreachable backend every few seconds.
+      supabase?.auth.stopAutoRefresh();
       setSession(DEMO_SESSION);
       setProfile(DEMO_PROFILE);
       setLoading(false);

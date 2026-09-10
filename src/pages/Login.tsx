@@ -35,14 +35,14 @@ export default function Login() {
           <img
             src="/LogoLight.png"
             alt="Hotel Optimizer"
-            className="w-48 rounded-2xl shadow-pop"
+            className="w-48 rounded-xl3 shadow-pop-lg"
           />
         </div>
         <div>
           <div className="text-[13px] uppercase tracking-widest opacity-80">
             Sustainability performance, on one platform
           </div>
-          <div className="text-3xl font-extrabold mt-3 leading-tight">
+          <div className="text-3xl font-bold mt-3 leading-tight tracking-tight">
             Genuine Performance.<br />Verified data.<br />Action that compounds.
           </div>
           <div className="text-sm opacity-80 mt-4 max-w-md">
@@ -54,19 +54,21 @@ export default function Login() {
 
       {/* Right form */}
       <div className="flex items-center justify-center p-6">
-        <div className="w-full max-w-sm">
+        {/* The form gets its own surface — a white card on the page grey, like every other
+            primary surface in the app — instead of floating on the background. */}
+        <div className="w-full max-w-sm bg-white rounded-xl3 shadow-card-lg p-8">
 
           {/* Light coloured logo — visible on mobile where left panel is hidden */}
           <img src="/LogoLight.png" alt="Hotel Optimizer" className="h-10 w-auto object-contain mb-6 lg:hidden" />
 
           <form onSubmit={onSubmit}>
-            <h1 className="text-2xl font-extrabold text-ink-900">Sign in</h1>
+            <h1 className="text-2xl font-bold text-ink-900 tracking-tight">Sign in</h1>
             <p className="text-sm text-ink-500 mt-1">
               Use your Hotel Optimizer credentials.
             </p>
 
             {error && (
-              <div className="mt-4 text-sm rounded-lg border border-bad/25 bg-bad/10 text-bad px-3 py-2">
+              <div className="mt-4 text-sm rounded-xl bg-bad/10 text-bad-700 px-3 py-2">
                 {error}
               </div>
             )}
