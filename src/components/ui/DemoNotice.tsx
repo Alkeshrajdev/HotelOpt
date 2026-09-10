@@ -8,8 +8,8 @@ export default function DemoNotice({ message }: { message?: string }) {
   if (!isDemo || dismissed) return null;
 
   return (
-    <div className="flex items-center gap-3 px-4 sm:px-6 py-2.5 bg-amber-50 border-b border-amber-200 text-[12px] text-amber-800 shrink-0">
-      <FlaskConical size={14} className="shrink-0 text-amber-600" />
+    <div className="flex items-center gap-3 px-4 sm:px-6 py-2.5 bg-warn/10 border-b border-warn/30 text-[12px] text-warn-700 shrink-0">
+      <FlaskConical size={14} className="shrink-0 text-warn-700" />
       <span className="flex-1 leading-snug">
         <span className="font-semibold">Demo mode</span>
         {" — "}
@@ -17,7 +17,7 @@ export default function DemoNotice({ message }: { message?: string }) {
       </span>
       <button
         onClick={() => setDismissed(true)}
-        className="shrink-0 w-6 h-6 grid place-items-center rounded hover:bg-amber-100 text-amber-600 transition-colors"
+        className="shrink-0 w-6 h-6 grid place-items-center rounded hover:bg-warn/15 text-warn-700 transition-colors"
         aria-label="Dismiss demo notice"
       >
         <X size={12} />

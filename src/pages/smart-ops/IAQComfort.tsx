@@ -295,9 +295,9 @@ function StatusDot({ status }: { status: "Good" | "Warn" | "ALERT" }) {
   return (
     <span className={cn(
       "inline-block w-2.5 h-2.5 rounded-full flex-shrink-0",
-      status === "Good" && "bg-emerald-500",
-      status === "Warn" && "bg-amber-400",
-      status === "ALERT" && "bg-red-500 animate-pulse"
+      status === "Good" && "bg-good",
+      status === "Warn" && "bg-warn",
+      status === "ALERT" && "bg-bad animate-pulse"
     )} />
   );
 }
@@ -311,7 +311,7 @@ function SeverityBadge({ severity }: { severity: IaqAlert["severity"] }) {
 
 function FlagValue({ value, flagged }: { value: string; flagged?: boolean }) {
   return (
-    <span className={cn("text-xs", flagged ? "text-red-600 font-semibold" : "text-neutral-700")}>
+    <span className={cn("text-xs", flagged ? "text-bad-700 font-semibold" : "text-ink-700")}>
       {value}{flagged ? " ↑" : ""}
     </span>
   );
@@ -320,12 +320,12 @@ function FlagValue({ value, flagged }: { value: string; flagged?: boolean }) {
 function Co2Bar({ value, max = 1400 }: { value: number; max?: number }) {
   const pct = Math.min(100, Math.round((value / max) * 100));
   const color =
-    value < 800 ? "bg-emerald-400" :
-    value < 1000 ? "bg-amber-400" :
+    value < 800 ? "bg-good" :
+    value < 1000 ? "bg-warn" :
     value < 1500 ? "bg-orange-500" :
-    "bg-red-500";
+    "bg-bad";
   return (
-    <div className="w-full bg-neutral-100 rounded-full h-2">
+    <div className="w-full bg-ink-100 rounded-full h-2">
       <div className={cn("h-2 rounded-full transition-all", color)} style={{ width: `${pct}%` }} />
     </div>
   );
@@ -340,7 +340,7 @@ function OverviewTab() {
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
         <KpiTile
           icon={<Activity size={20} />}
-          iconBg="bg-amber-100"
+          iconBg="bg-warn/15"
           label="IAQ Compliance"
           value="91.2"
           unit="%"
@@ -351,7 +351,7 @@ function OverviewTab() {
         />
         <KpiTile
           icon={<Thermometer size={20} />}
-          iconBg="bg-blue-100"
+          iconBg="bg-info/15"
           label="Comfort Compliance"
           value="94.8"
           unit="%"
@@ -370,14 +370,14 @@ function OverviewTab() {
         />
         <KpiTile
           icon={<AlertTriangle size={20} />}
-          iconBg="bg-red-100"
+          iconBg="bg-bad/15"
           label="Active IAQ Alerts"
           value="4"
           caption="1 High · 3 Medium"
         />
         <KpiTile
           icon={<WifiOff size={20} />}
-          iconBg="bg-neutral-100"
+          iconBg="bg-ink-100"
           label="Offline Sensors"
           value="3"
           unit="of 42"
@@ -398,7 +398,7 @@ function OverviewTab() {
         />
         <KpiTile
           icon={<Zap size={20} />}
-          iconBg="bg-emerald-100"
+          iconBg="bg-good/15"
           label="TVOC Alerts"
           value="0"
           caption="This week"
@@ -406,7 +406,7 @@ function OverviewTab() {
         />
         <KpiTile
           icon={<Thermometer size={20} />}
-          iconBg="bg-amber-100"
+          iconBg="bg-warn/15"
           label="Temp Out-of-Band"
           value="8"
           unit="zone-hrs"
@@ -415,7 +415,7 @@ function OverviewTab() {
         />
         <KpiTile
           icon={<Droplets size={20} />}
-          iconBg="bg-cyan-100"
+          iconBg="bg-info/15"
           label="Humidity Out-of-Range"
           value="3"
           unit="zone-hrs"
@@ -426,36 +426,36 @@ function OverviewTab() {
 
       {/* zone compliance table */}
       <Card className="overflow-hidden">
-        <div className="p-4 border-b border-neutral-100">
-          <p className="text-sm font-semibold text-neutral-700">Zone Compliance Overview</p>
+        <div className="p-4 border-b border-ink-100">
+          <p className="text-sm font-semibold text-ink-700">Zone Compliance Overview</p>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="bg-neutral-50 border-b border-neutral-200">
+              <tr className="bg-ink-50 border-b border-ink-200">
                 {["Zone", "Status", "CO₂", "Temp", "RH", "PM2.5", "Sensors"].map((h) => (
-                  <th key={h} className="text-left px-4 py-2.5 text-xs font-semibold text-neutral-500 uppercase tracking-wide whitespace-nowrap">{h}</th>
+                  <th key={h} className="text-left px-4 py-2.5 text-xs font-semibold text-ink-500 uppercase tracking-wide whitespace-nowrap">{h}</th>
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-neutral-100">
+            <tbody className="divide-y divide-ink-100">
               {ZONES.map((z) => (
                 <tr
                   key={z.zone}
                   className={cn(
-                    "hover:bg-neutral-50 transition-colors",
-                    z.status === "ALERT" && "bg-red-50 hover:bg-red-50"
+                    "hover:bg-ink-50 transition-colors",
+                    z.status === "ALERT" && "bg-bad/10 hover:bg-bad/10"
                   )}
                 >
-                  <td className="px-4 py-3 font-medium text-neutral-800 whitespace-nowrap text-xs">{z.zone}</td>
+                  <td className="px-4 py-3 font-medium text-ink-800 whitespace-nowrap text-xs">{z.zone}</td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-1.5">
                       <StatusDot status={z.status} />
                       <span className={cn(
                         "text-xs font-medium",
-                        z.status === "Good" && "text-emerald-700",
-                        z.status === "Warn" && "text-amber-700",
-                        z.status === "ALERT" && "text-red-700"
+                        z.status === "Good" && "text-good-700",
+                        z.status === "Warn" && "text-warn-700",
+                        z.status === "ALERT" && "text-bad-700"
                       )}>{z.status}</span>
                     </div>
                   </td>
@@ -467,8 +467,8 @@ function OverviewTab() {
                     <span className={cn(
                       "text-xs",
                       z.sensors.startsWith(z.sensors.split("/")[1].split(" ")[0])
-                        ? "text-emerald-600"
-                        : "text-amber-600"
+                        ? "text-good-700"
+                        : "text-warn-700"
                     )}>{z.sensors}</span>
                   </td>
                 </tr>
@@ -484,27 +484,27 @@ function OverviewTab() {
 function ZoneMapTab() {
   return (
     <div className="space-y-4">
-      <p className="text-sm text-neutral-500">Detailed sensor readings by zone — {ZONES.length} zones monitored</p>
+      <p className="text-sm text-ink-500">Detailed sensor readings by zone — {ZONES.length} zones monitored</p>
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
         {ZONES.map((z) => (
           <div
             key={z.zone}
             className={cn(
-              "bg-white rounded-xl border border-neutral-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow",
-              "border-l-4",
-              z.status === "Good" && "border-l-emerald-500",
-              z.status === "Warn" && "border-l-amber-400",
-              z.status === "ALERT" && "border-l-red-500"
+              "bg-white rounded-xl border border-ink-200 overflow-hidden shadow-card hover:shadow-pop transition-shadow",
+              "",
+              z.status === "Good" && "",
+              z.status === "Warn" && "",
+              z.status === "ALERT" && ""
             )}
           >
             {/* card header */}
-            <div className="p-4 pb-3 border-b border-neutral-100">
+            <div className="p-4 pb-3 border-b border-ink-100">
               <div className="flex items-start justify-between gap-2">
                 <div>
-                  <p className="text-[10px] text-neutral-400 mb-1">Skyline Dubai · {z.floor} · {z.zone}</p>
+                  <p className="text-[10px] text-ink-400 mb-1">Skyline Dubai · {z.floor} · {z.zone}</p>
                   <div className="flex items-center gap-2">
                     <StatusDot status={z.status} />
-                    <p className="text-sm font-semibold text-neutral-800">{z.zone}</p>
+                    <p className="text-sm font-semibold text-ink-800">{z.zone}</p>
                   </div>
                 </div>
                 <div className="flex flex-col items-end gap-1">
@@ -522,24 +522,24 @@ function ZoneMapTab() {
             <div className="p-4 grid grid-cols-2 gap-3">
               {/* CO₂ */}
               <div>
-                <p className="text-[10px] text-neutral-400 uppercase tracking-wide font-medium mb-1">CO₂</p>
-                <p className={cn("text-sm font-semibold", z.co2Flag ? "text-red-600" : "text-neutral-800")}>
+                <p className="text-[10px] text-ink-400 uppercase tracking-wide font-medium mb-1">CO₂</p>
+                <p className={cn("text-sm font-semibold", z.co2Flag ? "text-bad-700" : "text-ink-800")}>
                   {z.co2}
-                  {z.co2Flag && <TrendingUp className="w-3 h-3 inline ml-1 text-red-500" />}
+                  {z.co2Flag && <TrendingUp className="w-3 h-3 inline ml-1 text-bad-700" />}
                 </p>
                 <Co2Bar value={parseInt(z.co2.replace(/,/g, "").replace(" ppm", ""))} />
               </div>
 
               {/* Temperature */}
               <div>
-                <p className="text-[10px] text-neutral-400 uppercase tracking-wide font-medium mb-1">Temperature</p>
-                <p className={cn("text-sm font-semibold", z.tempFlag ? "text-orange-600" : "text-neutral-800")}>
+                <p className="text-[10px] text-ink-400 uppercase tracking-wide font-medium mb-1">Temperature</p>
+                <p className={cn("text-sm font-semibold", z.tempFlag ? "text-orange-600" : "text-ink-800")}>
                   {z.temp}
                   {z.tempFlag && <TrendingUp className="w-3 h-3 inline ml-1 text-orange-500" />}
                 </p>
-                <div className="w-full bg-neutral-100 rounded-full h-2 mt-1">
+                <div className="w-full bg-ink-100 rounded-full h-2 mt-1">
                   <div
-                    className={cn("h-2 rounded-full", z.tempFlag ? "bg-orange-400" : "bg-blue-400")}
+                    className={cn("h-2 rounded-full", z.tempFlag ? "bg-orange-400" : "bg-info")}
                     style={{ width: `${Math.min(100, Math.round(((parseFloat(z.temp) - 18) / 15) * 100))}%` }}
                   />
                 </div>
@@ -547,14 +547,14 @@ function ZoneMapTab() {
 
               {/* RH */}
               <div>
-                <p className="text-[10px] text-neutral-400 uppercase tracking-wide font-medium mb-1">Humidity (RH)</p>
-                <p className={cn("text-sm font-semibold", z.rhFlag ? "text-amber-600" : "text-neutral-800")}>
+                <p className="text-[10px] text-ink-400 uppercase tracking-wide font-medium mb-1">Humidity (RH)</p>
+                <p className={cn("text-sm font-semibold", z.rhFlag ? "text-warn-700" : "text-ink-800")}>
                   {z.rh}
-                  {z.rhFlag && <TrendingUp className="w-3 h-3 inline ml-1 text-amber-500" />}
+                  {z.rhFlag && <TrendingUp className="w-3 h-3 inline ml-1 text-warn-700" />}
                 </p>
-                <div className="w-full bg-neutral-100 rounded-full h-2 mt-1">
+                <div className="w-full bg-ink-100 rounded-full h-2 mt-1">
                   <div
-                    className={cn("h-2 rounded-full", z.rhFlag ? "bg-amber-400" : "bg-cyan-400")}
+                    className={cn("h-2 rounded-full", z.rhFlag ? "bg-warn" : "bg-info")}
                     style={{ width: `${parseInt(z.rh)}%` }}
                   />
                 </div>
@@ -562,14 +562,14 @@ function ZoneMapTab() {
 
               {/* PM2.5 */}
               <div>
-                <p className="text-[10px] text-neutral-400 uppercase tracking-wide font-medium mb-1">PM2.5</p>
-                <p className={cn("text-sm font-semibold", z.pm25Flag ? "text-red-600" : "text-neutral-800")}>
+                <p className="text-[10px] text-ink-400 uppercase tracking-wide font-medium mb-1">PM2.5</p>
+                <p className={cn("text-sm font-semibold", z.pm25Flag ? "text-bad-700" : "text-ink-800")}>
                   {z.pm25}
-                  {z.pm25Flag && <TrendingUp className="w-3 h-3 inline ml-1 text-red-500" />}
+                  {z.pm25Flag && <TrendingUp className="w-3 h-3 inline ml-1 text-bad-700" />}
                 </p>
-                <div className="w-full bg-neutral-100 rounded-full h-2 mt-1">
+                <div className="w-full bg-ink-100 rounded-full h-2 mt-1">
                   <div
-                    className={cn("h-2 rounded-full", z.pm25Flag ? "bg-red-400" : "bg-emerald-400")}
+                    className={cn("h-2 rounded-full", z.pm25Flag ? "bg-bad" : "bg-good")}
                     style={{ width: `${Math.min(100, Math.round((parseInt(z.pm25) / 50) * 100))}%` }}
                   />
                 </div>
@@ -579,17 +579,17 @@ function ZoneMapTab() {
             {/* footer */}
             <div className="px-4 pb-4 flex items-center justify-between">
               <div className="flex items-center gap-1.5">
-                <Activity className="w-3 h-3 text-neutral-400" />
-                <span className="text-[10px] text-neutral-500">AHU: {z.ahu}</span>
+                <Activity className="w-3 h-3 text-ink-400" />
+                <span className="text-[10px] text-ink-500">AHU: {z.ahu}</span>
               </div>
               {z.tvoc && (
-                <span className="text-[10px] text-neutral-400">TVOC: {z.tvoc}</span>
+                <span className="text-[10px] text-ink-400">TVOC: {z.tvoc}</span>
               )}
               <span className={cn(
                 "text-[10px] font-medium",
                 z.sensors.includes("/") && z.sensors.split("/")[0] === z.sensors.split(" ")[0] + "/" + z.sensors.split(" ")[0]
-                  ? "text-emerald-600"
-                  : "text-amber-600"
+                  ? "text-good-700"
+                  : "text-warn-700"
               )}>{z.sensors}</span>
             </div>
           </div>
@@ -602,9 +602,9 @@ function ZoneMapTab() {
 function Co2VentilationTab() {
   const zones = ["Meeting Room B", "Gym", "Lobby"] as const;
   const colors: Record<string, string> = {
-    "Meeting Room B": "bg-red-400",
-    Gym: "bg-amber-400",
-    Lobby: "bg-blue-400",
+    "Meeting Room B": "bg-bad",
+    Gym: "bg-warn",
+    Lobby: "bg-info",
   };
   const maxCo2 = 1400;
 
@@ -612,32 +612,32 @@ function Co2VentilationTab() {
     <div className="space-y-6">
       {/* CO₂ threshold guide */}
       <Card className="p-5">
-        <p className="text-sm font-semibold text-neutral-700 mb-4">CO₂ Threshold Reference</p>
+        <p className="text-sm font-semibold text-ink-700 mb-4">CO₂ Threshold Reference</p>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-3 text-center">
-            <p className="text-xs font-semibold text-emerald-700">&lt; 800 ppm</p>
-            <p className="text-sm font-bold text-emerald-800 mt-1">Excellent</p>
+          <div className="bg-good/10 border border-good/30 rounded-lg p-3 text-center">
+            <p className="text-xs font-semibold text-good-700">&lt; 800 ppm</p>
+            <p className="text-sm font-bold text-good-700 mt-1">Excellent</p>
           </div>
-          <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-center">
-            <p className="text-xs font-semibold text-amber-700">800–1,000 ppm</p>
-            <p className="text-sm font-bold text-amber-800 mt-1">Acceptable</p>
+          <div className="bg-warn/10 border border-warn/30 rounded-lg p-3 text-center">
+            <p className="text-xs font-semibold text-warn-700">800–1,000 ppm</p>
+            <p className="text-sm font-bold text-warn-700 mt-1">Acceptable</p>
           </div>
           <div className="bg-orange-50 border border-orange-200 rounded-lg p-3 text-center">
             <p className="text-xs font-semibold text-orange-700">1,000–1,500 ppm</p>
             <p className="text-sm font-bold text-orange-800 mt-1">Action Recommended</p>
             <p className="text-[10px] text-orange-600 mt-0.5">Increase ventilation</p>
           </div>
-          <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-center">
-            <p className="text-xs font-semibold text-red-700">&gt; 1,500 ppm</p>
-            <p className="text-sm font-bold text-red-800 mt-1">Urgent Action</p>
+          <div className="bg-bad/10 border border-bad/30 rounded-lg p-3 text-center">
+            <p className="text-xs font-semibold text-bad-700">&gt; 1,500 ppm</p>
+            <p className="text-sm font-bold text-bad-700 mt-1">Urgent Action</p>
           </div>
         </div>
       </Card>
 
       {/* 14-day CO₂ trend */}
       <Card className="p-5">
-        <p className="text-sm font-semibold text-neutral-700 mb-1">14-Day CO₂ Trend — Top 3 Zones</p>
-        <p className="text-xs text-neutral-500 mb-4">Dashed line at 1,000 ppm action threshold</p>
+        <p className="text-sm font-semibold text-ink-700 mb-1">14-Day CO₂ Trend — Top 3 Zones</p>
+        <p className="text-xs text-ink-500 mb-4">Dashed line at 1,000 ppm action threshold</p>
 
         <div className="space-y-6">
           {zones.map((zone) => {
@@ -650,29 +650,29 @@ function Co2VentilationTab() {
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
                     <div className={cn("w-3 h-3 rounded-sm", colors[zone])} />
-                    <p className="text-xs font-semibold text-neutral-700">{zone}</p>
+                    <p className="text-xs font-semibold text-ink-700">{zone}</p>
                   </div>
-                  <p className="text-xs text-neutral-500">
-                    Current: <span className={cn("font-semibold", values[13] >= 1000 ? "text-red-600" : values[13] >= 800 ? "text-amber-600" : "text-emerald-600")}>
+                  <p className="text-xs text-ink-500">
+                    Current: <span className={cn("font-semibold", values[13] >= 1000 ? "text-bad-700" : values[13] >= 800 ? "text-warn-700" : "text-good-700")}>
                       {values[13].toLocaleString()} ppm
                     </span>
                   </p>
                 </div>
-                <div className="relative bg-neutral-50 rounded-lg p-3">
+                <div className="relative bg-ink-50 rounded-lg p-3">
                   {/* threshold line */}
                   <div
-                    className="absolute left-3 right-3 border-t border-dashed border-amber-400"
+                    className="absolute left-3 right-3 border-t border-dashed border-warn"
                     style={{ bottom: `calc(${thresholdPct}% + 0.75rem)` }}
                   >
-                    <span className="text-[9px] text-amber-600 absolute right-0 -top-3">1,000 ppm</span>
+                    <span className="text-[10px] text-warn-700 absolute right-0 -top-3">1,000 ppm</span>
                   </div>
 
                   <div className="flex items-end gap-0.5 h-20">
                     {values.map((v, i) => {
                       const pct = Math.round((v / (localMax * 1.1)) * 100);
                       const barColor =
-                        v >= 1000 ? "bg-red-400 hover:bg-red-500" :
-                        v >= 800 ? "bg-amber-400 hover:bg-amber-500" :
+                        v >= 1000 ? "bg-bad hover:bg-bad" :
+                        v >= 800 ? "bg-warn hover:bg-warn" :
                         `${colors[zone]} hover:opacity-90`;
                       return (
                         <div key={i} className="flex-1 min-w-0 h-full flex flex-col items-center gap-1">
@@ -683,7 +683,7 @@ function Co2VentilationTab() {
                               title={`D${i + 1}: ${v} ppm`}
                             />
                           </div>
-                          <span className="text-[8px] text-neutral-400 h-2.5 leading-none">{i % 3 === 0 ? `D${i + 1}` : ""}</span>
+                          <span className="text-[10px] text-ink-400 h-2.5 leading-none">{i % 3 === 0 ? `D${i + 1}` : ""}</span>
                         </div>
                       );
                     })}
@@ -697,52 +697,52 @@ function Co2VentilationTab() {
 
       {/* ventilation recommendations */}
       <div className="space-y-3">
-        <p className="text-sm font-semibold text-neutral-700">Ventilation Recommendations</p>
+        <p className="text-sm font-semibold text-ink-700">Ventilation Recommendations</p>
 
-        <Card className="p-5 border-l-4 border-l-red-500">
+        <Card className="p-5">
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-1">
                 <Badge tone="bad">High — Active</Badge>
                 <Badge tone="neutral">AHU-03</Badge>
               </div>
-              <p className="text-sm font-semibold text-neutral-800 mt-2">Meeting Room B — CO₂ 1,240 ppm for 3+ hours</p>
-              <p className="text-xs text-neutral-600 mt-1">
+              <p className="text-sm font-semibold text-ink-800 mt-2">Meeting Room B — CO₂ 1,240 ppm for 3+ hours</p>
+              <p className="text-xs text-ink-600 mt-1">
                 Increase AHU-03 fresh air damper to maximum fresh air position. Verify occupancy load vs
                 design capacity. Consider reducing meeting room occupancy until CO₂ normalises.
               </p>
               <div className="flex items-center gap-4 mt-3">
                 <div>
-                  <p className="text-[10px] text-neutral-400">Estimated additional cost</p>
-                  <p className="text-xs font-medium text-neutral-700">$2/hr (additional cooling)</p>
+                  <p className="text-[10px] text-ink-400">Estimated additional cost</p>
+                  <p className="text-xs font-medium text-ink-700">$2/hr (additional cooling)</p>
                 </div>
                 <div>
-                  <p className="text-[10px] text-neutral-400">Estimated benefit</p>
-                  <p className="text-xs font-medium text-emerald-700">Guest comfort improvement</p>
+                  <p className="text-[10px] text-ink-400">Estimated benefit</p>
+                  <p className="text-xs font-medium text-good-700">Guest comfort improvement</p>
                 </div>
               </div>
             </div>
-            <button className="px-3 py-1.5 text-xs font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 whitespace-nowrap flex-shrink-0">
+            <button className="px-3 py-1.5 text-xs font-medium bg-info text-white rounded-lg hover:bg-info-700 whitespace-nowrap flex-shrink-0">
               Create Action
             </button>
           </div>
         </Card>
 
-        <Card className="p-5 border-l-4 border-l-amber-400">
+        <Card className="p-5">
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-1">
                 <Badge tone="warn">Medium</Badge>
                 <Badge tone="neutral">AHU-07</Badge>
               </div>
-              <p className="text-sm font-semibold text-neutral-800 mt-2">Gym — CO₂ trending up since 09:00</p>
-              <p className="text-xs text-neutral-600 mt-1">
+              <p className="text-sm font-semibold text-ink-800 mt-2">Gym — CO₂ trending up since 09:00</p>
+              <p className="text-xs text-ink-600 mt-1">
                 CO₂ at 890 ppm and rising. Verify AHU-07 operational schedule and fresh air damper ratio.
                 High occupancy gym environments may require greater fresh air provision.
                 Check if AHU-07 setpoint has been recently adjusted.
               </p>
             </div>
-            <button className="px-3 py-1.5 text-xs font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 whitespace-nowrap flex-shrink-0">
+            <button className="px-3 py-1.5 text-xs font-medium bg-info text-white rounded-lg hover:bg-info-700 whitespace-nowrap flex-shrink-0">
               Create Action
             </button>
           </div>
@@ -750,9 +750,9 @@ function Co2VentilationTab() {
       </div>
 
       {/* disclaimer */}
-      <div className="bg-neutral-50 border border-neutral-200 rounded-xl p-4 flex items-start gap-3">
-        <Info className="w-4 h-4 text-neutral-500 flex-shrink-0 mt-0.5" />
-        <p className="text-xs text-neutral-600">
+      <div className="bg-ink-50 border border-ink-200 rounded-xl p-4 flex items-start gap-3">
+        <Info className="w-4 h-4 text-ink-500 flex-shrink-0 mt-0.5" />
+        <p className="text-xs text-ink-600">
           CO₂ levels shown are for ventilation management purposes. Hotel Optimizer does not make health claims
           based on CO₂ readings. Thresholds are operational guidelines only.
         </p>
@@ -823,20 +823,20 @@ function TempHumidityTab() {
     <div className="space-y-6">
       {/* zone heatmap / table */}
       <Card className="overflow-hidden">
-        <div className="p-4 border-b border-neutral-100">
-          <p className="text-sm font-semibold text-neutral-700">Temperature & Humidity — All Zones</p>
-          <p className="text-xs text-neutral-500 mt-0.5">Comfort band compliance by area type</p>
+        <div className="p-4 border-b border-ink-100">
+          <p className="text-sm font-semibold text-ink-700">Temperature & Humidity — All Zones</p>
+          <p className="text-xs text-ink-500 mt-0.5">Comfort band compliance by area type</p>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="bg-neutral-50 border-b border-neutral-200">
+              <tr className="bg-ink-50 border-b border-ink-200">
                 {["Zone", "Temp", "RH", "Comfort Band (Temp)", "Comfort Band (RH)", "Status"].map((h) => (
-                  <th key={h} className="text-left px-4 py-2.5 text-xs font-semibold text-neutral-500 uppercase tracking-wide whitespace-nowrap">{h}</th>
+                  <th key={h} className="text-left px-4 py-2.5 text-xs font-semibold text-ink-500 uppercase tracking-wide whitespace-nowrap">{h}</th>
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-neutral-100">
+            <tbody className="divide-y divide-ink-100">
               {ZONES.map((z) => {
                 const tempVal = parseFloat(z.temp);
                 const rhVal = parseInt(z.rh);
@@ -850,25 +850,25 @@ function TempHumidityTab() {
                   <tr
                     key={z.zone}
                     className={cn(
-                      "hover:bg-neutral-50",
-                      (z.tempFlag || z.rhFlag) && "bg-amber-50 hover:bg-amber-50"
+                      "hover:bg-ink-50",
+                      (z.tempFlag || z.rhFlag) && "bg-warn/10 hover:bg-warn/10"
                     )}
                   >
-                    <td className="px-4 py-3 font-medium text-neutral-800 text-xs whitespace-nowrap">{z.zone}</td>
+                    <td className="px-4 py-3 font-medium text-ink-800 text-xs whitespace-nowrap">{z.zone}</td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-1">
-                        <span className={cn("text-xs font-semibold", z.tempFlag ? "text-orange-600" : "text-neutral-700")}>{z.temp}</span>
+                        <span className={cn("text-xs font-semibold", z.tempFlag ? "text-orange-600" : "text-ink-700")}>{z.temp}</span>
                         {z.tempFlag && <TrendingUp className="w-3 h-3 text-orange-500" />}
                       </div>
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-1">
-                        <span className={cn("text-xs font-semibold", z.rhFlag ? "text-amber-600" : "text-neutral-700")}>{z.rh}</span>
-                        {z.rhFlag && <TrendingUp className="w-3 h-3 text-amber-500" />}
+                        <span className={cn("text-xs font-semibold", z.rhFlag ? "text-warn-700" : "text-ink-700")}>{z.rh}</span>
+                        {z.rhFlag && <TrendingUp className="w-3 h-3 text-warn-700" />}
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-xs text-neutral-500 whitespace-nowrap">{tempBand}</td>
-                    <td className="px-4 py-3 text-xs text-neutral-500 whitespace-nowrap">{rhBand}</td>
+                    <td className="px-4 py-3 text-xs text-ink-500 whitespace-nowrap">{tempBand}</td>
+                    <td className="px-4 py-3 text-xs text-ink-500 whitespace-nowrap">{rhBand}</td>
                     <td className="px-4 py-3">
                       {z.tempFlag || z.rhFlag
                         ? <Badge tone="warn">Out of band</Badge>
@@ -884,26 +884,26 @@ function TempHumidityTab() {
 
       {/* out of band detail */}
       <div className="space-y-3">
-        <p className="text-sm font-semibold text-neutral-700">Out-of-Band Zone Detail</p>
+        <p className="text-sm font-semibold text-ink-700">Out-of-Band Zone Detail</p>
         {OUT_OF_BAND.map((item) => (
           <Card key={item.zone} className={cn(
-            "p-4 border-l-4",
-            item.severity === "Medium" ? "border-l-amber-400" : "border-l-blue-400"
+            "p-4",
+            item.severity === "Medium" ? "" : ""
           )}>
             <div className="flex items-start justify-between gap-4">
               <div>
                 <div className="flex items-center gap-2 mb-1">
-                  <p className="text-sm font-semibold text-neutral-800">{item.zone}</p>
+                  <p className="text-sm font-semibold text-ink-800">{item.zone}</p>
                   <Badge tone={item.severity === "Medium" ? "warn" : "info"}>{item.severity}</Badge>
                 </div>
-                <p className="text-xs text-neutral-600 mt-0.5">
-                  Reading: <span className="font-medium text-amber-700">{item.reading}</span>
+                <p className="text-xs text-ink-600 mt-0.5">
+                  Reading: <span className="font-medium text-warn-700">{item.reading}</span>
                 </p>
-                <p className="text-xs text-neutral-500 mt-1">{item.issue}</p>
+                <p className="text-xs text-ink-500 mt-1">{item.issue}</p>
               </div>
               <div className="text-right flex-shrink-0">
-                <p className="text-[10px] text-neutral-400">Recommended action</p>
-                <p className="text-xs font-medium text-blue-700 mt-0.5">{item.action}</p>
+                <p className="text-[10px] text-ink-400">Recommended action</p>
+                <p className="text-xs font-medium text-info-700 mt-0.5">{item.action}</p>
               </div>
             </div>
           </Card>
@@ -912,23 +912,23 @@ function TempHumidityTab() {
 
       {/* comfort band summary cards */}
       <div className="space-y-3">
-        <p className="text-sm font-semibold text-neutral-700">Comfort Bands by Area Type</p>
+        <p className="text-sm font-semibold text-ink-700">Comfort Bands by Area Type</p>
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
           {COMFORT_BANDS.map((band) => (
             <Card key={band.area} className="p-4">
-              <p className="text-xs font-semibold text-neutral-700 mb-2">{band.area}</p>
+              <p className="text-xs font-semibold text-ink-700 mb-2">{band.area}</p>
               <div className="space-y-1">
                 <div className="flex justify-between">
-                  <span className="text-[10px] text-neutral-400">Temp target</span>
-                  <span className="text-[10px] font-medium text-neutral-600">{band.tempRange}</span>
+                  <span className="text-[10px] text-ink-400">Temp target</span>
+                  <span className="text-[10px] font-medium text-ink-600">{band.tempRange}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-[10px] text-neutral-400">RH target</span>
-                  <span className="text-[10px] font-medium text-neutral-600">{band.rhRange}</span>
+                  <span className="text-[10px] text-ink-400">RH target</span>
+                  <span className="text-[10px] font-medium text-ink-600">{band.rhRange}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-[10px] text-neutral-400">Zones</span>
-                  <span className="text-[10px] font-medium text-neutral-600">{band.zones.length}</span>
+                  <span className="text-[10px] text-ink-400">Zones</span>
+                  <span className="text-[10px] font-medium text-ink-600">{band.zones.length}</span>
                 </div>
               </div>
             </Card>
@@ -943,7 +943,7 @@ function AlertsTab() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <p className="text-sm text-neutral-500">{IAQ_ALERTS.length} IAQ alerts · 6 Active · 1 Monitoring</p>
+        <p className="text-sm text-ink-500">{IAQ_ALERTS.length} IAQ alerts · 6 Active · 1 Monitoring</p>
         <div className="flex items-center gap-2">
           <Badge tone="bad">1 High</Badge>
           <Badge tone="warn">2 Medium</Badge>
@@ -956,30 +956,30 @@ function AlertsTab() {
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="bg-neutral-50 border-b border-neutral-200">
+              <tr className="bg-ink-50 border-b border-ink-200">
                 {["Zone", "Type", "Current Value", "Threshold", "Duration", "Severity", "Status", "Action"].map((h) => (
-                  <th key={h} className="text-left px-3 py-2.5 text-xs font-semibold text-neutral-500 uppercase tracking-wide whitespace-nowrap">{h}</th>
+                  <th key={h} className="text-left px-3 py-2.5 text-xs font-semibold text-ink-500 uppercase tracking-wide whitespace-nowrap">{h}</th>
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-neutral-100">
+            <tbody className="divide-y divide-ink-100">
               {IAQ_ALERTS.map((alert) => (
                 <tr
                   key={alert.id}
                   className={cn(
-                    "hover:bg-neutral-50 transition-colors",
-                    alert.severity === "High" && "bg-red-50 hover:bg-red-50"
+                    "hover:bg-ink-50 transition-colors",
+                    alert.severity === "High" && "bg-bad/10 hover:bg-bad/10"
                   )}
                 >
-                  <td className="px-3 py-3 font-medium text-neutral-800 text-xs whitespace-nowrap">{alert.zone}</td>
-                  <td className="px-3 py-3 text-neutral-600 text-xs whitespace-nowrap">{alert.type}</td>
-                  <td className="px-3 py-3 font-mono text-xs font-medium text-neutral-800 whitespace-nowrap">
+                  <td className="px-3 py-3 font-medium text-ink-800 text-xs whitespace-nowrap">{alert.zone}</td>
+                  <td className="px-3 py-3 text-ink-600 text-xs whitespace-nowrap">{alert.type}</td>
+                  <td className="px-3 py-3 font-mono text-xs font-medium text-ink-800 whitespace-nowrap">
                     {alert.current !== "N/A"
-                      ? <span className={alert.severity === "High" || alert.severity === "Medium" ? "text-red-600" : "text-neutral-700"}>{alert.current}</span>
-                      : <span className="text-neutral-400">N/A</span>}
+                      ? <span className={alert.severity === "High" || alert.severity === "Medium" ? "text-bad-700" : "text-ink-700"}>{alert.current}</span>
+                      : <span className="text-ink-400">N/A</span>}
                   </td>
-                  <td className="px-3 py-3 text-xs text-neutral-500 whitespace-nowrap">{alert.threshold}</td>
-                  <td className="px-3 py-3 text-xs text-neutral-600 whitespace-nowrap">{alert.duration}</td>
+                  <td className="px-3 py-3 text-xs text-ink-500 whitespace-nowrap">{alert.threshold}</td>
+                  <td className="px-3 py-3 text-xs text-ink-600 whitespace-nowrap">{alert.duration}</td>
                   <td className="px-3 py-3 whitespace-nowrap"><SeverityBadge severity={alert.severity} /></td>
                   <td className="px-3 py-3 whitespace-nowrap">
                     {alert.status === "Active"
@@ -987,7 +987,7 @@ function AlertsTab() {
                       : <Badge tone="info">Monitoring</Badge>}
                   </td>
                   <td className="px-3 py-3 whitespace-nowrap">
-                    <button className="text-xs text-blue-600 hover:text-blue-700 font-medium whitespace-nowrap">
+                    <button className="text-xs text-info-700 hover:text-info-700 font-medium whitespace-nowrap">
                       {alert.action}
                     </button>
                   </td>
@@ -999,11 +999,11 @@ function AlertsTab() {
       </Card>
 
       {/* bulk action bar */}
-      <div className="bg-white border border-neutral-200 rounded-xl p-4 flex items-center justify-between gap-4">
-        <p className="text-sm text-neutral-600">
+      <div className="bg-white border border-ink-200 rounded-xl p-4 flex items-center justify-between gap-4">
+        <p className="text-sm text-ink-600">
           <span className="font-semibold">6 active alerts</span> require attention. Creating maintenance actions will log these in the work order system.
         </p>
-        <button className="px-4 py-2 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex-shrink-0">
+        <button className="px-4 py-2 text-sm font-medium bg-info text-white rounded-lg hover:bg-info-700 flex-shrink-0">
           Create All Actions
         </button>
       </div>
@@ -1035,9 +1035,9 @@ export default function IAQComfort() {
         />
 
         {/* disclaimer */}
-        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 flex items-start gap-3">
-          <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
-          <p className="text-sm text-blue-800">
+        <div className="bg-info/10 border border-info/30 rounded-xl p-4 flex items-start gap-3">
+          <Info className="w-5 h-5 text-info-700 flex-shrink-0 mt-0.5" />
+          <p className="text-sm text-info-700">
             <span className="font-semibold">Important: </span>
             IAQ monitoring supports comfort and ventilation management. Data shown is for operational management
             only and does not constitute health certification or regulatory compliance unless independently verified.
@@ -1045,7 +1045,7 @@ export default function IAQComfort() {
         </div>
 
         {/* tab navigation */}
-        <div className="flex gap-1 bg-white border border-neutral-200 rounded-xl p-1 w-fit flex-wrap">
+        <div className="flex gap-1 bg-white border border-ink-200 rounded-xl p-1 w-fit flex-wrap">
           {TABS.map((tab) => (
             <button
               key={tab.id}
@@ -1053,8 +1053,8 @@ export default function IAQComfort() {
               className={cn(
                 "px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap",
                 activeTab === tab.id
-                  ? "bg-blue-600 text-white shadow-sm"
-                  : "text-neutral-600 hover:text-neutral-800 hover:bg-neutral-100"
+                  ? "bg-info text-white shadow-card"
+                  : "text-ink-600 hover:text-ink-800 hover:bg-ink-100"
               )}
             >
               {tab.label}

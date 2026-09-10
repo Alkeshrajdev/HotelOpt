@@ -98,7 +98,7 @@ function AnomalyCard({
   return (
     <div className={cn("rounded-xl border p-3", a.severity === "critical" ? "border-bad/30 bg-bad/5" : "border-warn/30 bg-warn/5")}>
       <div className="flex items-start gap-3">
-        <div className={cn("w-8 h-8 rounded-lg grid place-items-center shrink-0", a.severity === "critical" ? "bg-bad/15 text-bad" : "bg-warn/15 text-amber-700")}>
+        <div className={cn("w-8 h-8 rounded-full grid place-items-center shrink-0", a.severity === "critical" ? "bg-bad/15 text-bad" : "bg-warn/15 text-warn-700")}>
           <Icon size={16} />
         </div>
         <div className="flex-1 min-w-0">

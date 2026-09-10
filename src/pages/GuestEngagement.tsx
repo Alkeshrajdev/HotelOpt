@@ -46,6 +46,7 @@ import Tabs from "@/components/ui/Tabs";
 import StatusPipeline from "@/components/shared/StatusPipeline";
 import { PORTFOLIO_HOTELS } from "@/lib/mock";
 import { cn } from "@/lib/utils";
+import { useToast } from "@/components/ui/Toast";
 
 const PROPERTY_NAMES = PORTFOLIO_HOTELS.map((h) => h.name);
 const slug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
@@ -277,8 +278,8 @@ function PublicPageTab({ property }: { property: string }) {
           </div>
           <div className="flex items-center gap-2 flex-wrap">
             {status === "draft"    && <button className="btn-primary" onClick={() => setStatus("pending")}><Send size={14} /> Submit for approval</button>}
-            {status === "pending"  && <><button className="btn bg-bad text-white hover:bg-red-700" onClick={() => setStatus("draft")}>Reject</button><button className="btn-primary" onClick={() => setStatus("live")}><CheckCircle2 size={14} /> Approve &amp; publish</button></>}
-            {status === "live"     && <button className="btn bg-bad text-white hover:bg-red-700" onClick={() => setStatus("disabled")}><PowerOff size={14} /> Disable</button>}
+            {status === "pending"  && <><button className="btn-secondary text-bad-700 border-bad/30 hover:bg-bad/10" onClick={() => setStatus("draft")}>Reject</button><button className="btn-primary" onClick={() => setStatus("live")}><CheckCircle2 size={14} /> Approve &amp; publish</button></>}
+            {status === "live"     && <button className="btn-secondary text-bad-700 border-bad/30 hover:bg-bad/10" onClick={() => setStatus("disabled")}><PowerOff size={14} /> Disable</button>}
             {status === "disabled" && <button className="btn-primary" onClick={() => setStatus("pending")}>Re-publish</button>}
           </div>
         </div>
@@ -503,7 +504,7 @@ function RenewableClaimsPanel() {
           >
             <div className="flex items-start gap-3">
               <div className={cn(
-                "w-9 h-9 rounded-lg grid place-items-center shrink-0",
+                "w-9 h-9 rounded-full grid place-items-center shrink-0",
                 claim.certType === "I-REC" || claim.certType === "EAC" ? "bg-warn/10 text-warn" : "bg-good/10 text-good"
               )}>
                 {claim.certType === "VCS" ? <Leaf size={16} /> : <Sun size={16} />}
@@ -532,7 +533,7 @@ function RenewableClaimsPanel() {
                     : "Sustainability Manager — please approve public visibility. Once approved, this claim will appear on the guest page and in campaign templates."}
                 </div>
                 <button
-                  className="btn bg-bad text-white hover:bg-red-700 h-8 px-3 text-[12px] shrink-0"
+                  className="btn-secondary text-bad-700 border-bad/30 hover:bg-bad/10 h-8 px-3 text-[12px] shrink-0"
                   onClick={() => reject(claim.id)}
                 >
                   Reject
@@ -581,6 +582,7 @@ function CampaignsTab({ property }: { property: string }) {
   const [editId, setEditId]       = useState<string | null>(null);
   const [detailId, setDetailId]   = useState<string | null>(null);
   const [form, setForm]           = useState<CampaignForm>({ ...CAMPAIGN_INITIAL, property });
+  const toast = useToast();
 
   function set<K extends keyof CampaignForm>(k: K, v: CampaignForm[K]) { setForm((f) => ({ ...f, [k]: v })); }
 
@@ -600,6 +602,7 @@ function CampaignsTab({ property }: { property: string }) {
       setCampaigns((cs) => [nc, ...cs]);
     }
     setModalOpen(false);
+    toast.success(editId ? "Campaign updated" : "Campaign created", form.name);
   }
 
   const CAMP_STATUS_TONE: Record<CampaignStatus, "good" | "neutral" | "info"> = { active: "good", draft: "neutral", completed: "info" };
@@ -775,6 +778,7 @@ function CampaignDetailModal({ campaign: c, onClose }: { campaign: Campaign | nu
 
 function SurveysTab({ property }: { property: string }) {
   const [questions, setQuestions] = useState<SurveyQuestion[]>(INITIAL_QUESTIONS);
+  const toast = useToast();
   const [adding, setAdding]       = useState<QuestionType | null>(null);
   const [newText, setNewText]     = useState("");
 
@@ -847,8 +851,8 @@ function SurveysTab({ property }: { property: string }) {
           )}
 
           <div className="px-4 pb-4 border-t border-ink-200 pt-3 flex gap-2">
-            <button className="btn-primary text-[12px] h-8"><Send size={12} /> Publish survey</button>
-            <button className="btn-secondary text-[12px] h-8">Save draft</button>
+            <button className="btn-primary text-[12px] h-8" onClick={() => toast.success("Survey published", "Live on the public page and in-room QR.")}><Send size={12} /> Publish survey</button>
+            <button className="btn-secondary text-[12px] h-8" onClick={() => toast.info("Draft saved")}>Save draft</button>
           </div>
         </Card>
 
@@ -1009,7 +1013,7 @@ function EcoPointsTab() {
             const Icon = r.icon;
             return (
               <div key={r.id} className="rounded-xl border border-ink-200 p-3 flex items-center gap-3 hover:bg-ink-50/60">
-                <div className="w-9 h-9 rounded-lg bg-brand-50 text-brand-700 grid place-items-center shrink-0"><Icon size={16} /></div>
+                <div className="w-9 h-9 rounded-full bg-brand-50 text-brand-700 grid place-items-center shrink-0"><Icon size={16} /></div>
                 <div className="min-w-0 flex-1">
                   <div className="text-[12px] font-semibold text-ink-900 truncate">{r.label}</div>
                   <div className="text-[11px] text-ink-500">{r.redeemed} redeemed</div>
@@ -1034,7 +1038,7 @@ function EcoPointsTab() {
               return (
                 <div key={c.id} className="rounded-xl border border-ink-200 p-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-lg bg-brand-50 text-brand-700 grid place-items-center shrink-0"><Icon size={16} /></div>
+                    <div className="w-9 h-9 rounded-full bg-brand-50 text-brand-700 grid place-items-center shrink-0"><Icon size={16} /></div>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
                         <span className="text-[13px] font-semibold text-ink-900">{c.name}</span>
@@ -1161,14 +1165,14 @@ function QrAnalyticsTab({ property }: { property: string }) {
             {QR_POINTS.map((p) => (
               <div key={p.id} className="rounded-xl border border-ink-200 p-3">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-ink-100 text-ink-600 grid place-items-center shrink-0"><QrCode size={15} /></div>
+                  <div className="w-8 h-8 rounded-full bg-ink-100 text-ink-600 grid place-items-center shrink-0"><QrCode size={15} /></div>
                   <div className="min-w-0 flex-1">
                     <div className="text-[12px] font-semibold text-ink-900">{p.location}</div>
                     <div className="text-[11px] text-ink-400 truncate">→ {p.dest}</div>
                   </div>
                   <div className="text-right shrink-0">
                     <div className="text-[13px] font-bold text-ink-900 tabular-nums">{p.scans.toLocaleString()}</div>
-                    <div className={cn("text-[10px] font-semibold", p.conv >= 25 ? "text-good" : p.conv >= 12 ? "text-amber-700" : "text-ink-400")}>{p.conv}% → action</div>
+                    <div className={cn("text-[10px] font-semibold", p.conv >= 25 ? "text-good" : p.conv >= 12 ? "text-warn-700" : "text-ink-400")}>{p.conv}% → action</div>
                   </div>
                 </div>
                 <div className="mt-2 h-1.5 rounded-full bg-ink-100 overflow-hidden">
@@ -1260,7 +1264,7 @@ function OverviewTab({ property, onJump }: { property: string; onJump: (t: Tab) 
               const detail = co2 >= 1 ? `${co2.toFixed(0)} kg CO₂e` : `${Math.round((a.water * a.count) / 1000)} m³ water`;
               return (
                 <div key={a.label} className="rounded-xl border border-ink-200 p-3 flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-lg bg-brand-50 text-brand-700 grid place-items-center shrink-0"><Icon size={16} /></div>
+                  <div className="w-9 h-9 rounded-full bg-brand-50 text-brand-700 grid place-items-center shrink-0"><Icon size={16} /></div>
                   <div className="min-w-0 flex-1">
                     <div className="text-[12px] font-semibold text-ink-900 truncate">{a.label}</div>
                     <div className="text-[11px] text-ink-500">{a.count.toLocaleString()} actions · {detail}</div>
@@ -1311,7 +1315,7 @@ function OverviewTab({ property, onJump }: { property: string; onJump: (t: Tab) 
 }
 
 function PulseTile({ label, value, sub, tone, icon, onClick }: { label: string; value: string; sub?: string; tone: "good" | "warn" | "info"; icon: React.ReactNode; onClick?: () => void }) {
-  const v = tone === "good" ? "text-good" : tone === "warn" ? "text-amber-700" : "text-ink-900";
+  const v = tone === "good" ? "text-good" : tone === "warn" ? "text-warn-700" : "text-ink-900";
   const inner = (
     <>
       <div className="flex items-center justify-between"><span className="text-[11px] text-ink-500">{label}</span><span className="text-ink-300">{icon}</span></div>

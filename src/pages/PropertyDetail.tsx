@@ -52,6 +52,7 @@ import {
 import type { PillarKey } from "@/pages/performance/Shell";
 import { useAccount } from "@/lib/account";
 import { cn } from "@/lib/utils";
+import { useToast } from "@/components/ui/Toast";
 
 type TabKey =
   | "overview"
@@ -119,7 +120,7 @@ export default function PropertyDetail() {
             <button className="btn-secondary" onClick={() => setEditOpen(true)}>
               <Edit3 size={14} /> Edit configuration
             </button>
-            <button className="btn bg-bad text-white hover:bg-red-700">
+            <button className="btn-secondary text-bad-700 border-bad/30 hover:bg-bad/10 hover:border-bad/40">
               <PowerOff size={14} /> Deactivate
             </button>
           </>
@@ -308,6 +309,7 @@ const EMPTY_METER: Omit<Meter, "id"> = { type: "Electricity", meterId: "", suppl
 
 function MeterRegistry({ property }: { property: RichProperty }) {
   const [meters, setMeters] = useState<Meter[]>(property.meters);
+  const toast = useToast();
   const [editing, setEditing] = useState<Meter | null>(null);
   const [open, setOpen] = useState(false);
 
@@ -315,6 +317,7 @@ function MeterRegistry({ property }: { property: RichProperty }) {
   function openEdit(m: Meter) { setEditing({ ...m }); setOpen(true); }
   function remove(id: string) { setMeters((ms) => ms.filter((m) => m.id !== id)); }
   function save(m: Meter) {
+    toast.success("Meter saved");
     if (m.id) setMeters((ms) => ms.map((x) => (x.id === m.id ? m : x)));
     else setMeters((ms) => [...ms, { ...m, id: `m-${Date.now()}` }]);
     setOpen(false);
@@ -434,7 +437,7 @@ function ConfiguredElsewhere() {
           const Icon = l.icon;
           return (
             <Link key={l.label} to={l.to} className="flex items-center gap-3 rounded-xl border border-ink-200 p-3 hover:border-brand-300 hover:bg-ink-50/50 transition-colors">
-              <div className="w-8 h-8 rounded-lg bg-ink-100 text-ink-600 grid place-items-center shrink-0"><Icon size={15} /></div>
+              <div className="w-8 h-8 rounded-full bg-ink-100 text-ink-600 grid place-items-center shrink-0"><Icon size={15} /></div>
               <div className="min-w-0 flex-1">
                 <div className="text-[13px] font-medium text-ink-900 truncate">{l.label}</div>
                 <div className="text-[11px] text-ink-500">{l.where}</div>
@@ -1016,18 +1019,18 @@ function HeroStat({
   info?: string;
 }) {
   const accent = {
-    good: "border-l-good",
-    warn: "border-l-warn",
-    bad:  "border-l-bad",
-    info: "border-l-info",
+    good: "",
+    warn: "",
+    bad:  "",
+    info: "",
   }[tone];
   return (
-    <div className={cn("card card-pad border-l-4", accent)}>
+    <div className={cn("card card-pad", accent)}>
       <div className="flex items-center gap-1 text-[11px] uppercase font-semibold tracking-[0.06em] text-ink-400">
         {label}
         {info && <InfoHint text={info} />}
       </div>
-      <div className="text-[26px] leading-none font-bold text-ink-900 mt-1.5 tabular-nums">
+      <div className="text-stat leading-none font-bold text-ink-900 mt-1.5 tabular-nums">
         {value}
         {suffix && <span className="text-base font-medium text-ink-500 ml-1">{suffix}</span>}
       </div>

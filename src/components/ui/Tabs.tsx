@@ -41,7 +41,7 @@ export default function Tabs({
       <div
         role="tablist"
         aria-label={ariaLabel}
-        className={cn("inline-flex flex-wrap items-center gap-1 rounded-xl bg-ink-100 p-1", className)}
+        className={cn("inline-flex flex-wrap items-center gap-1 rounded-full bg-ink-100 p-1", className)}
       >
         {items.map((t) => {
           const Icon = t.icon;
@@ -53,7 +53,7 @@ export default function Tabs({
               aria-selected={active}
               onClick={() => onChange(t.key)}
               className={cn(
-                "inline-flex items-center gap-1.5 rounded-lg font-medium transition-colors",
+                "inline-flex items-center gap-1.5 rounded-full font-medium transition-colors",
                 size === "sm" ? "px-2.5 py-1 text-[12px]" : "px-3 py-1.5 text-sm",
                 active
                   ? "bg-white shadow-card text-ink-900"

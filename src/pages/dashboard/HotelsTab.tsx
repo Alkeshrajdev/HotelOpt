@@ -112,7 +112,7 @@ function HotelCard({ h }: { h: typeof PORTFOLIO_HOTELS[0] }) {
   const stripeCls = carbonTone === "good" ? "bg-good" : carbonTone === "warn" ? "bg-warn" : "bg-bad";
 
   return (
-    <div className={cn("rounded-xl border-2 bg-white overflow-hidden hover:shadow-md transition-all flex flex-col", borderCls)}>
+    <div className={cn("rounded-xl border-2 bg-white overflow-hidden hover:shadow-pop transition-all flex flex-col", borderCls)}>
       {/* Top colour stripe */}
       <div className={cn("h-1", stripeCls)} />
 
@@ -140,12 +140,12 @@ function HotelCard({ h }: { h: typeof PORTFOLIO_HOTELS[0] }) {
               <span className={cn("text-[13px] font-bold tabular-nums", `text-${carbonTone}`)}>
                 {h.carbonIntensity.toFixed(1)}
               </span>
-              <span className="text-[9px] text-ink-400">kgCO₂/RN</span>
+              <span className="text-[10px] text-ink-400">kgCO₂/RN</span>
               <YoY val={h.yoyCarbon} />
             </div>
           </div>
           <MetricBar value={h.carbonIntensity} max={120} tone={carbonTone} />
-          <div className="flex justify-between text-[8px] text-ink-300 mt-0.5">
+          <div className="flex justify-between text-[10px] text-ink-300 mt-0.5">
             <span>0</span><span className="text-ink-400 font-medium">avg 54</span><span>120</span>
           </div>
         </div>
@@ -158,12 +158,12 @@ function HotelCard({ h }: { h: typeof PORTFOLIO_HOTELS[0] }) {
               <span className={cn("text-[13px] font-bold tabular-nums", `text-${energyTone}`)}>
                 {h.energyIntensity.toFixed(1)}
               </span>
-              <span className="text-[9px] text-ink-400">kWh/RN</span>
+              <span className="text-[10px] text-ink-400">kWh/RN</span>
               <YoY val={h.yoyEnergy} />
             </div>
           </div>
           <MetricBar value={h.energyIntensity} max={250} tone={energyTone} />
-          <div className="flex justify-between text-[8px] text-ink-300 mt-0.5">
+          <div className="flex justify-between text-[10px] text-ink-300 mt-0.5">
             <span>0</span><span className="text-ink-400 font-medium">avg 107</span><span>250</span>
           </div>
         </div>
@@ -176,11 +176,11 @@ function HotelCard({ h }: { h: typeof PORTFOLIO_HOTELS[0] }) {
               <span className={cn("text-[13px] font-bold tabular-nums", `text-${waterTone}`)}>
                 {h.waterIntensity.toFixed(0)}
               </span>
-              <span className="text-[9px] text-ink-400">L/GN</span>
+              <span className="text-[10px] text-ink-400">L/GN</span>
             </div>
           </div>
           <MetricBar value={h.waterIntensity} max={1200} tone={waterTone} />
-          <div className="flex justify-between text-[8px] text-ink-300 mt-0.5">
+          <div className="flex justify-between text-[10px] text-ink-300 mt-0.5">
             <span>0</span><span className="text-ink-400 font-medium">avg 476</span><span>1200</span>
           </div>
         </div>
@@ -192,27 +192,27 @@ function HotelCard({ h }: { h: typeof PORTFOLIO_HOTELS[0] }) {
           <div className={cn("text-[13px] font-bold tabular-nums leading-none", `text-${divTone}`)}>
             {h.diversion_pct}%
           </div>
-          <div className="text-[8px] text-ink-400 mt-0.5">Diversion</div>
+          <div className="text-[10px] text-ink-400 mt-0.5">Diversion</div>
         </div>
         <div>
           <div className={cn("text-[13px] font-bold tabular-nums leading-none", `text-${renewTone}`)}>
             {h.renewablePct}%
           </div>
-          <div className="text-[8px] text-ink-400 mt-0.5">Renewable</div>
+          <div className="text-[10px] text-ink-400 mt-0.5">Renewable</div>
         </div>
         <div>
           <div className={cn("text-[13px] font-bold tabular-nums leading-none", `text-${dataTone}`)}>
             {coverage}/12
           </div>
-          <div className="text-[8px] text-ink-400 mt-0.5">Data</div>
+          <div className="text-[10px] text-ink-400 mt-0.5">Data</div>
         </div>
         <div>
           <div className="flex justify-center">
-            <Badge tone={certTone(certStatus)} className="text-[8px] px-1 py-0">
+            <Badge tone={certTone(certStatus)} className="text-[10px] px-1 py-0">
               {certStatus === "certified" ? "✓ Cert" : certStatus === "in-progress" ? "~ Prog" : "✗ Gap"}
             </Badge>
           </div>
-          <div className="text-[8px] text-ink-400 mt-0.5">Cert</div>
+          <div className="text-[10px] text-ink-400 mt-0.5">Cert</div>
         </div>
       </div>
 
@@ -354,7 +354,7 @@ export default function HotelsTab() {
                 {HEATMAP_METRICS.map(m => (
                   <th key={m.key} className="pb-2 font-medium text-ink-500 text-center min-w-[80px]">
                     <div>{m.label}</div>
-                    <div className="text-[9px] font-normal text-ink-400">{m.unit}</div>
+                    <div className="text-[10px] font-normal text-ink-400">{m.unit}</div>
                   </th>
                 ))}
               </tr>
@@ -373,7 +373,7 @@ export default function HotelsTab() {
                         <div className={cn(
                           "rounded-lg px-2 py-1.5 text-[11px] font-semibold tabular-nums mx-auto",
                           tone === "good" ? "bg-good/12 text-good" :
-                          tone === "warn" ? "bg-warn/15 text-amber-700" :
+                          tone === "warn" ? "bg-warn/15 text-warn-700" :
                           "bg-bad/12 text-bad"
                         )}>
                           {m.format(raw)}

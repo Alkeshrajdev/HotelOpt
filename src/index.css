@@ -56,6 +56,12 @@
   --warn: 245 158 11;
   --bad:  220 38 38;
   --info: 14 165 233;
+  /* Darker, contrast-safe shades for status TEXT and icons on light tints
+     (the base shades pass for fills/chips but not for small text on white). */
+  --good-700: 21 128 61;
+  --warn-700: 180 83 9;
+  --bad-700:  185 28 28;
+  --info-700: 3 105 161;
 
   /* Pillar — RGB triplets for opacity utilities (bg-pillar-energy/10 etc.)
    * Energy=green · Water=blue · Waste=teal · Carbon=deep-teal · Social=purple · Gov=orange */
@@ -70,9 +76,8 @@
 @layer base {
   html, body, #root { height: 100%; }
   body {
-    background: #EEF1F1;
+    background: #ECEEF3;
     @apply text-ink-900 font-sans antialiased;
-    font-feature-settings: "cv11", "ss01";
   }
   * { -webkit-font-smoothing: antialiased; }
 
@@ -89,22 +94,22 @@
     outline-offset: 2px;
     border-radius: 2px;
   }
-  /* Lighter ring on the dark emerald sidebar for contrast. */
-  .sidebar-shell :focus-visible {
-    outline-color: #6FE0A6;
-  }
 }
 
 @layer components {
   /* ----- Cards (base) ----- */
   .card {
-    @apply bg-white border border-ink-200/70 rounded-xl2 shadow-card;
+    @apply bg-white rounded-xl2 shadow-card;
   }
   .card-lg {
-    @apply bg-white border border-ink-200/70 rounded-xl3 shadow-card-lg;
+    @apply bg-white rounded-xl3 shadow-card-lg;
   }
   .card-pad {
     @apply p-6;
+  }
+  /* Any clickable card/tile: one consistent affordance (cursor, lift, shadow). */
+  .card-interactive {
+    @apply cursor-pointer transition-all duration-150 hover:shadow-pop hover:-translate-y-0.5;
   }
   .card-pad-lg {
     @apply p-7;
@@ -113,21 +118,21 @@
   /* ----- Card hierarchy (BRD §1.2) ----- */
   /* Level 1 — Primary KPIs and urgent insights. Stronger shadow, 1.5rem padding. */
   .card-level-1 {
-    @apply bg-white border border-ink-200/70 rounded-xl2 p-6;
+    @apply bg-white rounded-xl2 p-6;
     box-shadow: 0 1px 2px rgba(16, 24, 40, 0.05), 0 12px 28px -8px rgba(16, 24, 40, 0.12);
   }
   /* Level 1 with a pillar-coloured left accent bar (border-l colour set inline). */
   .card-level-1-accent {
-    @apply bg-white border border-ink-200/70 rounded-xl2 p-6 border-l-4;
+    @apply bg-white rounded-xl2 p-6;
     box-shadow: 0 1px 2px rgba(16, 24, 40, 0.05), 0 12px 28px -8px rgba(16, 24, 40, 0.12);
   }
   /* Level 2 — Standard: trend charts, comparison tables, six-pillar grids. */
   .card-level-2 {
-    @apply bg-white rounded-xl2 shadow-card border border-ink-200/60;
+    @apply bg-white rounded-xl2 shadow-card;
   }
   /* Level 3 — Supporting: notes, evidence metadata, contextual warnings. */
   .card-level-3 {
-    @apply bg-ink-50 border border-ink-100 rounded-xl p-4;
+    @apply bg-ink-50 rounded-xl2 p-4;
   }
 
   /* ----- Typography helpers (BRD §1.3) ----- */
@@ -147,56 +152,52 @@
 
   /* ----- Chips & badges ----- */
   .chip {
-    @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium;
+    @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium;
   }
   .kbd {
     @apply px-1.5 py-0.5 text-[10px] font-medium rounded border border-ink-200 bg-ink-50 text-ink-500;
   }
 
-  /* ----- Sidebar (dark emerald) ----- */
+  /* ----- Sidebar (light panel, emerald active pill) ----- */
   .sidebar-shell {
     @apply flex flex-col shrink-0 transition-[width] duration-200 ease-out;
-    /* Base fill (white-label overridable) + a top-lit translucent sheen that
-       gives the panel depth over any base colour. */
-    background-color: var(--sidebar-bg, #06291B);
-    background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.035) 0%, rgba(255, 255, 255, 0) 22%, rgba(0, 0, 0, 0.12) 100%);
-    color: var(--sidebar-text, #A7D5BC);
-    border-right: 1px solid var(--sidebar-border, #0E3D28);
+    background-color: var(--sidebar-bg, #FFFFFF);
+    color: var(--sidebar-text, rgb(71 85 105));
+    border-right: 1px solid var(--sidebar-border, rgba(226, 232, 240, 0.7));
   }
   .sidebar-divider {
-    border-color: var(--sidebar-border, #0F4528);
+    border-color: var(--sidebar-border, rgba(226, 232, 240, 0.7));
   }
   .nav-item {
-    @apply flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] font-medium transition-colors duration-100;
-    color: var(--sidebar-text, #A7D5BC);
+    @apply flex items-center gap-3 px-3 py-2 rounded-xl text-[13.5px] font-medium transition-colors duration-100;
+    color: var(--sidebar-text, rgb(71 85 105));
   }
   .nav-item:hover {
-    background: var(--sidebar-bg-hover, rgba(255, 255, 255, 0.06));
-    color: #FFFFFF;
+    background: var(--sidebar-bg-hover, rgb(241 245 249));
+    color: rgb(15 23 42);
   }
   .nav-item-active {
     background: var(--sidebar-bg-active, #0F6A3C);
     color: #FFFFFF;
-    /* Inner top highlight + soft drop = a gently raised, "current" pill. */
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 1px 2px rgba(0, 0, 0, 0.28);
+    box-shadow: 0 1px 2px rgba(15, 106, 60, 0.25);
   }
   .nav-item-active:hover {
     background: var(--sidebar-bg-active, #0F6A3C);
     color: #FFFFFF;
   }
   .nav-group-heading {
-    color: var(--sidebar-heading, #5C8E73);
+    color: var(--sidebar-heading, rgb(148 163 184));
   }
 
   /* ----- Inputs ----- */
   .input {
-    @apply w-full h-9 px-3 rounded-lg border border-ink-200 bg-white text-sm
+    @apply w-full h-9 px-3 rounded-xl border border-ink-200 bg-white text-sm
            placeholder:text-ink-400 focus:outline-none focus:ring-2 focus:ring-brand-500/30 focus:border-brand-500;
   }
 
   /* ----- Buttons ----- */
   .btn {
-    @apply inline-flex items-center justify-center gap-2 h-9 px-3.5 rounded-lg text-sm font-medium
+    @apply inline-flex items-center justify-center gap-2 h-9 px-4 rounded-xl text-sm font-medium
            transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
   }
   .btn-primary {
@@ -213,11 +214,11 @@
 
   /* ----- Tabs ----- */
   .tab {
-    @apply inline-flex items-center gap-2 px-3.5 py-2 rounded-lg text-sm font-medium
+    @apply inline-flex items-center gap-2 px-3.5 py-2 rounded-full text-sm font-medium
            text-ink-500 hover:text-ink-900 transition-colors;
   }
   .tab-active {
-    @apply bg-white text-ink-900 shadow-card border border-ink-200;
+    @apply bg-white text-ink-900 shadow-card;
   }
 
   /* ----- Progress ----- */
@@ -238,6 +239,10 @@
 }
 
 
+/* Motion — entrances for overlays and toasts (160ms, ease-out) */
+@keyframes fadein  { from { opacity: 0; transform: translateY(6px) scale(0.99); } to { opacity: 1; transform: none; } }
+@keyframes toastin { from { opacity: 0; transform: translateY(8px); }             to { opacity: 1; transform: none; } }
+
 /* Scrollbar polish */
 ::-webkit-scrollbar { width: 10px; height: 10px; }
 ::-webkit-scrollbar-thumb {
@@ -251,13 +256,3 @@
   background-clip: padding-box;
 }
 ::-webkit-scrollbar-track { background: transparent; }
-
-/* Sidebar gets a darker scrollbar to match the dark theme. */
-.sidebar-shell ::-webkit-scrollbar-thumb {
-  background: #18472D;
-  background-clip: padding-box;
-}
-.sidebar-shell ::-webkit-scrollbar-thumb:hover {
-  background: #235C3C;
-  background-clip: padding-box;
-}

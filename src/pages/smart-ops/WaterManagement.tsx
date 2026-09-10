@@ -52,11 +52,11 @@ const DAILY_WATER_TREND = [
 ];
 
 const AREA_BREAKDOWN = [
-  { label: "Guestrooms", pct: 41, color: "bg-blue-500" },
-  { label: "Kitchen", pct: 22, color: "bg-emerald-500" },
+  { label: "Guestrooms", pct: 41, color: "bg-info" },
+  { label: "Kitchen", pct: 22, color: "bg-good" },
   { label: "Laundry", pct: 18, color: "bg-violet-500" },
-  { label: "Irrigation", pct: 11, color: "bg-amber-500" },
-  { label: "Cooling Tower", pct: 8, color: "bg-cyan-500" },
+  { label: "Irrigation", pct: 11, color: "bg-warn" },
+  { label: "Cooling Tower", pct: 8, color: "bg-info" },
 ];
 
 const NIGHT_FLOW = [
@@ -331,10 +331,10 @@ const WATER_ACTIONS = [
 // ─── sub-components ─────────────────────────────────────────────────────────
 
 function StatusDot({ status }: { status: string }) {
-  if (status === "Live") return <span className="inline-block w-2 h-2 rounded-full bg-emerald-500 mr-1.5" />;
-  if (status === "Delayed") return <span className="inline-block w-2 h-2 rounded-full bg-amber-400 mr-1.5" />;
-  if (status === "Live — ALERT") return <span className="inline-block w-2 h-2 rounded-full bg-red-500 mr-1.5 animate-pulse" />;
-  return <span className="inline-block w-2 h-2 rounded-full bg-neutral-400 mr-1.5" />;
+  if (status === "Live") return <span className="inline-block w-2 h-2 rounded-full bg-good mr-1.5" />;
+  if (status === "Delayed") return <span className="inline-block w-2 h-2 rounded-full bg-warn mr-1.5" />;
+  if (status === "Live — ALERT") return <span className="inline-block w-2 h-2 rounded-full bg-bad mr-1.5 animate-pulse" />;
+  return <span className="inline-block w-2 h-2 rounded-full bg-ink-400 mr-1.5" />;
 }
 
 function SeverityBadge({ severity }: { severity: string }) {
@@ -372,21 +372,21 @@ function MeterModal({ meter, open, onClose }: { meter: Meter | null; open: boole
       <div className="space-y-5">
         {/* 7-day trend */}
         <div>
-          <p className="text-xs font-medium text-neutral-500 uppercase tracking-wide mb-2">7-Day Consumption Trend</p>
-          <div className="flex items-end gap-1 h-24 bg-neutral-50 rounded-lg p-3">
+          <p className="text-xs font-medium text-ink-500 uppercase tracking-wide mb-2">7-Day Consumption Trend</p>
+          <div className="flex items-end gap-1 h-24 bg-ink-50 rounded-lg p-3">
             {meter.dailyTrend.map((v, i) => {
               const pct = Math.round((v / maxVal) * 100);
               const isAlert = v > 4 && meter.name.includes("Zone B") && (i === 4 || i === 5);
               return (
                 <div key={i} className="flex-1 min-w-0 h-full flex flex-col items-center gap-1">
-                  <span className="text-[9px] text-neutral-400">{v}</span>
+                  <span className="text-[10px] text-ink-400">{v}</span>
                   <div className="w-full flex-1 flex items-end">
                     <div
-                      className={cn("w-full rounded-t", isAlert ? "bg-red-400" : "bg-blue-400")}
+                      className={cn("w-full rounded-t", isAlert ? "bg-bad" : "bg-info")}
                       style={{ height: `${pct}%` }}
                     />
                   </div>
-                  <span className="text-[9px] text-neutral-400">D{i + 1}</span>
+                  <span className="text-[10px] text-ink-400">D{i + 1}</span>
                 </div>
               );
             })}
@@ -395,35 +395,35 @@ function MeterModal({ meter, open, onClose }: { meter: Meter | null; open: boole
 
         {/* details */}
         <div className="grid grid-cols-2 gap-3">
-          <div className="bg-neutral-50 rounded-lg p-3">
-            <p className="text-xs text-neutral-500">Latest Reading</p>
-            <p className="text-lg font-semibold text-neutral-800">{meter.reading} <span className="text-xs text-neutral-500">{meter.unit}</span></p>
+          <div className="bg-ink-50 rounded-lg p-3">
+            <p className="text-xs text-ink-500">Latest Reading</p>
+            <p className="text-lg font-semibold text-ink-800">{meter.reading} <span className="text-xs text-ink-500">{meter.unit}</span></p>
           </div>
-          <div className="bg-neutral-50 rounded-lg p-3">
-            <p className="text-xs text-neutral-500">Data Completeness</p>
-            <p className="text-lg font-semibold text-neutral-800">{meter.completeness}</p>
+          <div className="bg-ink-50 rounded-lg p-3">
+            <p className="text-xs text-ink-500">Data Completeness</p>
+            <p className="text-lg font-semibold text-ink-800">{meter.completeness}</p>
           </div>
-          <div className="bg-neutral-50 rounded-lg p-3">
-            <p className="text-xs text-neutral-500">Calibration Date</p>
-            <p className="text-sm font-medium text-neutral-800">{meter.calibrationDate}</p>
+          <div className="bg-ink-50 rounded-lg p-3">
+            <p className="text-xs text-ink-500">Calibration Date</p>
+            <p className="text-sm font-medium text-ink-800">{meter.calibrationDate}</p>
           </div>
-          <div className="bg-neutral-50 rounded-lg p-3">
-            <p className="text-xs text-neutral-500">Protocol</p>
-            <p className="text-sm font-medium text-neutral-800">{meter.protocol}</p>
+          <div className="bg-ink-50 rounded-lg p-3">
+            <p className="text-xs text-ink-500">Protocol</p>
+            <p className="text-sm font-medium text-ink-800">{meter.protocol}</p>
           </div>
         </div>
 
         {/* benchmark */}
-        <div className="bg-blue-50 border border-blue-100 rounded-lg p-3">
-          <p className="text-xs font-medium text-blue-700 mb-1">Benchmark</p>
-          <p className="text-sm text-blue-800">{meter.benchmark}</p>
+        <div className="bg-info/10 border border-info/30 rounded-lg p-3">
+          <p className="text-xs font-medium text-info-700 mb-1">Benchmark</p>
+          <p className="text-sm text-info-700">{meter.benchmark}</p>
         </div>
 
         {/* alerts */}
         {meter.alerts !== "—" && (
-          <div className="bg-red-50 border border-red-100 rounded-lg p-3 flex items-start gap-2">
-            <AlertTriangle className="w-4 h-4 text-red-500 mt-0.5 flex-shrink-0" />
-            <p className="text-sm text-red-700">{meter.alerts}</p>
+          <div className="bg-bad/10 border border-bad/30 rounded-lg p-3 flex items-start gap-2">
+            <AlertTriangle className="w-4 h-4 text-bad-700 mt-0.5 flex-shrink-0" />
+            <p className="text-sm text-bad-700">{meter.alerts}</p>
           </div>
         )}
       </div>
@@ -439,11 +439,11 @@ function OverviewTab() {
   return (
     <div className="space-y-6">
       {/* alert banner */}
-      <div className="flex items-center gap-3 bg-amber-50 border border-amber-200 rounded-xl p-4">
-        <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0" />
+      <div className="flex items-center gap-3 bg-warn/10 border border-warn/30 rounded-xl p-4">
+        <AlertTriangle className="w-5 h-5 text-warn-700 flex-shrink-0" />
         <div>
-          <p className="text-sm font-semibold text-amber-800">2 active water alerts</p>
-          <p className="text-xs text-amber-700 mt-0.5">
+          <p className="text-sm font-semibold text-warn-700">2 active water alerts</p>
+          <p className="text-xs text-warn-700 mt-0.5">
             Continuous night flow detected Zone 3 (Critical) · Pool makeup water abnormal (Low)
           </p>
         </div>
@@ -453,7 +453,7 @@ function OverviewTab() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <KpiTile
           icon={<Droplets size={20} />}
-          iconBg="bg-blue-100"
+          iconBg="bg-info/15"
           label="Total Water Consumed"
           value="8,420"
           unit="m³"
@@ -464,7 +464,7 @@ function OverviewTab() {
         />
         <KpiTile
           icon={<DollarSign size={20} />}
-          iconBg="bg-emerald-100"
+          iconBg="bg-good/15"
           label="Water Cost"
           value="$11,450"
           delta={-2.8}
@@ -484,7 +484,7 @@ function OverviewTab() {
         />
         <KpiTile
           icon={<Gauge size={20} />}
-          iconBg="bg-cyan-100"
+          iconBg="bg-info/15"
           label="L / Occupied Room Night"
           value="312"
           unit="L"
@@ -516,7 +516,7 @@ function OverviewTab() {
         />
         <KpiTile
           icon={<Activity size={20} />}
-          iconBg="bg-sky-100"
+          iconBg="bg-info/15"
           label="Cooling Tower Make-up"
           value="820"
           unit="m³"
@@ -524,7 +524,7 @@ function OverviewTab() {
         />
         <KpiTile
           icon={<AlertTriangle size={20} />}
-          iconBg="bg-amber-100"
+          iconBg="bg-warn/15"
           label="Estimated Water Loss"
           value="142"
           unit="m³"
@@ -536,8 +536,8 @@ function OverviewTab() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         {/* 14-day daily trend */}
         <Card className="p-5">
-          <p className="text-sm font-semibold text-neutral-700 mb-4">14-Day Daily Water Consumption</p>
-          <div className="flex items-end gap-1 h-36 bg-neutral-50 rounded-lg p-3">
+          <p className="text-sm font-semibold text-ink-700 mb-4">14-Day Daily Water Consumption</p>
+          <div className="flex items-end gap-1 h-36 bg-ink-50 rounded-lg p-3">
             {DAILY_WATER_TREND.map((v, i) => {
               const pct = Math.round((v / maxDaily) * 100);
               return (
@@ -545,34 +545,34 @@ function OverviewTab() {
                   {/* Track fills the column so the bar's % height resolves against a definite size */}
                   <div className="w-full flex-1 flex items-end">
                     <div
-                      className="w-full rounded-t bg-blue-400 hover:bg-blue-500 transition-colors"
+                      className="w-full rounded-t bg-info hover:bg-info transition-colors"
                       style={{ height: `${pct}%` }}
                       title={`${v} m³`}
                     />
                   </div>
-                  <span className="text-[9px] text-neutral-400 h-3 leading-3">{i % 2 === 0 ? `D${i + 1}` : ""}</span>
+                  <span className="text-[10px] text-ink-400 h-3 leading-3">{i % 2 === 0 ? `D${i + 1}` : ""}</span>
                 </div>
               );
             })}
           </div>
           <div className="flex justify-between mt-2">
-            <span className="text-xs text-neutral-400">Min: {Math.min(...DAILY_WATER_TREND)} m³</span>
-            <span className="text-xs text-neutral-400">Max: {Math.max(...DAILY_WATER_TREND)} m³</span>
-            <span className="text-xs text-neutral-400">Avg: {Math.round(DAILY_WATER_TREND.reduce((a, b) => a + b, 0) / DAILY_WATER_TREND.length)} m³/day</span>
+            <span className="text-xs text-ink-400">Min: {Math.min(...DAILY_WATER_TREND)} m³</span>
+            <span className="text-xs text-ink-400">Max: {Math.max(...DAILY_WATER_TREND)} m³</span>
+            <span className="text-xs text-ink-400">Avg: {Math.round(DAILY_WATER_TREND.reduce((a, b) => a + b, 0) / DAILY_WATER_TREND.length)} m³/day</span>
           </div>
         </Card>
 
         {/* water by area */}
         <Card className="p-5">
-          <p className="text-sm font-semibold text-neutral-700 mb-4">Water Consumption by Area</p>
+          <p className="text-sm font-semibold text-ink-700 mb-4">Water Consumption by Area</p>
           <div className="space-y-3">
             {AREA_BREAKDOWN.map((area) => (
               <div key={area.label} className="space-y-1">
                 <div className="flex justify-between text-xs">
-                  <span className="text-neutral-700">{area.label}</span>
-                  <span className="font-medium text-neutral-800">{area.pct}%</span>
+                  <span className="text-ink-700">{area.label}</span>
+                  <span className="font-medium text-ink-800">{area.pct}%</span>
                 </div>
-                <div className="w-full bg-neutral-100 rounded-full h-3">
+                <div className="w-full bg-ink-100 rounded-full h-3">
                   <div
                     className={cn("h-3 rounded-full transition-all", area.color)}
                     style={{ width: `${area.pct}%` }}
@@ -588,42 +588,42 @@ function OverviewTab() {
       <Card className="p-5">
         <div className="flex items-start justify-between mb-4">
           <div>
-            <p className="text-sm font-semibold text-neutral-700">Night Flow Trend (00:00–05:00)</p>
-            <p className="text-xs text-neutral-500 mt-0.5">7-day — baseline 8 m³/hr alert band</p>
+            <p className="text-sm font-semibold text-ink-700">Night Flow Trend (00:00–05:00)</p>
+            <p className="text-xs text-ink-500 mt-0.5">7-day — baseline 8 m³/hr alert band</p>
           </div>
           <Badge tone="bad">2 Alert Days</Badge>
         </div>
-        <div className="flex items-end gap-2 h-32 bg-neutral-50 rounded-lg p-4 relative">
+        <div className="flex items-end gap-2 h-32 bg-ink-50 rounded-lg p-4 relative">
           {/* alert band line at ~57% (8/14 * 100) */}
           <div className="absolute left-4 right-4" style={{ bottom: `calc(${Math.round((8 / 16) * 100)}% + 1rem)` }}>
-            <div className="border-t border-dashed border-amber-400 w-full" />
-            <span className="text-[9px] text-amber-600 absolute right-0 -top-3">Alert: 8 m³/hr</span>
+            <div className="border-t border-dashed border-warn w-full" />
+            <span className="text-[10px] text-warn-700 absolute right-0 -top-3">Alert: 8 m³/hr</span>
           </div>
           {NIGHT_FLOW.map((d, i) => {
             const pct = Math.round((d.value / 16) * 100);
             return (
               <div key={i} className="flex-1 min-w-0 h-full flex flex-col items-center gap-1">
-                <span className="text-[9px] text-neutral-500">{d.value}</span>
+                <span className="text-[10px] text-ink-500">{d.value}</span>
                 <div className="w-full flex-1 flex items-end">
                   <div
-                    className={cn("w-full rounded-t transition-colors", d.alert ? "bg-red-400" : "bg-blue-400")}
+                    className={cn("w-full rounded-t transition-colors", d.alert ? "bg-bad" : "bg-info")}
                     style={{ height: `${pct}%` }}
                     title={`${d.day}: ${d.value} m³/hr`}
                   />
                 </div>
-                <span className="text-[9px] text-neutral-400">{d.day.replace("Day ", "D")}</span>
+                <span className="text-[10px] text-ink-400">{d.day.replace("Day ", "D")}</span>
               </div>
             );
           })}
         </div>
         <div className="flex items-center gap-4 mt-3">
           <div className="flex items-center gap-1.5">
-            <div className="w-3 h-3 rounded-sm bg-blue-400" />
-            <span className="text-xs text-neutral-500">Normal</span>
+            <div className="w-3 h-3 rounded-sm bg-info" />
+            <span className="text-xs text-ink-500">Normal</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <div className="w-3 h-3 rounded-sm bg-red-400" />
-            <span className="text-xs text-neutral-500">Alert (above 8 m³/hr baseline)</span>
+            <div className="w-3 h-3 rounded-sm bg-bad" />
+            <span className="text-xs text-ink-500">Alert (above 8 m³/hr baseline)</span>
           </div>
         </div>
       </Card>
@@ -637,7 +637,7 @@ function SmartMetersTab() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <p className="text-sm text-neutral-500">{METERS.length} meters · Last data refresh: 2 min ago</p>
+        <p className="text-sm text-ink-500">{METERS.length} meters · Last data refresh: 2 min ago</p>
         <Badge tone="good">10 / 10 configured</Badge>
       </div>
 
@@ -645,60 +645,60 @@ function SmartMetersTab() {
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="bg-neutral-50 border-b border-neutral-200">
-                <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-500 uppercase tracking-wide whitespace-nowrap">Meter Name</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-500 uppercase tracking-wide">Area</th>
-                <th className="text-right px-4 py-3 text-xs font-semibold text-neutral-500 uppercase tracking-wide whitespace-nowrap">Latest Reading</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-500 uppercase tracking-wide">Status</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-500 uppercase tracking-wide whitespace-nowrap">Last Update</th>
-                <th className="text-right px-4 py-3 text-xs font-semibold text-neutral-500 uppercase tracking-wide whitespace-nowrap">Data Completeness</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-500 uppercase tracking-wide">Alerts</th>
+              <tr className="bg-ink-50 border-b border-ink-200">
+                <th className="text-left px-4 py-3 text-xs font-semibold text-ink-500 uppercase tracking-wide whitespace-nowrap">Meter Name</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-ink-500 uppercase tracking-wide">Area</th>
+                <th className="text-right px-4 py-3 text-xs font-semibold text-ink-500 uppercase tracking-wide whitespace-nowrap">Latest Reading</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-ink-500 uppercase tracking-wide">Status</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-ink-500 uppercase tracking-wide whitespace-nowrap">Last Update</th>
+                <th className="text-right px-4 py-3 text-xs font-semibold text-ink-500 uppercase tracking-wide whitespace-nowrap">Data Completeness</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-ink-500 uppercase tracking-wide">Alerts</th>
                 <th className="px-4 py-3" />
               </tr>
             </thead>
-            <tbody className="divide-y divide-neutral-100">
+            <tbody className="divide-y divide-ink-100">
               {METERS.map((meter) => (
                 <tr
                   key={meter.name}
                   className={cn(
-                    "hover:bg-neutral-50 transition-colors",
-                    meter.alerts !== "—" && "bg-red-50 hover:bg-red-50"
+                    "hover:bg-ink-50 transition-colors",
+                    meter.alerts !== "—" && "bg-bad/10 hover:bg-bad/10"
                   )}
                 >
-                  <td className="px-4 py-3 font-medium text-neutral-800 whitespace-nowrap">{meter.name}</td>
-                  <td className="px-4 py-3 text-neutral-600 whitespace-nowrap">{meter.area}</td>
-                  <td className="px-4 py-3 text-right font-mono font-medium text-neutral-800 whitespace-nowrap">
-                    {meter.reading} <span className="text-neutral-400 font-normal">{meter.unit}</span>
+                  <td className="px-4 py-3 font-medium text-ink-800 whitespace-nowrap">{meter.name}</td>
+                  <td className="px-4 py-3 text-ink-600 whitespace-nowrap">{meter.area}</td>
+                  <td className="px-4 py-3 text-right font-mono font-medium text-ink-800 whitespace-nowrap">
+                    {meter.reading} <span className="text-ink-400 font-normal">{meter.unit}</span>
                   </td>
                   <td className="px-4 py-3 whitespace-nowrap">
                     <div className="flex items-center">
                       <StatusDot status={meter.status} />
                       <span className={cn(
                         "text-xs",
-                        meter.status === "Live — ALERT" ? "text-red-600 font-medium" :
-                        meter.status === "Delayed" ? "text-amber-600" :
-                        "text-emerald-600"
+                        meter.status === "Live — ALERT" ? "text-bad-700 font-medium" :
+                        meter.status === "Delayed" ? "text-warn-700" :
+                        "text-good-700"
                       )}>{meter.status}</span>
                     </div>
                   </td>
-                  <td className="px-4 py-3 text-neutral-500 text-xs whitespace-nowrap">{meter.lastUpdate}</td>
+                  <td className="px-4 py-3 text-ink-500 text-xs whitespace-nowrap">{meter.lastUpdate}</td>
                   <td className="px-4 py-3 text-right">
                     <span className={cn(
                       "text-xs font-medium",
-                      parseInt(meter.completeness) < 97 ? "text-amber-600" : "text-emerald-600"
+                      parseInt(meter.completeness) < 97 ? "text-warn-700" : "text-good-700"
                     )}>{meter.completeness}</span>
                   </td>
                   <td className="px-4 py-3">
                     {meter.alerts !== "—" ? (
-                      <span className="text-xs text-red-600 font-medium">{meter.alerts}</span>
+                      <span className="text-xs text-bad-700 font-medium">{meter.alerts}</span>
                     ) : (
-                      <span className="text-xs text-neutral-400">—</span>
+                      <span className="text-xs text-ink-400">—</span>
                     )}
                   </td>
                   <td className="px-4 py-3">
                     <button
                       onClick={() => setSelectedMeter(meter)}
-                      className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-700 font-medium whitespace-nowrap"
+                      className="flex items-center gap-1 text-xs text-info-700 hover:text-info-700 font-medium whitespace-nowrap"
                     >
                       <Eye className="w-3.5 h-3.5" />
                       View
@@ -728,11 +728,11 @@ function WaterBalanceTab() {
   return (
     <div className="space-y-5">
       {/* coverage notice */}
-      <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 flex items-start gap-3">
-        <CheckCircle className="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" />
+      <div className="bg-good/10 border border-good/30 rounded-xl p-4 flex items-start gap-3">
+        <CheckCircle className="w-5 h-5 text-good-700 flex-shrink-0 mt-0.5" />
         <div>
-          <p className="text-sm font-semibold text-emerald-800">Sub-meter coverage: 100% for all major areas</p>
-          <p className="text-xs text-emerald-700 mt-0.5">
+          <p className="text-sm font-semibold text-good-700">Sub-meter coverage: 100% for all major areas</p>
+          <p className="text-xs text-good-700 mt-0.5">
             Greywater recycling offsets 142 m³/month from irrigation. Unallocated water: 0 m³.
           </p>
         </div>
@@ -742,8 +742,8 @@ function WaterBalanceTab() {
       <Card className="p-5">
         <div className="flex items-center justify-between mb-5">
           <div>
-            <p className="text-xs text-neutral-500 uppercase tracking-wide font-medium">Main Meter Total</p>
-            <p className="text-3xl font-bold text-neutral-800 mt-1">8,420 <span className="text-base font-normal text-neutral-500">m³/month</span></p>
+            <p className="text-xs text-ink-500 uppercase tracking-wide font-medium">Main Meter Total</p>
+            <p className="text-3xl font-bold text-ink-800 mt-1">8,420 <span className="text-base font-normal text-ink-500">m³/month</span></p>
           </div>
           <Badge tone="good">100% Metered</Badge>
         </div>
@@ -752,19 +752,19 @@ function WaterBalanceTab() {
           {BALANCE_ROWS.map((row) => (
             <div key={row.label} className="space-y-1.5">
               <div className="flex justify-between text-sm">
-                <span className="font-medium text-neutral-700">{row.label}</span>
+                <span className="font-medium text-ink-700">{row.label}</span>
                 <div className="flex items-center gap-3">
-                  <span className="text-neutral-500 text-xs">Benchmark: {row.benchmark}</span>
-                  <span className="font-semibold text-neutral-800">{row.m3.toLocaleString()} m³</span>
-                  <span className="text-neutral-500 w-10 text-right">{row.pct}%</span>
+                  <span className="text-ink-500 text-xs">Benchmark: {row.benchmark}</span>
+                  <span className="font-semibold text-ink-800">{row.m3.toLocaleString()} m³</span>
+                  <span className="text-ink-500 w-10 text-right">{row.pct}%</span>
                   {row.benchmarkOk
                     ? <Badge tone="good">OK</Badge>
                     : <Badge tone="warn">Review</Badge>}
                 </div>
               </div>
-              <div className="w-full bg-neutral-100 rounded-full h-3">
+              <div className="w-full bg-ink-100 rounded-full h-3">
                 <div
-                  className="h-3 rounded-full bg-blue-500 transition-all"
+                  className="h-3 rounded-full bg-info transition-all"
                   style={{ width: `${row.pct}%` }}
                 />
               </div>
@@ -773,40 +773,40 @@ function WaterBalanceTab() {
         </div>
 
         {/* greywater offset */}
-        <div className="mt-5 pt-4 border-t border-neutral-100 space-y-2">
+        <div className="mt-5 pt-4 border-t border-ink-100 space-y-2">
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-2">
-              <span className="text-sm font-medium text-neutral-700">Greywater Recycled</span>
+              <span className="text-sm font-medium text-ink-700">Greywater Recycled</span>
               <Badge tone="good">Offset</Badge>
             </div>
-            <span className="text-sm font-semibold text-emerald-600">–142 m³</span>
+            <span className="text-sm font-semibold text-good-700">–142 m³</span>
           </div>
           <div className="flex justify-between items-center">
-            <span className="text-sm text-neutral-500">Unallocated</span>
-            <span className="text-sm font-medium text-neutral-500">0 m³</span>
+            <span className="text-sm text-ink-500">Unallocated</span>
+            <span className="text-sm font-medium text-ink-500">0 m³</span>
           </div>
-          <div className="flex justify-between items-center pt-2 border-t border-neutral-100">
-            <span className="text-sm font-semibold text-neutral-700">Net Consumption</span>
-            <span className="text-sm font-bold text-neutral-800">8,278 m³</span>
+          <div className="flex justify-between items-center pt-2 border-t border-ink-100">
+            <span className="text-sm font-semibold text-ink-700">Net Consumption</span>
+            <span className="text-sm font-bold text-ink-800">8,278 m³</span>
           </div>
         </div>
       </Card>
 
       {/* sankey-style summary */}
       <Card className="p-5">
-        <p className="text-sm font-semibold text-neutral-700 mb-4">Balance Summary</p>
+        <p className="text-sm font-semibold text-ink-700 mb-4">Balance Summary</p>
         <div className="grid grid-cols-3 gap-3 text-center">
-          <div className="bg-blue-50 rounded-lg p-4">
-            <p className="text-xs text-blue-600 font-medium">Main Meter In</p>
-            <p className="text-xl font-bold text-blue-800 mt-1">8,420 m³</p>
+          <div className="bg-info/10 rounded-lg p-4">
+            <p className="text-xs text-info-700 font-medium">Main Meter In</p>
+            <p className="text-xl font-bold text-info-700 mt-1">8,420 m³</p>
           </div>
-          <div className="bg-emerald-50 rounded-lg p-4">
-            <p className="text-xs text-emerald-600 font-medium">Sub-meters Total</p>
-            <p className="text-xl font-bold text-emerald-800 mt-1">8,420 m³</p>
+          <div className="bg-good/10 rounded-lg p-4">
+            <p className="text-xs text-good-700 font-medium">Sub-meters Total</p>
+            <p className="text-xl font-bold text-good-700 mt-1">8,420 m³</p>
           </div>
-          <div className="bg-neutral-50 rounded-lg p-4">
-            <p className="text-xs text-neutral-600 font-medium">Unaccounted</p>
-            <p className="text-xl font-bold text-neutral-800 mt-1">0 m³</p>
+          <div className="bg-ink-50 rounded-lg p-4">
+            <p className="text-xs text-ink-600 font-medium">Unaccounted</p>
+            <p className="text-xl font-bold text-ink-800 mt-1">0 m³</p>
           </div>
         </div>
       </Card>
@@ -830,39 +830,39 @@ function LeakDetectionTab() {
   return (
     <div className="space-y-5">
       {/* header KPIs */}
-      <p className="text-sm font-semibold text-neutral-600">Active leak alerts and night flow analysis</p>
+      <p className="text-sm font-semibold text-ink-600">Active leak alerts and night flow analysis</p>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <Card className="p-4">
-          <p className="text-xs text-neutral-500">Baseline Night Flow (00:00–05:00)</p>
-          <p className="text-xl font-bold text-neutral-700 mt-1">5.8 <span className="text-sm font-normal">m³/hr</span></p>
-          <p className="text-xs text-neutral-400 mt-0.5">Expected</p>
+          <p className="text-xs text-ink-500">Baseline Night Flow (00:00–05:00)</p>
+          <p className="text-xl font-bold text-ink-700 mt-1">5.8 <span className="text-sm font-normal">m³/hr</span></p>
+          <p className="text-xs text-ink-400 mt-0.5">Expected</p>
         </Card>
-        <Card className="p-4 border-red-200 bg-red-50">
-          <p className="text-xs text-red-600">Current Night Flow</p>
-          <p className="text-xl font-bold text-red-700 mt-1">14.2 <span className="text-sm font-normal">m³/hr</span></p>
-          <p className="text-xs text-red-500 mt-0.5">Alert — +8.4 m³/hr above baseline</p>
-        </Card>
-        <Card className="p-4">
-          <p className="text-xs text-neutral-500">Duration</p>
-          <p className="text-xl font-bold text-amber-700 mt-1">36 hrs</p>
-          <p className="text-xs text-neutral-400 mt-0.5">Zone 3 Guestrooms</p>
+        <Card className="p-4 border-bad/30 bg-bad/10">
+          <p className="text-xs text-bad-700">Current Night Flow</p>
+          <p className="text-xl font-bold text-bad-700 mt-1">14.2 <span className="text-sm font-normal">m³/hr</span></p>
+          <p className="text-xs text-bad-700 mt-0.5">Alert — +8.4 m³/hr above baseline</p>
         </Card>
         <Card className="p-4">
-          <p className="text-xs text-neutral-500">Estimated Loss</p>
-          <p className="text-xl font-bold text-neutral-800 mt-1">302 m³</p>
-          <p className="text-xs text-red-500 mt-0.5">$411</p>
+          <p className="text-xs text-ink-500">Duration</p>
+          <p className="text-xl font-bold text-warn-700 mt-1">36 hrs</p>
+          <p className="text-xs text-ink-400 mt-0.5">Zone 3 Guestrooms</p>
+        </Card>
+        <Card className="p-4">
+          <p className="text-xs text-ink-500">Estimated Loss</p>
+          <p className="text-xl font-bold text-ink-800 mt-1">302 m³</p>
+          <p className="text-xs text-bad-700 mt-0.5">$411</p>
         </Card>
       </div>
 
       {/* night flow chart */}
       <Card className="p-5">
-        <p className="text-sm font-semibold text-neutral-700 mb-1">Night Flow (00:00–05:00) — Hourly by Day</p>
-        <p className="text-xs text-neutral-500 mb-4">Red bars indicate values above 8 m³/hr alert threshold</p>
+        <p className="text-sm font-semibold text-ink-700 mb-1">Night Flow (00:00–05:00) — Hourly by Day</p>
+        <p className="text-xs text-ink-500 mb-4">Red bars indicate values above 8 m³/hr alert threshold</p>
         <div className="space-y-2">
           {NIGHT_FLOW_7DAY.map((row) => (
             <div key={row.hour} className="flex items-center gap-2">
-              <span className="text-[10px] text-neutral-400 w-10 flex-shrink-0">{row.hour}</span>
+              <span className="text-[10px] text-ink-400 w-10 flex-shrink-0">{row.hour}</span>
               <div className="flex flex-1 items-end gap-1 h-8">
                 {row.values.map((v, i) => {
                   const pct = Math.round((v / maxVal) * 100);
@@ -870,7 +870,7 @@ function LeakDetectionTab() {
                   return (
                     <div key={i} className="flex-1 h-full flex items-end">
                       <div
-                        className={cn("w-full rounded-sm", isAlert ? "bg-red-400" : "bg-blue-300")}
+                        className={cn("w-full rounded-sm", isAlert ? "bg-bad" : "bg-info/25")}
                         style={{ height: `${pct}%` }}
                         title={`${dayLabels[i]} ${row.hour}: ${v} m³/hr`}
                       />
@@ -884,7 +884,7 @@ function LeakDetectionTab() {
             <span className="w-10 flex-shrink-0" />
             <div className="flex flex-1 gap-1">
               {dayLabels.map((d, i) => (
-                <div key={i} className="flex-1 text-center text-[9px] text-neutral-400">{d}</div>
+                <div key={i} className="flex-1 text-center text-[10px] text-ink-400">{d}</div>
               ))}
             </div>
           </div>
@@ -893,35 +893,35 @@ function LeakDetectionTab() {
 
       {/* leak alert table */}
       <Card className="overflow-hidden">
-        <div className="p-4 border-b border-neutral-100">
-          <p className="text-sm font-semibold text-neutral-700">Leak Alert Log</p>
+        <div className="p-4 border-b border-ink-100">
+          <p className="text-sm font-semibold text-ink-700">Leak Alert Log</p>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="bg-neutral-50 border-b border-neutral-200">
+              <tr className="bg-ink-50 border-b border-ink-200">
                 {["Zone", "Meter", "Type", "Est. Loss/hr", "Duration", "Total Loss", "Cost", "Severity", "Status", "Action"].map((h) => (
-                  <th key={h} className="text-left px-3 py-2.5 text-xs font-semibold text-neutral-500 uppercase tracking-wide whitespace-nowrap">{h}</th>
+                  <th key={h} className="text-left px-3 py-2.5 text-xs font-semibold text-ink-500 uppercase tracking-wide whitespace-nowrap">{h}</th>
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-neutral-100">
+            <tbody className="divide-y divide-ink-100">
               {LEAK_ALERTS.map((alert) => (
                 <tr
                   key={alert.id}
                   className={cn(
-                    "hover:bg-neutral-50 transition-colors",
-                    alert.status === "Active" && alert.severity === "Critical" && "bg-red-50 hover:bg-red-50",
+                    "hover:bg-ink-50 transition-colors",
+                    alert.status === "Active" && alert.severity === "Critical" && "bg-bad/10 hover:bg-bad/10",
                     alert.status === "Closed" && "opacity-60"
                   )}
                 >
-                  <td className="px-3 py-3 font-medium text-neutral-800 whitespace-nowrap text-xs">{alert.zone}</td>
-                  <td className="px-3 py-3 text-neutral-600 text-xs whitespace-nowrap">{alert.meter}</td>
-                  <td className="px-3 py-3 text-neutral-600 text-xs whitespace-nowrap">{alert.type}</td>
-                  <td className="px-3 py-3 font-mono text-xs text-neutral-700 whitespace-nowrap">{alert.lossPerHr}</td>
-                  <td className="px-3 py-3 text-xs text-neutral-600 whitespace-nowrap">{alert.duration}</td>
-                  <td className="px-3 py-3 font-mono text-xs font-medium text-neutral-800 whitespace-nowrap">{alert.totalLoss}</td>
-                  <td className="px-3 py-3 text-xs text-neutral-700 whitespace-nowrap">{alert.cost}</td>
+                  <td className="px-3 py-3 font-medium text-ink-800 whitespace-nowrap text-xs">{alert.zone}</td>
+                  <td className="px-3 py-3 text-ink-600 text-xs whitespace-nowrap">{alert.meter}</td>
+                  <td className="px-3 py-3 text-ink-600 text-xs whitespace-nowrap">{alert.type}</td>
+                  <td className="px-3 py-3 font-mono text-xs text-ink-700 whitespace-nowrap">{alert.lossPerHr}</td>
+                  <td className="px-3 py-3 text-xs text-ink-600 whitespace-nowrap">{alert.duration}</td>
+                  <td className="px-3 py-3 font-mono text-xs font-medium text-ink-800 whitespace-nowrap">{alert.totalLoss}</td>
+                  <td className="px-3 py-3 text-xs text-ink-700 whitespace-nowrap">{alert.cost}</td>
                   <td className="px-3 py-3 whitespace-nowrap"><SeverityBadge severity={alert.severity} /></td>
                   <td className="px-3 py-3 whitespace-nowrap">
                     {alert.status === "Active"
@@ -930,9 +930,9 @@ function LeakDetectionTab() {
                   </td>
                   <td className="px-3 py-3 whitespace-nowrap">
                     {alert.action !== "—" ? (
-                      <button className="text-xs text-blue-600 hover:text-blue-700 font-medium">{alert.action}</button>
+                      <button className="text-xs text-info-700 hover:text-info-700 font-medium">{alert.action}</button>
                     ) : (
-                      <span className="text-xs text-neutral-400">—</span>
+                      <span className="text-xs text-ink-400">—</span>
                     )}
                   </td>
                 </tr>
@@ -943,9 +943,9 @@ function LeakDetectionTab() {
       </Card>
 
       {/* disclaimer */}
-      <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 flex items-start gap-3">
-        <Activity className="w-4 h-4 text-blue-500 flex-shrink-0 mt-0.5" />
-        <p className="text-xs text-blue-700">
+      <div className="bg-info/10 border border-info/30 rounded-xl p-4 flex items-start gap-3">
+        <Activity className="w-4 h-4 text-info-700 flex-shrink-0 mt-0.5" />
+        <p className="text-xs text-info-700">
           Continuous night flow is a strong indicator of a water leak. Hotel Optimizer flags this for investigation —
           root cause must be confirmed on site by engineering or maintenance staff.
         </p>
@@ -961,7 +961,7 @@ function WaterActionsTab() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <p className="text-sm text-neutral-500">{WATER_ACTIONS.length} recommended water actions</p>
+        <p className="text-sm text-ink-500">{WATER_ACTIONS.length} recommended water actions</p>
         <div className="flex items-center gap-2">
           <Badge tone="bad">1 Critical</Badge>
           <Badge tone="warn">3 Medium</Badge>
@@ -971,10 +971,10 @@ function WaterActionsTab() {
 
       {sorted.map((action) => (
         <Card key={action.id} className={cn(
-          "p-5 border-l-4",
-          action.priority === "Critical" && "border-l-red-500",
-          action.priority === "Medium" && "border-l-amber-400",
-          action.priority === "Low" && "border-l-blue-400"
+          "p-5",
+          action.priority === "Critical" && "",
+          action.priority === "Medium" && "",
+          action.priority === "Low" && ""
         )}>
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1">
@@ -982,20 +982,20 @@ function WaterActionsTab() {
                 <PriorityBadge priority={action.priority} />
                 <Badge tone="neutral">{action.category}</Badge>
               </div>
-              <p className="text-sm font-semibold text-neutral-800 mt-2">{action.title}</p>
-              <p className="text-xs text-neutral-500 mt-1">{action.description}</p>
+              <p className="text-sm font-semibold text-ink-800 mt-2">{action.title}</p>
+              <p className="text-xs text-ink-500 mt-1">{action.description}</p>
             </div>
             <div className="text-right flex-shrink-0">
-              <p className="text-xs text-neutral-500">Est. saving</p>
-              <p className="text-base font-bold text-emerald-700">{action.saving}</p>
-              <p className="text-xs text-neutral-400">{action.savingUnit}</p>
+              <p className="text-xs text-ink-500">Est. saving</p>
+              <p className="text-base font-bold text-good-700">{action.saving}</p>
+              <p className="text-xs text-ink-400">{action.savingUnit}</p>
             </div>
           </div>
           <div className="flex gap-2 mt-4">
-            <button className="px-3 py-1.5 text-xs font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+            <button className="px-3 py-1.5 text-xs font-medium bg-info text-white rounded-lg hover:bg-info-700 transition-colors">
               Create Action
             </button>
-            <button className="px-3 py-1.5 text-xs font-medium text-neutral-600 border border-neutral-200 rounded-lg hover:bg-neutral-50 transition-colors">
+            <button className="px-3 py-1.5 text-xs font-medium text-ink-600 border border-ink-200 rounded-lg hover:bg-ink-50 transition-colors">
               Dismiss
             </button>
           </div>
@@ -1029,7 +1029,7 @@ export default function WaterManagement() {
         />
 
         {/* tab navigation */}
-        <div className="flex gap-1 bg-white border border-neutral-200 rounded-xl p-1 w-fit">
+        <div className="flex gap-1 bg-white border border-ink-200 rounded-xl p-1 w-fit">
           {TABS.map((tab) => (
             <button
               key={tab.id}
@@ -1037,8 +1037,8 @@ export default function WaterManagement() {
               className={cn(
                 "px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap",
                 activeTab === tab.id
-                  ? "bg-blue-600 text-white shadow-sm"
-                  : "text-neutral-600 hover:text-neutral-800 hover:bg-neutral-100"
+                  ? "bg-info text-white shadow-card"
+                  : "text-ink-600 hover:text-ink-800 hover:bg-ink-100"
               )}
             >
               {tab.label}

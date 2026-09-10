@@ -49,7 +49,7 @@ function KpiCard({ icon: Icon, iconBg, label, value, tone, sub }: {
           <Icon size={12} />
         </div>
       </div>
-      <div className={cn("text-[1.6rem] font-bold tabular-nums leading-none mt-1", valueColor)}>{value}</div>
+      <div className={cn("text-stat font-bold tabular-nums leading-none mt-1", valueColor)}>{value}</div>
       {sub && <div className="text-[11px] text-ink-500">{sub}</div>}
     </div>
   );
@@ -272,7 +272,7 @@ function GovernanceSection() {
           <div className="grid grid-cols-3 lg:grid-cols-1 gap-2 lg:w-44 shrink-0">
             {[{v:"74%",l:"Code signed",t:"ink"},{v:"52%",l:"ESG submitted",t:"warn"},{v:"43%",l:"Approved",t:"bad"}].map(s => (
               <div key={s.l} className="rounded-lg bg-ink-50 px-4 py-2.5 text-center">
-                <div className={cn("text-[1.2rem] font-bold", s.t==="warn"?"text-warn":s.t==="bad"?"text-bad":"text-ink-900")}>{s.v}</div>
+                <div className={cn("text-xl font-bold", s.t==="warn"?"text-warn":s.t==="bad"?"text-bad":"text-ink-900")}>{s.v}</div>
                 <div className="text-[10px] text-ink-400">{s.l}</div>
               </div>
             ))}

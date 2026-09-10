@@ -421,9 +421,9 @@ function SummaryTile({
 }) {
   const accent =
     tone === "good"
-      ? "border-l-4 border-l-good"
+      ? ""
       : tone === "info"
-        ? "border-l-4 border-l-info"
+        ? ""
         : "";
   return (
     <div className={cn("card card-pad", accent)}>
@@ -431,7 +431,7 @@ function SummaryTile({
         {label}
         {info && <InfoHint text={info} />}
       </div>
-      <div className="text-[26px] leading-none font-bold text-ink-900 mt-1.5 tabular-nums">{value}</div>
+      <div className="text-stat leading-none font-bold text-ink-900 mt-1.5 tabular-nums">{value}</div>
       {hint && <div className="text-[12px] text-ink-500 mt-1">{hint}</div>}
     </div>
   );

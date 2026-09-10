@@ -389,7 +389,7 @@ function SupplierProfileDrawer({
   return (
     <div className="fixed inset-0 z-40 flex justify-end" onClick={onClose}>
       <div
-        className="relative h-full w-full max-w-md bg-white shadow-2xl flex flex-col border-l border-ink-200"
+        className="relative h-full w-full max-w-md bg-white shadow-pop-lg flex flex-col border-l border-ink-200"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -849,7 +849,7 @@ function ReReviewRow({ supplier, field, change, reason, tone }: { supplier: stri
 function Request({ from, ask, due, clients, status }: { from: string; ask: string; due: string; clients: number; status: "open" | "submitted" }) {
   return (
     <li className={cn("flex items-start gap-3 rounded-xl border p-3", status === "open" ? "border-warn/25 bg-warn/10" : "border-ink-200")}>
-      <span className={cn("w-9 h-9 rounded-lg grid place-items-center shrink-0", status === "open" ? "bg-warn/15 text-warn" : "bg-good/10 text-good")}>
+      <span className={cn("w-9 h-9 rounded-full grid place-items-center shrink-0", status === "open" ? "bg-warn/15 text-warn" : "bg-good/10 text-good")}>
         {status === "open" ? <Bell size={15} /> : <CheckCircle2 size={15} />}
       </span>
       <div className="flex-1 min-w-0">

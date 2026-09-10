@@ -26,19 +26,19 @@ import KpiTile from "@/components/ui/KpiTile";
 import { cn } from "@/lib/utils";
 
 const ENERGY_BY_SYSTEM = [
-  { label: "HVAC", pct: 58, color: "bg-blue-500" },
-  { label: "Lighting", pct: 14, color: "bg-yellow-400" },
+  { label: "HVAC", pct: 58, color: "bg-info" },
+  { label: "Lighting", pct: 14, color: "bg-warn" },
   { label: "Kitchen", pct: 12, color: "bg-orange-500" },
   { label: "Laundry", pct: 8, color: "bg-purple-500" },
-  { label: "Other", pct: 8, color: "bg-gray-400" },
+  { label: "Other", pct: 8, color: "bg-ink-400" },
 ];
 
 const WATER_BY_AREA = [
-  { label: "Guestrooms", pct: 41, color: "bg-cyan-500" },
+  { label: "Guestrooms", pct: 41, color: "bg-info" },
   { label: "Kitchen", pct: 22, color: "bg-orange-500" },
   { label: "Laundry", pct: 18, color: "bg-purple-500" },
-  { label: "Irrigation", pct: 11, color: "bg-green-500" },
-  { label: "Cooling tower", pct: 8, color: "bg-blue-400" },
+  { label: "Irrigation", pct: 11, color: "bg-good" },
+  { label: "Cooling tower", pct: 8, color: "bg-info" },
 ];
 
 const ALERT_SEVERITY = [
@@ -197,7 +197,7 @@ export default function SmartOpsOverview() {
       {/* Row 1 — Top KPI drill-down tiles */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div
-          className="cursor-pointer"
+          className="card-interactive"
           onClick={() => navigate("/smart-ops/energy")}
           role="button"
           tabIndex={0}
@@ -218,7 +218,7 @@ export default function SmartOpsOverview() {
         </div>
 
         <div
-          className="cursor-pointer"
+          className="card-interactive"
           onClick={() => navigate("/smart-ops/water")}
           role="button"
           tabIndex={0}
@@ -239,7 +239,7 @@ export default function SmartOpsOverview() {
         </div>
 
         <div
-          className="cursor-pointer"
+          className="card-interactive"
           onClick={() => navigate("/smart-ops/alerts")}
           role="button"
           tabIndex={0}
@@ -257,7 +257,7 @@ export default function SmartOpsOverview() {
         </div>
 
         <div
-          className="cursor-pointer"
+          className="card-interactive"
           onClick={() => navigate("/smart-ops/savings")}
           role="button"
           tabIndex={0}

@@ -28,6 +28,7 @@ import {
 } from "@/lib/propertiesData";
 import type { PillarKey } from "@/pages/performance/Shell";
 import { cn } from "@/lib/utils";
+import { useToast } from "@/components/ui/Toast";
 
 const PILLARS: { key: PillarKey; label: string; icon: any }[] = [
   { key: "energy",     label: "Energy",     icon: Zap },
@@ -188,6 +189,7 @@ export default function AddPropertyModal({
 }) {
   const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
   const [form, setForm] = useState<Form>(INITIAL);
+  const toast = useToast();
   const [errors, setErrors] = useState<Errors>({});
 
   const set = <K extends keyof Form>(k: K, v: Form[K]) => {
@@ -236,6 +238,7 @@ export default function AddPropertyModal({
       return;
     }
     onSubmit?.(form);
+    toast.success("Property added", `${form.name} is now onboarding.`);
     reset();
     onClose();
   }
@@ -466,7 +469,7 @@ export default function AddPropertyModal({
             </Field>
 
             <Field label="External comparison" full>
-              <label className="flex items-start gap-3 rounded-lg border border-ink-200 p-3 cursor-pointer">
+              <label className="flex items-start gap-3 rounded-lg border border-ink-200 p-3 cursor-pointer hover:bg-ink-50">
                 <input type="checkbox" className="mt-0.5" checked={form.poolEligible} onChange={(e) => set("poolEligible", e.target.checked)} />
                 <div>
                   <div className="text-sm font-medium text-ink-900">Include in the comparable pool</div>

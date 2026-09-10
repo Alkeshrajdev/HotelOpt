@@ -58,7 +58,7 @@ export default function Modal({
       aria-modal="true"
     >
       <div
-        className="absolute inset-0 bg-ink-900/50 backdrop-blur-[2px]"
+        className="absolute inset-0 bg-ink-900/50 backdrop-blur-sm"
         onClick={onClose}
       />
       <div

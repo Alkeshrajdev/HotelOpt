@@ -55,7 +55,7 @@ export default function KpiTile({
         </div>
         <div
           className={cn(
-            "w-8 h-8 rounded-lg grid place-items-center shrink-0",
+            "w-8 h-8 rounded-full grid place-items-center shrink-0",
             iconBg
           )}
         >

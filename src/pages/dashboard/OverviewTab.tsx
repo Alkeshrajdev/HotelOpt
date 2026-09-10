@@ -187,7 +187,6 @@ const isNegDelta = (d: string) => d.trimStart().startsWith("−") || d.trimStart
 type EffTile = {
   icon:     React.ElementType;
   color:    string;
-  accentBg: string;
   label:    string;
   value:    string;
   unit:     string;
@@ -198,28 +197,28 @@ type EffTile = {
 
 const EFF_TILES: EffTile[] = [
   {
-    icon: Zap, color: "#D97706", accentBg: "border-l-[#D97706]",
+    icon: Zap, color: "#D97706",
     label: "Energy intensity", value: portfolioEnergyPerOrnTotal().toFixed(0), unit: "kWh / ORN",
     delta: -6.0,
     progress: 42, // (137−118)/(137−91)
     targetLabel: "Target 91 kWh/ORN by 2030",
   },
   {
-    icon: Droplet, color: "#0EA5E9", accentBg: "border-l-[#0EA5E9]",
+    icon: Droplet, color: "#0EA5E9",
     label: "Water intensity", value: portfolioWaterPerGn().toFixed(0), unit: "L / GN",
     delta: -8.0,
     progress: 50, // (612−556)/(612−500) — water on guest-night basis
     targetLabel: "Target 500 L/GN by 2030",
   },
   {
-    icon: Cloud, color: "#0F6A3C", accentBg: "border-l-[#0F6A3C]",
+    icon: Cloud, color: "#0F6A3C",
     label: "Carbon intensity", value: carbonS12PerOrn().toFixed(1), unit: "kgCO₂e / ORN",
     delta: -10.0,
     progress: 52, // (34.0−25.2)/(34.0−17.0) — Scope 1+2 basis
     targetLabel: "SBTi −50% by 2030 (17.0)",
   },
   {
-    icon: Recycle, color: "#7C3AED", accentBg: "border-l-[#7C3AED]",
+    icon: Recycle, color: "#7C3AED",
     label: "Waste diversion", value: `${wasteDiversionDual()}%`, unit: "TRUE / incl WtE",
     delta: 6.0,
     progress: 50, // TRUE 42%: (42−24)/(60−24)
@@ -268,8 +267,8 @@ function ChartTip({ active, payload, label, metric }: {
       <div className="bg-white border border-ink-200 rounded-xl shadow-pop px-3.5 py-3 text-[12px] min-w-[190px]">
         <div className="font-semibold text-ink-800 mb-2">{label}</div>
         <div className="space-y-0.5">
-          <div className="flex justify-between gap-4"><span className="text-amber-600">Energy</span><span className="font-medium">${eTY}k</span></div>
-          <div className="flex justify-between gap-4"><span className="text-sky-500">Water</span><span className="font-medium">${wTY}k</span></div>
+          <div className="flex justify-between gap-4"><span className="text-warn-700">Energy</span><span className="font-medium">${eTY}k</span></div>
+          <div className="flex justify-between gap-4"><span className="text-info-700">Water</span><span className="font-medium">${wTY}k</span></div>
           <div className="flex justify-between gap-4"><span className="text-violet-600">Waste</span><span className="font-medium">${dTY}k</span></div>
         </div>
         <div className="border-t border-ink-100 mt-1.5 pt-1.5 space-y-0.5">
@@ -320,9 +319,9 @@ function SectionLabel({ title, action, onClick }: { title: string; action?: stri
 function NeedsAttention() {
   if (!ACTION_CENTRE.length) return null;
   const toneText = (s: string) =>
-    s === "bad" ? "text-bad" : s === "warn" ? "text-amber-700" : "text-info";
+    s === "bad" ? "text-bad" : s === "warn" ? "text-warn-700" : "text-info";
   const toneChip = (s: string) =>
-    s === "bad" ? "bg-bad/10 text-bad" : s === "warn" ? "bg-warn/15 text-amber-700" : "bg-info/10 text-info";
+    s === "bad" ? "bg-bad/10 text-bad" : s === "warn" ? "bg-warn/15 text-warn-700" : "bg-info/10 text-info";
   return (
     <div>
       <SectionLabel title="Needs attention" />
@@ -333,10 +332,10 @@ function NeedsAttention() {
             to={it.href}
             className="group card p-3 flex items-center gap-3 hover:shadow-card-lg hover:-translate-y-px transition-all duration-150"
           >
-            <div className={cn("w-9 h-9 rounded-lg grid place-items-center shrink-0 text-[15px] font-bold tabular-nums leading-none", toneChip(it.severity))}>
+            <div className={cn("w-9 h-9 rounded-full grid place-items-center shrink-0 text-[15px] font-bold tabular-nums leading-none", toneChip(it.severity))}>
               {it.count}
             </div>
-            <div className="min-w-0 flex-1 text-[11.5px] font-medium text-ink-700 leading-tight">{it.label}</div>
+            <div className="min-w-0 flex-1 text-[11px] font-medium text-ink-700 leading-tight">{it.label}</div>
             <ChevronRight size={14} className={cn("shrink-0 transition-all group-hover:translate-x-0.5", toneText(it.severity), "opacity-40 group-hover:opacity-100")} />
           </Link>
         ))}
@@ -377,21 +376,16 @@ export default function OverviewTab({ onNavigate }: Props) {
             return (
               <div
                 key={t.label}
-                className={cn(
-                  "group relative overflow-hidden rounded-xl2 border bg-white p-4 shadow-card transition-all duration-150 hover:shadow-card-lg hover:-translate-y-px",
-                  t.highlight ? "border-good/40 ring-1 ring-good/10" : "border-ink-200/70"
-                )}
+                className="group relative overflow-hidden rounded-xl2 bg-white p-4 shadow-card transition-all duration-150 hover:shadow-card-lg hover:-translate-y-px"
               >
-                {/* colour accent bar keys the tile to its metric */}
-                <span className={cn("absolute inset-x-0 top-0 h-[3px]", snapAccent(t.iconBg))} />
                 <div className="flex items-center justify-between gap-2">
-                  <div className="text-[10.5px] font-semibold uppercase tracking-[0.07em] text-ink-500 leading-snug">{t.label}</div>
-                  <div className={cn("w-8 h-8 rounded-lg grid place-items-center shrink-0", t.iconBg)}>
+                  <div className="text-[10px] font-semibold uppercase tracking-[0.07em] text-ink-500 leading-snug">{t.label}</div>
+                  <div className={cn("w-8 h-8 rounded-full grid place-items-center shrink-0", t.iconBg)}>
                     <Icon size={15} />
                   </div>
                 </div>
                 <div className={cn(
-                  "text-[1.85rem] font-bold tabular-nums mt-2.5 leading-none tracking-tight",
+                  "text-kpi font-bold tabular-nums mt-2.5 leading-none tracking-tight",
                   t.highlight ? "text-good" : "text-ink-900"
                 )}>
                   {t.value}
@@ -433,7 +427,7 @@ export default function OverviewTab({ onNavigate }: Props) {
                   className={cn(
                     "px-2.5 h-6 text-[11px] font-medium rounded-md transition-colors capitalize",
                     aggregation === a
-                      ? "bg-white text-ink-900 shadow-sm"
+                      ? "bg-white text-ink-900 shadow-card"
                       : "text-ink-500 hover:text-ink-700"
                   )}
                 >
@@ -454,7 +448,7 @@ export default function OverviewTab({ onNavigate }: Props) {
                   className={cn(
                     "px-2.5 h-6 text-[11px] font-medium rounded-md transition-colors",
                     metric === m.key
-                      ? "bg-white text-ink-900 shadow-sm"
+                      ? "bg-white text-ink-900 shadow-card"
                       : "text-ink-500 hover:text-ink-700"
                   )}
                 >
@@ -510,8 +504,8 @@ export default function OverviewTab({ onNavigate }: Props) {
             <div className="ml-auto flex items-center gap-3 text-[11px] text-ink-500">
               {metric === "combined" && (
                 <>
-                  <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm inline-block bg-amber-500" />Energy</span>
-                  <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm inline-block bg-sky-400" />Water</span>
+                  <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm inline-block bg-warn" />Energy</span>
+                  <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm inline-block bg-info" />Water</span>
                   <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm inline-block bg-violet-600" />Waste</span>
                 </>
               )}
@@ -523,14 +517,14 @@ export default function OverviewTab({ onNavigate }: Props) {
               )}
               {showPYLine && (
                 <span className="flex items-center gap-1.5">
-                  <span className="w-5 border-t-2 border-dashed border-slate-400 inline-block" />
+                  <span className="w-5 border-t-2 border-dashed border-ink-400 inline-block" />
                   {aggregation === "quarterly" ? "Same qtr prior year" : "Prior year"}
                 </span>
               )}
               {metric === "carbon" && (
                 <>
                   <span className="flex items-center gap-1.5"><span className="w-5 border-t-2 border-teal-600 inline-block" />Intensity</span>
-                  <span className="flex items-center gap-1.5"><span className="w-5 border-t-2 border-dashed border-green-600 inline-block" />2030 target</span>
+                  <span className="flex items-center gap-1.5"><span className="w-5 border-t-2 border-dashed border-good inline-block" />2030 target</span>
                 </>
               )}
             </div>
@@ -651,8 +645,7 @@ export default function OverviewTab({ onNavigate }: Props) {
             return (
               <div
                 key={t.label}
-                className="card p-5 border-l-4 flex flex-col gap-3"
-                style={{ borderLeftColor: t.color }}
+                className="card p-5 flex flex-col gap-3"
               >
                 {/* Header */}
                 <div className="flex items-center justify-between">
@@ -672,7 +665,7 @@ export default function OverviewTab({ onNavigate }: Props) {
 
                 {/* Value */}
                 <div>
-                  <span className="text-[2rem] font-bold tabular-nums text-ink-900 leading-none tracking-tight">{t.value}</span>
+                  <span className="text-kpi font-bold tabular-nums text-ink-900 leading-none tracking-tight">{t.value}</span>
                   <span className="text-[12px] text-ink-400 ml-1.5">{t.unit}</span>
                 </div>
 

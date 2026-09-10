@@ -268,7 +268,7 @@ function GenerateReportTab() {
                 { val: "approved",  label: "Approved data only", sub: "Recommended for external reporting" },
                 { val: "provisional",label: "Approved + provisional", sub: "Clearly labelled" },
               ].map(o => (
-                <label key={o.val} className={cn("flex-1 rounded-xl border p-3 cursor-pointer transition-colors", dataBasis === o.val ? "border-brand-400 bg-brand-50" : "border-ink-200")}>
+                <label key={o.val} className={cn("flex-1 rounded-xl border p-3 cursor-pointer hover:bg-ink-50 transition-colors", dataBasis === o.val ? "border-brand-400 bg-brand-50" : "border-ink-200")}>
                   <input type="radio" name="dataBasis" value={o.val} checked={dataBasis === o.val} onChange={() => setDataBasis(o.val)} className="sr-only" />
                   <div className="font-medium text-ink-900 text-[12px]">{o.label}</div>
                   <div className="text-[11px] text-ink-400 mt-0.5">{o.sub}</div>
@@ -601,10 +601,10 @@ function AuditCalendarTab() {
       <div className="flex items-center justify-between">
         <p className="text-sm text-ink-500">Key deadlines, certification renewals, and review milestones.</p>
         <div className="flex gap-1 rounded-lg border border-ink-100 p-0.5 bg-ink-50">
-          <button onClick={() => setView("list")} className={cn("px-3 py-1.5 rounded-md text-[12px] font-medium transition-colors", view === "list" ? "bg-white shadow-sm text-ink-900" : "text-ink-500 hover:text-ink-800")}>
+          <button onClick={() => setView("list")} className={cn("px-3 py-1.5 rounded-md text-[12px] font-medium transition-colors", view === "list" ? "bg-white shadow-card text-ink-900" : "text-ink-500 hover:text-ink-800")}>
             <span className="flex items-center gap-1"><List size={12} /> List</span>
           </button>
-          <button onClick={() => setView("quarter")} className={cn("px-3 py-1.5 rounded-md text-[12px] font-medium transition-colors", view === "quarter" ? "bg-white shadow-sm text-ink-900" : "text-ink-500 hover:text-ink-800")}>
+          <button onClick={() => setView("quarter")} className={cn("px-3 py-1.5 rounded-md text-[12px] font-medium transition-colors", view === "quarter" ? "bg-white shadow-card text-ink-900" : "text-ink-500 hover:text-ink-800")}>
             <span className="flex items-center gap-1"><LayoutGrid size={12} /> Quarter</span>
           </button>
         </div>
@@ -625,7 +625,7 @@ function AuditCalendarTab() {
           {AUDIT_EVENTS.map((e, i) => {
             const d = new Date(e.date);
             return (
-              <div key={i} className="flex items-start gap-4 rounded-xl border border-ink-100 bg-white p-4 hover:shadow-sm transition-shadow">
+              <div key={i} className="flex items-start gap-4 rounded-xl border border-ink-100 bg-white p-4 hover:shadow-card transition-shadow">
                 <div className="w-12 shrink-0 text-center">
                   <div className="text-[10px] font-semibold text-ink-400 uppercase">{d.toLocaleString("default", { month: "short" })}</div>
                   <div className="text-xl font-extrabold text-ink-900 leading-tight">{d.getDate()}</div>
@@ -817,7 +817,7 @@ export default function PortfolioReports() {
         })}
       </div>
 
-      <div className="bg-white rounded-xl border border-ink-100 p-5 shadow-sm">
+      <div className="bg-white rounded-xl border border-ink-100 p-5 shadow-card">
         {tab === "status"        && <ReportingStatusTab />}
         {tab === "generate"      && <GenerateReportTab />}
         {tab === "certification" && <CertificationTab />}

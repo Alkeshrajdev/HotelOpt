@@ -171,12 +171,12 @@ function BillingTab() {
           <CardHeader title="Payment method" hint="Managed via Stripe" right={<button className="btn-secondary h-8 px-3 text-[12px]"><Plus size={12} /> Add</button>} />
           <div className="p-6 space-y-3 text-sm">
             <div className="rounded-xl border border-ink-200 p-4 flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-brand-700 grid place-items-center text-white"><CreditCard size={16} /></div>
+              <div className="w-10 h-10 rounded-full bg-brand-700 grid place-items-center text-white"><CreditCard size={16} /></div>
               <div className="flex-1"><div className="font-semibold">Visa •••• 4242</div><div className="text-[11px] text-ink-500">Expires 12/2027 · primary</div></div>
               <Badge tone="good">Default</Badge>
             </div>
             <div className="rounded-xl border border-ink-200 p-4 flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-ink-100 grid place-items-center text-ink-700"><Wallet size={16} /></div>
+              <div className="w-10 h-10 rounded-full bg-ink-100 grid place-items-center text-ink-700"><Wallet size={16} /></div>
               <div className="flex-1"><div className="font-semibold">ACH · Bank of America</div><div className="text-[11px] text-ink-500">Ending 7890</div></div>
               <Badge tone="neutral">Backup</Badge>
             </div>

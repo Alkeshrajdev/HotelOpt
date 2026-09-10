@@ -296,7 +296,7 @@ function Stepper({
               className={cn(
                 "flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm",
                 active
-                  ? "bg-brand-700 text-white shadow-sm"
+                  ? "bg-brand-700 text-white shadow-card"
                   : done
                     ? "bg-good/10 text-good ring-1 ring-good/25 hover:bg-good/15"
                     : "bg-ink-100 text-ink-500"
@@ -346,7 +346,7 @@ function PickDataType({ onPick }: { onPick: (k: DataTypeKey) => void }) {
               className="card text-left p-5 hover:shadow-pop hover:-translate-y-0.5 transition-all"
             >
               <div className="flex items-start gap-3">
-                <div className={cn("w-10 h-10 rounded-xl grid place-items-center shrink-0", dt.iconBg)}>
+                <div className={cn("w-10 h-10 rounded-full grid place-items-center shrink-0", dt.iconBg)}>
                   <Icon size={18} />
                 </div>
                 <div className="min-w-0 flex-1">
@@ -413,7 +413,7 @@ function PickMethod({
               )}
             >
               <div className={cn(
-                "w-10 h-10 rounded-xl grid place-items-center shrink-0",
+                "w-10 h-10 rounded-full grid place-items-center shrink-0",
                 supported ? "bg-brand-50 text-brand-700" : "bg-ink-100 text-ink-400"
               )}>
                 {iconFor(m)}
@@ -1319,7 +1319,7 @@ function FileDrop({ files, setFiles }: { files: File[]; setFiles: (f: File[]) =>
               <span className="text-ink-500">{Math.round(f.size / 1024)} KB</span>
             </li>
           ))}
-          <li className="text-[11px] text-brand-700 font-semibold cursor-pointer" onClick={() => setFiles([])}>
+          <li className="text-[11px] text-brand-700 font-semibold cursor-pointer hover:underline" onClick={() => setFiles([])}>
             Clear
           </li>
         </ul>
@@ -2000,7 +2000,7 @@ function ApiWorkflow({ cfg }: { cfg: DataTypeConfig }) {
             <div key={i.key} className="rounded-xl border border-ink-200">
               <div className="p-3 flex items-start gap-3">
                 <div className={cn(
-                  "w-10 h-10 rounded-lg grid place-items-center shrink-0",
+                  "w-10 h-10 rounded-full grid place-items-center shrink-0",
                   i.status === "active" ? "bg-good/10 text-good" : i.status === "configured" ? "bg-info/10 text-info" : i.status === "action-needed" ? "bg-warn/10 text-warn" : "bg-ink-100 text-ink-500"
                 )}>
                   <Plug size={16} />

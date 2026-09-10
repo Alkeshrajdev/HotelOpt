@@ -41,6 +41,7 @@ import ProgressBar from "@/components/ui/ProgressBar";
 import StatusPipeline from "@/components/shared/StatusPipeline";
 import Modal from "@/components/ui/Modal";
 import { cn } from "@/lib/utils";
+import { useToast } from "@/components/ui/Toast";
 import {
   ACTIONS,
   ACTION_TYPE_META,
@@ -298,7 +299,7 @@ export default function Actions() {
         <>
           {/* Market instruments disclaimer (req 2) */}
           <div className="rounded-xl border border-warn/30 bg-warn/5 p-4 flex items-start gap-3">
-            <Banknote size={18} className="text-amber-700 mt-0.5 shrink-0" />
+            <Banknote size={18} className="text-warn-700 mt-0.5 shrink-0" />
             <div>
               <div className="text-sm font-bold text-ink-900">Market Instruments</div>
               <div className="text-[13px] text-ink-600 mt-0.5">{MARKET_DISCLAIMER}</div>
@@ -339,9 +340,9 @@ function ActionCard({ action: a }: { action: Action }) {
   return (
     <li className="rounded-xl border border-ink-200 hover:shadow-card transition-shadow">
       {/* Collapsed header */}
-      <div className="p-4 cursor-pointer" onClick={() => setOpen((o) => !o)}>
+      <div className="p-4 cursor-pointer hover:bg-ink-50/60 transition-colors" onClick={() => setOpen((o) => !o)}>
         <div className="flex items-start gap-3">
-          <div className="w-10 h-10 rounded-lg bg-brand-50 grid place-items-center text-brand-700 shrink-0">
+          <div className="w-10 h-10 rounded-full bg-brand-50 grid place-items-center text-brand-700 shrink-0">
             <TypeIcon size={16} />
           </div>
           <div className="min-w-0 flex-1">
@@ -389,7 +390,7 @@ function ActionCard({ action: a }: { action: Action }) {
 
           {/* Trigger / source */}
           {a.sourceRef && (
-            <div className="rounded-lg border border-warn/25 bg-warn/10 p-2 text-[12px] text-amber-800 flex items-start gap-1.5">
+            <div className="rounded-lg border border-warn/25 bg-warn/10 p-2 text-[12px] text-warn-700 flex items-start gap-1.5">
               <AlertTriangle size={12} className="mt-0.5 shrink-0" />
               <span><strong>{SOURCE_META[a.source].label}:</strong> {a.sourceRef}
                 {a.triggerLink && <Link className="ml-1 underline font-semibold" to={a.triggerLink}>Investigate ›</Link>}</span>
@@ -567,6 +568,7 @@ const EMPTY_FORM: NewActionForm = {
 };
 
 function NewActionModal({ open, onClose, initial }: { open: boolean; onClose: () => void; initial?: Partial<NewActionForm> | null }) {
+  const toast = useToast();
   const [form, setForm] = useState<NewActionForm>(EMPTY_FORM);
   const [submitted, setSubmitted] = useState(false);
   const set = <K extends keyof NewActionForm>(k: K, v: NewActionForm[K]) => setForm((f) => ({ ...f, [k]: v }));
@@ -591,7 +593,7 @@ function NewActionModal({ open, onClose, initial }: { open: boolean; onClose: ()
       ) : (
         <>
           <button className="btn-secondary" onClick={handleClose}>Cancel</button>
-          <button className={cn("btn-primary", !canSubmit && "opacity-50 cursor-not-allowed")} onClick={() => canSubmit && setSubmitted(true)} disabled={!canSubmit}>
+          <button className={cn("btn-primary", !canSubmit && "opacity-50 cursor-not-allowed")} onClick={() => canSubmit && (setSubmitted(true), toast.success("Action created", "Routed for approval before implementation."))} disabled={!canSubmit}>
             <ArrowRight size={14} /> Submit for approval
           </button>
         </>
@@ -698,7 +700,7 @@ function Chip({ active, onClick, children }: { active: boolean; onClick: () => v
 
 function SavingsTile({ label, co2e, usd, hint, tone }: { label: string; co2e: number; usd: number; hint: string; tone: "info" | "warn" | "good" }) {
   const ring = { info: "border-ink-200 bg-ink-50", warn: "border-warn/25 bg-warn/10", good: "border-good/25 bg-good/10" }[tone];
-  const valTone = { info: "text-ink-900", warn: "text-amber-700", good: "text-good" }[tone];
+  const valTone = { info: "text-ink-900", warn: "text-warn-700", good: "text-good" }[tone];
   return (
     <div className={cn("rounded-xl border p-4", ring)}>
       <div className="text-[11px] uppercase tracking-wide font-semibold text-ink-500">{label}</div>
@@ -710,7 +712,7 @@ function SavingsTile({ label, co2e, usd, hint, tone }: { label: string; co2e: nu
 }
 
 function Field({ icon, label, value, tone }: { icon: React.ReactNode; label: string; value: string; tone?: "good" | "warn" | "bad" }) {
-  const vt = tone === "good" ? "text-good" : tone === "warn" ? "text-amber-700" : tone === "bad" ? "text-bad" : "text-ink-800";
+  const vt = tone === "good" ? "text-good" : tone === "warn" ? "text-warn-700" : tone === "bad" ? "text-bad" : "text-ink-800";
   return (
     <div className="rounded-lg bg-ink-50 border border-ink-100 px-2.5 py-1.5">
       <div className="flex items-center gap-1 text-[10px] text-ink-400">{icon}{label}</div>

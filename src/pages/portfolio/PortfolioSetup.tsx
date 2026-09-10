@@ -17,6 +17,7 @@ import {
   ToggleRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useToast } from "@/components/ui/Toast";
 import PageHeader from "@/components/ui/PageHeader";
 
 type Tab = "hotels" | "groups" | "targets" | "users" | "rules" | "escalations";
@@ -376,6 +377,7 @@ function RulesTab() {
   const [minApproval, setMinApproval]   = useState("80");
   const [minCompleteness, setMinCompleteness] = useState("75");
   const [groupingLogic, setGroupingLogic] = useState("Region");
+  const toast = useToast();
 
   return (
     <div className="space-y-5">
@@ -467,7 +469,7 @@ function RulesTab() {
       </section>
       </div>
 
-      <button className="btn-primary">Save Settings</button>
+      <button className="btn-primary" onClick={() => toast.success("Settings saved", "Reporting rules apply from the next cycle.")}>Save Settings</button>
     </div>
   );
 }
@@ -567,7 +569,7 @@ export default function PortfolioSetup() {
         })}
       </div>
 
-      <div className="bg-white rounded-xl border border-ink-100 p-5 shadow-sm">
+      <div className="bg-white rounded-xl border border-ink-100 p-5 shadow-card">
         {tab === "hotels"      && <HotelsTab />}
         {tab === "groups"      && <GroupsTab />}
         {tab === "targets"     && <TargetsTab />}

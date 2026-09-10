@@ -274,10 +274,10 @@ export default function Certifications() {
               )}
             >
               <div className="flex items-start justify-between mb-2">
-                <div className="w-8 h-8 rounded-lg bg-brand-50 grid place-items-center text-brand-700 text-[10px] font-bold shrink-0">
+                <div className="w-8 h-8 rounded-full bg-brand-50 grid place-items-center text-brand-700 text-[10px] font-bold shrink-0">
                   {c.shortName}
                 </div>
-                <Badge tone={CERT_STATUS_TONE[c.status]} className="text-[9px]">
+                <Badge tone={CERT_STATUS_TONE[c.status]} className="text-[10px]">
                   {CERT_STATUS_LABEL[c.status]}
                 </Badge>
               </div>
@@ -429,7 +429,7 @@ export default function Certifications() {
                     title="Today (May 2026)"
                   />
                 </div>
-                <Badge tone={CERT_STATUS_TONE[tc.status]} className="text-[9px] w-16 justify-center shrink-0">
+                <Badge tone={CERT_STATUS_TONE[tc.status]} className="text-[10px] w-16 justify-center shrink-0">
                   {CERT_STATUS_LABEL[tc.status]}
                 </Badge>
               </div>
@@ -600,7 +600,7 @@ export default function Certifications() {
           <ul className="p-6 space-y-2 text-sm">
             {DOSSIER_VERSIONS.map((d) => (
               <li key={d.v} className="flex items-start gap-3 rounded-xl border border-ink-200 p-3">
-                <div className="w-9 h-9 rounded-lg bg-brand-50 grid place-items-center text-brand-700 shrink-0">
+                <div className="w-9 h-9 rounded-full bg-brand-50 grid place-items-center text-brand-700 shrink-0">
                   <History size={15} />
                 </div>
                 <div className="min-w-0 flex-1">
@@ -751,11 +751,11 @@ function CertCertificatePanel() {
 function SummaryTile({ label, value, hint, tone }: {
   label: string; value: string; hint?: string; tone: "brand" | "good" | "warn" | "bad";
 }) {
-  const accent = { brand: "border-l-brand-500", good: "border-l-good", warn: "border-l-warn", bad: "border-l-bad" }[tone];
+  const accent = { brand: "", good: "", warn: "", bad: "" }[tone];
   return (
-    <div className={cn("card card-pad border-l-4", accent)}>
+    <div className={cn("card card-pad", accent)}>
       <div className="text-[11px] uppercase tracking-[0.06em] font-semibold text-ink-400">{label}</div>
-      <div className="text-[26px] leading-none font-bold text-ink-900 mt-1.5 tabular-nums">{value}</div>
+      <div className="text-stat leading-none font-bold text-ink-900 mt-1.5 tabular-nums">{value}</div>
       {hint && <div className="text-[12px] text-ink-500 mt-1">{hint}</div>}
     </div>
   );

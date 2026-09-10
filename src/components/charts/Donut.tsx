@@ -44,7 +44,7 @@ export default function Donut({
         <div className="absolute inset-0 grid place-items-center pointer-events-none">
           <div className="text-center">
             {totalValue && (
-              <div className="text-[20px] font-bold text-ink-900 tabular-nums">
+              <div className="text-xl font-bold text-ink-900 tabular-nums">
                 {totalValue}
               </div>
             )}
