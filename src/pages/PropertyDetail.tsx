@@ -437,7 +437,7 @@ function ConfiguredElsewhere() {
           const Icon = l.icon;
           return (
             <Link key={l.label} to={l.to} className="flex items-center gap-3 rounded-xl border border-ink-200 p-3 hover:border-brand-300 hover:bg-ink-50/50 transition-colors">
-              <div className="w-8 h-8 rounded-lg bg-ink-100 text-ink-600 grid place-items-center shrink-0"><Icon size={15} /></div>
+              <div className="w-8 h-8 rounded-full bg-ink-100 text-ink-600 grid place-items-center shrink-0"><Icon size={15} /></div>
               <div className="min-w-0 flex-1">
                 <div className="text-[13px] font-medium text-ink-900 truncate">{l.label}</div>
                 <div className="text-[11px] text-ink-500">{l.where}</div>

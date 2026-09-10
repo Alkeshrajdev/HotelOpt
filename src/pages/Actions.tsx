@@ -342,7 +342,7 @@ function ActionCard({ action: a }: { action: Action }) {
       {/* Collapsed header */}
       <div className="p-4 cursor-pointer hover:bg-ink-50/60 transition-colors" onClick={() => setOpen((o) => !o)}>
         <div className="flex items-start gap-3">
-          <div className="w-10 h-10 rounded-lg bg-brand-50 grid place-items-center text-brand-700 shrink-0">
+          <div className="w-10 h-10 rounded-full bg-brand-50 grid place-items-center text-brand-700 shrink-0">
             <TypeIcon size={16} />
           </div>
           <div className="min-w-0 flex-1">

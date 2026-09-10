@@ -105,7 +105,7 @@ export default function Admin() {
                   to={t.to}
                   className="card card-pad hover:shadow-pop hover:-translate-y-0.5 transition-all flex items-start gap-3"
                 >
-                  <div className={`w-10 h-10 rounded-xl grid place-items-center shrink-0 ${t.iconBg}`}>
+                  <div className={`w-10 h-10 rounded-full grid place-items-center shrink-0 ${t.iconBg}`}>
                     <Icon size={18} />
                   </div>
                   <div className="min-w-0 flex-1">

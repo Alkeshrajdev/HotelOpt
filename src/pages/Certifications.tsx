@@ -274,7 +274,7 @@ export default function Certifications() {
               )}
             >
               <div className="flex items-start justify-between mb-2">
-                <div className="w-8 h-8 rounded-lg bg-brand-50 grid place-items-center text-brand-700 text-[10px] font-bold shrink-0">
+                <div className="w-8 h-8 rounded-full bg-brand-50 grid place-items-center text-brand-700 text-[10px] font-bold shrink-0">
                   {c.shortName}
                 </div>
                 <Badge tone={CERT_STATUS_TONE[c.status]} className="text-[10px]">
@@ -600,7 +600,7 @@ export default function Certifications() {
           <ul className="p-6 space-y-2 text-sm">
             {DOSSIER_VERSIONS.map((d) => (
               <li key={d.v} className="flex items-start gap-3 rounded-xl border border-ink-200 p-3">
-                <div className="w-9 h-9 rounded-lg bg-brand-50 grid place-items-center text-brand-700 shrink-0">
+                <div className="w-9 h-9 rounded-full bg-brand-50 grid place-items-center text-brand-700 shrink-0">
                   <History size={15} />
                 </div>
                 <div className="min-w-0 flex-1">

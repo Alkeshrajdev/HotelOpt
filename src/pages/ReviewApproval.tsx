@@ -1247,7 +1247,7 @@ function EvidenceTab({ record }: { record: ReviewRecord }) {
       <ul className="space-y-2">
         {record.evidence.map((e) => (
           <li key={e.name} className="flex items-center gap-3 rounded-xl border border-ink-200 p-3">
-            <div className="w-10 h-10 rounded-lg bg-brand-50 grid place-items-center text-brand-700 shrink-0">
+            <div className="w-10 h-10 rounded-full bg-brand-50 grid place-items-center text-brand-700 shrink-0">
               {iconFor(e.type)}
             </div>
             <div className="min-w-0 flex-1">
@@ -1725,7 +1725,7 @@ function SupplierProfileDrawer({
           </button>
         </div>
         <div className="p-5 space-y-4">
-          <div className="w-12 h-12 rounded-xl bg-pillar-social/10 grid place-items-center text-pillar-social">
+          <div className="w-12 h-12 rounded-full bg-pillar-social/10 grid place-items-center text-pillar-social">
             <Truck size={20} />
           </div>
 

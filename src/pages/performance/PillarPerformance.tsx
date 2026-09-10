@@ -192,7 +192,7 @@ export default function PillarPerformance({ pillar }: { pillar: "water"|"waste"|
         ].map(t => (
           <div key={t.title} className="card p-6 flex flex-col gap-1">
             <div className="flex items-center gap-2">
-              <div className={cn("w-8 h-8 rounded-lg grid place-items-center shrink-0", t.bg)}>{t.icon}</div>
+              <div className={cn("w-8 h-8 rounded-full grid place-items-center shrink-0", t.bg)}>{t.icon}</div>
               <span className="text-[11px] font-semibold uppercase tracking-wide text-ink-400">{t.title}</span>
             </div>
             <div className={cn("mt-2 text-stat font-bold leading-none tabular-nums", t.color)}>{t.value}</div>

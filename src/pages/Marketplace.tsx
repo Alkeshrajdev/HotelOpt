@@ -728,7 +728,7 @@ function ProductCard({
       <div className="p-4 flex flex-col gap-3 flex-1">
         {/* Icon + name */}
         <div className="flex items-start gap-3">
-          <div className="w-9 h-9 rounded-xl bg-brand-50 grid place-items-center shrink-0">
+          <div className="w-9 h-9 rounded-full bg-brand-50 grid place-items-center shrink-0">
             <CatIcon size={18} className="text-brand-600" />
           </div>
           <div className="flex-1 min-w-0">
@@ -771,7 +771,7 @@ function ProductCard({
         </button>
         <button
           className={cn(
-            "w-9 h-9 rounded-lg border grid place-items-center transition-colors shrink-0",
+            "w-9 h-9 rounded-full border grid place-items-center transition-colors shrink-0",
             shortlisted
               ? "border-brand-300 bg-brand-50 text-brand-600"
               : "border-ink-200 bg-white text-ink-400 hover:border-brand-300 hover:text-brand-500"

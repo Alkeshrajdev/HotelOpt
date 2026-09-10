@@ -105,7 +105,7 @@ function TargetCard({ target }: { target: Target }) {
       {/* Header */}
       <div className="flex items-start justify-between gap-3 mb-4">
         <div className="flex items-center gap-3">
-          <div className={cn("w-8 h-8 rounded-lg grid place-items-center shrink-0", ICON_BG[target.icon])}>
+          <div className={cn("w-8 h-8 rounded-full grid place-items-center shrink-0", ICON_BG[target.icon])}>
             {ICON_MAP[target.icon]}
           </div>
           <div>

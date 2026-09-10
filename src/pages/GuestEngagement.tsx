@@ -504,7 +504,7 @@ function RenewableClaimsPanel() {
           >
             <div className="flex items-start gap-3">
               <div className={cn(
-                "w-9 h-9 rounded-lg grid place-items-center shrink-0",
+                "w-9 h-9 rounded-full grid place-items-center shrink-0",
                 claim.certType === "I-REC" || claim.certType === "EAC" ? "bg-warn/10 text-warn" : "bg-good/10 text-good"
               )}>
                 {claim.certType === "VCS" ? <Leaf size={16} /> : <Sun size={16} />}
@@ -1013,7 +1013,7 @@ function EcoPointsTab() {
             const Icon = r.icon;
             return (
               <div key={r.id} className="rounded-xl border border-ink-200 p-3 flex items-center gap-3 hover:bg-ink-50/60">
-                <div className="w-9 h-9 rounded-lg bg-brand-50 text-brand-700 grid place-items-center shrink-0"><Icon size={16} /></div>
+                <div className="w-9 h-9 rounded-full bg-brand-50 text-brand-700 grid place-items-center shrink-0"><Icon size={16} /></div>
                 <div className="min-w-0 flex-1">
                   <div className="text-[12px] font-semibold text-ink-900 truncate">{r.label}</div>
                   <div className="text-[11px] text-ink-500">{r.redeemed} redeemed</div>
@@ -1038,7 +1038,7 @@ function EcoPointsTab() {
               return (
                 <div key={c.id} className="rounded-xl border border-ink-200 p-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-lg bg-brand-50 text-brand-700 grid place-items-center shrink-0"><Icon size={16} /></div>
+                    <div className="w-9 h-9 rounded-full bg-brand-50 text-brand-700 grid place-items-center shrink-0"><Icon size={16} /></div>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
                         <span className="text-[13px] font-semibold text-ink-900">{c.name}</span>
@@ -1165,7 +1165,7 @@ function QrAnalyticsTab({ property }: { property: string }) {
             {QR_POINTS.map((p) => (
               <div key={p.id} className="rounded-xl border border-ink-200 p-3">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-ink-100 text-ink-600 grid place-items-center shrink-0"><QrCode size={15} /></div>
+                  <div className="w-8 h-8 rounded-full bg-ink-100 text-ink-600 grid place-items-center shrink-0"><QrCode size={15} /></div>
                   <div className="min-w-0 flex-1">
                     <div className="text-[12px] font-semibold text-ink-900">{p.location}</div>
                     <div className="text-[11px] text-ink-400 truncate">→ {p.dest}</div>
@@ -1264,7 +1264,7 @@ function OverviewTab({ property, onJump }: { property: string; onJump: (t: Tab) 
               const detail = co2 >= 1 ? `${co2.toFixed(0)} kg CO₂e` : `${Math.round((a.water * a.count) / 1000)} m³ water`;
               return (
                 <div key={a.label} className="rounded-xl border border-ink-200 p-3 flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-lg bg-brand-50 text-brand-700 grid place-items-center shrink-0"><Icon size={16} /></div>
+                  <div className="w-9 h-9 rounded-full bg-brand-50 text-brand-700 grid place-items-center shrink-0"><Icon size={16} /></div>
                   <div className="min-w-0 flex-1">
                     <div className="text-[12px] font-semibold text-ink-900 truncate">{a.label}</div>
                     <div className="text-[11px] text-ink-500">{a.count.toLocaleString()} actions · {detail}</div>

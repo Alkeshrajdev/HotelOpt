@@ -137,7 +137,7 @@ export default function EnergyPerformance() {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="card p-6 flex flex-col gap-1">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-good/10 grid place-items-center shrink-0"><TrendingDown size={15} className="text-good" /></div>
+            <div className="w-8 h-8 rounded-full bg-good/10 grid place-items-center shrink-0"><TrendingDown size={15} className="text-good" /></div>
             <span className="text-[11px] font-semibold uppercase tracking-wide text-ink-400">Genuine saving</span>
           </div>
           <div className="mt-2 text-kpi font-bold text-good leading-none tabular-nums">440 MWh</div>
@@ -146,7 +146,7 @@ export default function EnergyPerformance() {
 
         <div className="card p-6 flex flex-col gap-1">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-good/10 grid place-items-center shrink-0"><DollarSign size={15} className="text-good" /></div>
+            <div className="w-8 h-8 rounded-full bg-good/10 grid place-items-center shrink-0"><DollarSign size={15} className="text-good" /></div>
             <span className="text-[11px] font-semibold uppercase tracking-wide text-ink-400">Financial impact</span>
           </div>
           <div className="mt-2 text-kpi font-bold text-good leading-none tabular-nums">${GENUINE_SAVING_USD.toLocaleString()}</div>
@@ -155,7 +155,7 @@ export default function EnergyPerformance() {
 
         <div className="card p-6 flex flex-col gap-1">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-ink-100 grid place-items-center shrink-0"><TrendingUp size={15} className="text-ink-500" /></div>
+            <div className="w-8 h-8 rounded-full bg-ink-100 grid place-items-center shrink-0"><TrendingUp size={15} className="text-ink-500" /></div>
             <span className="text-[11px] font-semibold uppercase tracking-wide text-ink-400">Adjusted baseline</span>
           </div>
           <div className="mt-2 text-kpi font-bold text-ink-800 leading-none tabular-nums">3,280 MWh</div>

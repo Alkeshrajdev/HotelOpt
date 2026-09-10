@@ -889,7 +889,7 @@ export default function Topbar({ onMenu }: { onMenu?: () => void }) {
                       key={topic.label}
                       className="w-full text-left p-3 rounded-xl hover:bg-ink-50 flex items-start gap-3 transition-colors"
                     >
-                      <div className="w-8 h-8 rounded-lg bg-brand-50 text-brand-700 grid place-items-center shrink-0 mt-0.5">
+                      <div className="w-8 h-8 rounded-full bg-brand-50 text-brand-700 grid place-items-center shrink-0 mt-0.5">
                         <topic.icon size={15} />
                       </div>
                       <div className="min-w-0">

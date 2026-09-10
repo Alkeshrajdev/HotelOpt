@@ -157,7 +157,7 @@ export default function EnergyBenchmarks() {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="card p-6 flex flex-col gap-1 border-l-4 border-l-brand-600">
           <div className="flex items-center gap-2 mb-1">
-            <div className="w-8 h-8 rounded-lg bg-brand-50 grid place-items-center shrink-0">
+            <div className="w-8 h-8 rounded-full bg-brand-50 grid place-items-center shrink-0">
               <TrendingDown size={15} className="text-brand-700" />
             </div>
             <span className="text-[11px] font-semibold uppercase tracking-wide text-ink-400">Opportunity vs best peer</span>
@@ -168,7 +168,7 @@ export default function EnergyBenchmarks() {
 
         <div className="card p-6 flex flex-col gap-1 border-l-4 border-l-good">
           <div className="flex items-center gap-2 mb-1">
-            <div className="w-8 h-8 rounded-lg bg-good/10 grid place-items-center shrink-0">
+            <div className="w-8 h-8 rounded-full bg-good/10 grid place-items-center shrink-0">
               <DollarSign size={15} className="text-good" />
             </div>
             <span className="text-[11px] font-semibold uppercase tracking-wide text-ink-400">Value of the gap</span>

@@ -34,7 +34,7 @@ export default function StatCard({
       <div className="flex items-start gap-3">
         <div
           className={cn(
-            "w-10 h-10 rounded-xl grid place-items-center shrink-0",
+            "w-10 h-10 rounded-full grid place-items-center shrink-0",
             iconBg
           )}
         >

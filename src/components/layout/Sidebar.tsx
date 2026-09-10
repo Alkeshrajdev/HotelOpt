@@ -157,7 +157,7 @@ export default function Sidebar({ collapsed, onToggle, mobileOpen = false, onMob
         {/* Logo text — styled to match logo typography */}
         <div className={cn("flex items-center gap-2.5", collapsed ? "h-16 justify-center px-2" : "h-16 px-4")}>
           {/* Icon badge — small building mark */}
-          <div className="w-8 h-8 rounded-xl bg-brand-700 grid place-items-center shrink-0">
+          <div className="w-8 h-8 rounded-full bg-brand-700 grid place-items-center shrink-0">
             <Building2 size={15} className="text-white" />
           </div>
           {!collapsed && (

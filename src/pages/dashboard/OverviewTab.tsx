@@ -333,7 +333,7 @@ function NeedsAttention() {
             to={it.href}
             className="group card p-3 flex items-center gap-3 hover:shadow-card-lg hover:-translate-y-px transition-all duration-150"
           >
-            <div className={cn("w-9 h-9 rounded-lg grid place-items-center shrink-0 text-[15px] font-bold tabular-nums leading-none", toneChip(it.severity))}>
+            <div className={cn("w-9 h-9 rounded-full grid place-items-center shrink-0 text-[15px] font-bold tabular-nums leading-none", toneChip(it.severity))}>
               {it.count}
             </div>
             <div className="min-w-0 flex-1 text-[11px] font-medium text-ink-700 leading-tight">{it.label}</div>
@@ -386,7 +386,7 @@ export default function OverviewTab({ onNavigate }: Props) {
                 <span className={cn("absolute inset-x-0 top-0 h-[3px]", snapAccent(t.iconBg))} />
                 <div className="flex items-center justify-between gap-2">
                   <div className="text-[10px] font-semibold uppercase tracking-[0.07em] text-ink-500 leading-snug">{t.label}</div>
-                  <div className={cn("w-8 h-8 rounded-lg grid place-items-center shrink-0", t.iconBg)}>
+                  <div className={cn("w-8 h-8 rounded-full grid place-items-center shrink-0", t.iconBg)}>
                     <Icon size={15} />
                   </div>
                 </div>

@@ -331,7 +331,7 @@ export default function Reports() {
                   : "border-ink-200 bg-white"
               )}
             >
-              <div className="w-9 h-9 rounded-lg bg-brand-50 grid place-items-center text-brand-700 mb-2">
+              <div className="w-9 h-9 rounded-full bg-brand-50 grid place-items-center text-brand-700 mb-2">
                 {rt.icon}
               </div>
               <div className="text-sm font-bold text-ink-900 leading-tight">{rt.label}</div>
@@ -538,7 +538,7 @@ export default function Reports() {
         <ul className="p-5 space-y-3">
           {RECENT_REPORTS.map((r, i) => (
             <li key={r.name} className="flex items-start gap-3 rounded-xl border border-ink-200 p-3">
-              <div className="w-9 h-9 rounded-lg bg-brand-50 grid place-items-center text-brand-700 shrink-0">
+              <div className="w-9 h-9 rounded-full bg-brand-50 grid place-items-center text-brand-700 shrink-0">
                 <FileText size={16} />
               </div>
               <div className="min-w-0 flex-1">
