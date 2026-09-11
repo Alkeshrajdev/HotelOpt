@@ -1,20 +1,20 @@
 import { useMemo, useState } from "react";
+import { Link } from "react-router-dom";
+import { ChevronRight, Layers } from "lucide-react";
 import {
   Area, Bar, CartesianGrid, ComposedChart, Line, LineChart, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis,
 } from "recharts";
 import PageHeader from "@/components/ui/PageHeader";
 import { Card, CardHeader } from "@/components/ui/Card";
 import StatTile from "@/components/ui/StatTile";
-import Badge from "@/components/ui/Badge";
 import Tabs from "@/components/ui/Tabs";
 import EmptyState from "@/components/ui/EmptyState";
-import { Layers } from "lucide-react";
 import { CHART } from "@/lib/chartPalette";
 import {
   DEVIATIONS, END_USES, KITCHEN, KITCHEN_NIGHT, LAUNDRY, LAUNDRY_DAILY, LAUNDRY_THROUGHPUT_SOURCE, LIGHTING, LIGHTING_PROFILE, ROOMS_DAILY,
   THRESHOLDS, defaultReference, fmt, reconcile, type RefKind, type Resource,
 } from "@/lib/smartOps";
-import { FactRow, KV, LevelBadge, ReferencePicker } from "@/components/smart-ops/Shared";
+import { FactBar, KV, LevelBadge, ReferencePicker } from "@/components/smart-ops/Shared";
 import { attribution } from "./SmartOpsOverview";
 
 const TIP = { fontSize: 12, borderRadius: 12, border: `1px solid ${CHART.grid}` } as const;
@@ -228,12 +228,19 @@ export default function EndUses() {
       )}
 
       <Card>
-        <CardHeader title={`Facts — ${resource}`} hint="Deviations stated at the level the metering entitles" right={<Badge tone="neutral">{facts.length}</Badge>} />
-        <div className="p-6 pt-4 grid grid-cols-1 lg:grid-cols-2 gap-3">
-          {facts.length === 0 && (
-            <div className="lg:col-span-2"><EmptyState inset icon={<Layers size={20} />} title="No deviations for this resource" description="Every metered end-use is within its expected range and the quantity floor." /></div>
+        <CardHeader
+          title={`Facts — ${resource}`}
+          hint={`Deviation against each target's own reference · tick marks the ${THRESHOLDS.materialityPct}% threshold · open a fact for its statement, persistence and excess`}
+          right={<Link to="/smart-ops/alerts" className="text-[11px] font-semibold text-brand-700 hover:text-brand-900 inline-flex items-center gap-1">Alerts <ChevronRight size={12} /></Link>}
+        />
+        <div className="px-6 pt-3 pb-4">
+          {facts.length === 0 ? (
+            <EmptyState inset icon={<Layers size={20} />} title="No deviations for this resource" description="Every metered end-use is within its expected range and the quantity floor." />
+          ) : (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-12">
+              {facts.map((f) => <FactBar key={f.id} fact={f} to="/smart-ops/alerts" className="border-b border-ink-100 last:border-0" />)}
+            </div>
           )}
-          {facts.map((f) => <FactRow key={f.id} fact={f} />)}
         </div>
       </Card>
     </div>

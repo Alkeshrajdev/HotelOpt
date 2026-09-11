@@ -120,7 +120,22 @@ export function FactRow({ fact, compact = false, to }: { fact: DeviationFact; co
         </span>
       </div>
       <p className={cn("text-ink-700 leading-snug mt-2", compact ? "text-[12px]" : "text-[13px]")}>{fact.statement}</p>
-      <div className={cn("mt-3 grid gap-x-6 gap-y-1 text-[12px]", compact ? "grid-cols-2" : "grid-cols-2 md:grid-cols-4")}>
+      {!compact && (
+        <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3">
+          <div>
+            <div className="flex items-center justify-between mb-1.5">
+              <span className="text-[10px] uppercase tracking-[0.06em] font-semibold text-ink-400">Deviation vs reference</span>
+              <span className="text-[12px] font-semibold text-ink-900 tabular-nums">{fact.deviationPct === undefined ? fact.measured : `${fact.deviationPct > 0 ? "+" : ""}${fact.deviationPct}%`}</span>
+            </div>
+            <DeviationTrack pct={fact.deviationPct} band={fact.band} />
+          </div>
+          <div>
+            <div className="text-[10px] uppercase tracking-[0.06em] font-semibold text-ink-400 mb-1.5">Persistence · last 14 days</div>
+            <PersistenceStrip days={fact.persistenceDays} band={fact.band} />
+          </div>
+        </div>
+      )}
+      <div className={cn("mt-4 grid gap-x-6 gap-y-1 text-[12px]", compact ? "grid-cols-2" : "grid-cols-2 md:grid-cols-4")}>
         <KV label="Measured" value={fact.measured} />
         <KV label={fact.refKind ? `Reference · ${REF_LABEL[fact.refKind].toLowerCase()}` : "Reference"} value={fact.reference} />
         <KV label="Persistence" value={`${fact.persistenceDays} day${fact.persistenceDays === 1 ? "" : "s"} · since ${fact.since}`} />
@@ -155,5 +170,145 @@ export function SectionLabel({ children, right }: { children: ReactNode; right?:
       <div className="text-[11px] uppercase tracking-[0.06em] font-semibold text-ink-400">{children}</div>
       {right}
     </div>
+  );
+}
+
+/* ── A fact as a bar: deviation against the materiality threshold, with persistence ── */
+
+const BAND_BAR = { "above-threshold": "bg-chart-rose", watch: "bg-chart-sand", "data-quality": "bg-chart-moss" } as const;
+
+/** The bar itself: deviation on a 0–max% scale, the tick at the materiality threshold. No percentage → full bar (a threshold-type fact). */
+export function DeviationTrack({ pct, band, max = 70 }: { pct?: number; band: DeviationFact["band"]; max?: number }) {
+  const width = pct === undefined ? 100 : Math.max(2, Math.min(100, (pct / max) * 100));
+  const threshold = (THRESHOLDS.materialityPct / max) * 100;
+  return (
+    <div className="relative h-2.5 rounded-full bg-ink-100">
+      <div className={cn("h-full rounded-full", BAND_BAR[band])} style={{ width: `${width}%` }} />
+      {pct !== undefined && <span className="absolute -top-1 -bottom-1 w-px bg-ink-400" style={{ left: `${threshold}%` }} title={`Threshold ${THRESHOLDS.materialityPct}%`} />}
+    </div>
+  );
+}
+
+export function FactBar({ fact, to, max = 70, className }: { fact: DeviationFact; to?: string; max?: number; className?: string }) {
+  const pct = fact.deviationPct;
+  const modeLabel = fact.mode === "sensor-health" ? "Sensor health" : fact.mode === "night-flow" ? "Night flow" : MODE_LABEL[fact.mode];
+  const row = (
+    <div className={cn("grid grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)_64px] items-center gap-4 py-2", className)}>
+      <div className="min-w-0">
+        <div className="flex items-center gap-1.5 min-w-0">
+          <span className="text-[12px] font-semibold text-ink-900 truncate">{fact.target.label}</span>
+          <LevelBadge level={fact.level} />
+        </div>
+        <div className="text-[10px] text-ink-400 truncate mt-0.5">{modeLabel} · {fact.measured} vs {fact.reference}</div>
+      </div>
+      <div title={pct === undefined ? fact.statement : `${pct > 0 ? "+" : ""}${pct}% against the reference · threshold ${THRESHOLDS.materialityPct}%`}>
+        <DeviationTrack pct={pct} band={fact.band} max={max} />
+      </div>
+      <div className="text-right tabular-nums">
+        <div className="text-[12px] font-semibold text-ink-900 whitespace-nowrap">{pct === undefined ? fact.measured : `${pct > 0 ? "+" : ""}${pct}%`}</div>
+        <div className="text-[10px] text-ink-400 whitespace-nowrap">{fact.persistenceDays} day{fact.persistenceDays === 1 ? "" : "s"}</div>
+      </div>
+    </div>
+  );
+  return to ? <Link to={to} className="block rounded-xl hover:bg-ink-50/70 -mx-2 px-2 transition-colors">{row}</Link> : row;
+}
+
+/** One cell per day: filled for each day the deviation has persisted, lightest at the start of the window. */
+export function PersistenceStrip({ days, max = 14, band }: { days: number; max?: number; band: DeviationFact["band"] }) {
+  const filled = Math.min(max, days);
+  return (
+    <div className="flex items-center gap-2" title={`${days} of the last ${max} days`}>
+      <div className="flex gap-px flex-1 h-2.5">
+        {Array.from({ length: max }, (_, i) => (
+          <span key={i} className={cn("flex-1 rounded-[2px]", i >= max - filled ? BAND_BAR[band] : "bg-ink-100")} />
+        ))}
+      </div>
+      <span className="text-[10px] text-ink-400 tabular-nums whitespace-nowrap">{days} / {max} d</span>
+    </div>
+  );
+}
+
+/* ── Composition strips (segments summing to a whole) and sparkbars ── */
+
+export type Segment = { label: string; value: number; className: string };
+
+export function SegmentStrip({ segments, legend = true, height = "h-2.5" }: { segments: Segment[]; legend?: boolean; height?: string }) {
+  const total = segments.reduce((s, x) => s + x.value, 0) || 1;
+  return (
+    <div>
+      <div className={cn("flex w-full rounded-full overflow-hidden gap-px bg-white", height)}>
+        {segments.filter((s) => s.value > 0).map((s) => (
+          <div key={s.label} className={cn("h-full first:rounded-l-full last:rounded-r-full", s.className)} style={{ width: `${(s.value / total) * 100}%` }} title={`${s.label} · ${s.value}`} />
+        ))}
+      </div>
+      {legend && (
+        <div className="mt-2.5 flex flex-wrap gap-x-4 gap-y-1">
+          {segments.map((s) => (
+            <span key={s.label} className="inline-flex items-center gap-1.5 text-[11px] text-ink-600">
+              <span className={cn("w-2 h-2 rounded-full", s.className)} />
+              {s.label} <span className="font-semibold text-ink-900 tabular-nums">{s.value}</span>
+            </span>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/** 24 cells for the last 24 hours; the trailing gap is drawn as missing cells — never filled in. */
+export function CompletenessStrip({ gapHours, status, hours = 24 }: { gapHours: number; status: MeterStatus; hours?: number }) {
+  const missing = Math.min(hours, gapHours);
+  return (
+    <div className="flex gap-px h-3" title={missing ? `${gapHours} h without a reading` : "Complete"}>
+      {Array.from({ length: hours }, (_, i) => {
+        const gap = i >= hours - missing;
+        return <span key={i} className={cn("flex-1 rounded-[2px]", !gap ? "bg-chart-olive/70" : status === "offline" ? "bg-chart-rose/60" : "bg-chart-sand")} />;
+      })}
+    </div>
+  );
+}
+
+export function MiniBars({ values, className = "bg-chart-olive", height = "h-10", highlightLast = false }: { values: number[]; className?: string; height?: string; highlightLast?: boolean }) {
+  const max = Math.max(...values, 1);
+  return (
+    <div className={cn("flex items-end gap-[3px]", height)}>
+      {values.map((v, i) => (
+        <span key={i} className={cn("flex-1 rounded-[2px]", className, highlightLast && i === values.length - 1 && "opacity-100", highlightLast && i !== values.length - 1 && "opacity-60")} style={{ height: `${Math.max(4, (v / max) * 100)}%` }} />
+      ))}
+    </div>
+  );
+}
+
+/* ── Chart furniture: a tooltip with palette dots, and a legend swatch ── */
+
+type TipItem = { name?: string; value?: number | string; color?: string; dataKey?: string; payload?: Record<string, unknown> };
+
+export function ChartTip({ active, payload, label, unit = "", format }: {
+  active?: boolean; payload?: TipItem[]; label?: string; unit?: string; format?: (v: number) => string;
+}) {
+  if (!active || !payload?.length) return null;
+  const items = payload.filter((p) => p.value !== null && p.value !== undefined && p.name !== "_base");
+  if (!items.length) return null;
+  return (
+    <div className="popover rounded-xl px-3 py-2 text-[12px] min-w-[140px]">
+      {label && <div className="text-[11px] font-semibold text-ink-900 mb-1">{label}</div>}
+      {items.map((p, i) => (
+        <div key={i} className="flex items-center justify-between gap-4 py-0.5">
+          <span className="inline-flex items-center gap-1.5 text-ink-600"><span className="w-2 h-2 rounded-full" style={{ backgroundColor: p.color }} />{p.name}</span>
+          <span className="font-medium text-ink-900 tabular-nums">{typeof p.value === "number" ? (format ? format(p.value) : p.value.toLocaleString("en-US")) : p.value}{unit ? ` ${unit}` : ""}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export function Swatch({ color, className, label, dashed = false }: { color?: string; className?: string; label: string; dashed?: boolean }) {
+  return (
+    <span className="inline-flex items-center gap-1.5 text-[11px] text-ink-600 whitespace-nowrap">
+      {dashed
+        ? <span className="w-4 border-t-2 border-dashed" style={{ borderColor: color }} />
+        : <span className={cn("w-2.5 h-2.5 rounded-full", className)} style={color ? { backgroundColor: color } : undefined} />}
+      {label}
+    </span>
   );
 }

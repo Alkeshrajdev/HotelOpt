@@ -6,12 +6,11 @@ import { Card, CardHeader } from "@/components/ui/Card";
 import StatTile from "@/components/ui/StatTile";
 import Badge from "@/components/ui/Badge";
 import Tabs from "@/components/ui/Tabs";
-import { cn } from "@/lib/utils";
 import {
   DEVIATIONS, END_USES, METERS, MV_MEASURES, RAISED_ACTIONS, SERVICE_EDGES, THRESHOLDS,
-  fmt, levelFor, reconcile, type Resource,
+  fmt, levelFor, reconcile, verifiedMonthly, type DeviationFact, type Resource,
 } from "@/lib/smartOps";
-import { FactRow, LevelBadge, StatusDot } from "@/components/smart-ops/Shared";
+import { CompletenessStrip, FactBar, LevelBadge, MiniBars, SegmentStrip, StatusDot } from "@/components/smart-ops/Shared";
 
 /** Attribution per end-use for a resource, from the service graph, plus the Unallocated line. */
 export function attribution(resource: Resource) {
@@ -33,17 +32,33 @@ export function attribution(resource: Resource) {
   return { rec, rows, unit: resource === "water" ? "m³" : "kWh" };
 }
 
+export const factLink = (f: DeviationFact) =>
+  f.target.type === "asset" ? "/smart-ops/assets" : f.target.type === "end-use" ? "/smart-ops/end-uses" : "/smart-ops/meters";
+
 export default function SmartOpsOverview() {
   const [resource, setResource] = useState<Resource>("electricity");
   const elec = reconcile("ELEC-MAIN");
   const water = reconcile("WATER-MAIN");
   const live = METERS.filter((m) => m.status === "live").length;
+  const delayed = METERS.filter((m) => m.status === "delayed").length;
+  const offline = METERS.filter((m) => m.status === "offline").length;
   const attention = METERS.filter((m) => m.status !== "live" || m.gapHours > 0);
   const above = DEVIATIONS.filter((d) => d.band === "above-threshold");
   const watch = DEVIATIONS.filter((d) => d.band === "watch");
   const dq = DEVIATIONS.filter((d) => d.band === "data-quality");
+  const ranked = [...above, ...watch].sort((a, b) => (b.deviationPct ?? 999) - (a.deviationPct ?? 999));
   const attr = useMemo(() => attribution(resource), [resource]);
   const max = Math.max(...attr.rows.map((r) => r.total), attr.rec.unallocated);
+
+  const mv = {
+    signed: MV_MEASURES.filter((m) => m.status === "verified" || m.status === "reported"),
+    monitoring: MV_MEASURES.filter((m) => m.status === "monitoring").length,
+    implemented: MV_MEASURES.filter((m) => m.status === "implemented").length,
+    awaiting: MV_MEASURES.filter((m) => m.status === "awaiting-approval").length,
+  };
+  const kwh = mv.signed.filter((m) => m.resource === "electricity").reduce((s, m) => s + (m.result?.saving ?? 0), 0);
+  const monthly = useMemo(() => verifiedMonthly("electricity").slice(-12), []);
+  const monthlyTotals = monthly.map((r) => Object.entries(r).reduce((s, [k, v]) => (typeof v === "number" && k !== "ym" && k !== "m" ? s + v : s), 0));
 
   return (
     <div className="space-y-5">
@@ -109,16 +124,24 @@ export default function SmartOpsOverview() {
           </div>
         </Card>
 
-        {/* Largest measured deviations */}
+        {/* Measured deviations, as bars against the threshold */}
         <Card className="col-span-12 lg:col-span-5 flex flex-col">
-          <CardHeader title="Measured deviations" hint="Facts as measured · no cause, no verdict, no saving" right={<Link to="/smart-ops/alerts" className="text-[11px] font-semibold text-brand-700 hover:text-brand-900 inline-flex items-center gap-1">All <ChevronRight size={12} /></Link>} />
-          <div className="p-6 pt-4 flex-1 flex flex-col gap-3">
-            {above.slice(0, 2).map((f) => (
-              <FactRow key={f.id} fact={f} compact to={f.target.type === "asset" ? "/smart-ops/assets" : f.target.type === "end-use" ? "/smart-ops/end-uses" : "/smart-ops/meters"} />
-            ))}
-            <div className="mt-auto pt-2 flex items-center justify-between text-[11px] text-ink-500">
-              <span>Threshold: ≥ {THRESHOLDS.materialityPct}% for {THRESHOLDS.persistenceDays}+ days, above the quantity floor.</span>
-              {above.length > 2 && <Link to="/smart-ops/alerts" className="font-semibold text-brand-700 hover:text-brand-900 whitespace-nowrap">{above.length - 2} more</Link>}
+          <CardHeader
+            title="Measured deviations"
+            hint="Against each target's own reference · no cause, no verdict, no saving"
+            right={<Link to="/smart-ops/alerts" className="text-[11px] font-semibold text-brand-700 hover:text-brand-900 inline-flex items-center gap-1">All <ChevronRight size={12} /></Link>}
+          />
+          <div className="px-6 pt-4 pb-2 flex-1 flex flex-col">
+            <SegmentStrip segments={[
+              { label: "Above threshold", value: above.length, className: "bg-chart-rose" },
+              { label: "Watch", value: watch.length, className: "bg-chart-sand" },
+              { label: "Data quality", value: dq.length, className: "bg-chart-moss" },
+            ]} />
+            <div className="mt-3 divide-y divide-ink-100">
+              {ranked.map((f) => <FactBar key={f.id} fact={f} to={factLink(f)} />)}
+            </div>
+            <div className="mt-auto pt-3 flex items-center justify-between gap-3 text-[11px] text-ink-500">
+              <span>Tick marks the {THRESHOLDS.materialityPct}% materiality threshold · a fact needs {THRESHOLDS.persistenceDays}+ days above the quantity floor.</span>
             </div>
           </div>
         </Card>
@@ -126,18 +149,28 @@ export default function SmartOpsOverview() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card className="flex flex-col">
-          <CardHeader title="Meters needing attention" hint={`${attention.length} of ${METERS.length}`} right={<Link to="/smart-ops/meters" className="text-[11px] font-semibold text-brand-700 hover:text-brand-900 inline-flex items-center gap-1">Meters <ChevronRight size={12} /></Link>} />
-          <div className="px-6 pb-6 pt-4 flex-1 flex flex-col gap-3">
-            {attention.map((m) => (
-              <div key={m.id} className="flex items-start justify-between gap-3 py-2 border-b border-ink-100 last:border-0">
-                <div className="min-w-0">
-                  <div className="text-[12px] font-semibold text-ink-900 truncate">{m.name}</div>
-                  <div className="text-[11px] text-ink-500">{m.id} · last reading {m.lastReading}{m.gapHours ? ` · gap ${m.gapHours} h` : ""}</div>
+          <CardHeader title="Meters" hint={`${attention.length} of ${METERS.length} need attention`} right={<Link to="/smart-ops/meters" className="text-[11px] font-semibold text-brand-700 hover:text-brand-900 inline-flex items-center gap-1">Meters <ChevronRight size={12} /></Link>} />
+          <div className="px-6 pb-6 pt-4 flex-1 flex flex-col gap-4">
+            <SegmentStrip segments={[
+              { label: "Live", value: live, className: "bg-chart-olive" },
+              { label: "Delayed", value: delayed, className: "bg-chart-sand" },
+              { label: "Offline", value: offline, className: "bg-chart-rose" },
+            ]} />
+            <div className="space-y-3">
+              {attention.map((m) => (
+                <div key={m.id}>
+                  <div className="flex items-center justify-between gap-3 mb-1.5">
+                    <div className="min-w-0">
+                      <div className="text-[12px] font-semibold text-ink-900 truncate">{m.name}</div>
+                      <div className="text-[10px] text-ink-400 truncate">{m.id} · last reading {m.lastReading}{m.gapHours ? ` · gap ${m.gapHours} h` : ""}</div>
+                    </div>
+                    <StatusDot status={m.status} />
+                  </div>
+                  <CompletenessStrip gapHours={m.gapHours} status={m.status} />
                 </div>
-                <StatusDot status={m.status} />
-              </div>
-            ))}
-            <div className="mt-auto pt-3 border-t border-ink-100 text-[11px] text-ink-500">Gaps are shown as gaps. Nothing is interpolated into a reported figure.</div>
+              ))}
+            </div>
+            <div className="mt-auto pt-3 border-t border-ink-100 text-[11px] text-ink-500">Last 24 h per meter. Gaps are shown as gaps; nothing is interpolated into a reported figure.</div>
           </div>
         </Card>
 
@@ -166,12 +199,24 @@ export default function SmartOpsOverview() {
 
         <Card className="flex flex-col">
           <CardHeader title="Verification" hint="Measures under an approved M&V plan" right={<Link to="/smart-ops/verification" className="text-[11px] font-semibold text-brand-700 hover:text-brand-900 inline-flex items-center gap-1">Open <ChevronRight size={12} /></Link>} />
-          <div className="px-6 pb-6 pt-4 flex-1 flex flex-col gap-3 text-[12px]">
-            <VerifyLine label="Signed (L4)" value={`${MV_MEASURES.filter((m) => m.status === "verified" || m.status === "reported").length} measures`} tone="good" />
-            <VerifyLine label="In monitoring — no figure until verified" value={`${MV_MEASURES.filter((m) => m.status === "monitoring").length} measures`} tone="info" />
-            <VerifyLine label="Implemented — period not started" value={`${MV_MEASURES.filter((m) => m.status === "implemented").length} measure`} tone="info" />
-            <VerifyLine label="Awaiting plan approval" value={`${MV_MEASURES.filter((m) => m.status === "awaiting-approval").length} measure`} tone="warn" />
-            <div className={cn("mt-auto pt-3 border-t border-ink-100 text-[11px] text-ink-500")}>
+          <div className="px-6 pb-6 pt-4 flex-1 flex flex-col gap-4">
+            <SegmentStrip segments={[
+              { label: "Signed", value: mv.signed.length, className: "bg-chart-olive" },
+              { label: "Monitoring", value: mv.monitoring, className: "bg-chart-moss" },
+              { label: "Implemented", value: mv.implemented, className: "bg-chart-sage" },
+              { label: "Awaiting approval", value: mv.awaiting, className: "bg-chart-sand" },
+            ]} />
+            <div>
+              <div className="flex items-center justify-between text-[11px] mb-2">
+                <span className="text-ink-600">Verified per month · electricity</span>
+                <span className="font-semibold text-ink-900 tabular-nums">Σ {fmt(kwh)} kWh</span>
+              </div>
+              <MiniBars values={monthlyTotals} height="h-14" />
+              <div className="flex items-center justify-between text-[10px] text-ink-400 mt-1.5">
+                <span>{monthly[0]?.m}</span><span>{monthly[monthly.length - 1]?.m}</span>
+              </div>
+            </div>
+            <div className="mt-auto pt-3 border-t border-ink-100 text-[11px] text-ink-500">
               A saving exists only as an L4 output under an approved plan. Nothing here is projected or estimated.
             </div>
           </div>
@@ -182,15 +227,6 @@ export default function SmartOpsOverview() {
         Meter data feeds attribution, asset performance, diagnostics and verification. Reported figures come from the source of record.
         <Link to="/performance/energy/overview" className="inline-flex items-center gap-1 font-semibold text-brand-700 hover:text-brand-900 ml-1">Performance <ArrowRight size={11} /></Link>
       </div>
-    </div>
-  );
-}
-
-function VerifyLine({ label, value, tone }: { label: string; value: string; tone: "good" | "info" | "warn" }) {
-  return (
-    <div className="flex items-center justify-between gap-3 py-1.5 border-b border-ink-100 last:border-0">
-      <span className="text-ink-600">{label}</span>
-      <Badge tone={tone}>{value}</Badge>
     </div>
   );
 }

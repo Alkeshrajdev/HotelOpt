@@ -205,7 +205,8 @@ export function levelFor(target: { type: "asset" | "end-use"; id: string }, reso
 
 /* ── References (design · commissioned · own baseline) ──────────────────── */
 
-export type CurvePoint = { load: number; value: number };
+/** A point on a part-load curve. `hours` = time the asset spent in that load band over the measured window. */
+export type CurvePoint = { load: number; value: number; hours?: number };
 export type Reference = {
   kind: RefKind;
   label: string;
@@ -237,6 +238,13 @@ export const CONDITIONS = {
     { date: "2026-04-21", wetBulbC: 26.1, by: "F. Setiawan", reason: "Station outage" },
   ],
 };
+
+/** Wet-bulb from the weather API, hourly, last 48 h — what the chiller ratios are read against. */
+export const WETBULB_48H = Array.from({ length: 48 }, (_, i) => {
+  const h = i % 24;
+  const wb = 26.6 + 1.6 * Math.sin(((h - 9) / 24) * Math.PI * 2) + (i >= 24 ? 0.4 : 0);
+  return { h: `${String(h).padStart(2, "0")}:00`, day: i < 24 ? "Yesterday" : "Today", wb: +wb.toFixed(1) };
+});
 
 export const LAUNDRY_THROUGHPUT_SOURCE = {
   active: "Laundry system feed (Kannegiesser)" as const,
@@ -289,7 +297,7 @@ export const ASSETS: Asset[] = [
         commissioned: [{ load: 25, value: 0.76 }, { load: 50, value: 0.63 }, { load: 75, value: 0.61 }, { load: 100, value: 0.65 }],
         baseline:     [{ load: 25, value: 0.80 }, { load: 50, value: 0.66 }, { load: 75, value: 0.63 }, { load: 100, value: 0.66 }],
       },
-      measured:       [{ load: 25, value: 0.92 }, { load: 50, value: 0.77 }, { load: 75, value: 0.75 }, { load: 100, value: 0.79 }],
+      measured:       [{ load: 25, value: 0.92, hours: 58 }, { load: 50, value: 0.77, hours: 121 }, { load: 75, value: 0.75, hours: 126 }, { load: 100, value: 0.79, hours: 31 }],
       measuredWindow: "26 Apr – 9 May 2026 · 1,344 intervals · wet-bulb 26.1–28.9 °C",
     },
     linkedMeters: ["SM-CHL-01", "BTU-01", "SEN-LOAD-1", "SEN-WB"],
@@ -315,7 +323,7 @@ export const ASSETS: Asset[] = [
         commissioned: [{ load: 25, value: 0.74 }, { load: 50, value: 0.62 }, { load: 75, value: 0.59 }, { load: 100, value: 0.63 }],
         baseline:     [{ load: 25, value: 0.75 }, { load: 50, value: 0.63 }, { load: 75, value: 0.60 }, { load: 100, value: 0.64 }],
       },
-      measured:       [{ load: 25, value: 0.78 }, { load: 50, value: 0.64 }, { load: 75, value: 0.62 }, { load: 100, value: 0.66 }],
+      measured:       [{ load: 25, value: 0.78, hours: 66 }, { load: 50, value: 0.64, hours: 118 }, { load: 75, value: 0.62, hours: 112 }, { load: 100, value: 0.66, hours: 28 }],
       measuredWindow: "22 Apr – 5 May 2026 · 1,296 intervals (last window with output measured)",
     },
     linkedMeters: ["SM-CHL-02", "BTU-02", "SEN-LOAD-2", "SEN-WB"],
@@ -527,19 +535,27 @@ export function fmt(n: number) {
 
 /* ── Measurement & Verification (L4) ────────────────────────────────────── */
 
+/** The interval store's last approved month — what "today" means for the mock series. */
+export const TODAY_YM = "2026-05";
+
+export type MvStatus = "awaiting-approval" | "implemented" | "monitoring" | "verified" | "reported";
+
 export type MvMeasure = {
   id: string; code: string; name: string; property: string; target: string;
   resource: "electricity" | "water";
   option: "A" | "B" | "C" | "D";
-  status: "awaiting-approval" | "implemented" | "monitoring" | "verified" | "reported";
+  status: MvStatus;
   baselinePeriod: string; reportingPeriod: string; interval: "Monthly" | "Weekly" | "Daily";
+  /** Calendar geometry (YYYY-MM). `installed` and `reportingStart` are null until they exist. */
+  timeline: { baselineStart: string; baselineMonths: number; installed: string | null; reportingStart: string | null; reportingMonths: number };
+  /** Typical monthly quantity in the baseline period — drawn only while no result exists. */
+  baselineMonthly?: number;
   fit?: { cvrmse: number; nmbe: number };
   monitoringDay?: number; monitoringDays?: number;
   signatory?: string; signedOn?: string;
-  /** The six lines the guide requires to be published together (§8.1.1). */
+  /** The lines the guide requires to be published together (§8.1.1). The raw change is derived, never typed. */
   result?: {
     unit: string;
-    rawChange: number;
     routine: { qty: number; variables: string };
     nonRoutine: { qty: number; note: string }[];
     adjustedBaseline: number;
@@ -552,33 +568,119 @@ export type MvMeasure = {
 export const MV_MEASURES: MvMeasure[] = [
   { id: "MV-002", code: "ENG-014", name: "Chiller 01 — VFD retrofit", property: "Skyline Dubai", target: "Chiller 01", resource: "electricity", option: "B", status: "reported",
     baselinePeriod: "Jun 2023 – May 2024", reportingPeriod: "Jun 2024 – May 2025", interval: "Weekly", fit: { cvrmse: 14.8, nmbe: -2.3 },
+    timeline: { baselineStart: "2023-06", baselineMonths: 12, installed: "2024-05", reportingStart: "2024-06", reportingMonths: 12 },
     signatory: "R. Haddad · Platform Admin", signedOn: "2025-06-20",
-    result: { unit: "kWh", rawChange: 4100, routine: { qty: 32500, variables: "cooling degree-days +9%, occupied room nights +11%" }, nonRoutine: [], adjustedBaseline: 612000, reporting: 583600, saving: 28400, reconciliationPct: -0.9 } },
+    result: { unit: "kWh", routine: { qty: 32500, variables: "cooling degree-days +9%, occupied room nights +11%" }, nonRoutine: [], adjustedBaseline: 612000, reporting: 583600, saving: 28400, reconciliationPct: -0.9 } },
   { id: "MV-001", code: "ENG-002", name: "LED retrofit — back of house", property: "Skyline Dubai", target: "Lighting — BOH circuits", resource: "electricity", option: "A", status: "verified",
     baselinePeriod: "Nov 2024 – Oct 2025", reportingPeriod: "Nov 2025 – Apr 2026", interval: "Monthly", fit: { cvrmse: 9.2, nmbe: 1.1 },
+    timeline: { baselineStart: "2024-11", baselineMonths: 12, installed: "2025-10", reportingStart: "2025-11", reportingMonths: 6 },
     signatory: "R. Haddad · Platform Admin", signedOn: "2026-05-06",
-    result: { unit: "kWh", rawChange: -9800, routine: { qty: 2400, variables: "occupied room nights +6%, cooling degree-days +3%" }, nonRoutine: [], adjustedBaseline: 61400, reporting: 44200, saving: 17200, reconciliationPct: 1.8 } },
+    result: { unit: "kWh", routine: { qty: 2400, variables: "occupied room nights +6%, cooling degree-days +3%" }, nonRoutine: [], adjustedBaseline: 61400, reporting: 44200, saving: 17200, reconciliationPct: 1.8 } },
   { id: "MV-003", code: "ENG-001", name: "BMS scheduling — AHUs", property: "Skyline Dubai", target: "Whole facility", resource: "electricity", option: "C", status: "verified",
     baselinePeriod: "Jan – Dec 2025", reportingPeriod: "Jan – Apr 2026", interval: "Monthly", fit: { cvrmse: 11.6, nmbe: 0.8 },
+    timeline: { baselineStart: "2025-01", baselineMonths: 12, installed: "2025-12", reportingStart: "2026-01", reportingMonths: 4 },
     signatory: "R. Haddad · Platform Admin", signedOn: "2026-05-08",
-    result: { unit: "kWh", rawChange: -6200, routine: { qty: 1900, variables: "occupied room nights +4%" }, nonRoutine: [{ qty: -3100, note: "Tower B floors 9–12 closed for refurbishment, Feb–Mar 2026 (works order WO-2026-041)" }], adjustedBaseline: 1132400, reporting: 1118900, saving: 13500, reconciliationPct: 0.4 } },
+    result: { unit: "kWh", routine: { qty: 1900, variables: "occupied room nights +4%" }, nonRoutine: [{ qty: -3100, note: "Tower B floors 9–12 closed for refurbishment, Feb–Mar 2026 (works order WO-2026-041)" }], adjustedBaseline: 1132400, reporting: 1118900, saving: 13500, reconciliationPct: 0.4 } },
   { id: "MV-004", code: "WTR-003", name: "Laundry — heat & water recovery", property: "Skyline Dubai", target: "Laundry", resource: "water", option: "B", status: "verified",
     baselinePeriod: "May 2025 – Oct 2025", reportingPeriod: "Nov 2025 – Apr 2026", interval: "Daily", fit: { cvrmse: 18.4, nmbe: -1.6 },
+    timeline: { baselineStart: "2025-05", baselineMonths: 6, installed: "2025-10", reportingStart: "2025-11", reportingMonths: 6 },
     signatory: "R. Haddad · Platform Admin", signedOn: "2026-05-02",
-    result: { unit: "m³", rawChange: -540, routine: { qty: 90, variables: "kg processed +4%" }, nonRoutine: [], adjustedBaseline: 7410, reporting: 6800, saving: 610, reconciliationPct: 2.1 } },
+    result: { unit: "m³", routine: { qty: 90, variables: "kg processed +4%" }, nonRoutine: [], adjustedBaseline: 7410, reporting: 6800, saving: 610, reconciliationPct: 2.1 } },
   { id: "MV-005", code: "WTR-001", name: "Greywater reuse — landscaping", property: "Skyline Dubai", target: "Irrigation & landscape", resource: "water", option: "B", status: "monitoring",
-    baselinePeriod: "Apr 2025 – Mar 2026", reportingPeriod: "from 1 Apr 2026", interval: "Daily", monitoringDay: 41, monitoringDays: 90 },
+    baselinePeriod: "Apr 2025 – Mar 2026", reportingPeriod: "from 1 Apr 2026", interval: "Daily", monitoringDay: 41, monitoringDays: 90, baselineMonthly: 620, fit: { cvrmse: 16.2, nmbe: 0.9 },
+    timeline: { baselineStart: "2025-04", baselineMonths: 12, installed: "2026-03", reportingStart: "2026-04", reportingMonths: 3 } },
   { id: "MV-006", code: "OPS-021", name: "Kitchen refrigeration controls", property: "Skyline Dubai", target: "Kitchen & F&B", resource: "electricity", option: "A", status: "monitoring",
-    baselinePeriod: "May 2025 – Apr 2026", reportingPeriod: "from 28 Apr 2026", interval: "Daily", monitoringDay: 12, monitoringDays: 60 },
+    baselinePeriod: "May 2025 – Apr 2026", reportingPeriod: "from 28 Apr 2026", interval: "Daily", monitoringDay: 12, monitoringDays: 60, baselineMonthly: 28400, fit: { cvrmse: 12.4, nmbe: -1.2 },
+    timeline: { baselineStart: "2025-05", baselineMonths: 12, installed: "2026-04", reportingStart: "2026-05", reportingMonths: 2 } },
   { id: "MV-007", code: "ENG-019", name: "Cooling-tower fill replacement", property: "Skyline Dubai", target: "Cooling towers 01–02", resource: "electricity", option: "B", status: "implemented",
-    baselinePeriod: "Mar 2025 – Feb 2026", reportingPeriod: "starts 1 Jun 2026", interval: "Weekly" },
+    baselinePeriod: "Mar 2025 – Feb 2026", reportingPeriod: "starts 1 Jun 2026", interval: "Weekly", baselineMonthly: 24600, fit: { cvrmse: 13.1, nmbe: 0.6 },
+    timeline: { baselineStart: "2025-03", baselineMonths: 12, installed: "2026-05", reportingStart: "2026-06", reportingMonths: 6 } },
   { id: "MV-008", code: "OPS-014", name: "Chiller 01 — condenser tube clean", property: "Skyline Dubai", target: "Chiller 01", resource: "electricity", option: "B", status: "awaiting-approval",
-    baselinePeriod: "Apr 2025 – Mar 2026", reportingPeriod: "—", interval: "Weekly" },
+    baselinePeriod: "Apr 2025 – Mar 2026", reportingPeriod: "—", interval: "Weekly", baselineMonthly: 52800,
+    timeline: { baselineStart: "2025-04", baselineMonths: 12, installed: null, reportingStart: null, reportingMonths: 0 } },
 ];
 
-/** Verified savings recognised per month — signed L4 outputs only. */
-export const MV_MONTHLY = [
-  { m: "Jun 25", kwh: 3400 }, { m: "Jul 25", kwh: 3600 }, { m: "Aug 25", kwh: 3900 }, { m: "Sep 25", kwh: 4200 },
-  { m: "Oct 25", kwh: 4400 }, { m: "Nov 25", kwh: 4600 }, { m: "Dec 25", kwh: 5200 }, { m: "Jan 26", kwh: 5600 },
-  { m: "Feb 26", kwh: 5900 }, { m: "Mar 26", kwh: 6100 }, { m: "Apr 26", kwh: 6000 }, { m: "May 26", kwh: 6200 },
-];
+/** The span every measure timeline is drawn on. */
+export const MV_RANGE = { start: "2023-06", end: "2026-12" };
+
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+export function monthIndex(ym: string) { const [y, m] = ym.split("-").map(Number); return y * 12 + (m - 1); }
+export function ymAdd(ym: string, n: number) { const i = monthIndex(ym) + n; return `${Math.floor(i / 12)}-${String((i % 12) + 1).padStart(2, "0")}`; }
+export function monthLabel(ym: string) { const [y, m] = ym.split("-").map(Number); return `${MONTHS[m - 1]} ${String(y).slice(2)}`; }
+export function monthLong(ym: string) { const [y, m] = ym.split("-").map(Number); return `${MONTHS[m - 1]} ${y}`; }
+
+/** Dubai seasonal shape by calendar month (Jan → Dec), normalised around 1. */
+const SEASON: Record<MvMeasure["resource"], number[]> = {
+  electricity: [0.86, 0.82, 0.88, 0.95, 1.05, 1.12, 1.18, 1.20, 1.12, 1.02, 0.92, 0.88],
+  water:       [0.92, 0.90, 0.94, 0.98, 1.02, 1.06, 1.10, 1.10, 1.06, 1.00, 0.96, 0.96],
+};
+/** Deterministic ±3% scatter so the measured months sit around the model, not on it. */
+const jitter = (i: number) => (((i * 9301 + 49297) % 233280) / 233280 - 0.5) * 0.06;
+
+/** The published lines with the derived ones: baseline-year quantity for the same months, and the raw change. */
+export function sixLines(m: MvMeasure) {
+  const r = m.result;
+  if (!r) return null;
+  const nonRoutine = r.nonRoutine.reduce((s, n) => s + n.qty, 0);
+  const baselineSame = r.adjustedBaseline - r.routine.qty - nonRoutine;
+  return {
+    unit: r.unit, baselineSame, routine: r.routine.qty, routineVariables: r.routine.variables, nonRoutine, nonRoutineNotes: r.nonRoutine,
+    adjustedBaseline: r.adjustedBaseline, reporting: r.reporting, saving: r.saving,
+    rawChange: r.reporting - baselineSame, reconciliationPct: r.reconciliationPct,
+  };
+}
+
+export type MvPoint = {
+  ym: string; m: string;
+  phase: "baseline" | "install" | "reporting" | "pending";
+  measured: number | null;
+  /** Fitted baseline model over the baseline months (what CV(RMSE) measures). */
+  model: number | null;
+  /** Adjusted baseline over the reporting months — only once a result is signed. */
+  adjusted: number | null;
+};
+
+/** Monthly series behind a measure: baseline months with the fitted model, an install slot, then the reporting months. */
+export function mvSeries(m: MvMeasure): MvPoint[] {
+  const w = (ym: string) => SEASON[m.resource][Number(ym.split("-")[1]) - 1];
+  const t = m.timeline;
+  const baseMonths = Array.from({ length: t.baselineMonths }, (_, i) => ymAdd(t.baselineStart, i));
+  const repMonths = t.reportingStart ? Array.from({ length: t.reportingMonths }, (_, i) => ymAdd(t.reportingStart!, i)) : [];
+  const six = sixLines(m);
+  const sumW = repMonths.reduce((s, ym) => s + w(ym), 0);
+  const level = six && sumW ? six.baselineSame / sumW : (m.baselineMonthly ?? 0);
+  const pts: MvPoint[] = baseMonths.map((ym, i) => ({
+    ym, m: monthLabel(ym), phase: "baseline",
+    measured: Math.round(level * w(ym) * (1 + jitter(i))), model: Math.round(level * w(ym)), adjusted: null,
+  }));
+  if (t.installed) pts.push({ ym: t.installed, m: "Installed", phase: "install", measured: null, model: null, adjusted: null });
+  if (six) {
+    const raw = repMonths.map((ym, i) => w(ym) * (1 + jitter(i + 7)));
+    const sumRaw = raw.reduce((s, x) => s + x, 0);
+    repMonths.forEach((ym, i) => pts.push({
+      ym, m: monthLabel(ym), phase: "reporting",
+      measured: Math.round((six.reporting * raw[i]) / sumRaw), model: null, adjusted: Math.round((six.adjustedBaseline * w(ym)) / sumW),
+    }));
+  } else {
+    repMonths.forEach((ym, i) => {
+      const elapsed = monthIndex(ym) <= monthIndex(TODAY_YM);
+      pts.push({
+        ym, m: monthLabel(ym), phase: elapsed ? "reporting" : "pending",
+        measured: elapsed ? Math.round(level * w(ym) * 0.96 * (1 + jitter(i + 3))) : null, model: null, adjusted: null,
+      });
+    });
+  }
+  return pts;
+}
+
+/** Verified saving recognised per calendar month, by measure — signed L4 outputs only, one resource at a time. */
+export function verifiedMonthly(resource: MvMeasure["resource"]) {
+  const signed = MV_MEASURES.filter((x) => x.resource === resource && (x.status === "verified" || x.status === "reported"));
+  const map = new Map<string, Record<string, number>>();
+  signed.forEach((x) => mvSeries(x)
+    .filter((p) => p.phase === "reporting" && p.adjusted !== null && p.measured !== null)
+    .forEach((p) => { const row = map.get(p.ym) ?? {}; row[x.id] = p.adjusted! - p.measured!; map.set(p.ym, row); }));
+  return [...map.entries()]
+    .sort((a, b) => monthIndex(a[0]) - monthIndex(b[0]))
+    .map(([ym, v]) => ({ ym, m: monthLabel(ym), ...v }));
+}

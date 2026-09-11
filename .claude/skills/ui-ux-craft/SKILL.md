@@ -21,6 +21,12 @@ repo's tokens. When in doubt, the rule wins over the existing code.
   (`toLocaleString()`, `tabular-nums`), zero/empty (`EmptyState`), and many rows (tables, not cards).
 - Pick the component from the data: trend → line/bars; share → stacked bar/donut; ranking → table or
   horizontal bars; a single number with context → `KpiTile`.
+- **A fact is a picture before it is a sentence** (user feedback, Sep 2026: "too text heavy, more
+  visualization"). A deviation is a bar against its threshold tick (`DeviationTrack` / `FactBar`),
+  persistence is a strip of day cells, a count-by-status is a `SegmentStrip`, a period on a calendar
+  is a track (baseline → installed → reporting), a multi-line arithmetic result is a bridge chart,
+  meter completeness is 24 cells with the gap left empty. Prose carries only what the picture can't
+  (the statement, the provenance line). Never render a fact as a 2×4 key/value grid alone.
 - Never leave a chart that can render empty — a percentage-height bar needs a definite-height column
   (`h-full` column + `flex-1 flex items-end` track). Charts get explicit heights.
 
