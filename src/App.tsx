@@ -37,12 +37,11 @@ const AdminStub           = lazy(() => import("./pages/admin/Stub"));
 
 // Smart Operations
 const SmartOpsOverview    = lazy(() => import("./pages/smart-ops/SmartOpsOverview"));
-const EnergyManagement    = lazy(() => import("./pages/smart-ops/EnergyManagement"));
-const WaterManagement     = lazy(() => import("./pages/smart-ops/WaterManagement"));
-const IAQComfort          = lazy(() => import("./pages/smart-ops/IAQComfort"));
-const AssetPerformance    = lazy(() => import("./pages/smart-ops/AssetPerformance"));
+const SmartOpsMeters      = lazy(() => import("./pages/smart-ops/Meters"));
+const SmartOpsEndUses     = lazy(() => import("./pages/smart-ops/EndUses"));
+const SmartOpsAssets      = lazy(() => import("./pages/smart-ops/Assets"));
 const AlertsCentre        = lazy(() => import("./pages/smart-ops/AlertsCentre"));
-const SavingsVerification = lazy(() => import("./pages/smart-ops/SavingsVerification"));
+const SmartOpsVerification = lazy(() => import("./pages/smart-ops/Verification"));
 
 export default function App() {
   return (
@@ -67,12 +66,15 @@ export default function App() {
 
           {/* Smart Operations */}
           <Route path="/smart-ops" element={<SmartOpsOverview />} />
-          <Route path="/smart-ops/energy" element={<EnergyManagement />} />
-          <Route path="/smart-ops/water" element={<WaterManagement />} />
-          <Route path="/smart-ops/iaq" element={<IAQComfort />} />
-          <Route path="/smart-ops/assets" element={<AssetPerformance />} />
+          <Route path="/smart-ops/meters" element={<SmartOpsMeters />} />
+          <Route path="/smart-ops/end-uses" element={<SmartOpsEndUses />} />
+          <Route path="/smart-ops/assets" element={<SmartOpsAssets />} />
           <Route path="/smart-ops/alerts" element={<AlertsCentre />} />
-          <Route path="/smart-ops/savings" element={<SavingsVerification />} />
+          <Route path="/smart-ops/verification" element={<SmartOpsVerification />} />
+          <Route path="/smart-ops/energy" element={<Navigate to="/smart-ops/end-uses" replace />} />
+          <Route path="/smart-ops/water" element={<Navigate to="/smart-ops/end-uses" replace />} />
+          <Route path="/smart-ops/iaq" element={<Navigate to="/smart-ops" replace />} />
+          <Route path="/smart-ops/savings" element={<Navigate to="/smart-ops/verification" replace />} />
 
           {/* Performance — pillar-first hub */}
           <Route

@@ -23,6 +23,9 @@ import {
   TrendingDown,
   Activity,
   FolderOpen,
+  ShieldCheck,
+  Layers,
+  Gauge,
 } from "lucide-react";
 
 import type { ModuleKey } from "./account";
@@ -95,13 +98,12 @@ export const NAV: NavSection[] = [
     roles: ["property_sm", "super_admin"],
     module: "smartOps",
     items: [
-      { to: "/smart-ops",         label: "Overview",    icon: Activity,    matchPrefix: "/smart-ops" },
-      { to: "/smart-ops/energy",  label: "Energy",      icon: Zap },
-      { to: "/smart-ops/water",   label: "Water",       icon: Droplets },
-      { to: "/smart-ops/iaq",     label: "IAQ & Comfort", icon: Wind },
-      { to: "/smart-ops/assets",  label: "Assets",      icon: Cpu },
-      { to: "/smart-ops/alerts",  label: "Alerts",      icon: Bell,        badge: "7" },
-      { to: "/smart-ops/savings", label: "Savings",     icon: TrendingDown },
+      { to: "/smart-ops",         label: "Overview",     icon: Activity },
+      { to: "/smart-ops/meters",       label: "Meters",       icon: Gauge },
+      { to: "/smart-ops/end-uses",     label: "End-uses",     icon: Layers },
+      { to: "/smart-ops/assets",       label: "Assets",       icon: Cpu },
+      { to: "/smart-ops/alerts",       label: "Alerts",       icon: Bell,  badge: "4" },
+      { to: "/smart-ops/verification", label: "Verification", icon: ShieldCheck },
     ],
   },
 
