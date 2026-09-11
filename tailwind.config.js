@@ -76,8 +76,6 @@ export default {
           water:  "rgb(var(--pillar-water)  / <alpha-value>)",
           waste:  "rgb(var(--pillar-waste)  / <alpha-value>)",
           carbon: "rgb(var(--pillar-carbon) / <alpha-value>)",
-          social: "rgb(var(--pillar-social) / <alpha-value>)",
-          gov:    "rgb(var(--pillar-gov)    / <alpha-value>)",
         },
         // Data-viz palette — mirrors src/lib/chartPalette.ts. For hand-built bars, dots
         // and legend swatches; recharts uses the hex constants from that module.
