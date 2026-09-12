@@ -37,25 +37,27 @@ const DEMO_EFS: EfRow[] = [
 const SOURCE_LABEL: Record<string, string> = {
   electricity_grid: "Grid electricity", natural_gas: "Natural gas", district_cooling: "District cooling", diesel: "Diesel", solar_pv: "Solar PV (on-site)",
 };
-const SOURCE_SCOPE: Record<string, string> = {
-  electricity_grid: "Scope 2", district_cooling: "Scope 2", natural_gas: "Scope 1", diesel: "Scope 1", solar_pv: "Scope 2",
-};
+/** Scope 3 rows show the category too, so "Scope 3 Cat 5" filters as its own bucket. */
+function scopeLabel(r: EmissionFactor): string {
+  if (r.scope === 3) return r.category ? `Scope 3 ${r.category.replace(/^cat/, "Cat ")}` : "Scope 3";
+  return `Scope ${r.scope}`;
+}
 
 /** Library rows → table rows. "Versions" counts every row for the same source × region. */
 function fromDb(rows: EmissionFactor[]): EfRow[] {
   const perKey = new Map<string, number>();
-  const keyOf = (r: EmissionFactor) => `${r.source_type}|${r.region ?? "GLOBAL"}`;
+  const keyOf = (r: EmissionFactor) => `${r.factor_key ?? r.source_type}|${r.region ?? "GLOBAL"}`;
   rows.forEach((r) => perKey.set(keyOf(r), (perKey.get(keyOf(r)) ?? 0) + 1));
   return rows.map((r) => ({
     id: r.id,
-    source: SOURCE_LABEL[r.source_type] ?? r.source_type,
+    source: r.factor_key ?? SOURCE_LABEL[r.source_type ?? ""] ?? String(r.source_type),
     region: r.region ?? "GLOBAL",
     year: r.year,
     version: r.version,
     value: Number(r.ef_value),
     unit: r.ef_unit.replace("CO2e", "CO₂e"),
-    scope: SOURCE_SCOPE[r.source_type] ?? "—",
-    origin: r.version.toUpperCase().startsWith("IPCC") ? "IPCC" : "Hotel Optimizer library",
+    scope: scopeLabel(r),
+    origin: r.standard ?? (r.version.toUpperCase().startsWith("IPCC") ? "IPCC" : "Hotel Optimizer library"),
     active: r.is_active,
     versions: perKey.get(keyOf(r)) ?? 1,
   }));

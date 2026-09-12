@@ -8,6 +8,7 @@ export type Property = Tables<"properties">;
 export type ConsumptionRecord = Tables<"consumption_records">;
 export type ActivityRecord = Tables<"activity_records">;
 export type EmissionFactor = Tables<"ef_library">;
+export type EmissionActivity = Tables<"emission_activities">;
 export type Profile = Tables<"user_profiles">;
 export type AuditRow = Tables<"audit_log">;
 export type RecordStatus = ConsumptionRecord["status"];
@@ -39,6 +40,22 @@ export async function listProfiles(): Promise<Profile[]> {
 
 export async function listEnergyEFs(): Promise<EmissionFactor[]> {
   const { data, error } = await supabase!.from("ef_library").select("*").eq("is_active", true).order("source_type");
+  if (error) throw error;
+  return data ?? [];
+}
+
+/**
+ * Every active factor in the library — energy rows plus the Scope 1 fugitive and
+ * Scope 3 rows keyed by `factor_key`. The inventory builder needs all of them.
+ */
+export async function listFactors(): Promise<EmissionFactor[]> {
+  const { data, error } = await supabase!
+    .from("ef_library")
+    .select("*")
+    .eq("is_active", true)
+    .order("scope")
+    .order("category")
+    .order("source_type");
   if (error) throw error;
   return data ?? [];
 }
@@ -221,6 +238,95 @@ export async function upsertActivity(payload: {
     submitted_at: payload.submit ? new Date().toISOString() : null,
   };
   const { data, error } = await supabase!.from("activity_records").upsert(row, { onConflict: "property_id,period_start" }).select().single();
+  if (error) throw error;
+  return data;
+}
+
+/* ---------------- Emission activities (Scope 1 fugitive + Scope 3) ---------------- */
+
+export type ActivityType = "refrigerant" | "purchase" | "capital" | "upstream_transport" | "business_travel" | "commute";
+
+export async function listEmissionActivities(opts?: {
+  propertyId?: string;
+  from?: string;
+  to?: string;
+  status?: RecordStatus | RecordStatus[];
+  scope?: 1 | 3;
+  limit?: number;
+}): Promise<EmissionActivity[]> {
+  let q = supabase!
+    .from("emission_activities")
+    .select("*")
+    .order("period_start", { ascending: false })
+    .limit(opts?.limit ?? 3000);
+  if (opts?.propertyId) q = q.eq("property_id", opts.propertyId);
+  if (opts?.from) q = q.gte("period_start", opts.from);
+  if (opts?.to) q = q.lte("period_start", opts.to);
+  if (opts?.scope) q = q.eq("scope", opts.scope);
+  if (opts?.status) q = Array.isArray(opts.status) ? q.in("status", opts.status) : q.eq("status", opts.status);
+  const { data, error } = await q;
+  if (error) throw error;
+  return data ?? [];
+}
+
+/**
+ * One captured activity. The caller has already resolved the factor (see
+ * `lib/data/factors.ts`), so the row stores the factor and the tCO2e it produced
+ * alongside the quantity — a restatement can then show exactly what was applied.
+ */
+export async function createEmissionActivity(payload: {
+  property_id: string;
+  scope: 1 | 3;
+  category?: string | null;
+  activity_type: ActivityType;
+  factor_key?: string | null;
+  description?: string | null;
+  vendor?: string | null;
+  period_start: string;
+  period_end: string;
+  quantity: number;
+  unit: string;
+  tier?: number | null;
+  ef_id?: string | null;
+  ef_value?: number | null;
+  ef_unit?: string | null;
+  tco2e?: number | null;
+  invoice_ref?: string | null;
+  notes?: string | null;
+  source_payload?: Record<string, unknown> | null;
+  anomaly_flags?: Record<string, unknown>[];
+  input_method?: string;
+  submit?: boolean;
+}): Promise<EmissionActivity> {
+  const me = await uid();
+  const insert: Inserts<"emission_activities"> = {
+    property_id: payload.property_id,
+    client_id: PLACEHOLDER_CLIENT,
+    scope: payload.scope,
+    category: payload.category ?? null,
+    activity_type: payload.activity_type,
+    factor_key: payload.factor_key ?? null,
+    description: payload.description ?? null,
+    vendor: payload.vendor ?? null,
+    period_start: payload.period_start,
+    period_end: payload.period_end,
+    quantity: payload.quantity,
+    unit: payload.unit,
+    tier: payload.tier ?? null,
+    ef_id: payload.ef_id ?? null,
+    ef_value: payload.ef_value ?? null,
+    ef_unit: payload.ef_unit ?? null,
+    tco2e: payload.tco2e ?? null,
+    invoice_ref: payload.invoice_ref ?? null,
+    notes: payload.notes ?? null,
+    source_payload: (payload.source_payload ?? null) as Inserts<"emission_activities">["source_payload"],
+    anomaly_flags: (payload.anomaly_flags ?? []) as Inserts<"emission_activities">["anomaly_flags"],
+    status: payload.submit ? "submitted" : "draft",
+    input_method: payload.input_method ?? "manual",
+    submitted_by: me,
+    submitted_at: payload.submit ? new Date().toISOString() : null,
+  };
+  const { data, error } = await supabase!.from("emission_activities").insert(insert).select().single();
   if (error) throw error;
   return data;
 }

@@ -52,7 +52,10 @@ import {
   type FieldDef,
   type Method,
 } from "@/lib/dataCaptureConfig";
-import { createRecord, uploadEvidence, upsertActivity } from "@/lib/api";
+import { createEmissionActivity, createRecord, listFactors, uploadEvidence, upsertActivity } from "@/lib/api";
+import {
+  findFactor, purchaseFactorKey, refrigerantKey, toFactorUnit, travelModeKey,
+} from "@/lib/data/factors";
 import { anomalyFlagsFor } from "@/lib/data/records";
 import { useProperties, type PropertyLite as Property } from "@/lib/data/properties";
 import { useDataMode } from "@/lib/data/mode";
@@ -140,6 +143,125 @@ function validateOccupancy(values: Record<string, string>): Record<string, strin
   return errs;
 }
 
+/**
+ * Scope 1 fugitive and Scope 3 activity capture — purchases, travel/commute and
+ * refrigerant events. The factor is resolved here so the stored row carries the value
+ * that produced its tCO2e and a restatement can show what was applied. When the library
+ * has no factor for the activity, the submission is refused with the reason rather than
+ * stored as an uncalculated row.
+ *
+ * Returns an error message, or null on success.
+ */
+async function submitEmissionActivity(opts: {
+  key: DataTypeKey;
+  values: Record<string, string>;
+  propertyId: string;
+  start: string;
+  end: string;
+  files: File[];
+  method: Method;
+  anomalyFlags: Record<string, unknown>[];
+}): Promise<string | null> {
+  const { key, values: v, propertyId, start, end, files, method, anomalyFlags } = opts;
+  const num = (k: string) => (v[k] !== undefined && v[k] !== "" ? parseFloat(v[k]) : null);
+  const factors = await listFactors();
+
+  const evidence = await Promise.all(files.map((f) => uploadEvidence(propertyId, f)));
+  const withEvidence = (detail: Record<string, unknown>) =>
+    evidence.length ? { ...detail, evidence } : detail;
+
+  if (key === "refrigerants") {
+    const gas = v["refrigerant"] ?? "";
+    const charged = num("charged") ?? 0;
+    const recovered = num("recovered") ?? 0;
+    const released = +(charged - recovered).toFixed(3);
+    if (released <= 0) {
+      return "Recovered is not less than charged, so nothing was released. Record the service visit in Ops events instead — a zero-emission line would only add noise to the inventory.";
+    }
+    const factor = findFactor(factors, { key: refrigerantKey(gas), unit: "kg" });
+    if (!factor) return `No GWP on file for ${gas || "this refrigerant"}. Ask the platform admin to add it to the factor library, then resubmit.`;
+    await createEmissionActivity({
+      property_id: propertyId, scope: 1, category: null, activity_type: "refrigerant",
+      factor_key: factor.factor_key, description: `Refrigerant released — ${gas}`,
+      period_start: start, period_end: end, quantity: released, unit: "kg", tier: 1,
+      ef_id: factor.id, ef_value: factor.ef_value, ef_unit: factor.ef_unit,
+      tco2e: (released * Number(factor.ef_value)) / 1000,
+      notes: v["notes"] || null,
+      source_payload: withEvidence({
+        charged, recovered, equipmentType: v["equipmentType"] ?? null, date: v["date"] ?? null,
+        method: "Simplified material balance: charged minus recovered.",
+      }),
+      anomaly_flags: anomalyFlags, input_method: method, submit: true,
+    });
+    return null;
+  }
+
+  if (key === "procurement") {
+    const category = v["category"] ?? "cat1";
+    const unit = v["unit"] ?? "USD";
+    const amount = num("amount");
+    if (amount === null || amount <= 0) return "Enter the amount purchased.";
+    const pick = purchaseFactorKey({ category, unit, description: v["description"] ?? v["vendor"] });
+    if (!pick) {
+      return `The library has no factor for ${category.toUpperCase()} measured in ${unit}. Spend-based factors are USD-denominated; enter the amount in USD, or capture the purchase by mass (kg / tonnes).`;
+    }
+    const conv = toFactorUnit(amount, unit);
+    const factor = findFactor(factors, { key: pick.key, unit: conv.unit });
+    if (!factor) return `No ${pick.key} factor in the library for ${conv.unit}. Ask the platform admin to load it, then resubmit.`;
+    await createEmissionActivity({
+      property_id: propertyId, scope: 3, category,
+      activity_type: category === "cat2" ? "capital" : category === "cat4" ? "upstream_transport" : "purchase",
+      factor_key: factor.factor_key,
+      description: v["description"] || v["vendor"] || "Purchase",
+      vendor: v["vendor"] || null,
+      period_start: start, period_end: end, quantity: conv.quantity, unit: conv.unit,
+      tier: v["tier"] ? Number(v["tier"]) : null,
+      ef_id: factor.id, ef_value: factor.ef_value, ef_unit: factor.ef_unit,
+      tco2e: (conv.quantity * Number(factor.ef_value)) / 1000,
+      invoice_ref: v["invoiceRef"] || null, notes: v["notes"] || null,
+      source_payload: withEvidence({
+        enteredAmount: amount, enteredUnit: unit, factorKey: pick.key,
+        method: pick.note ?? "Spend x EEIO factor.",
+      }),
+      anomaly_flags: anomalyFlags, input_method: method, submit: true,
+    });
+    return null;
+  }
+
+  // travel & commute
+  const category = v["category"] ?? "cat6";
+  const travelMode = v["mode"] ?? "";
+  const unit = v["unit"] ?? "pkm";
+  const distance = num("distance");
+  if (distance === null || distance <= 0) {
+    return "Enter the distance travelled in passenger-km. A mode alone cannot be converted to emissions.";
+  }
+  if (unit === "trips") {
+    return "Trips cannot be converted without a distance. Enter passenger-km, or record nights for a hotel stay.";
+  }
+  const conv = toFactorUnit(distance, unit);
+  const factor = findFactor(factors, { key: travelModeKey(travelMode), unit: conv.unit });
+  if (!factor) {
+    return `No factor in the library for ${travelMode || "this mode"} measured in ${conv.unit}. Ask the platform admin to load it, then resubmit.`;
+  }
+  await createEmissionActivity({
+    property_id: propertyId, scope: 3, category,
+    activity_type: category === "cat7" ? "commute" : "business_travel",
+    factor_key: factor.factor_key,
+    description: `${category === "cat7" ? "Employee commuting" : "Business travel"} — ${travelMode}`,
+    period_start: start, period_end: end, quantity: conv.quantity, unit: conv.unit, tier: 2,
+    ef_id: factor.id, ef_value: factor.ef_value, ef_unit: factor.ef_unit,
+    tco2e: (conv.quantity * Number(factor.ef_value)) / 1000,
+    notes: v["notes"] || null,
+    source_payload: withEvidence({
+      mode: travelMode, headcount: num("headcount"), enteredUnit: unit,
+      method: "Distance x mode factor (tier 2).",
+    }),
+    anomaly_flags: anomalyFlags, input_method: method, submit: true,
+  });
+  return null;
+}
+
 /* =================================================================== */
 /* Main component                                                       */
 /* =================================================================== */
@@ -185,11 +307,12 @@ export default function DataCapture() {
     setSubmitError(null);
     try {
       const v = capture.values;
-      const liveType = cfg.key === "energy" || cfg.key === "water" || cfg.key === "waste" || cfg.key === "occupancy";
+      const utilityType = cfg.key === "energy" || cfg.key === "water" || cfg.key === "waste" || cfg.key === "occupancy";
+      const activityType = cfg.key === "procurement" || cfg.key === "travel-commute" || cfg.key === "refrigerants";
       if (mode === "live") {
         // Be honest rather than show a fake success: only these types and manual entry reach the database today.
-        if (!liveType) {
-          setSubmitError(`${cfg.label} is not stored by the backend yet. Energy, water, waste and occupancy are; the rest is on the roadmap in HANDOVER.md.`);
+        if (!utilityType && !activityType) {
+          setSubmitError(`${cfg.label} is not stored by the backend yet. Energy, water, waste, occupancy, purchases, business travel / commute and refrigerants are; the rest is on the roadmap in HANDOVER.md.`);
           return;
         }
         if (method !== "manual") {
@@ -213,6 +336,13 @@ export default function DataCapture() {
             guest_nights: num("guestNights"), fb_covers: num("fbCovers"), laundry_kg: num("laundryKg"),
             notes: v["notes"] || null, submit: true,
           });
+        } else if (activityType) {
+          const problem = await submitEmissionActivity({
+            key: cfg.key, values: v, propertyId: capture.propertyId, start, end,
+            files: capture.files, method: method ?? "manual",
+            anomalyFlags: anomalyFlagsFor(capture.anomalies),
+          });
+          if (problem) { setSubmitError(problem); return; }
         } else {
           const consumption = num("consumption") ?? num("quantity") ?? 0;
           // Evidence goes to the private bucket first; the record then points at it.
