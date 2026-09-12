@@ -98,32 +98,32 @@ Status of every route. **Live** = reads/writes the Supabase project. **Demo** = 
 | Billing | `/billing` | Demo | |
 | Admin › Clients | `/admin/clients` | Demo | Account type / module entitlements live in `localStorage` (`src/lib/account.tsx`), not the database. |
 | Admin › Users | `/admin/users` | Demo | Mock list; "Invite user" is not wired. |
-| Admin › EF Library | `/admin/ef-library` | **Live (read)** | Lists every `ef_library` row with its real scope and Scope 3 category, region, version, value and standard; filters work. New EF / import / edit are not wired. |
+| Admin › EF Library | `/admin/ef-library` | **Live (read)** | Browses all 3,718 factors server-side: dataset, domain, boundary and geography filters, a provisional-only view, reliability grade per row, and the dataset table with each publisher's methodology note. "Import dataset" / "New factor" are not wired — loading is the `scripts/ef-import` pipeline. |
 | Admin › Pools, other tiles | `/admin/pools`, `/admin/:section` | Demo / stub | |
 
 ---
 
 ## 5. Emission sources — coverage audit
 
-What the user asked: "all emission sources? Scope 1, 2, 3 categories 1–7?" Answer: **Scope 1, Scope 2 location-based and Scope 3 Cat 1–7 are computed from the database. Still missing: the Scope 2 market-based method, four Scope 1 fuels that have no enum value, and the client's own EEIO dataset.**
+What the user asked: "all emission sources? Scope 1, 2, 3 categories 1–7?" Answer: **Scope 1, Scope 2 location-based and Scope 3 Cat 1–7 are computed from published factors (see §9). Still missing: the Scope 2 market-based method, four Scope 1 fuels that have no `energy_source` enum value, a capture path for owned vehicles, and region-specific electricity WTT.**
 
 | Source | Scope | Capture form | Stored | Carbon computed | Gap |
 |---|---|---|---|---|---|
-| Grid electricity | 2 (location) | ✔ manual | ✔ `consumption_records` | ✔ EF by country (AE, CA-BC, CH, ES, FR, GB, ID, PT, SG, TH, ZA) | Market-based method, RECs/PPAs, supplier factors not modelled — the report says so rather than showing a number |
-| District cooling | 2 | ✔ | ✔ | ✔ (AE + GLOBAL) | |
-| Natural gas | 1 | ✔ | ✔ | ✔ kWh and m³ factors | |
-| Diesel (generators) | 1 | ✔ | ✔ | ✔ kWh and litre factors | |
-| Solar PV on-site | 2 (zero) | ✔ | ✔ | ✔ EF 0 | Export / net-metering not handled |
-| LPG, purchased heat/steam, biomass, owned-fleet fuel | 1 / 2 | ✖ | ✖ (not in `energy_source` enum) | ✖ | Add enum values + EFs |
-| Refrigerants (fugitive) | 1 | ✔ manual | ✔ `emission_activities` | ✔ (charged − recovered) × GWP, IPCC AR6 | Leak-rate screening and an equipment register would beat per-event entry |
-| Water | — | ✔ | ✔ m³ with source | ✔ as Scope 3 Cat 1 (supply + treatment, DEFRA) | Treatment assumes 95 % return to sewer |
-| Waste | 3 · Cat 5 | ✔ | ✔ kg by stream and route | ✔ per-route DEFRA factors | Hazardous and e-waste routes have no factor of their own |
-| Cat 1 Purchased goods & services | 3 | ✔ manual (spend or mass, tier 1–3) | ✔ `emission_activities` | ✔ spend × EEIO, or mass × product-class average | EEIO factors are **indicative** — load the client's EXIOBASE/USEEIO set; only USD is priced; no commodity classification |
-| Cat 2 Capital goods | 3 | ✔ same form | ✔ | ✔ spend × EEIO | As Cat 1 |
-| Cat 3 Fuel- and energy-related (WTT, T&D losses) | 3 | — (derived) | — | ✔ computed from the stored energy records | Region-specific WTT and T&D loss rates not loaded; GLOBAL applies everywhere |
-| Cat 4 Upstream transport | 3 | ✔ same form | ✔ | ✔ spend × EEIO | Distance/mass-based freight not modelled |
-| Cat 6 Business travel | 3 | ✔ manual (mode + distance) | ✔ | ✔ distance × mode factor | `trips` is refused — it needs a distance; hotel-stay factor is a portfolio average |
-| Cat 7 Employee commuting | 3 | ✔ same form | ✔ | ✔ distance × mode factor | Survey headcount is stored but not used to extrapolate |
+| Grid electricity | 2 (location) | ✔ manual | ✔ `consumption_records` | ✔ 197 countries + 39 sub-national/utility overrides + 26 US eGRID subregions, by year | Market-based method, RECs/PPAs, supplier factors not modelled — the report says so rather than showing a number. 217 country factors are grade B‑. |
+| District cooling | 2 | ✔ | ✔ | ✔ bridge factor, **grade C** | Nobody publishes one. Empower and Tabreed both publish an intensity — load it and delete the bridge row. |
+| Natural gas | 1 | ✔ | ✔ | ✔ DEFRA 2025, kWh and m³ | |
+| Diesel (generators) | 1 | ✔ | ✔ | ✔ DEFRA 2025 mineral diesel, kWh and L | |
+| Solar PV on-site | 2 (zero) | ✔ | ✔ | ✔ bridge row, zero by definition | Export / net-metering not handled |
+| LPG, purchased heat/steam, biomass, owned-fleet fuel | 1 / 2 | ✖ | ✖ (not in `energy_source` enum) | **factors are loaded** | Only the enum values and a capture path are missing — DEFRA's fuel, heat/steam, bioenergy and vehicle factors are all in the library |
+| Refrigerants (fugitive) | 1 | ✔ manual | ✔ `emission_activities` | ✔ (charged − recovered) × GWP, **99 gases, IPCC AR5** | Leak-rate screening and an equipment register would beat per-event entry |
+| Water | — | ✔ | ✔ m³ with source | ✔ as Scope 3 Cat 1 (DEFRA supply + treatment) | Treatment assumes 95 % return to sewer |
+| Waste | 3 · Cat 5 | ✔ | ✔ kg by stream and route | ✔ DEFRA by **material × route** | Hazardous (beyond asbestos) has no factor; a stream/route pair the library does not cover prints the gap instead of borrowing a number |
+| Cat 1 Purchased goods & services | 3 | ✔ manual, **16 hotel commodities → NAICS** | ✔ `emission_activities` | ✔ spend × USEEIO NAICS-6 (with margins) | US economy basis; USD 2022 only — non-USD spend is refused rather than converted at an invented rate. Supplier-specific (tier 1) factors still need a client-override path. |
+| Cat 2 Capital goods | 3 | ✔ same form | ✔ | ✔ spend × USEEIO | As Cat 1 |
+| Cat 3 Fuel- and energy-related (WTT, T&D losses) | 3 | — (derived) | — | ✔ the `wtt` and `t_and_d` boundaries of the same energy records | Electricity WTT exists only for GB and the eGRID grids — elsewhere the line prints "the library has no well-to-tank factor for purchased electricity at this location" rather than borrowing the UK figure. Region-specific T&D beyond the override sheet is not loaded. |
+| Cat 4 Upstream transport | 3 | ✔ same form | ✔ | ✔ spend × USEEIO | DEFRA's 258 distance/mass freight factors are loaded but there is no tonne-km capture form yet |
+| Cat 6 Business travel | 3 | ✔ manual (mode + distance) | ✔ | ✔ DEFRA by mode, RF included | `trips` is refused — it needs a distance. `Air — international (neither end UK)` was added because the short/long-haul rows are UK-origin and wrong for most of this portfolio. 37 country hotel-stay factors are loaded. |
+| Cat 7 Employee commuting | 3 | ✔ same form | ✔ | ✔ DEFRA average car per **vehicle**-km | Survey headcount is stored but not used to extrapolate |
 | Cat 8–15 | 3 | ✖ | ✖ | N/A with a stated reason | Cat 13 (sub-let space) and Cat 14 (franchises) become real if the client has either; nothing records a lease or a franchise agreement yet |
 
 **Approval gap.** `emission_activities` rows are written with status `submitted`, but the Review & Approval queue reads `consumption_records` only, so nothing can approve them in the app — the inventory counts approved rows and shows a banner for the pending ones. `record_comments.record_id` has a foreign key to `consumption_records`, so wiring the queue needs that constraint generalised (see §11).
@@ -177,16 +177,54 @@ Migrations (all applied via the MCP; SQL is not in the repo — pull it with `li
 | 12 | emission_activities | Scope 1 fugitive + Scope 3 activity table. Reuses `tg_records_set_client_id`; adds `tg_audit_rows()` (a generic `tg_audit_records` that takes the table name from the trigger context). RLS mirrors `consumption_records`. Stores `ef_id`, `ef_value`, `ef_unit`, `tco2e` as applied at capture. |
 | 13 | seed_scope1_scope3_activities | ~1,400 approved rows, May 2024 – Apr 2026, ten hotels: Cat 1 (food / goods / services), Cat 2, Cat 4, Cat 6, Cat 7 and two refrigerant events a year. Deterministic from `md5(property || period || salt)`, scaled by room count, seasonal, 3 % better in year two. |
 | 14 | rescale_scope3_seed | Corrects migration 13's per-room scales (capital goods had come out larger than purchased goods). Audit trigger disabled for the update — a seed rescale is not a business event. |
+| 15 / 15b | ef_library_v2_schema | `ef_datasets`, `ef_factors`, `ef_unit_conversions`, `ef_haul_definitions`. Reference rows are shared (`client_id` null, readable by any signed-in user); a client's own factors are their own rows. 15b adds `domain` to the unique key — DEFRA's "Mini" is both an owned car (Scope 1) and business travel (Cat 6). |
+| 16 | properties_grid_assignment | `properties.grid_code` / `grid_label`, resolved before the country. Both Dubai hotels → `AE-DEWA`. |
+| 17 | ef_bridge_factors | Six rows for what nothing publishes: district cooling (graded C, an unsourced estimate), on-site solar at zero, mixed recyclables, donated food. Each states its derivation. |
+| 18 | spend_factor_category_is_per_purchase | A NAICS factor has no Scope 3 category of its own — the same factor is Cat 1 for food, Cat 2 for furniture, Cat 4 for freight. Spend rows carry `category` null. |
+| 19 | migrate_activities_to_ef_factors | Repoints `emission_activities.ef_id` at `ef_factors`, restates the AR6 refrigerants to AR5 and the indicative EEIO placeholders to real NAICS factors (the reason is written into each row's `source_payload.restated_2026_09`), then drops `ef_library`. |
+| 20 | ef_facets_view | `ef_facets` view (distinct domain / boundary / geo_code with counts). The library browser's filters were being built from whatever PostgREST returned first, which caps at 1,000 rows, so most values never appeared. |
 
 Enums: `pillar` energy/water/waste/carbon/social/governance · `energy_source` electricity_grid/natural_gas/district_cooling/diesel/solar_pv · `record_status` draft/submitted/queried/approved/rejected · `user_role` maker/checker/property_sm/super_admin. `emission_activities.scope` (1 or 3), `category` (`cat1`…`cat15`) and `activity_type` (refrigerant / purchase / capital / upstream_transport / business_travel / commute) are checked text, not enums.
 
-**Factor keys.** Non-energy factors are looked up by `factor_key`, which is deliberately the same string the capture form sends: a refrigerant gas code (`R-410A`), `waste_<route>`, `travel_<mode>`, `wtt_<source>`, `td_electricity_grid`, `water_supply` / `water_treatment`, `eeio_cat1_food` / `_goods` / `_services`, `eeio_cat2_capital`, `eeio_cat4_transport`, `goods_mass_average`. Matching is by key + the unit after the slash in `ef_unit` + region, falling back to GLOBAL.
+### The factor library
+
+`ef_factors` holds **3,718 rows across five datasets**. An activity is identified by four things, not one:
+
+| | |
+|---|---|
+| `domain` | electricity · fuel · bioenergy · heat · refrigerant · water · waste · material · travel · freight · vehicle · hotel_stay · homeworking · spend · other |
+| `activity_key` | the publisher's row, normalised — `natural_gas`, `r410a`, `average_car`, `commercial_and_industrial_waste`, `naics_311999` |
+| `boundary` | **the load-bearing one.** `combustion` · `location_based` · `market_based` · `t_and_d` · `wtt` · `disposal` · `gwp` · `lifecycle` · `out_of_scope`. A grid factor, its T&D losses and its upstream fuel cycle are three rows for the same activity, so a Cat 3 figure cannot be summed into Scope 2. WTT stopped being a separate key and became a boundary. |
+| `unit_denominator` | matched, never converted blind. `kWh` is **gross CV** (DEFRA's basis for company reporting); net CV is kept as `kWh_net`. |
+
+**Resolution** (`resolveFactor` in `src/lib/data/factors.ts`): client override → geography (`grid_code` → subdivision → country → `GLOBAL`) → newest `factor_year` **at or before** the reporting year → dataset `precedence` → `is_default`. No match returns null and the caller states the gap; nothing is substituted.
+
+| Dataset | Rows | Notes |
+|---|---|---|
+| Hotel Optimizer — Global Grid EF Master 2026-09-12 | 436 | 197 country defaults, 138 historical, 39 sub-national/utility overrides, each split into up to three boundary rows. `factor_year` is parsed for resolution; `factor_year_label` keeps the publisher's own wording ("varies (mainly 2021–22)", "IEA 2025 ed.") verbatim. **217 rows are grade B‑ or worse** and the UI says so. |
+| UK DESNZ/DEFRA 2025 v1 | 2,175 | Fuels, bioenergy, 99 refrigerant GWPs (AR5), owned vehicles, heat, WTT, T&D, water, materials, waste by material × route, travel, freight, hotel stay, homeworking. Its `Overseas electricity` sheet is empty in 2025 — the Grid Master is the only non-UK grid source. |
+| US EPA GHG Emission Factors Hub 2025 | 85 | 26 eGRID subregions (lb/MWh → kgCO₂e/kWh, loss rate as a separate `t_and_d` row) and the AR5 GWP tables. Tables 1–5 and 8–10 are **not** loaded — DEFRA covers those activities and no property reports in US units. |
+| US EPA / USEEIO v1.3.0 (NAICS, USD 2022) | 1,016 | **With margins**: invoice spend is a purchaser price. `category` is null — it depends on the purchase. |
+| Hotel Optimizer — Bridge factors 2026.1 | 6 | District cooling (grade C, unsourced estimate), on-site solar = 0, mixed recyclables, donated food. Each row's `notes` records its derivation. |
+
+**GWP set is AR5 throughout**, matching both published sets. `ef_unit_conversions` (210 rows) holds DEFRA's conversions and per-fuel calorific values, so litres→kWh is data rather than a constant. `ef_haul_definitions` (215) is flagged UK-origin and so cannot classify flights for this portfolio.
 
 Evidence object path: `<property_id>/<uuid>/<file name>` — the first folder is what the storage policies check.
 
 Test rows created by sessions (safe to keep or delete): Airport Hotel Dubai electricity May 2026 `124f3503-f52b-4b62-9f46-39116b12d6aa` (approved with a checker comment) and June 2026 `41f605ec-e8f4-4a1b-ba87-bcde9eb8002b` (submitted, two flags, one CSV in the bucket). In `emission_activities`, two submitted test rows for Airport Hotel Dubai: a Cat 1 food purchase (48,250 USD, Sep 2026) and an R-407C release (8.5 kg net, Jan 2026, 16.2 tCO₂e) — the second is what makes the pending banner visible on the Carbon inventory for RY 2025/26.
 
-App wiring: `src/lib/supabase.ts` (client) · `src/lib/auth.tsx` · `src/lib/data/mode.ts` · `src/lib/data/properties.tsx` (directory behind the top bar) · `src/lib/api.ts` (all queries, uploads, signed URLs) · `src/lib/data/records.ts` (queue adapter, flag mapping, evidence mapping) · `src/lib/data/performance.ts` (reporting-year builder) · `src/lib/data/factors.ts` (factor matching + form-value → factor key) · `src/lib/data/carbon.ts` (`buildInventory`, `usePropertyInventory`) · `src/lib/database.types.ts` (hand-maintained; regenerate with the MCP `generate_typescript_types` after schema changes).
+App wiring: `src/lib/supabase.ts` (client) · `src/lib/auth.tsx` · `src/lib/data/mode.ts` · `src/lib/data/properties.tsx` (directory behind the top bar, carries `gridCode`) · `src/lib/api.ts` (all queries, uploads, signed URLs) · `src/lib/data/records.ts` (queue adapter, flag mapping, evidence mapping) · `src/lib/data/performance.ts` (reporting-year builder) · `src/lib/data/factors.ts` (the resolver + every form-value → taxonomy mapping) · `src/lib/data/carbon.ts` (`buildInventory`, `usePropertyInventory`) · `src/lib/database.types.ts` (hand-maintained; regenerate with the MCP `generate_typescript_types` after schema changes).
+
+**Never load the whole library into the browser.** `listFactorSet({domains, geoCodes, boundaries, activityKeys})` fetches the narrow slice a page needs (~400 rows for one property); `listFactorsByIds` fetches exactly the rows stored records were calculated with; `listFactorCandidates` resolves one capture; `queryFactors` pages the admin browser server-side.
+
+### Reloading the factor library
+
+```bash
+python3 scripts/ef-import/build_ef_sql.py          # reads ../EF/*.xlsx|csv -> out/ef-library.json
+node scripts/ef-import/load.mjs '<admin password>' # upserts as admin@demo.test, through RLS
+```
+
+The workbooks live in `/Users/alkeshrajdev/Documents/Cloude/EF` (not in the repo). The importer is idempotent — dataset ids are deterministic and every table has a natural unique key — and prints a quality scan (suspect rows, colliding signatures) that should come back empty. `out/` is gitignored: it is fully derived from the workbooks plus the script.
 
 **Where the inventory's numbers come from.** Utility lines are recomputed from the library on every load, so a factor correction restates them. Activity lines use the `tco2e` stored on the row, so the figure an approver saw is the figure that is reported. Both behaviours are stated on the page.
 
@@ -197,8 +235,11 @@ App wiring: `src/lib/supabase.ts` (client) · `src/lib/auth.tsx` · `src/lib/dat
 - **Auth lock deadlock**: never await a Supabase query inside `onAuthStateChange`; `auth.tsx` defers profile loading with `setTimeout`. Symptom: pages make no network requests at all.
 - **Popup blockers**: do not `window.open` after an `await`. Evidence links are pre-signed anchors for this reason.
 - **`execute_sql` shows only the last statement's result.**
-- **An enum→text cast is not immutable**, so `coalesce(source_type::text, factor_key)` cannot go in an index expression — `ef_library` uses two partial unique indexes instead.
+- **An enum→text cast is not immutable**, so it cannot appear in an index expression.
 - `round(double precision, int)` does not exist in Postgres: cast to `numeric` first. `sin()` in a seed expression is what makes the whole thing a double.
+- **PostgREST caps a select at 1,000 rows**, so deriving distinct values by selecting a column and de-duplicating in the browser silently truncates. Use a view — that is what `ef_facets` is for.
+- **Never `select *` from `ef_factors` without filters.** It is 3,718 rows; every page asks for the slice it needs (§9).
+- DEFRA names blends by ASHRAE number without a hyphen (`R410A`) but pure gases by chemical designation (`HFC-134a`), while the capture form and EPA hyphenate throughout. `refrigerantKey` in `factors.ts` carries the alias map.
 - The trigger overwrites `client_id`; the API passes a placeholder on insert.
 - RLS: a maker or checker sees a property only with a `user_properties` row; the seed covers all ten.
 - zsh globbing in the tool shell: quote `--include='*.ts'`; the working directory sometimes resets — use absolute paths or `git -C`.
@@ -211,12 +252,13 @@ App wiring: `src/lib/supabase.ts` (client) · `src/lib/auth.tsx` · `src/lib/dat
 ## 11. Next-session plan (priority order)
 
 1. **Vercel env vars** (§1) so production runs live. Five minutes.
-2. ~~**Full Scope 1 + Scope 3 data model.**~~ **Done** (migrations 10–14, `lib/data/factors.ts`, `lib/data/carbon.ts`, Carbon inventory and GHG Inventory live). What it left open, in priority order:
-   - **Approve Scope 1/3 activity.** `emission_activities` rows are submitted but the queue only reads `consumption_records`, so no one can approve them. Generalise `record_comments.record_id` (drop the FK or add a `table_name`), extend `useReviewRecords` / `transitionRecord` in `src/lib/data/records.ts` to cover both tables, and add a filter so a checker can see activity rows. This closes capture → approve → report for Scope 3.
-   - **Replace the indicative EEIO factors** with the client's own EXIOBASE/USEEIO set, and price currencies other than USD (the form refuses non-USD spend today).
-   - **Scope 2 market-based.** Needs a contractual-instruments table (RECs, PPAs, green tariffs, supplier factors) and residual-mix factors. The report currently states that it is not modelled.
-   - **Missing Scope 1 fuels**: LPG, purchased heat/steam, biomass, owned-fleet fuel need `energy_source` enum values and EFs.
-   - **Region-specific WTT and T&D** loss rates, and factors for the hazardous and e-waste routes.
+2. ~~**Full Scope 1 + Scope 3 data model.**~~ ~~**The real factor library.**~~ **Both done** (migrations 10–20, `lib/data/factors.ts`, `lib/data/carbon.ts`, `scripts/ef-import`, §9). What they left open, in priority order:
+   - **Approve Scope 1/3 activity.** `emission_activities` rows are submitted but the queue only reads `consumption_records`, so no one can approve them. Generalise `record_comments.record_id` (drop the FK or add a `table_name`), extend `useReviewRecords` / `transitionRecord` in `src/lib/data/records.ts` to cover both tables, and add a filter so a checker can see activity rows. This closes capture → approve → report for Scope 3, and is still the biggest hole.
+   - **Assign the remaining grid overrides.** Only the two Dubai hotels have a `grid_code`. Malaysia, Australia, Canada, Indonesia and the US eGRID subregions all have A+ sub-national factors sitting unused, and the Properties detail page has no field to set one.
+   - **Client factor overrides.** The schema supports them (`ef_factors.client_id`, which wins during resolution) but nothing in the UI can add a supplier-specific factor, which is what tier 1 Cat 1 actually needs.
+   - **Scope 2 market-based.** Needs a contractual-instruments table (RECs, PPAs, green tariffs, supplier factors) plus residual-mix factors; the `market_based` boundary already exists and is empty. The report states that it is not modelled.
+   - **Owned vehicles and the missing Scope 1 fuels.** DEFRA's vehicle, LPG, heat/steam and bioenergy factors are all loaded; what is missing is `energy_source` enum values and a capture path.
+   - **District cooling** is a grade-C unsourced estimate. Empower and Tabreed publish intensities — load one and delete the bridge row.
    - **Base year** is not in the data model; the report prints "Not configured".
    - **Portfolio-level GHG reporting** is still out of scope by the product rule (Portfolio is the only cross-property section) — if the owner wants a consolidated corporate inventory, that is a Portfolio page, not this report.
 3. **AI classification for purchases + OCR** (§6) as edge functions; wire the AI-assist and OCR wizards to them and persist their output with confidence flags.
