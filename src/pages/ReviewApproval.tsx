@@ -84,6 +84,7 @@ import { useToast } from "@/components/ui/Toast";
 import { useAuth } from "@/lib/auth";
 import { useDataMode } from "@/lib/data/mode";
 import { shortId, useReviewRecords } from "@/lib/data/records";
+import { evidenceUrl } from "@/lib/api";
 
 /** Live ids are uuids; show them the way the queue shows every record. */
 const displayId = (id: string) => (id.length > 20 ? shortId(id) : id);
@@ -1259,6 +1260,21 @@ function SlaPanel({ record }: { record: ReviewRecord }) {
 
 function EvidenceTab({ record }: { record: ReviewRecord }) {
   const [previewItem, setPreviewItem] = useState<ReviewRecord["evidence"][number] | null>(null);
+  // Stored files (live mode) get short-lived signed links up front, so Open / Download are
+  // plain anchors — no popup after an await, which browsers block. Demo rows keep the mock preview.
+  const [links, setLinks] = useState<Record<string, { open: string; download: string }>>({});
+  const evidence = record.evidence;
+  useEffect(() => {
+    let cancelled = false;
+    const stored = evidence.filter((e): e is typeof e & { path: string } => typeof e.path === "string");
+    if (stored.length === 0) { setLinks({}); return; }
+    Promise.all(
+      stored.map(async (e) => [e.path, { open: await evidenceUrl(e.path), download: await evidenceUrl(e.path, 600, e.name) }] as const)
+    )
+      .then((pairs) => { if (!cancelled) setLinks(Object.fromEntries(pairs)); })
+      .catch(() => { if (!cancelled) setLinks({}); });
+    return () => { cancelled = true; };
+  }, [evidence]);
 
   if (record.evidence.length === 0) {
     return (
@@ -1288,12 +1304,29 @@ function EvidenceTab({ record }: { record: ReviewRecord }) {
               <div className="text-sm font-semibold text-ink-900 truncate">{e.name}</div>
               <div className="text-[11px] text-ink-500">{e.type} · {e.size}</div>
             </div>
-            <button onClick={() => setPreviewItem(e)} className="btn-ghost h-8 px-2 text-[12px] text-brand-700">
-              <Eye size={14} /> Preview
-            </button>
-            <button className="btn-ghost h-8 px-2 text-[12px] text-ink-500">
-              <Download size={14} />
-            </button>
+            {e.path ? (
+              links[e.path] ? (
+                <>
+                  <a href={links[e.path].open} target="_blank" rel="noopener noreferrer" className="btn-ghost h-8 px-2 text-[12px] text-brand-700">
+                    <Eye size={14} /> Open
+                  </a>
+                  <a href={links[e.path].download} className="btn-ghost h-8 px-2 text-[12px] text-ink-500" aria-label="Download">
+                    <Download size={14} />
+                  </a>
+                </>
+              ) : (
+                <span className="text-[11px] text-ink-400">Preparing link…</span>
+              )
+            ) : (
+              <>
+                <button onClick={() => setPreviewItem(e)} className="btn-ghost h-8 px-2 text-[12px] text-brand-700">
+                  <Eye size={14} /> Preview
+                </button>
+                <button className="btn-ghost h-8 px-2 text-[12px] text-ink-500" aria-label="Download">
+                  <Download size={14} />
+                </button>
+              </>
+            )}
           </li>
         ))}
       </ul>

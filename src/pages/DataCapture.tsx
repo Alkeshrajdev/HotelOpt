@@ -52,7 +52,8 @@ import {
   type FieldDef,
   type Method,
 } from "@/lib/dataCaptureConfig";
-import { createRecord, upsertActivity } from "@/lib/api";
+import { createRecord, uploadEvidence, upsertActivity } from "@/lib/api";
+import { anomalyFlagsFor } from "@/lib/data/records";
 import { useProperties, type PropertyLite as Property } from "@/lib/data/properties";
 import { useDataMode } from "@/lib/data/mode";
 import { useTopbar } from "@/lib/topbarContext";
@@ -185,7 +186,20 @@ export default function DataCapture() {
     try {
       const v = capture.values;
       const liveType = cfg.key === "energy" || cfg.key === "water" || cfg.key === "waste" || cfg.key === "occupancy";
-      if (mode === "live" && capture.propertyId && liveType) {
+      if (mode === "live") {
+        // Be honest rather than show a fake success: only these types and manual entry reach the database today.
+        if (!liveType) {
+          setSubmitError(`${cfg.label} is not stored by the backend yet. Energy, water, waste and occupancy are; the rest is on the roadmap in HANDOVER.md.`);
+          return;
+        }
+        if (method !== "manual") {
+          setSubmitError(`${METHOD_META[method ?? "manual"].label} is not connected to the backend yet. Use manual entry for now.`);
+          return;
+        }
+        if (!capture.propertyId) {
+          setSubmitError("Select a property first.");
+          return;
+        }
         const period = v["period"] ?? (v["date"] ? v["date"].slice(0, 7) : new Date().toISOString().slice(0, 7));
         const [y, m] = period.split("-").map(Number);
         const start = new Date(Date.UTC(y, m - 1, 1)).toISOString().slice(0, 10);
@@ -201,6 +215,13 @@ export default function DataCapture() {
           });
         } else {
           const consumption = num("consumption") ?? num("quantity") ?? 0;
+          // Evidence goes to the private bucket first; the record then points at it.
+          const evidence = await Promise.all(capture.files.map((f) => uploadEvidence(capture.propertyId, f)));
+          const detail: Record<string, unknown> =
+            cfg.key === "water" ? { source: v["sourceType"] ?? "municipal" }
+            : cfg.key === "waste" ? { stream: v["stream"] ?? "mixed", route: v["disposalRoute"] ?? "landfill", contractor: v["contractor"] ?? null, date: v["date"] ?? null }
+            : {};
+          if (evidence.length) detail.evidence = evidence;
           await createRecord({
             property_id: capture.propertyId,
             pillar: cfg.key as "energy" | "water" | "waste",
@@ -210,7 +231,8 @@ export default function DataCapture() {
             unit: v["unit"] ?? (cfg.key === "energy" ? "kWh" : cfg.key === "water" ? "m³" : "kg"),
             cost_amount: num("cost"), cost_currency: capture.currency,
             meter_id: v["meterId"] || null, invoice_ref: v["invoiceRef"] || null, notes: v["notes"] || null,
-            source_payload: cfg.key === "water" ? { source: v["sourceType"] ?? "municipal" } : cfg.key === "waste" ? { stream: v["stream"] ?? "mixed", route: v["disposalRoute"] ?? "landfill", contractor: v["contractor"] ?? null, date: v["date"] ?? null } : null,
+            source_payload: Object.keys(detail).length ? detail : null,
+            anomaly_flags: anomalyFlagsFor(capture.anomalies),
             input_method: method ?? "manual",
             submit: true,
           });
@@ -247,7 +269,7 @@ export default function DataCapture() {
       {step === 1 && <PickDataType onPick={pickDataType} />}
 
       {step === 2 && cfg && (
-        <PickMethod cfg={cfg} onBack={() => setStep(1)} onPick={pickMethod} />
+        <PickMethod cfg={cfg} live={mode === "live"} onBack={() => setStep(1)} onPick={pickMethod} />
       )}
 
       {step === 3 && cfg && method && (
@@ -395,11 +417,13 @@ function PickDataType({ onPick }: { onPick: (k: DataTypeKey) => void }) {
 /* =================================================================== */
 
 function PickMethod({
-  cfg, onPick, onBack,
+  cfg, onPick, onBack, live,
 }: {
   cfg: DataTypeConfig;
   onPick: (m: Method) => void;
   onBack: () => void;
+  /** Live sessions can only persist manual entry today; the other methods are simulated. */
+  live: boolean;
 }) {
   const ALL_METHODS: Method[] = ["manual", "ocr", "bulk", "qr", "api", "survey", "ai-assist"];
   return (
@@ -418,20 +442,22 @@ function PickMethod({
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
         {ALL_METHODS.map((m) => {
           const supported = cfg.methods.includes(m);
+          const connected = !live || m === "manual";
+          const enabled = supported && connected;
           const meta = METHOD_META[m];
           return (
             <button
               key={m}
-              onClick={() => supported && onPick(m)}
-              disabled={!supported}
+              onClick={() => enabled && onPick(m)}
+              disabled={!enabled}
               className={cn(
                 "card text-left p-4 transition-all flex items-start gap-3",
-                supported ? "hover:shadow-pop hover:-translate-y-0.5" : "opacity-60 cursor-not-allowed"
+                enabled ? "hover:shadow-pop hover:-translate-y-0.5" : "opacity-60 cursor-not-allowed"
               )}
             >
               <div className={cn(
                 "w-10 h-10 rounded-full grid place-items-center shrink-0",
-                supported ? "bg-brand-50 text-brand-700" : "bg-ink-100 text-ink-400"
+                enabled ? "bg-brand-50 text-brand-700" : "bg-ink-100 text-ink-400"
               )}>
                 {iconFor(m)}
               </div>
@@ -441,12 +467,14 @@ function PickMethod({
                 </div>
                 <p className="text-[12px] text-ink-500 mt-1 leading-snug">{meta.description}</p>
                 <div className="mt-2">
-                  {supported ? (
+                  {!supported ? (
+                    <Badge tone="neutral"><CircleSlash size={11} /> Not applicable for this data type</Badge>
+                  ) : !connected ? (
+                    <Badge tone="neutral"><CircleSlash size={11} /> Not connected yet</Badge>
+                  ) : (
                     <Badge tone={m === "manual" ? "good" : "info"}>
                       {m === "manual" ? "Always available" : "Available"}
                     </Badge>
-                  ) : (
-                    <Badge tone="neutral"><CircleSlash size={11} /> Not applicable for this data type</Badge>
                   )}
                 </div>
               </div>

@@ -51,7 +51,10 @@ export type AiSuggestion = {
 export type EvidenceFile = {
   name: string;
   size: string;
-  type: "PDF" | "PNG" | "JPG" | "XLSX" | "CSV";
+  /** Display label — PDF, PNG, JPG, XLSX, CSV or the file extension. */
+  type: string;
+  /** Storage path when the file lives in the evidence bucket (live mode); absent for demo rows. */
+  path?: string;
 };
 
 export type QueryRound = {

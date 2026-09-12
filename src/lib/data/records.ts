@@ -5,9 +5,9 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   listAudit, listComments, listProfiles, listRecords, resubmitRecord, transitionRecord,
-  type AuditRow, type Comment as DbComment, type Profile, type RecordWithProperty,
+  type AuditRow, type Comment as DbComment, type EvidencePointer, type Profile, type RecordWithProperty,
 } from "@/lib/api";
-import type { AuditEntry, Comment, QueryRound, ReviewRecord, Role, Status } from "@/lib/reviewMock";
+import type { AnomalyFlag, AuditEntry, Comment, EvidenceFile, QueryRound, ReviewRecord, Role, Status } from "@/lib/reviewMock";
 
 const SLA_DAYS = 5;
 const SOURCE_LABEL: Record<string, string> = {
@@ -30,6 +30,53 @@ function dataTypeOf(r: RecordWithProperty) {
 
 function toStatus(s: RecordWithProperty["status"]): Status {
   return s; // draft | submitted | queried | approved | rejected map 1:1; "resubmitted"/"locked" are UI-only
+}
+
+/* ---- Capture-time anomalies → the queue's typed flags ---- */
+
+const FLAG_RULES: { test: RegExp; flag: Omit<AnomalyFlag, "hint"> }[] = [
+  { test: /very large|unit issue/i, flag: { key: "unit", label: "Value is very large for a monthly figure", severity: "warn" } },
+  { test: /negative/i, flag: { key: "range", label: "Negative consumption", severity: "bad" } },
+  { test: /spike/i, flag: { key: "spike", label: "Spike vs same month last year", severity: "warn" } },
+  { test: /\bdrop\b/i, flag: { key: "drop", label: "Drop vs same month last year", severity: "warn" } },
+  { test: /no evidence/i, flag: { key: "missing-evidence", label: "No evidence file attached", severity: "warn" } },
+  { test: /confidence/i, flag: { key: "ai-low", label: "Low extraction confidence", severity: "warn" } },
+];
+
+/** The capture wizard raises plain-language warnings; the queue wants typed flags (one per key). */
+export function anomalyFlagsFor(messages: string[]): AnomalyFlag[] {
+  const out: AnomalyFlag[] = [];
+  for (const m of messages) {
+    const rule = FLAG_RULES.find((r) => r.test.test(m));
+    const flag: AnomalyFlag = rule ? { ...rule.flag, hint: m } : { key: "range", label: m, severity: "warn" };
+    if (!out.some((f) => f.key === flag.key)) out.push(flag);
+  }
+  return out;
+}
+
+/* ---- Evidence pointers stored in source_payload.evidence ---- */
+
+const fmtSize = (bytes: number) =>
+  bytes >= 1048576 ? `${(bytes / 1048576).toFixed(1)} MB` : `${Math.max(1, Math.round(bytes / 1024))} KB`;
+
+function typeLabel(mime: string, name: string): string {
+  const m = mime.toLowerCase();
+  if (m.includes("pdf")) return "PDF";
+  if (m.includes("png")) return "PNG";
+  if (m.includes("jpeg") || m.includes("jpg")) return "JPG";
+  if (m.includes("csv")) return "CSV";
+  if (m.includes("sheet") || m.includes("excel")) return "XLSX";
+  return name.split(".").pop()?.toUpperCase() || "FILE";
+}
+
+function toEvidence(raw: unknown): EvidenceFile[] {
+  if (!Array.isArray(raw)) return [];
+  return raw.flatMap((e) => {
+    const o = e as Partial<EvidencePointer> | null;
+    if (!o || typeof o.path !== "string") return [];
+    const name = o.name ?? o.path.split("/").pop() ?? "file";
+    return [{ name, size: fmtSize(Number(o.size ?? 0)), type: typeLabel(String(o.type ?? ""), name), path: o.path }];
+  });
 }
 
 export function toReviewRecord(r: RecordWithProperty, profiles: Map<string, Profile>): ReviewRecord {
@@ -59,7 +106,7 @@ export function toReviewRecord(r: RecordWithProperty, profiles: Map<string, Prof
     dueAt: due.toISOString(),
     overdueDays,
     flags: Array.isArray(r.anomaly_flags) ? (r.anomaly_flags as ReviewRecord["flags"]) : [],
-    evidence: [],
+    evidence: toEvidence(p?.evidence),
     queryRounds: [],
     comments: [],
     audit: [],

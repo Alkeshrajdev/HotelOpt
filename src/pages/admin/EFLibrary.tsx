@@ -1,12 +1,29 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { History, Plus, Search, Upload } from "lucide-react";
 import { Card, CardHeader } from "@/components/ui/Card";
 import StatTile from "@/components/ui/StatTile";
 import Badge from "@/components/ui/Badge";
 import EmptyState from "@/components/ui/EmptyState";
 import AdminShell from "./AdminShell";
+import { useDataMode } from "@/lib/data/mode";
+import { listEFs, type EmissionFactor } from "@/lib/api";
 
-const EFS = [
+type EfRow = {
+  id: string;
+  source: string;
+  region: string;
+  year: number;
+  version: string;
+  value: number;
+  unit: string;
+  scope: string;
+  origin: string;
+  active: boolean;
+  versions: number;
+};
+
+// Demo rows — shown only when there is no live session.
+const DEMO_EFS: EfRow[] = [
   { id: "ef-001", source: "Grid electricity",       region: "AE",     year: 2026, version: "2026-Q2",  value: 0.418, unit: "kgCO₂e/kWh", scope: "Scope 2", origin: "DEFRA", active: true,  versions: 4 },
   { id: "ef-002", source: "Grid electricity",       region: "ID",     year: 2026, version: "2026-Q2",  value: 0.770, unit: "kgCO₂e/kWh", scope: "Scope 2", origin: "ESDM",  active: true,  versions: 3 },
   { id: "ef-003", source: "Grid electricity",       region: "CA-BC", year: 2026, version: "2026-Q2",  value: 0.012, unit: "kgCO₂e/kWh", scope: "Scope 2", origin: "ECCC",  active: true,  versions: 5 },
@@ -17,16 +34,73 @@ const EFS = [
   { id: "ef-008", source: "Grid electricity",       region: "AE",     year: 2025, version: "2025-Q4",  value: 0.432, unit: "kgCO₂e/kWh", scope: "Scope 2", origin: "DEFRA", active: false, versions: 4 },
 ];
 
+const SOURCE_LABEL: Record<string, string> = {
+  electricity_grid: "Grid electricity", natural_gas: "Natural gas", district_cooling: "District cooling", diesel: "Diesel", solar_pv: "Solar PV (on-site)",
+};
+const SOURCE_SCOPE: Record<string, string> = {
+  electricity_grid: "Scope 2", district_cooling: "Scope 2", natural_gas: "Scope 1", diesel: "Scope 1", solar_pv: "Scope 2",
+};
+
+/** Library rows → table rows. "Versions" counts every row for the same source × region. */
+function fromDb(rows: EmissionFactor[]): EfRow[] {
+  const perKey = new Map<string, number>();
+  const keyOf = (r: EmissionFactor) => `${r.source_type}|${r.region ?? "GLOBAL"}`;
+  rows.forEach((r) => perKey.set(keyOf(r), (perKey.get(keyOf(r)) ?? 0) + 1));
+  return rows.map((r) => ({
+    id: r.id,
+    source: SOURCE_LABEL[r.source_type] ?? r.source_type,
+    region: r.region ?? "GLOBAL",
+    year: r.year,
+    version: r.version,
+    value: Number(r.ef_value),
+    unit: r.ef_unit.replace("CO2e", "CO₂e"),
+    scope: SOURCE_SCOPE[r.source_type] ?? "—",
+    origin: r.version.toUpperCase().startsWith("IPCC") ? "IPCC" : "Hotel Optimizer library",
+    active: r.is_active,
+    versions: perKey.get(keyOf(r)) ?? 1,
+  }));
+}
+
 export default function AdminEFLibrary() {
+  const mode = useDataMode();
+  const [rows, setRows] = useState<EfRow[]>(mode === "live" ? [] : DEMO_EFS);
+  const [loading, setLoading] = useState(mode === "live");
+  const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
+  const [scope, setScope] = useState("all");
+  const [region, setRegion] = useState("all");
+  const [status, setStatus] = useState<"active" | "all" | "archived">("all");
+
+  useEffect(() => {
+    if (mode !== "live") { setRows(DEMO_EFS); setLoading(false); return; }
+    let cancelled = false;
+    setLoading(true);
+    listEFs()
+      .then((r) => { if (!cancelled) setRows(fromDb(r)); })
+      .catch((e: Error) => { if (!cancelled) setError(e.message); })
+      .finally(() => { if (!cancelled) setLoading(false); });
+    return () => { cancelled = true; };
+  }, [mode]);
+
+  const scopes = useMemo(() => Array.from(new Set(rows.map((r) => r.scope))).sort(), [rows]);
+  const regions = useMemo(() => Array.from(new Set(rows.map((r) => r.region))).sort(), [rows]);
+
   const q = search.trim().toLowerCase();
-  const filtered = EFS.filter((e) => !q || [e.source, e.region, e.version, e.scope, e.origin].some((v) => v.toLowerCase().includes(q)));
+  const filtered = rows.filter((e) =>
+    (!q || [e.source, e.region, e.version, e.scope, e.origin].some((v) => v.toLowerCase().includes(q))) &&
+    (scope === "all" || e.scope === scope) &&
+    (region === "all" || e.region === region) &&
+    (status === "all" || (status === "active" ? e.active : !e.active))
+  );
+
+  const active = rows.filter((r) => r.active).length;
+  const sources = new Set(rows.map((r) => r.source)).size;
 
   return (
     <AdminShell
       eyebrow="Reference data"
       title="Emission factor library"
-      subtitle="Versioned EFs by region and year. Audit-logged updates. Re-stating a prior period uses the EF active at submission, with the option to re-state under a current EF — both versions preserved for assurance."
+      subtitle="Versioned factors by region and year. Carbon in the performance views is consumption × the active factor for the property's country, with GLOBAL as the fallback."
       actions={
         <>
           <button className="btn-secondary"><Upload size={14} /> Import bulk</button>
@@ -35,10 +109,10 @@ export default function AdminEFLibrary() {
       }
     >
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <StatTile label="Active EFs"    value={String(EFS.filter((e) => e.active).length)} hint={`${EFS.length} total`} />
-        <StatTile label="Sources"        value="84"  hint="across regions" />
-        <StatTile label="Supplier-specific" value="36" hint="Cat 1 / 2 / 4" />
-        <StatTile label="Pending review" value="2"   hint="awaiting Super Admin" />
+        <StatTile label="Active EFs" value={String(active)} hint={`${rows.length} total`} />
+        <StatTile label="Sources" value={String(sources)} hint="fuel and energy types" />
+        <StatTile label="Regions covered" value={String(regions.length)} hint="incl. GLOBAL fallback" />
+        <StatTile label="Archived" value={String(rows.length - active)} hint="kept for restatement" />
       </div>
 
       <div className="flex items-center gap-2 flex-wrap">
@@ -46,13 +120,23 @@ export default function AdminEFLibrary() {
           <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-400" />
           <input className="input pl-9" placeholder="Search by source, region, version…" value={search} onChange={(e) => setSearch(e.target.value)} />
         </div>
-        <select className="input max-w-[160px]"><option>All scopes</option></select>
-        <select className="input max-w-[160px]"><option>All regions</option></select>
-        <select className="input max-w-[160px]"><option>Active only</option></select>
+        <select className="input max-w-[160px]" value={scope} onChange={(e) => setScope(e.target.value)}>
+          <option value="all">All scopes</option>
+          {scopes.map((s) => <option key={s} value={s}>{s}</option>)}
+        </select>
+        <select className="input max-w-[160px]" value={region} onChange={(e) => setRegion(e.target.value)}>
+          <option value="all">All regions</option>
+          {regions.map((r) => <option key={r} value={r}>{r}</option>)}
+        </select>
+        <select className="input max-w-[160px]" value={status} onChange={(e) => setStatus(e.target.value as typeof status)}>
+          <option value="all">Active and archived</option>
+          <option value="active">Active only</option>
+          <option value="archived">Archived only</option>
+        </select>
       </div>
 
       <Card>
-        <CardHeader title="Emission factors" hint="Locking a version freezes it for assurance" />
+        <CardHeader title="Emission factors" hint={mode === "live" ? "Live library for this client" : "Sample library"} />
         <div className="overflow-x-auto">
           <table className="w-full min-w-[960px]">
             <thead>
@@ -69,14 +153,20 @@ export default function AdminEFLibrary() {
               </tr>
             </thead>
             <tbody>
-              {filtered.length === 0 && (
+              {loading && (
+                <tr><td colSpan={9} className="table-td text-ink-500">Loading emission factors…</td></tr>
+              )}
+              {!loading && error && (
+                <tr><td colSpan={9} className="table-td text-bad-700">Could not load the library: {error}</td></tr>
+              )}
+              {!loading && !error && filtered.length === 0 && (
                 <tr>
                   <td colSpan={9} className="p-0">
-                    <EmptyState inset icon={<Search size={20} />} title="No emission factors match" description="Try a different source, region or version." action={<button className="btn-secondary" onClick={() => setSearch("")}>Clear search</button>} />
+                    <EmptyState inset icon={<Search size={20} />} title="No emission factors match" description="Try a different source, region or version." action={<button className="btn-secondary" onClick={() => { setSearch(""); setScope("all"); setRegion("all"); setStatus("all"); }}>Clear filters</button>} />
                   </td>
                 </tr>
               )}
-              {filtered.map((e) => (
+              {!loading && !error && filtered.map((e) => (
                 <tr key={e.id} className="hover:bg-ink-50/60">
                   <td className="table-td font-medium">{e.source}</td>
                   <td className="table-td">{e.scope}</td>

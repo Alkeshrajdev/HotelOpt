@@ -43,6 +43,18 @@ export async function listEnergyEFs(): Promise<EmissionFactor[]> {
   return data ?? [];
 }
 
+/** Every factor, active or archived — the admin library view. */
+export async function listEFs(): Promise<EmissionFactor[]> {
+  const { data, error } = await supabase!
+    .from("ef_library")
+    .select("*")
+    .order("source_type")
+    .order("region")
+    .order("year", { ascending: false });
+  if (error) throw error;
+  return data ?? [];
+}
+
 /* ---------------- Consumption records ---------------- */
 
 export type RecordWithProperty = ConsumptionRecord & {
@@ -87,6 +99,8 @@ export async function createRecord(payload: {
   invoice_ref?: string | null;
   notes?: string | null;
   source_payload?: Record<string, unknown> | null;
+  /** Flags raised at capture time; the queue renders them and its filters count them. */
+  anomaly_flags?: Record<string, unknown>[];
   input_method?: string;
   submit?: boolean;
 }): Promise<ConsumptionRecord> {
@@ -106,6 +120,7 @@ export async function createRecord(payload: {
     invoice_ref: payload.invoice_ref ?? null,
     notes: payload.notes ?? null,
     source_payload: (payload.source_payload ?? null) as Inserts<"consumption_records">["source_payload"],
+    anomaly_flags: (payload.anomaly_flags ?? []) as Inserts<"consumption_records">["anomaly_flags"],
     status: payload.submit ? "submitted" : "draft",
     submitted_by: me,
     submitted_at: payload.submit ? new Date().toISOString() : null,
@@ -114,6 +129,34 @@ export async function createRecord(payload: {
   const { data, error } = await supabase!.from("consumption_records").insert(insert).select().single();
   if (error) throw error;
   return data;
+}
+
+/* ---------------- Evidence files (private storage bucket) ---------------- */
+
+export type EvidencePointer = { path: string; name: string; size: number; type: string };
+const EVIDENCE_BUCKET = "evidence";
+
+/**
+ * Upload a bill, invoice or meter photo under the property's folder. The bucket's
+ * policies reuse property access, so whoever can see the property can open the file.
+ */
+export async function uploadEvidence(propertyId: string, file: File): Promise<EvidencePointer> {
+  const safeName = file.name.replace(/[^\w.\-]+/g, "_").slice(-120);
+  const path = `${propertyId}/${crypto.randomUUID()}/${safeName}`;
+  const { error } = await supabase!.storage
+    .from(EVIDENCE_BUCKET)
+    .upload(path, file, { contentType: file.type || undefined, upsert: false });
+  if (error) throw error;
+  return { path, name: file.name, size: file.size, type: file.type };
+}
+
+/** Short-lived signed URL for a stored evidence file; pass a file name to force a download. */
+export async function evidenceUrl(path: string, expiresInSeconds = 600, download?: string): Promise<string> {
+  const { data, error } = await supabase!.storage
+    .from(EVIDENCE_BUCKET)
+    .createSignedUrl(path, expiresInSeconds, download ? { download } : undefined);
+  if (error) throw error;
+  return data.signedUrl;
 }
 
 /** Checker decision. Approve / query / reject, with the comment the queue requires. */
