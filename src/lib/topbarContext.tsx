@@ -1,4 +1,23 @@
-import { createContext, useContext, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { useLocation } from "react-router-dom";
+import { PROPERTIES } from "./propertiesData";
+
+/* ─── Property context ───────────────────────────────────────────────────────
+ * The Portfolio section is the only place the product looks across hotels.
+ * Every other tool works on ONE property: the selector there lists properties
+ * only, and "All Properties" is not a valid state. Entering a property-level
+ * route with nothing chosen picks the last-used property (or the first).
+ */
+export const ALL_PROPERTIES = "All Properties (10)";
+export const PROPERTY_NAMES: string[] = PROPERTIES.map((p) => p.name);
+const LAST_PROPERTY_KEY = "ho.lastProperty";
+
+function readLastProperty(): string | null {
+  try { const v = localStorage.getItem(LAST_PROPERTY_KEY); return v && PROPERTY_NAMES.includes(v) ? v : null; } catch { return null; }
+}
+function writeLastProperty(name: string) {
+  try { localStorage.setItem(LAST_PROPERTY_KEY, name); } catch { /* storage unavailable */ }
+}
 
 /* ─── Data basis ─────────────────────────────────────────────────────────── */
 export type DataBasis =
@@ -38,6 +57,7 @@ export type OpsGranularity = "day" | "week" | "month" | "year" | "custom";
 /* ─── Per-route topbar config ────────────────────────────────────────────── */
 export type TopbarConfig = {
   periodType:    PeriodType;
+  /** Property-level tools require a property; Portfolio and account pages hide the selector. */
   showProperty:  boolean;
   showRegion:    boolean;
   showDataBasis: boolean;
@@ -55,9 +75,9 @@ export function getTopbarConfig(pathname: string): TopbarConfig {
   if (pathname.startsWith("/smart-ops"))
     return { periodType: "ops",          showProperty: true,  showRegion: false, showDataBasis: false };
   if (pathname.startsWith("/reports"))
-    return { periodType: "year",         showProperty: false, showRegion: false, showDataBasis: true  };
+    return { periodType: "year",         showProperty: true,  showRegion: false, showDataBasis: true  };
   if (pathname.startsWith("/certifications"))
-    return { periodType: "year",         showProperty: false, showRegion: false, showDataBasis: false };
+    return { periodType: "year",         showProperty: true,  showRegion: false, showDataBasis: false };
   if (pathname.startsWith("/actions"))
     return { periodType: "year",         showProperty: true,  showRegion: false, showDataBasis: false };
   if (pathname.startsWith("/portfolio"))
@@ -93,8 +113,11 @@ type TopbarCtx = {
   opsCustomEnd:      string;
   setOpsCustomEnd:   (v: string) => void;
   // Context filters
+  /** The selected property name, or ALL_PROPERTIES on portfolio routes. */
   property:          string;
   setProperty:       (v: string) => void;
+  /** The property every property-level tool works on — never "all". */
+  propertyName:      string;
   region:            string;
   setRegion:         (v: string) => void;
   dataBasis:         DataBasis;
@@ -130,7 +153,16 @@ export function TopbarProvider({ children }: { children: ReactNode }) {
   const [opsGranularity, setOpsGranularity] = useState<OpsGranularity>("month");
   const [opsCustomStart, setOpsCustomStart] = useState("2026-01-01");
   const [opsCustomEnd,   setOpsCustomEnd]   = useState("2026-05-31");
-  const [property,       setProperty]       = useState("All Properties (10)");
+  const [property,       setPropertyState] = useState<string>(() => readLastProperty() ?? ALL_PROPERTIES);
+  const { pathname } = useLocation();
+  const setProperty = (v: string) => { setPropertyState(v); if (v !== ALL_PROPERTIES) writeLastProperty(v); };
+  const propertyName = property !== ALL_PROPERTIES ? property : (readLastProperty() ?? PROPERTY_NAMES[0]);
+
+  // A property-level route always has a property. Landing there with "all" selected
+  // (only possible from a portfolio page) resolves to the last-used property.
+  useEffect(() => {
+    if (getTopbarConfig(pathname).showProperty && property === ALL_PROPERTIES) setPropertyState(propertyName);
+  }, [pathname, property, propertyName]);
   const [region,         setRegion]         = useState("All Regions");
   const [dataBasis,      setDataBasis]      = useState<DataBasis>("approved");
   const [lastRefreshed]                     = useState(new Date());
@@ -151,7 +183,7 @@ export function TopbarProvider({ children }: { children: ReactNode }) {
   const contextLine = [
     "Acme Hotels",
     region !== "All Regions" ? region : null,
-    property !== "All Properties (10)" ? property : "All Properties",
+    property !== ALL_PROPERTIES ? property : "All Properties",
     String(year),
     DATA_BASIS_LABEL[dataBasis],
     `Last refreshed ${hhmm}`,
@@ -166,6 +198,7 @@ export function TopbarProvider({ children }: { children: ReactNode }) {
       opsCustomStart, setOpsCustomStart,
       opsCustomEnd,   setOpsCustomEnd,
       property,       setProperty,
+      propertyName,
       region,         setRegion,
       dataBasis,      setDataBasis,
       dashHotelIds,   setDashHotelIds,

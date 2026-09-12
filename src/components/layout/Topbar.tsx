@@ -32,24 +32,14 @@ import { useAuth } from "@/lib/auth";
 import DashboardFilterBar from "../../pages/dashboard/FilterBar";
 import {
   useTopbar, DATA_BASIS_LABEL, type DataBasis,
-  getTopbarConfig, YEAR_OPTIONS, MONTH_OPTIONS, type OpsGranularity,
+  getTopbarConfig, YEAR_OPTIONS, MONTH_OPTIONS, PROPERTY_NAMES, type OpsGranularity,
 } from "@/lib/topbarContext";
 import { cn } from "@/lib/utils";
 
 /* ── Filter options ────────────────────────────────────────────────────────── */
-const PROPERTY_OPTIONS = [
-  "All Properties (10)",
-  "Skyline Dubai",
-  "Airport Hotel Dubai",
-  "Bay View Singapore",
-  "The Pavilion London",
-  "Grand Harbour Lisbon",
-  "Marina Residences Barcelona",
-  "Oceanfront Cape Town",
-  "The Montrose Paris",
-  "Peaks Resort Zermatt",
-  "Riverside Bangkok",
-];
+// Property-level tools list properties only; "All Properties" exists only for the
+// Portfolio section, which has its own filters (see topbarContext).
+const PROPERTY_OPTIONS = PROPERTY_NAMES;
 
 const REGION_OPTIONS = [
   "All Regions",

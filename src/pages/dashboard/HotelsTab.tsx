@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { TrendingDown, TrendingUp, ExternalLink, ArrowUpDown } from "lucide-react";
+import { TrendingDown, TrendingUp, ExternalLink, ArrowUpDown, ChevronRight } from "lucide-react";
 import Badge from "@/components/ui/Badge";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { PORTFOLIO_HOTELS, PORTFOLIO_CERTS_BY_HOTEL } from "@/lib/mock";
@@ -345,7 +345,11 @@ export default function HotelsTab() {
 
       {/* ── Heatmap matrix ── */}
       <Card>
-        <CardHeader title="Portfolio Heat Map" hint="10 hotels × 6 metrics — green = good, red = needs action" />
+        <CardHeader
+          title="Portfolio Heat Map"
+          hint="10 hotels × 6 metrics — green = good, red = needs action"
+          right={<Link to="/portfolio/compare" className="text-[11px] font-semibold text-brand-700 hover:text-brand-900 inline-flex items-center gap-1">Compare by pillar <ChevronRight size={12} /></Link>}
+        />
         <div className="px-4 pb-4 pt-2 overflow-x-auto">
           <table className="w-full text-[11px]">
             <thead>

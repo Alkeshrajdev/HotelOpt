@@ -15,7 +15,7 @@ import {
   CreditCard,
   ShoppingBag,
   Zap,
-  Sparkles,
+  ArrowLeftRight,
   Droplets,
   Wind,
   Cpu,
@@ -70,6 +70,7 @@ export const NAV: NavSection[] = [
     items: [
       { to: "/portfolio/dashboard",               label: "Dashboard",           icon: LayoutDashboard, matchPrefix: "/portfolio/dashboard" },
       { to: "/properties",                        label: "Properties",          icon: Building2 },
+      { to: "/portfolio/compare",                 label: "Compare",             icon: ArrowLeftRight },
       { to: "/portfolio/setup",                   label: "Setup",               icon: SettingsIcon },
       { to: "/portfolio/reports-certifications",  label: "Reporting Readiness", icon: FileText },
     ],
@@ -79,7 +80,6 @@ export const NAV: NavSection[] = [
 
   // ── Performance & Reporting ──────────────────────────────────────────
   { type: "item", to: "/performance/energy/overview", label: "Performance",    icon: BarChart3,   matchPrefix: "/performance", roles: ["property_sm", "super_admin"], module: "performance" },
-  { type: "item", to: "/genuine-performance",         label: "Genuine Performance", icon: Sparkles, matchPrefix: "/genuine-performance", roles: ["property_sm", "super_admin"], module: "performance" },
 
   { type: "divider" },
 

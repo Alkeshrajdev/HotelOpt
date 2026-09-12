@@ -16,7 +16,7 @@ const PortfolioReports    = lazy(() => import("./pages/portfolio/PortfolioReport
 const DataCapture         = lazy(() => import("./pages/DataCapture"));
 const ReviewApproval      = lazy(() => import("./pages/ReviewApproval"));
 const PerformanceShell    = lazy(() => import("./pages/performance/Shell"));
-const GenuinePortfolio    = lazy(() => import("./pages/performance/GenuinePortfolio"));
+const PortfolioCompare    = lazy(() => import("./pages/portfolio/Compare"));
 const GhgInventory        = lazy(() => import("./pages/GhgInventory"));
 const Reports             = lazy(() => import("./pages/Reports"));
 const Certifications      = lazy(() => import("./pages/Certifications"));
@@ -59,6 +59,7 @@ export default function App() {
           <Route path="/portfolio/dashboard" element={<Dashboard />} />
           <Route path="/portfolio/setup" element={<PortfolioSetup />} />
           <Route path="/portfolio/reports-certifications" element={<PortfolioReports />} />
+          <Route path="/portfolio/compare" element={<PortfolioCompare />} />
           <Route path="/data-capture" element={<DataCapture />} />
           <Route path="/review-approval" element={<ReviewApproval />} />
           <Route path="/properties" element={<Properties />} />
@@ -92,8 +93,8 @@ export default function App() {
 
           {/* Backwards-compatible redirects */}
           <Route path="/own-performance" element={<Navigate to="/performance/energy/overview" replace />} />
-          <Route path="/genuine-performance" element={<GenuinePortfolio />} />
-          <Route path="/internal-comparison" element={<Navigate to="/performance/energy/by-property" replace />} />
+          <Route path="/genuine-performance" element={<Navigate to="/portfolio/compare" replace />} />
+          <Route path="/internal-comparison" element={<Navigate to="/portfolio/compare" replace />} />
           <Route path="/external-comparison" element={<Navigate to="/performance/energy/external-comparison" replace />} />
           <Route path="/carbon-inventory" element={<Navigate to="/performance/carbon/carbon-inventory" replace />} />
 

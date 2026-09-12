@@ -137,7 +137,7 @@ export const ACTIONS: Action[] = [
     id: "a1", code: "ENG-001", name: "BMS optimisation — HVAC schedules",
     description: "Re-tune occupancy-driven HVAC setpoints across 14 zones; tighten night/shoulder setbacks.",
     actionType: "operational-efficiency", pillar: "energy", property: "Skyline Dubai",
-    source: "performance-gap", sourceRef: "Energy GP −3.1% vs expected (Apr 2026)", triggerLink: "/genuine-performance",
+    source: "performance-gap", sourceRef: "Energy GP −3.1% vs expected (Apr 2026)", triggerLink: "/performance/energy/genuine-performance",
     priority: "critical",
     impact: [
       { key: "energy_mwh", label: "Energy saved", value: 540, unit: "MWh/yr" },
@@ -158,7 +158,7 @@ export const ACTIONS: Action[] = [
     id: "a2", code: "ENG-002", name: "LED retrofit — back-of-house",
     description: "Replace 3,200 fluorescent fittings with LED across kitchens, BoH corridors and laundry.",
     actionType: "operational-efficiency", pillar: "energy", property: "Peaks Resort Zermatt",
-    source: "ai", sourceRef: "AI: lighting share above peer median", triggerLink: "/genuine-performance",
+    source: "ai", sourceRef: "AI: lighting share above peer median", triggerLink: "/performance/energy/genuine-performance",
     priority: "high",
     impact: [
       { key: "energy_mwh", label: "Energy saved", value: 95, unit: "MWh/yr" },
