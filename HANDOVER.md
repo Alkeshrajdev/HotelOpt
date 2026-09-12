@@ -83,48 +83,50 @@ Status of every route. **Live** = reads/writes the Supabase project. **Demo** = 
 | Portfolio › Reporting Readiness | `/portfolio/reports-certifications` | Demo | |
 | Performance › Overview | `/performance/:pillar/overview` | **Live** for energy, water, waste, carbon | `usePropertyPerformance()` → `buildPerformance()`: two reporting years of approved records, sources, monthly series, totals, intensities per ORN/GN. Social and governance overviews are mock. |
 | Performance › Genuine performance | `…/genuine-performance` | Demo | Fixed-share engine on mock hotels (see §7). |
-| Performance › Benchmarks, External comparison, Carbon inventory | | Demo | CHSB-style cohorts and the Scope 1/2/3 inventory are mock numbers. |
-| Data Capture | `/data-capture` | **Live** for manual entry of energy (grid, gas, district cooling, diesel, solar PV), water, waste, occupancy | Writes `consumption_records` (status `submitted`) or `activity_records`. Evidence files upload to the private `evidence` bucket and the record stores pointers in `source_payload.evidence`. Capture-time anomaly messages are persisted as typed `anomaly_flags`. In live mode the other methods (OCR, bulk, QR, API, survey, AI assist) are shown as "Not connected yet", and the other data types (procurement, travel/commute, refrigerants, ops events, cert evidence, custom) refuse to submit with a clear message instead of a fake success. In demo mode everything is simulated. |
+| Performance › Carbon inventory | `/performance/carbon/carbon-inventory` | **Live** | `usePropertyInventory()` → `buildInventory()`: Scope 1 (gas, diesel, refrigerant), Scope 2 location-based, Scope 3 Cat 1–7, Cat 8–15 as N/A with reasons, factors applied, approved-month coverage strips, and a banner for captured-but-unapproved rows. Demo mode keeps the old illustrative view. |
+| Performance › Benchmarks, External comparison | | Demo | CHSB-style cohorts are mock numbers. |
+| Data Capture | `/data-capture` | **Live** for manual entry of energy (grid, gas, district cooling, diesel, solar PV), water, waste, occupancy, purchases (Cat 1/2/4), business travel & commute (Cat 6/7), refrigerants (Scope 1) | Writes `consumption_records` (status `submitted`) or `activity_records`. Evidence files upload to the private `evidence` bucket and the record stores pointers in `source_payload.evidence`. Capture-time anomaly messages are persisted as typed `anomaly_flags`. Purchases, travel/commute and refrigerants write `emission_activities` with the factor resolved at capture (`ef_id`, `ef_value`, `tco2e`); if the library has no factor the submission is refused with the reason. In live mode the other methods (OCR, bulk, QR, API, survey, AI assist) are shown as "Not connected yet", and the remaining data types (ops events, cert evidence, custom) refuse to submit with a clear message instead of a fake success. In demo mode everything is simulated. |
 | Review & Approval › Approval Queue | `/review-approval` | **Live** | Queue from `consumption_records` (`useReviewRecords`), role from the profile, approve / query / reject / resubmit (`transitionRecord`, `resubmitRecord`), comments, audit trail, anomaly flags, evidence list with pre-signed Open / Download links (10 min). SLA is 5 days from submission. |
 | Review & Approval › Capture Status, Platform Review | | Demo | `src/lib/dataReadiness.ts` seeded model; the anomalies panel there is illustrative. |
 | Smart Ops (Overview, Meters, End-uses, Assets, Alerts, Verification) | `/smart-ops/*` | Demo | Metering model, alerts and verification bridge on `src/lib/smartOps*.ts` mock data. No meter feed. |
 | Actions | `/actions` | Demo | Local state only; "convert alert to action" and the pathway tile are mock. |
-| Reports, GHG Inventory | `/reports`, `/reports/ghg-inventory` | Demo | The inventory table and CSV export use `CARBON` / `PORTFOLIO_SCOPE3_CATEGORIES` from `mock.ts`. |
+| Reports › GHG Inventory | `/reports/ghg-inventory` | **Live** | One property (the top-bar selection), one reporting year. Boundary and methodology, the full line-item table with basis and factor, totals, intensity per ORN, factors applied with standard and version, Cat 8–15 N/A reasons, and a CSV export of all of it. Demo mode keeps the old portfolio-wide mock report. |
+| Reports (index) | `/reports` | Demo | |
 | Certifications | `/certifications` | Demo | |
 | Marketplace | `/marketplace` | Demo | |
 | Supplier Portal, AI Assistant, Guest Engagement | `/supplier-portal`, `/ai-assistant`, `/guest-engagement` | Demo | AI Assistant answers are canned strings; no model is called anywhere in the app. |
 | Billing | `/billing` | Demo | |
 | Admin › Clients | `/admin/clients` | Demo | Account type / module entitlements live in `localStorage` (`src/lib/account.tsx`), not the database. |
 | Admin › Users | `/admin/users` | Demo | Mock list; "Invite user" is not wired. |
-| Admin › EF Library | `/admin/ef-library` | **Live (read)** | Lists every `ef_library` row with scope, region, version, value; filters work. New EF / import / edit are not wired. |
+| Admin › EF Library | `/admin/ef-library` | **Live (read)** | Lists every `ef_library` row with its real scope and Scope 3 category, region, version, value and standard; filters work. New EF / import / edit are not wired. |
 | Admin › Pools, other tiles | `/admin/pools`, `/admin/:section` | Demo / stub | |
 
 ---
 
 ## 5. Emission sources — coverage audit
 
-What the user asked: "all emission sources? Scope 1, 2, 3 categories 1–7?" Answer: **Scope 1 and 2 stationary sources are live end to end; refrigerants and every Scope 3 category are forms or charts without storage or calculation.**
+What the user asked: "all emission sources? Scope 1, 2, 3 categories 1–7?" Answer: **Scope 1, Scope 2 location-based and Scope 3 Cat 1–7 are computed from the database. Still missing: the Scope 2 market-based method, four Scope 1 fuels that have no enum value, and the client's own EEIO dataset.**
 
 | Source | Scope | Capture form | Stored | Carbon computed | Gap |
 |---|---|---|---|---|---|
-| Grid electricity | 2 (location) | ✔ manual | ✔ `consumption_records` | ✔ EF by country (AE, CA-BC, CH, ES, FR, GB, ID, PT, SG, TH, ZA) | Market-based method, RECs/PPAs, supplier factors not modelled |
+| Grid electricity | 2 (location) | ✔ manual | ✔ `consumption_records` | ✔ EF by country (AE, CA-BC, CH, ES, FR, GB, ID, PT, SG, TH, ZA) | Market-based method, RECs/PPAs, supplier factors not modelled — the report says so rather than showing a number |
 | District cooling | 2 | ✔ | ✔ | ✔ (AE + GLOBAL) | |
 | Natural gas | 1 | ✔ | ✔ | ✔ kWh and m³ factors | |
 | Diesel (generators) | 1 | ✔ | ✔ | ✔ kWh and litre factors | |
 | Solar PV on-site | 2 (zero) | ✔ | ✔ | ✔ EF 0 | Export / net-metering not handled |
 | LPG, purchased heat/steam, biomass, owned-fleet fuel | 1 / 2 | ✖ | ✖ (not in `energy_source` enum) | ✖ | Add enum values + EFs |
-| Refrigerants (fugitive) | 1 | ✔ form (`refrigerants` type: gas, charged, recovered) | ✖ | ✖ no GWP table live | Needs `refrigerant_events` table + GWP factors (AR6) |
-| Water | — | ✔ | ✔ m³ with source | — | Supply/treatment EF (Scope 3 Cat 1) not applied |
-| Waste | 3 · Cat 5 | ✔ | ✔ kg by stream and route | ✖ no waste treatment EFs | Add DEFRA-style per-route factors |
-| Cat 1 Purchased goods & services | 3 | ✔ form (`procurement` type with tier: spend / average / supplier-specific) | ✖ | ✖ | No spend-based EEIO factors, no classification |
-| Cat 2 Capital goods | 3 | option in the same form | ✖ | ✖ | |
-| Cat 3 Fuel- and energy-related (WTT, T&D losses) | 3 | — | derivable from stored energy | ✖ | Add WTT and T&D factors; compute from existing records |
-| Cat 4 Upstream transport | 3 | option only | ✖ | ✖ | |
-| Cat 6 Business travel | 3 | ✔ form (`travel-commute`, mode + distance) | ✖ | ✖ | |
-| Cat 7 Employee commuting | 3 | ✔ form (survey headcount) | ✖ | ✖ | |
-| Cat 8–15 | 3 | ✖ | ✖ | ✖ | Mostly not applicable to hotel operators; Cat 8/13 leased assets and Cat 14 franchises matter for brands. The inventory should list them as N/A with a justification. |
+| Refrigerants (fugitive) | 1 | ✔ manual | ✔ `emission_activities` | ✔ (charged − recovered) × GWP, IPCC AR6 | Leak-rate screening and an equipment register would beat per-event entry |
+| Water | — | ✔ | ✔ m³ with source | ✔ as Scope 3 Cat 1 (supply + treatment, DEFRA) | Treatment assumes 95 % return to sewer |
+| Waste | 3 · Cat 5 | ✔ | ✔ kg by stream and route | ✔ per-route DEFRA factors | Hazardous and e-waste routes have no factor of their own |
+| Cat 1 Purchased goods & services | 3 | ✔ manual (spend or mass, tier 1–3) | ✔ `emission_activities` | ✔ spend × EEIO, or mass × product-class average | EEIO factors are **indicative** — load the client's EXIOBASE/USEEIO set; only USD is priced; no commodity classification |
+| Cat 2 Capital goods | 3 | ✔ same form | ✔ | ✔ spend × EEIO | As Cat 1 |
+| Cat 3 Fuel- and energy-related (WTT, T&D losses) | 3 | — (derived) | — | ✔ computed from the stored energy records | Region-specific WTT and T&D loss rates not loaded; GLOBAL applies everywhere |
+| Cat 4 Upstream transport | 3 | ✔ same form | ✔ | ✔ spend × EEIO | Distance/mass-based freight not modelled |
+| Cat 6 Business travel | 3 | ✔ manual (mode + distance) | ✔ | ✔ distance × mode factor | `trips` is refused — it needs a distance; hotel-stay factor is a portfolio average |
+| Cat 7 Employee commuting | 3 | ✔ same form | ✔ | ✔ distance × mode factor | Survey headcount is stored but not used to extrapolate |
+| Cat 8–15 | 3 | ✖ | ✖ | N/A with a stated reason | Cat 13 (sub-let space) and Cat 14 (franchises) become real if the client has either; nothing records a lease or a franchise agreement yet |
 
-The GHG Inventory report and the Carbon inventory view show Cat 1–7 percentages, but those are constants in `mock.ts`.
+**Approval gap.** `emission_activities` rows are written with status `submitted`, but the Review & Approval queue reads `consumption_records` only, so nothing can approve them in the app — the inventory counts approved rows and shows a banner for the pending ones. `record_comments.record_id` has a foreign key to `consumption_records`, so wiring the queue needs that constraint generalised (see §11).
 
 ---
 
@@ -135,7 +137,7 @@ There is **no AI or OCR integration**. `package.json` depends only on supabase-j
 Recommended shape for the real thing (keeps keys server-side):
 
 1. A Supabase Edge Function `classify-purchase` that takes invoice text or line items (or the evidence file path, read from the bucket with the service role) and calls Claude (`claude-sonnet-5` for cost, `claude-opus-5` where accuracy matters) with a JSON schema: `{ category: cat1|cat2|cat4, commodity: <UNSPSC/NACE code>, ef_match: <ef_library id>, quantity, unit, confidence }`.
-2. Persist to a new `scope3_records` table with `ai_confidence`, `ai_model`, `ai_rationale`; records under 0.8 confidence get an `ai-low` flag so the checker sees them first (the queue already renders that flag).
+2. Persist to `emission_activities` (it exists — §9) with `ai_confidence`, `ai_model` and `ai_rationale` in `source_payload`; rows under 0.8 confidence get an `ai-low` entry in `anomaly_flags` so the checker sees them first (the queue already renders that flag shape). The function should resolve the factor the same way `lib/data/factors.ts` does, so an AI-classified purchase and a hand-entered one are calculated identically.
 3. OCR: the same function family with Claude vision on PDFs/images already stored in `evidence`.
 4. Function secrets hold `ANTHROPIC_API_KEY`; the Vite bundle never sees it.
 
@@ -170,14 +172,23 @@ Migrations (all applied via the MCP; SQL is not in the repo — pull it with `li
 | 07 | working_tool_schema | property columns (short_name, type, brand, city, currency, timezone), `activity_records` (ORN, ARN, guest nights, covers, laundry per property-month, unique per period), `tg_records_set_client_id` always derives client from property, `tg_audit_records` writes the audit log |
 | 08 | seed_portfolio_two_years | ten hotels `a0000000-0000-4000-8000-0000000000NN` (01 Skyline Dubai … 10 Riverside Bangkok, country ISO2), approved records May 2024–Apr 2026 (energy by source in kWh, water m³ with `source_payload.source`, waste kg with `source_payload.route`), activity rows, an open queue |
 | 09 | evidence_bucket | private bucket `evidence` (25 MB, PDF/PNG/JPEG/WebP/CSV/XLSX), policies: read for anyone with property access, insert for maker/checker/property_sm/super_admin. No update or delete policy on purpose. |
+| 10 | ef_library_scope_categories | `ef_library` gains `factor_key`, `scope`, `category`, `basis`, `standard`, `notes`; `source_type` becomes nullable with a check that one of the two keys is present. Two partial unique indexes (an enum→text cast is not immutable, so a single `coalesce` index is impossible). |
+| 11 | seed_scope1_scope3_factors | 36 factor rows: refrigerant GWPs (IPCC AR6), WTT + grid T&D, waste routes, water supply/treatment, travel modes, spend-based EEIO. EEIO rows carry `standard = 'EEIO (indicative)'` so the report can flag them. |
+| 12 | emission_activities | Scope 1 fugitive + Scope 3 activity table. Reuses `tg_records_set_client_id`; adds `tg_audit_rows()` (a generic `tg_audit_records` that takes the table name from the trigger context). RLS mirrors `consumption_records`. Stores `ef_id`, `ef_value`, `ef_unit`, `tco2e` as applied at capture. |
+| 13 | seed_scope1_scope3_activities | ~1,400 approved rows, May 2024 – Apr 2026, ten hotels: Cat 1 (food / goods / services), Cat 2, Cat 4, Cat 6, Cat 7 and two refrigerant events a year. Deterministic from `md5(property || period || salt)`, scaled by room count, seasonal, 3 % better in year two. |
+| 14 | rescale_scope3_seed | Corrects migration 13's per-room scales (capital goods had come out larger than purchased goods). Audit trigger disabled for the update — a seed rescale is not a business event. |
 
-Enums: `pillar` energy/water/waste/carbon/social/governance · `energy_source` electricity_grid/natural_gas/district_cooling/diesel/solar_pv · `record_status` draft/submitted/queried/approved/rejected · `user_role` maker/checker/property_sm/super_admin.
+Enums: `pillar` energy/water/waste/carbon/social/governance · `energy_source` electricity_grid/natural_gas/district_cooling/diesel/solar_pv · `record_status` draft/submitted/queried/approved/rejected · `user_role` maker/checker/property_sm/super_admin. `emission_activities.scope` (1 or 3), `category` (`cat1`…`cat15`) and `activity_type` (refrigerant / purchase / capital / upstream_transport / business_travel / commute) are checked text, not enums.
+
+**Factor keys.** Non-energy factors are looked up by `factor_key`, which is deliberately the same string the capture form sends: a refrigerant gas code (`R-410A`), `waste_<route>`, `travel_<mode>`, `wtt_<source>`, `td_electricity_grid`, `water_supply` / `water_treatment`, `eeio_cat1_food` / `_goods` / `_services`, `eeio_cat2_capital`, `eeio_cat4_transport`, `goods_mass_average`. Matching is by key + the unit after the slash in `ef_unit` + region, falling back to GLOBAL.
 
 Evidence object path: `<property_id>/<uuid>/<file name>` — the first folder is what the storage policies check.
 
-Test rows created by sessions (safe to keep or delete): Airport Hotel Dubai electricity May 2026 `124f3503-f52b-4b62-9f46-39116b12d6aa` (approved with a checker comment) and June 2026 `41f605ec-e8f4-4a1b-ba87-bcde9eb8002b` (submitted, two flags, one CSV in the bucket).
+Test rows created by sessions (safe to keep or delete): Airport Hotel Dubai electricity May 2026 `124f3503-f52b-4b62-9f46-39116b12d6aa` (approved with a checker comment) and June 2026 `41f605ec-e8f4-4a1b-ba87-bcde9eb8002b` (submitted, two flags, one CSV in the bucket). In `emission_activities`, two submitted test rows for Airport Hotel Dubai: a Cat 1 food purchase (48,250 USD, Sep 2026) and an R-407C release (8.5 kg net, Jan 2026, 16.2 tCO₂e) — the second is what makes the pending banner visible on the Carbon inventory for RY 2025/26.
 
-App wiring: `src/lib/supabase.ts` (client) · `src/lib/auth.tsx` · `src/lib/data/mode.ts` · `src/lib/data/properties.tsx` (directory behind the top bar) · `src/lib/api.ts` (all queries, uploads, signed URLs) · `src/lib/data/records.ts` (queue adapter, flag mapping, evidence mapping) · `src/lib/data/performance.ts` (reporting-year builder) · `src/lib/database.types.ts` (hand-maintained; regenerate with the MCP `generate_typescript_types` after schema changes).
+App wiring: `src/lib/supabase.ts` (client) · `src/lib/auth.tsx` · `src/lib/data/mode.ts` · `src/lib/data/properties.tsx` (directory behind the top bar) · `src/lib/api.ts` (all queries, uploads, signed URLs) · `src/lib/data/records.ts` (queue adapter, flag mapping, evidence mapping) · `src/lib/data/performance.ts` (reporting-year builder) · `src/lib/data/factors.ts` (factor matching + form-value → factor key) · `src/lib/data/carbon.ts` (`buildInventory`, `usePropertyInventory`) · `src/lib/database.types.ts` (hand-maintained; regenerate with the MCP `generate_typescript_types` after schema changes).
+
+**Where the inventory's numbers come from.** Utility lines are recomputed from the library on every load, so a factor correction restates them. Activity lines use the `tco2e` stored on the row, so the figure an approver saw is the figure that is reported. Both behaviours are stated on the page.
 
 ---
 
@@ -186,6 +197,8 @@ App wiring: `src/lib/supabase.ts` (client) · `src/lib/auth.tsx` · `src/lib/dat
 - **Auth lock deadlock**: never await a Supabase query inside `onAuthStateChange`; `auth.tsx` defers profile loading with `setTimeout`. Symptom: pages make no network requests at all.
 - **Popup blockers**: do not `window.open` after an `await`. Evidence links are pre-signed anchors for this reason.
 - **`execute_sql` shows only the last statement's result.**
+- **An enum→text cast is not immutable**, so `coalesce(source_type::text, factor_key)` cannot go in an index expression — `ef_library` uses two partial unique indexes instead.
+- `round(double precision, int)` does not exist in Postgres: cast to `numeric` first. `sin()` in a seed expression is what makes the whole thing a double.
 - The trigger overwrites `client_id`; the API passes a placeholder on insert.
 - RLS: a maker or checker sees a property only with a `user_properties` row; the seed covers all ten.
 - zsh globbing in the tool shell: quote `--include='*.ts'`; the working directory sometimes resets — use absolute paths or `git -C`.
@@ -198,7 +211,14 @@ App wiring: `src/lib/supabase.ts` (client) · `src/lib/auth.tsx` · `src/lib/dat
 ## 11. Next-session plan (priority order)
 
 1. **Vercel env vars** (§1) so production runs live. Five minutes.
-2. **Full Scope 1 + Scope 3 data model.** Add a generic `emission_activities` table (property, period, scope, category, activity type, quantity, unit, tier, supplier, ef_id, tco2e, status, source_payload) — or extend `consumption_records` — and persist the procurement, travel/commute and refrigerant forms into it. Extend `ef_library` with a `scope`/`category` column, GWP rows for refrigerants, WTT and T&D factors, waste-route factors, travel factors and spend-based EEIO factors. Then compute the Carbon inventory view and the GHG Inventory report from the database, with Cat 8–15 listed as N/A with reasons.
+2. ~~**Full Scope 1 + Scope 3 data model.**~~ **Done** (migrations 10–14, `lib/data/factors.ts`, `lib/data/carbon.ts`, Carbon inventory and GHG Inventory live). What it left open, in priority order:
+   - **Approve Scope 1/3 activity.** `emission_activities` rows are submitted but the queue only reads `consumption_records`, so no one can approve them. Generalise `record_comments.record_id` (drop the FK or add a `table_name`), extend `useReviewRecords` / `transitionRecord` in `src/lib/data/records.ts` to cover both tables, and add a filter so a checker can see activity rows. This closes capture → approve → report for Scope 3.
+   - **Replace the indicative EEIO factors** with the client's own EXIOBASE/USEEIO set, and price currencies other than USD (the form refuses non-USD spend today).
+   - **Scope 2 market-based.** Needs a contractual-instruments table (RECs, PPAs, green tariffs, supplier factors) and residual-mix factors. The report currently states that it is not modelled.
+   - **Missing Scope 1 fuels**: LPG, purchased heat/steam, biomass, owned-fleet fuel need `energy_source` enum values and EFs.
+   - **Region-specific WTT and T&D** loss rates, and factors for the hazardous and e-waste routes.
+   - **Base year** is not in the data model; the report prints "Not configured".
+   - **Portfolio-level GHG reporting** is still out of scope by the product rule (Portfolio is the only cross-property section) — if the owner wants a consolidated corporate inventory, that is a Portfolio page, not this report.
 3. **AI classification for purchases + OCR** (§6) as edge functions; wire the AI-assist and OCR wizards to them and persist their output with confidence flags.
 4. **Genuine performance on live data** (§7): coordinates, weather ingestion, regression with fit gates, events register, then point the Performance › Genuine performance view and Portfolio › Compare at it.
 5. **Portfolio dashboard and Compare on live data**: aggregate `buildPerformance()` across properties or add a SQL view of monthly totals per property × source; keep the chart vocabulary.
