@@ -14,6 +14,52 @@ export type Database = {
   __InternalSupabase: { PostgrestVersion: "14.5" };
   public: {
     Tables: {
+      activity_records: {
+        Row: {
+          available_room_nights: number | null;
+          client_id: string;
+          created_at: string;
+          fb_covers: number | null;
+          guest_nights: number | null;
+          id: string;
+          input_method: string;
+          laundry_kg: number | null;
+          notes: string | null;
+          occupied_room_nights: number;
+          period_end: string;
+          period_start: string;
+          property_id: string;
+          reviewed_at: string | null;
+          reviewed_by: string | null;
+          status: Database["public"]["Enums"]["record_status"];
+          submitted_at: string | null;
+          submitted_by: string | null;
+          updated_at: string;
+        };
+        Insert: {
+          available_room_nights?: number | null;
+          client_id: string;
+          created_at?: string;
+          fb_covers?: number | null;
+          guest_nights?: number | null;
+          id?: string;
+          input_method?: string;
+          laundry_kg?: number | null;
+          notes?: string | null;
+          occupied_room_nights: number;
+          period_end: string;
+          period_start: string;
+          property_id: string;
+          reviewed_at?: string | null;
+          reviewed_by?: string | null;
+          status?: Database["public"]["Enums"]["record_status"];
+          submitted_at?: string | null;
+          submitted_by?: string | null;
+          updated_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["activity_records"]["Insert"]>;
+        Relationships: [];
+      };
       audit_log: {
         Row: {
           action: string;
@@ -139,9 +185,12 @@ export type Database = {
       };
       properties: {
         Row: {
+          brand: string | null;
+          city: string | null;
           client_id: string;
           country: string | null;
           created_at: string;
+          currency: string;
           gfa_m2: number | null;
           id: string;
           latitude: number | null;
@@ -149,20 +198,29 @@ export type Database = {
           name: string;
           region: string | null;
           rooms: number | null;
+          short_name: string | null;
           status: string;
+          timezone: string | null;
+          type: string | null;
         };
         Insert: {
           client_id: string;
           name: string;
+          brand?: string | null;
+          city?: string | null;
           country?: string | null;
           created_at?: string;
+          currency?: string;
           gfa_m2?: number | null;
           id?: string;
           latitude?: number | null;
           longitude?: number | null;
           region?: string | null;
           rooms?: number | null;
+          short_name?: string | null;
           status?: string;
+          timezone?: string | null;
+          type?: string | null;
         };
         Update: Partial<Database["public"]["Tables"]["properties"]["Insert"]>;
         Relationships: [];

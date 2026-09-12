@@ -1,0 +1,161 @@
+/**
+ * The review queue on live data. Rows from Supabase are shaped into the
+ * `ReviewRecord` the queue already renders, so the page is the same in both modes.
+ */
+import { useCallback, useEffect, useMemo, useState } from "react";
+import {
+  listAudit, listComments, listProfiles, listRecords, resubmitRecord, transitionRecord,
+  type AuditRow, type Comment as DbComment, type Profile, type RecordWithProperty,
+} from "@/lib/api";
+import type { AuditEntry, Comment, QueryRound, ReviewRecord, Role, Status } from "@/lib/reviewMock";
+
+const SLA_DAYS = 5;
+const SOURCE_LABEL: Record<string, string> = {
+  electricity_grid: "Electricity — grid", natural_gas: "Natural gas", district_cooling: "District cooling", diesel: "Diesel", solar_pv: "Solar PV (on-site)",
+};
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+export const shortId = (uuid: string) => `REC-${uuid.slice(0, 6).toUpperCase()}`;
+const periodLabel = (d: string) => `${MONTHS[Number(d.slice(5, 7)) - 1]} ${d.slice(0, 4)}`;
+const stamp = (iso: string | null) => (iso ? iso.slice(0, 16).replace("T", " ") : "");
+const title = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+
+function dataTypeOf(r: RecordWithProperty) {
+  const p = r.source_payload as Record<string, unknown> | null;
+  if (r.pillar === "energy") return `Energy bill · ${SOURCE_LABEL[r.energy_source ?? ""] ?? "energy"}`;
+  if (r.pillar === "water") return `Water bill · ${title(String(p?.source ?? "municipal"))}`;
+  if (r.pillar === "waste") return `Waste · ${title(String(p?.stream ?? "mixed"))} → ${title(String(p?.route ?? "landfill"))}`;
+  return "Carbon record";
+}
+
+function toStatus(s: RecordWithProperty["status"]): Status {
+  return s; // draft | submitted | queried | approved | rejected map 1:1; "resubmitted"/"locked" are UI-only
+}
+
+export function toReviewRecord(r: RecordWithProperty, profiles: Map<string, Profile>): ReviewRecord {
+  const by = r.submitted_by ? profiles.get(r.submitted_by) : undefined;
+  const submittedAt = r.submitted_at ?? r.created_at;
+  const due = new Date(new Date(submittedAt).getTime() + SLA_DAYS * 86400000);
+  const open = r.status === "submitted" || r.status === "queried";
+  const overdueDays = open ? Math.max(0, Math.floor((Date.now() - due.getTime()) / 86400000)) : 0;
+  const p = r.source_payload as Record<string, unknown> | null;
+  return {
+    id: r.id,
+    property: r.property?.name ?? "—",
+    region: r.property?.region ?? "",
+    pillar: (r.pillar === "social" || r.pillar === "governance" ? "carbon" : r.pillar),
+    dataType: dataTypeOf(r),
+    method: r.input_method === "bulk" ? "bulk" : r.input_method === "ocr" ? "ocr" : r.input_method === "api" ? "api" : r.input_method === "qr" ? "qr" : "manual",
+    source: r.pillar === "energy" ? (SOURCE_LABEL[r.energy_source ?? ""] ?? "Energy") : r.pillar === "water" ? `Water — ${String(p?.source ?? "municipal")}` : r.pillar === "waste" ? `Waste — ${String(p?.route ?? "landfill")}` : "Carbon",
+    period: periodLabel(r.period_start),
+    value: `${Number(r.consumption).toLocaleString("en-US")} ${r.unit}`,
+    cost: r.cost_amount != null ? `${r.cost_currency ?? "USD"} ${Number(r.cost_amount).toLocaleString("en-US")}` : undefined,
+    meterId: r.meter_id ?? undefined,
+    invoiceRef: r.invoice_ref ?? undefined,
+    submittedBy: by?.full_name ?? "Maker",
+    submittedByRole: (by?.role as Role) ?? "maker",
+    submittedAt: stamp(submittedAt),
+    status: toStatus(r.status),
+    dueAt: due.toISOString(),
+    overdueDays,
+    flags: Array.isArray(r.anomaly_flags) ? (r.anomaly_flags as ReviewRecord["flags"]) : [],
+    evidence: [],
+    queryRounds: [],
+    comments: [],
+    audit: [],
+    locked: r.status === "approved",
+  };
+}
+
+function toComments(rows: DbComment[], profiles: Map<string, Profile>): Comment[] {
+  return rows.map((c) => {
+    const author = c.author ?? profiles.get(c.author_id);
+    const role = ((author as { role?: string } | undefined)?.role ?? "checker") as Role;
+    return { id: c.id, author: (author as { full_name?: string | null } | undefined)?.full_name ?? title(role), role, at: stamp(c.created_at), message: c.body };
+  });
+}
+
+function toRounds(comments: Comment[]): QueryRound[] {
+  const rounds: QueryRound[] = [];
+  comments.forEach((c) => {
+    const checker = c.role === "checker" || c.role === "property_sm" || c.role === "super_admin";
+    if (checker) rounds.push({ round: rounds.length + 1, raisedBy: c.author, raisedAt: c.at, message: c.message });
+    else if (rounds.length && !rounds[rounds.length - 1].response) rounds[rounds.length - 1].response = { by: c.author, at: c.at, message: c.message };
+  });
+  return rounds;
+}
+
+function toAudit(rows: AuditRow[], profiles: Map<string, Profile>): AuditEntry[] {
+  const out: AuditEntry[] = [];
+  rows.forEach((a) => {
+    const actor = a.actor_id ? profiles.get(a.actor_id) : undefined;
+    const base = { at: stamp(a.created_at), actor: actor?.full_name ?? "System", actorRole: ((a.actor_role ?? actor?.role ?? "maker") as Role) };
+    const next = (a.new_data as Record<string, unknown> | null)?.status as string | undefined;
+    const prev = (a.old_data as Record<string, unknown> | null)?.status as string | undefined;
+    if (a.action === "insert") out.push({ ...base, action: next === "submitted" ? "submitted" : "draft-saved" });
+    else if (next && next !== prev) {
+      const map: Record<string, AuditEntry["action"]> = { submitted: prev === "queried" ? "resubmitted" : "submitted", queried: "queried", approved: "approved", rejected: "rejected" };
+      out.push({ ...base, action: map[next] ?? "edit", note: a.note ?? undefined });
+      if (next === "approved") out.push({ ...base, action: "locked", note: "Auto-locked on approval" });
+    } else out.push({ ...base, action: "edit", note: a.note ?? undefined });
+  });
+  return out;
+}
+
+export function useReviewRecords(enabled: boolean) {
+  const [records, setRecords] = useState<ReviewRecord[]>([]);
+  const [profiles, setProfiles] = useState<Map<string, Profile>>(new Map());
+  const [loading, setLoading] = useState(enabled);
+  const [error, setError] = useState<string | null>(null);
+
+  const refresh = useCallback(async () => {
+    if (!enabled) return;
+    setLoading(true);
+    try {
+      const [open, recent, people] = await Promise.all([
+        listRecords({ status: ["draft", "submitted", "queried", "rejected"], limit: 300, orderBy: "submitted_at" }),
+        listRecords({ status: "approved", limit: 120, orderBy: "submitted_at" }),
+        listProfiles(),
+      ]);
+      const map = new Map(people.map((p) => [p.id, p]));
+      setProfiles(map);
+      setRecords([...open, ...recent].map((r) => toReviewRecord(r, map)));
+      setError(null);
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setLoading(false);
+    }
+  }, [enabled]);
+
+  useEffect(() => { void refresh(); }, [refresh]);
+
+  /** Comments and the audit trail arrive when a record is opened. */
+  const hydrate = useCallback(async (id: string) => {
+    if (!enabled) return;
+    try {
+      const [comments, audit] = await Promise.all([listComments(id), listAudit(id)]);
+      setRecords((rs) => rs.map((r) => {
+        if (r.id !== id) return r;
+        const cs = toComments(comments, profiles);
+        return { ...r, comments: cs, queryRounds: toRounds(cs), audit: toAudit(audit, profiles) };
+      }));
+    } catch (e) {
+      setError((e as Error).message);
+    }
+  }, [enabled, profiles]);
+
+  const decide = useCallback(async (id: string, next: "approved" | "queried" | "rejected", comment?: string) => {
+    await transitionRecord(id, next, comment);
+    await refresh();
+    await hydrate(id);
+  }, [refresh, hydrate]);
+
+  const resubmit = useCallback(async (id: string, comment: string, patch?: { consumption?: number }) => {
+    await resubmitRecord(id, comment, patch);
+    await refresh();
+    await hydrate(id);
+  }, [refresh, hydrate]);
+
+  return useMemo(() => ({ records, loading, error, refresh, hydrate, decide, resubmit }), [records, loading, error, refresh, hydrate, decide, resubmit]);
+}

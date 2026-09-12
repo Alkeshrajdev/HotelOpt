@@ -37,10 +37,10 @@ import ProgressBar from "@/components/ui/ProgressBar";
 import Tabs from "@/components/ui/Tabs";
 import InfoHint from "@/components/ui/InfoHint";
 import { GLOSSARY } from "@/components/ui/Abbr";
+import { useProperties } from "@/lib/data/properties";
 import {
   CERTIFICATIONS,
   PROPERTY_CERT_READINESS,
-  findProperty,
   getAssignedUsers,
   getAttributeHistory,
   getQrPoints,
@@ -85,8 +85,9 @@ export default function PropertyDetail() {
     setSearchParams(searchParams);
   };
 
-  const property = findProperty(propertyId);
-  if (!property) return <Navigate to="/properties" replace />;
+  const { byId, loading: directoryLoading } = useProperties();
+  const property = byId(propertyId);
+  if (!property) return directoryLoading ? null : <Navigate to="/properties" replace />;
 
   const { account } = useAccount();
   const setupReady = property.dataCompleteness >= 80 && property.gpReady;

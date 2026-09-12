@@ -13,6 +13,7 @@ import KpiTile from "@/components/ui/KpiTile";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { cn } from "@/lib/utils";
 import type { PillarKey } from "./Shell";
+import type { PillarLive } from "@/lib/data/performance";
 
 /* ─── Types ──────────────────────────────────────────────────────────────── */
 type MonthRow = {
@@ -211,14 +212,14 @@ function SourceChart({ source, data, unit }: { source: Source; data: MonthRow[];
 }
 
 /* ─── Main ───────────────────────────────────────────────────────────────── */
-export default function PillarOverview({ pillar }: { pillar: "water"|"waste"|"carbon" }) {
-  const cfg = CONFIGS[pillar];
+export default function PillarOverview({ pillar, live }: { pillar: "water"|"waste"|"carbon"; live?: PillarLive }) {
+  const cfg: PillarCfg = live ?? CONFIGS[pillar];
   const Icon = PILLAR_ICON[pillar];
   const totalTY   = cfg.monthly.reduce((s,m) => s + m.ty, 0);
   const totalPY   = cfg.monthly.reduce((s,m) => s + m.py, 0);
   const totalCost = cfg.monthly.reduce((s,m) => s + m.costTY, 0);
   const costPY    = cfg.monthly.reduce((s,m) => s + m.costPY, 0);
-  const yoy       = ((totalTY - totalPY) / totalPY * 100).toFixed(1);
+  const yoy       = totalPY ? ((totalTY - totalPY) / totalPY * 100).toFixed(1) : "0.0";
   const costSaved = (costPY - totalCost).toFixed(1);
 
   return (

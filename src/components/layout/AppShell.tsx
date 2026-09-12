@@ -6,6 +6,7 @@ import Sidebar from "./Sidebar";
 import Topbar from "./Topbar";
 import EntitlementGuard from "./EntitlementGuard";
 import { TopbarProvider } from "@/lib/topbarContext";
+import { PropertiesProvider } from "@/lib/data/properties";
 import { ToastProvider } from "@/components/ui/Toast";
 
 export default function AppShell() {
@@ -25,6 +26,7 @@ export default function AppShell() {
 
   return (
     <ToastProvider>
+    <PropertiesProvider>
     <TopbarProvider>
       <EntitlementGuard />
       <div className="flex h-screen w-screen overflow-hidden bg-[#ECEEF3]">
@@ -59,6 +61,7 @@ export default function AppShell() {
         </div>
       </div>
     </TopbarProvider>
+    </PropertiesProvider>
     </ToastProvider>
   );
 }

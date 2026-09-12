@@ -6,6 +6,7 @@ import OverviewTab from "./dashboard/OverviewTab";
 import EnvironmentTab from "./dashboard/EnvironmentTab";
 import TargetsTab from "./dashboard/TargetsTab";
 import HotelsTab from "./dashboard/HotelsTab";
+import LiveDataNotice from "@/components/ui/LiveDataNotice";
 
 const TABS = [
   { key: "overview",     label: "Overview" },
@@ -38,7 +39,8 @@ export default function Dashboard() {
         onChange={(k) => setTab(k as TabKey)}
       />
 
-      <div className="mt-6">
+      <div className="mt-4"><LiveDataNotice /></div>
+      <div className="mt-4">
         {tab === "overview"    && <OverviewTab onNavigate={(t) => setTab(t as TabKey)} />}
         {tab === "environment" && <EnvironmentTab />}
         {tab === "targets"     && <TargetsTab />}

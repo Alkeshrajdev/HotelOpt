@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { useLocation } from "react-router-dom";
 import { PROPERTIES } from "./propertiesData";
+import { useProperties } from "./data/properties";
 
 /* ─── Property context ───────────────────────────────────────────────────────
  * The Portfolio section is the only place the product looks across hotels.
@@ -9,11 +10,12 @@ import { PROPERTIES } from "./propertiesData";
  * route with nothing chosen picks the last-used property (or the first).
  */
 export const ALL_PROPERTIES = "All Properties (10)";
+/** Demo portfolio names — the live list comes from the property directory. */
 export const PROPERTY_NAMES: string[] = PROPERTIES.map((p) => p.name);
 const LAST_PROPERTY_KEY = "ho.lastProperty";
 
-function readLastProperty(): string | null {
-  try { const v = localStorage.getItem(LAST_PROPERTY_KEY); return v && PROPERTY_NAMES.includes(v) ? v : null; } catch { return null; }
+function readLastProperty(names: string[]): string | null {
+  try { const v = localStorage.getItem(LAST_PROPERTY_KEY); return v && names.includes(v) ? v : null; } catch { return null; }
 }
 function writeLastProperty(name: string) {
   try { localStorage.setItem(LAST_PROPERTY_KEY, name); } catch { /* storage unavailable */ }
@@ -118,6 +120,10 @@ type TopbarCtx = {
   setProperty:       (v: string) => void;
   /** The property every property-level tool works on — never "all". */
   propertyName:      string;
+  /** Its id in the directory (live uuid or demo id), null while the directory loads. */
+  propertyId:        string | null;
+  /** Every property the user may choose from. */
+  propertyNames:     string[];
   region:            string;
   setRegion:         (v: string) => void;
   dataBasis:         DataBasis;
@@ -153,16 +159,22 @@ export function TopbarProvider({ children }: { children: ReactNode }) {
   const [opsGranularity, setOpsGranularity] = useState<OpsGranularity>("month");
   const [opsCustomStart, setOpsCustomStart] = useState("2026-01-01");
   const [opsCustomEnd,   setOpsCustomEnd]   = useState("2026-05-31");
-  const [property,       setPropertyState] = useState<string>(() => readLastProperty() ?? ALL_PROPERTIES);
+  const { properties: directory } = useProperties();
+  const propertyNames = directory.map((p) => p.name);
+  const [property,       setPropertyState] = useState<string>(ALL_PROPERTIES);
   const { pathname } = useLocation();
   const setProperty = (v: string) => { setPropertyState(v); if (v !== ALL_PROPERTIES) writeLastProperty(v); };
-  const propertyName = property !== ALL_PROPERTIES ? property : (readLastProperty() ?? PROPERTY_NAMES[0]);
+  const propertyName = property !== ALL_PROPERTIES && propertyNames.includes(property)
+    ? property
+    : (readLastProperty(propertyNames) ?? propertyNames[0] ?? property);
+  const propertyId = directory.find((p) => p.name === propertyName)?.id ?? null;
 
   // A property-level route always has a property. Landing there with "all" selected
   // (only possible from a portfolio page) resolves to the last-used property.
   useEffect(() => {
-    if (getTopbarConfig(pathname).showProperty && property === ALL_PROPERTIES) setPropertyState(propertyName);
-  }, [pathname, property, propertyName]);
+    if (!propertyNames.length) return;
+    if (getTopbarConfig(pathname).showProperty && (property === ALL_PROPERTIES || !propertyNames.includes(property))) setPropertyState(propertyName);
+  }, [pathname, property, propertyName, propertyNames]);
   const [region,         setRegion]         = useState("All Regions");
   const [dataBasis,      setDataBasis]      = useState<DataBasis>("approved");
   const [lastRefreshed]                     = useState(new Date());
@@ -198,7 +210,7 @@ export function TopbarProvider({ children }: { children: ReactNode }) {
       opsCustomStart, setOpsCustomStart,
       opsCustomEnd,   setOpsCustomEnd,
       property,       setProperty,
-      propertyName,
+      propertyName,   propertyId, propertyNames,
       region,         setRegion,
       dataBasis,      setDataBasis,
       dashHotelIds,   setDashHotelIds,

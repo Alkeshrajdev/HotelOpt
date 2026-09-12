@@ -17,7 +17,7 @@
 //   • SLA / due-by / overdue badges
 //   • Approved records are LOCKED — surface revision-request flow
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import {
   AlertTriangle,
@@ -81,6 +81,12 @@ import CaptureStatusChip from "@/components/review/CaptureStatusChip";
 import AnomaliesPanel from "@/components/review/AnomaliesPanel";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/components/ui/Toast";
+import { useAuth } from "@/lib/auth";
+import { useDataMode } from "@/lib/data/mode";
+import { shortId, useReviewRecords } from "@/lib/data/records";
+
+/** Live ids are uuids; show them the way the queue shows every record. */
+const displayId = (id: string) => (id.length > 20 ? shortId(id) : id);
 
 type DetailTab = "details" | "evidence" | "comments" | "ai-ocr" | "audit";
 type PageTab = "queue" | "status" | "platform";
@@ -107,10 +113,18 @@ const INITIAL_FILTERS: FilterState = {
 
 export default function ReviewApproval() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [role, setRole] = useState<Role>(
+  const mode = useDataMode();
+  const live = mode === "live";
+  const { profile } = useAuth();
+  const toast = useToast();
+  const liveQueue = useReviewRecords(live);
+  const [roleState, setRole] = useState<Role>(
     (searchParams.get("role") as Role) ?? "checker"
   );
-  const [records, setRecords] = useState<ReviewRecord[]>(INITIAL_RECORDS);
+  // Live: the signed-in person's role decides what they can do. Demo: the picker.
+  const role: Role = live ? ((profile?.role as Role) ?? "checker") : roleState;
+  const [demoRecords, setRecords] = useState<ReviewRecord[]>(INITIAL_RECORDS);
+  const records = live ? liveQueue.records : demoRecords;
   const [filters, setFilters] = useState<FilterState>({
     ...INITIAL_FILTERS,
     pillar: (searchParams.get("pillar") as Pillar) ?? "all",
@@ -123,8 +137,8 @@ export default function ReviewApproval() {
   const { account } = useAccount();
 
   const properties = useMemo(
-    () => Array.from(new Set(INITIAL_RECORDS.map((r) => r.property))).sort(),
-    []
+    () => Array.from(new Set(records.map((r) => r.property))).sort(),
+    [records]
   );
 
   /* --- Filter + sort the queue --- */
@@ -166,6 +180,8 @@ export default function ReviewApproval() {
   // "" = nothing selected → full-width queue, detail drawer closed.
   const [selectedId, setSelectedId] = useState<string>("");
   const selected = selectedId ? sorted.find((r) => r.id === selectedId) ?? null : null;
+  const hydrate = liveQueue.hydrate;
+  useEffect(() => { if (live && selectedId) void hydrate(selectedId); }, [live, selectedId, hydrate]);
 
   // Comment dialog state
   const [dialog, setDialog] = useState<{ open: boolean; action: CommentAction }>({
@@ -175,6 +191,14 @@ export default function ReviewApproval() {
 
   function transition(action: CommentAction, comment: string) {
     if (!selected) return;
+    if (live) {
+      const next = action === "reject" ? "rejected" : action === "query" ? "queried" : "approved";
+      liveQueue.decide(selected.id, next, comment)
+        .then(() => toast.success(next === "approved" ? "Record approved and locked" : next === "queried" ? "Query sent to the maker" : "Record rejected"))
+        .catch((e: Error) => toast.error(e.message));
+      setDialog({ open: false, action: "approve" });
+      return;
+    }
     setRecords((rs) =>
       rs.map((r) => {
         if (r.id !== selected.id) return r;
@@ -223,11 +247,19 @@ export default function ReviewApproval() {
       })
     );
     setDialog({ open: false, action: "approve" });
+    toast.success(action === "reject" ? "Record rejected" : action === "query" ? "Query sent to the maker" : "Record approved and locked");
   }
 
   // Maker resubmit: attaches a response to the latest open query round, advances status
   function handleMakerResubmit(response: string, editedValues?: Record<string, string>) {
     if (!selected) return;
+    if (live) {
+      const edited = editedValues?.value ? parseFloat(editedValues.value.replace(/[^0-9.]/g, "")) : NaN;
+      liveQueue.resubmit(selected.id, response, Number.isFinite(edited) ? { consumption: edited } : undefined)
+        .then(() => toast.success("Resubmitted for review"))
+        .catch((e: Error) => toast.error(e.message));
+      return;
+    }
     setRecords((rs) =>
       rs.map((r) => {
         if (r.id !== selected.id) return r;
@@ -271,7 +303,9 @@ export default function ReviewApproval() {
         eyebrow="Approval queue"
         title="Review & Approval"
         subtitle={`${summary.pending} record${summary.pending === 1 ? "" : "s"} waiting for your decision — ${summary.overdue} overdue. Anomaly-flagged records surface first. Approve, query, or reject with a mandatory comment. Nothing appears in reports until you approve it.`}
-        actions={
+        actions={live ? (
+          <span className="text-[12px] text-ink-500">Signed in as <span className="font-semibold text-ink-900">{profile?.full_name ?? "—"}</span> · {ROLE_LABEL[role] ?? role}</span>
+        ) : (
           <RolePicker
             role={role}
             onChange={(r) => {
@@ -280,7 +314,7 @@ export default function ReviewApproval() {
               setSearchParams(searchParams);
             }}
           />
-        }
+        )}
       />
 
       {/* Page-level tab strip */}
@@ -301,6 +335,8 @@ export default function ReviewApproval() {
       {pageTab === "platform" && <PlatformReviewTab />}
 
       {pageTab === "queue" && <>
+      {live && liveQueue.error && <div className="text-[12px] text-bad-700">{liveQueue.error}</div>}
+      {live && liveQueue.loading && records.length === 0 && <div className="text-[12px] text-ink-500">Loading the queue…</div>}
       {/* Summary cards */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
         <SummaryCard label="Pending review" value={summary.pending} icon={<Clock size={14} />} tone="warn"  onClick={() => setFilters((f) => ({ ...f, status: "submitted" }))} active={filters.status === "submitted"} />
@@ -417,7 +453,7 @@ export default function ReviewApproval() {
                       )}
                     >
                       <td className="table-td"><PriorityDot record={r} /></td>
-                      <td className="table-td font-mono text-[11px] text-ink-700">{r.id}</td>
+                      <td className="table-td font-mono text-[11px] text-ink-700">{displayId(r.id)}</td>
                       <td className="table-td font-medium text-ink-900">{r.property}</td>
                       <td className="table-td">
                         <div className="capitalize">{r.pillar}</div>
@@ -921,7 +957,7 @@ function DetailPanel({
   return (
     <Card className="overflow-hidden">
       <CardHeader
-        title={`Record ${record.id}`}
+        title={`Record ${displayId(record.id)}`}
         hint={`${record.property} · ${record.dataType}`}
         right={
           isAuditor ? (
@@ -938,13 +974,13 @@ function DetailPanel({
             <Badge tone="neutral"><Eye size={11} /> Read-only · {ROLE_LABEL[role]}</Badge>
           ) : (
             <div className="flex flex-wrap gap-2">
-              <button disabled={!canQuery} onClick={() => { onAction("query"); toast.info("Query sent to the maker"); }} className="btn-secondary disabled:opacity-40">
+              <button disabled={!canQuery} onClick={() => onAction("query")} className="btn-secondary disabled:opacity-40">
                 <MessageCircle size={14} /> Query
               </button>
-              <button disabled={!canReject} onClick={() => { onAction("reject"); toast.warning("Record rejected", "The maker has been notified."); }} className="btn-secondary text-bad-700 border-bad/30 hover:bg-bad/10 disabled:opacity-40">
+              <button disabled={!canReject} onClick={() => onAction("reject")} className="btn-secondary text-bad-700 border-bad/30 hover:bg-bad/10 disabled:opacity-40">
                 <X size={14} /> Reject
               </button>
-              <button disabled={!canApprove} onClick={() => { onAction("approve"); toast.success("Record approved"); }} className="btn-primary disabled:opacity-40">
+              <button disabled={!canApprove} onClick={() => onAction("approve")} className="btn-primary disabled:opacity-40">
                 <Check size={14} /> Approve
               </button>
             </div>
@@ -1629,7 +1665,7 @@ function RevisionRequestModal({
     <div className="fixed inset-0 z-50 bg-black/40 grid place-items-center p-4">
       <div className="bg-white rounded-2xl shadow-pop max-w-lg w-full max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between px-6 py-4 border-b border-ink-200">
-          <h3 className="text-base font-bold text-ink-900">Revision request — Record {record.id}</h3>
+          <h3 className="text-base font-bold text-ink-900">Revision request — Record {displayId(record.id)}</h3>
           <button onClick={onClose} className="w-7 h-7 grid place-items-center rounded-lg hover:bg-ink-100">
             <X size={14} />
           </button>
@@ -1681,7 +1717,7 @@ function RevisionRequestModal({
           <div className="rounded-xl bg-ink-50 border border-ink-200 p-3 text-[12px] text-ink-600 space-y-1">
             <div className="flex justify-between"><span className="text-ink-400">Requested by</span><span className="font-medium">Demo Maker (session)</span></div>
             <div className="flex justify-between"><span className="text-ink-400">Approval route</span><span className="font-medium">Checker → Property SM</span></div>
-            <div className="flex justify-between"><span className="text-ink-400">Audit trail</span><span className="font-medium text-brand-700 underline cursor-pointer hover:text-brand-800">Record {record.id}</span></div>
+            <div className="flex justify-between"><span className="text-ink-400">Audit trail</span><span className="font-medium text-brand-700 underline cursor-pointer hover:text-brand-800">Record {displayId(record.id)}</span></div>
           </div>
 
           <div className="flex justify-end gap-2 pt-2 border-t border-ink-200">
@@ -1734,7 +1770,7 @@ function SupplierProfileDrawer({
             <KV label="Certificate"       value="ISO 14001 · Valid" />
             <KV label="Data freshness"    value="Last updated 14 days ago" />
             <KV label="Reuse permission"  value="Granted" />
-            <KV label="Linked record"     value={record.id} />
+            <KV label="Linked record"     value={displayId(record.id)} />
           </ul>
 
           <div className="rounded-xl bg-info/5 border border-info/20 p-3 text-[12px] text-info-700">

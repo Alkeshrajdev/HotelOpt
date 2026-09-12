@@ -15,6 +15,7 @@ import { Zap, DollarSign, Leaf, Activity } from "lucide-react";
 import KpiTile from "@/components/ui/KpiTile";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { cn } from "@/lib/utils";
+import type { PillarLive } from "@/lib/data/performance";
 
 /* ─── Monthly data ──────────────────────────────────────────────────────────
    TY = May 2025 – Apr 2026  |  PY = May 2024 – Apr 2025
@@ -107,12 +108,15 @@ function SourceTooltip({ active, payload, label }: {
 }
 
 /* ─── Small source chart ────────────────────────────────────────────────────*/
+type AnySource = { key: string; label: string; fullLabel: string; color: string };
+type AnyRow = { month: string; ty: number; py: number; costTY: number; costPY: number; [k: string]: number | string };
+
 function SourceChart({
   source,
   data,
 }: {
-  source: typeof SOURCES[number];
-  data: typeof MONTHLY;
+  source: AnySource;
+  data: AnyRow[];
 }) {
   const annualTY = data.reduce((s, m) => s + (m[source.key] as number), 0);
   const annualPY = data.reduce((s, m) => {
@@ -174,53 +178,33 @@ function SourceChart({
 }
 
 /* ─── Main component ────────────────────────────────────────────────────────*/
-export default function EnergyOverview() {
+export default function EnergyOverview({ live }: { live?: PillarLive }) {
   const [showCost, setShowCost] = useState(true);
+  const monthly: AnyRow[] = live?.monthly ?? MONTHLY;
+  const sources: AnySource[] = live?.sources ?? SOURCES;
+  const totalTY = live ? live.totalTY : TOTAL_TY;
+  const totalPY = live ? live.totalPY : TOTAL_PY;
+  const totalCost = live ? monthly.reduce((s, m) => s + m.costTY, 0) : TOTAL_COST;
+  const costPYTotal = monthly.reduce((s, m) => s + m.costPY, 0);
 
-  const yoyPct = ((TOTAL_TY - TOTAL_PY) / TOTAL_PY) * 100;
-  const costYoY = ((TOTAL_COST - MONTHLY.reduce((s, m) => s + m.costPY, 0)) /
-    MONTHLY.reduce((s, m) => s + m.costPY, 0)) * 100;
+  const yoyPct = totalPY ? ((totalTY - totalPY) / totalPY) * 100 : 0;
+  const costYoY = costPYTotal ? ((totalCost - costPYTotal) / costPYTotal) * 100 : 0;
 
   return (
     <div className="space-y-5">
 
       {/* ── KPI tiles ──────────────────────────────────────────────────── */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <KpiTile
-          icon={<Zap size={18} />}
-          iconBg="bg-pillar-energy/10 text-pillar-energy"
-          label="Total consumption"
-          value={TOTAL_TY.toLocaleString()}
-          unit="MWh"
-          delta={parseFloat(yoyPct.toFixed(1))}
-          goodDirection="down"
-        />
-        <KpiTile
-          icon={<Activity size={18} />}
-          iconBg="bg-warn/10 text-warn"
-          label="Energy intensity"
-          value="117.8"
-          unit="kWh / ORN"
-          delta={-6.0}
-          goodDirection="down"
-        />
-        <KpiTile
-          icon={<DollarSign size={18} />}
-          iconBg="bg-pillar-energy/10 text-pillar-energy"
-          label="Energy cost"
-          value="$4.6M"
-          delta={parseFloat(costYoY.toFixed(1))}
-          goodDirection="down"
-        />
-        <KpiTile
-          icon={<Leaf size={18} />}
-          iconBg="bg-brand-50 text-brand-700"
-          label="Renewable share"
-          value="12"
-          unit="%"
-          delta={3.0}
-          goodDirection="up"
-        />
+        {live ? live.kpis.map((k, i) => (
+          <KpiTile key={k.label} icon={[<Zap size={18} />, <Activity size={18} />, <DollarSign size={18} />, <Leaf size={18} />][i]} iconBg={k.iconBg} label={k.label} value={k.value} unit={k.unit} delta={k.delta} goodDirection={k.goodDir} />
+        )) : (
+          <>
+            <KpiTile icon={<Zap size={18} />} iconBg="bg-pillar-energy/10 text-pillar-energy" label="Total consumption" value={TOTAL_TY.toLocaleString()} unit="MWh" delta={parseFloat(yoyPct.toFixed(1))} goodDirection="down" />
+            <KpiTile icon={<Activity size={18} />} iconBg="bg-warn/10 text-warn" label="Energy intensity" value="117.8" unit="kWh / ORN" delta={-6.0} goodDirection="down" />
+            <KpiTile icon={<DollarSign size={18} />} iconBg="bg-pillar-energy/10 text-pillar-energy" label="Energy cost" value="$4.6M" delta={parseFloat(costYoY.toFixed(1))} goodDirection="down" />
+            <KpiTile icon={<Leaf size={18} />} iconBg="bg-brand-50 text-brand-700" label="Renewable share" value="12" unit="%" delta={3.0} goodDirection="up" />
+          </>
+        )}
       </div>
 
       {/* ── Consolidated monthly chart ──────────────────────────────────── */}
@@ -244,7 +228,7 @@ export default function EnergyOverview() {
         />
         <div className="px-6 pb-6 pt-4">
           <ResponsiveContainer width="100%" height={300}>
-            <ComposedChart data={MONTHLY} barGap={2} barCategoryGap="25%">
+            <ComposedChart data={monthly} barGap={2} barCategoryGap="25%">
               <CartesianGrid vertical={false} stroke="#EDEFF0" />
               <XAxis
                 dataKey="month"
@@ -261,7 +245,7 @@ export default function EnergyOverview() {
                 axisLine={false}
                 tickLine={false}
                 width={40}
-                domain={[0, 10000]}
+                domain={[0, "auto"]}
                 label={{ value: "MWh", angle: -90, position: "insideLeft", offset: 12, style: { fontSize: 10, fill: "#7B8285" } }}
               />
               {/* Right axis — $k */}
@@ -274,7 +258,7 @@ export default function EnergyOverview() {
                   axisLine={false}
                   tickLine={false}
                   width={52}
-                  domain={[0, 560]}
+                  domain={[0, "auto"]}
                 />
               )}
               <Tooltip content={<ConsolidatedTooltip />} cursor={{ fill: "rgba(0,0,0,0.03)" }} />
@@ -320,22 +304,22 @@ export default function EnergyOverview() {
         <div className="border-t border-ink-100 px-6 py-3 flex flex-wrap gap-6 text-[12px]">
           <div>
             <span className="text-ink-500">This year total  </span>
-            <span className="font-bold text-ink-900">{TOTAL_TY.toLocaleString()} MWh</span>
+            <span className="font-bold text-ink-900">{Math.round(totalTY).toLocaleString()} MWh</span>
           </div>
           <div>
             <span className="text-ink-500">Prior year total  </span>
-            <span className="font-semibold text-ink-400">{TOTAL_PY.toLocaleString()} MWh</span>
+            <span className="font-semibold text-ink-400">{Math.round(totalPY).toLocaleString()} MWh</span>
           </div>
           <div>
             <span className="text-ink-500">Change  </span>
             <span className={cn("font-bold", yoyPct < 0 ? "text-good" : "text-bad")}>
-              {yoyPct.toFixed(1)}%  ·  {(TOTAL_TY - TOTAL_PY).toLocaleString()} MWh
+              {yoyPct.toFixed(1)}%  ·  {Math.round(totalTY - totalPY).toLocaleString()} MWh
             </span>
           </div>
           <div>
             <span className="text-ink-500">Cost saving  </span>
             <span className="font-bold text-good">
-              ${Math.abs(MONTHLY.reduce((s, m) => s + m.costTY, 0) - MONTHLY.reduce((s, m) => s + m.costPY, 0)).toLocaleString()}k
+              ${Math.round(Math.abs(totalCost - costPYTotal)).toLocaleString()}k
             </span>
           </div>
         </div>
@@ -347,8 +331,8 @@ export default function EnergyOverview() {
           Consumption by energy source
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-          {SOURCES.map((s) => (
-            <SourceChart key={s.key} source={s} data={MONTHLY} />
+          {sources.map((s) => (
+            <SourceChart key={s.key} source={s} data={monthly} />
           ))}
         </div>
       </div>

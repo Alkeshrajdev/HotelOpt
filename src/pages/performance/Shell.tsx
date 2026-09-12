@@ -2,7 +2,13 @@ import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { Cloud, Droplet, Trash2, Zap } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import Tabs, { type TabItem } from "@/components/ui/Tabs";
+import { Database } from "lucide-react";
+import EmptyState from "@/components/ui/EmptyState";
+import { PageSkeleton } from "@/components/ui/Skeleton";
 import { useTopbar } from "@/lib/topbarContext";
+import { useDataMode } from "@/lib/data/mode";
+import { useProperties } from "@/lib/data/properties";
+import { usePropertyPerformance } from "@/lib/data/performance";
 
 import ExternalView from "./External";
 import CarbonInventoryView from "./CarbonInventory";
@@ -61,7 +67,11 @@ function isViewKey(s: string): s is ViewKey {
 export default function PerformanceShell() {
   const { pillar: pillarParam = "energy", view: viewParam = "overview" } = useParams();
   const navigate = useNavigate();
-  const { propertyName } = useTopbar();
+  const { propertyName, propertyId, year } = useTopbar();
+  const mode = useDataMode();
+  const { properties } = useProperties();
+  const countryCode = properties.find((p) => p.id === propertyId)?.countryCode ?? null;
+  const perf = usePropertyPerformance(propertyId, year, countryCode, mode === "live");
 
   // Retired pillar links land on energy
   if (!isPillarKey(pillarParam)) return <Navigate to="/performance/energy/overview" replace />;
@@ -102,8 +112,18 @@ export default function PerformanceShell() {
         onChange={(v) => navigate(`/performance/${pillar}/${v}`)}
       />
 
-      {view === "overview" && pillar === "energy" && <EnergyOverviewView />}
-      {view === "overview" && pillar !== "energy" && <PillarOverviewView pillar={pillar} />}
+      {view === "overview" && mode === "live" && perf.loading && <PageSkeleton />}
+      {view === "overview" && mode === "live" && !perf.loading && perf.error && (
+        <EmptyState icon={<Database size={20} />} title="Could not load approved data" description={perf.error} />
+      )}
+      {view === "overview" && mode === "live" && !perf.loading && !perf.error && perf.data && perf.data[pillar].monthsApproved === 0 && (
+        <EmptyState icon={<Database size={20} />} title={`No approved ${pillar} data for ${propertyName} in ${year}/${String(year + 1).slice(2)}`} description="Capture the monthly records and approve them; the overview fills in as months are approved." />
+      )}
+      {view === "overview" && mode === "live" && !perf.loading && !perf.error && perf.data && perf.data[pillar].monthsApproved > 0 && (
+        pillar === "energy" ? <EnergyOverviewView live={perf.data.energy} /> : <PillarOverviewView pillar={pillar} live={perf.data[pillar]} />
+      )}
+      {view === "overview" && mode === "demo" && pillar === "energy" && <EnergyOverviewView />}
+      {view === "overview" && mode === "demo" && pillar !== "energy" && <PillarOverviewView pillar={pillar} />}
 
       {view === "genuine-performance" && <GenuinePerformanceView pillar={pillar} />}
 

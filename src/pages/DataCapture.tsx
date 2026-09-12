@@ -52,7 +52,10 @@ import {
   type FieldDef,
   type Method,
 } from "@/lib/dataCaptureConfig";
-import { listProperties, createRecord, type Property } from "@/lib/api";
+import { createRecord, upsertActivity } from "@/lib/api";
+import { useProperties, type PropertyLite as Property } from "@/lib/data/properties";
+import { useDataMode } from "@/lib/data/mode";
+import { useTopbar } from "@/lib/topbarContext";
 import { cn } from "@/lib/utils";
 
 /* =================================================================== */
@@ -141,6 +144,7 @@ function validateOccupancy(values: Record<string, string>): Record<string, strin
 /* =================================================================== */
 
 export default function DataCapture() {
+  const mode = useDataMode();
   const [step, setStep] = useState<Step>(1);
   const [dataType, setDataType] = useState<DataTypeKey | null>(null);
   const [method, setMethod] = useState<Method | null>(null);
@@ -179,31 +183,44 @@ export default function DataCapture() {
     setSubmitting(true);
     setSubmitError(null);
     try {
-      if (cfg.key === "energy" && capture.propertyId) {
-        const period = capture.values["period"] ?? new Date().toISOString().slice(0, 7);
+      const v = capture.values;
+      const liveType = cfg.key === "energy" || cfg.key === "water" || cfg.key === "waste" || cfg.key === "occupancy";
+      if (mode === "live" && capture.propertyId && liveType) {
+        const period = v["period"] ?? (v["date"] ? v["date"].slice(0, 7) : new Date().toISOString().slice(0, 7));
         const [y, m] = period.split("-").map(Number);
         const start = new Date(Date.UTC(y, m - 1, 1)).toISOString().slice(0, 10);
         const end = new Date(Date.UTC(y, m, 0)).toISOString().slice(0, 10);
-        await createRecord({
-          property_id: capture.propertyId,
-          pillar: "energy",
-          energy_source: (capture.values["sourceType"] as any) ?? "electricity_grid",
-          period_start: start,
-          period_end: end,
-          consumption: parseFloat(capture.values["consumption"] ?? "0"),
-          unit: capture.values["unit"] ?? "kWh",
-          cost_amount: capture.values["cost"] ? parseFloat(capture.values["cost"]) : null,
-          meter_id: capture.values["meterId"] || null,
-          invoice_ref: capture.values["invoiceRef"] || null,
-          notes: capture.values["notes"] || null,
-          submit: true,
-        });
+        const num = (k: string) => (v[k] !== undefined && v[k] !== "" ? parseFloat(v[k]) : null);
+        if (cfg.key === "occupancy") {
+          await upsertActivity({
+            property_id: capture.propertyId, period_start: start, period_end: end,
+            occupied_room_nights: num("occupiedRoomNights") ?? 0,
+            available_room_nights: num("availableRooms") !== null ? Math.round((num("availableRooms") ?? 0) * (new Date(Date.UTC(y, m, 0)).getUTCDate())) : null,
+            guest_nights: num("guestNights"), fb_covers: num("fbCovers"), laundry_kg: num("laundryKg"),
+            notes: v["notes"] || null, submit: true,
+          });
+        } else {
+          const consumption = num("consumption") ?? num("quantity") ?? 0;
+          await createRecord({
+            property_id: capture.propertyId,
+            pillar: cfg.key as "energy" | "water" | "waste",
+            energy_source: cfg.key === "energy" ? ((v["sourceType"] as "electricity_grid" | "natural_gas" | "district_cooling" | "diesel" | "solar_pv") ?? "electricity_grid") : undefined,
+            period_start: start, period_end: end,
+            consumption,
+            unit: v["unit"] ?? (cfg.key === "energy" ? "kWh" : cfg.key === "water" ? "m³" : "kg"),
+            cost_amount: num("cost"), cost_currency: capture.currency,
+            meter_id: v["meterId"] || null, invoice_ref: v["invoiceRef"] || null, notes: v["notes"] || null,
+            source_payload: cfg.key === "water" ? { source: v["sourceType"] ?? "municipal" } : cfg.key === "waste" ? { stream: v["stream"] ?? "mixed", route: v["disposalRoute"] ?? "landfill", contractor: v["contractor"] ?? null, date: v["date"] ?? null } : null,
+            input_method: method ?? "manual",
+            submit: true,
+          });
+        }
       } else {
         await new Promise((r) => setTimeout(r, 500));
       }
       setStep(5);
-    } catch (e: any) {
-      setSubmitError(e.message ?? "Failed to submit. Please try again.");
+    } catch (e: unknown) {
+      setSubmitError((e as Error).message ?? "Failed to submit. Please try again.");
     } finally {
       setSubmitting(false);
     }
@@ -737,23 +754,24 @@ function ManualWorkflow({
   cfg: DataTypeConfig;
   onPreview: (r: CaptureResult) => void;
 }) {
-  const [properties, setProperties] = useState<Property[]>([]);
+  const { properties } = useProperties();
+  const { propertyId: currentPropertyId } = useTopbar();
   const [propertyId, setPropertyId] = useState<string>("");
-  const [values, setValues] = useState<Record<string, string>>({});
+  // The unit select shows its default from the first render, so the value must be in state too.
+  const [values, setValues] = useState<Record<string, string>>(() =>
+    Object.fromEntries(cfg.fields.filter((f) => f.type === "unit" && f.defaultUnit).map((f) => [f.key, f.defaultUnit as string]))
+  );
   const [files, setFiles] = useState<File[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [attempted, setAttempted] = useState(false);
 
   useEffect(() => {
-    listProperties().then((rows) => {
-      setProperties(rows);
-      if (rows[0]) setPropertyId(rows[0].id);
-    });
-  }, []);
+    if (!propertyId && properties.length) setPropertyId(currentPropertyId ?? properties[0].id);
+  }, [properties, currentPropertyId, propertyId]);
 
   const selectedProperty = properties.find((p) => p.id === propertyId) ?? null;
   const currency = useMemo(
-    () => getCurrencyFromCountry(selectedProperty?.country ?? null),
+    () => selectedProperty?.currency || getCurrencyFromCountry(selectedProperty?.country ?? null),
     [selectedProperty]
   );
 
@@ -1111,15 +1129,13 @@ function OcrWorkflow({ cfg, onPreview }: { cfg: DataTypeConfig; onPreview: (r: C
   const [busy, setBusy] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [editValues, setEditValues] = useState<Record<string, string>>({});
-  const [properties, setProperties] = useState<Property[]>([]);
+  const { properties } = useProperties();
+  const { propertyId: currentPropertyId } = useTopbar();
   const [propertyId, setPropertyId] = useState<string>("");
 
   useEffect(() => {
-    listProperties().then((rows) => {
-      setProperties(rows);
-      if (rows[0]) setPropertyId(rows[0].id);
-    });
-  }, []);
+    if (!propertyId && properties.length) setPropertyId(currentPropertyId ?? properties[0].id);
+  }, [properties, currentPropertyId, propertyId]);
 
   function simulateUpload() {
     setBusy(true);
@@ -1298,15 +1314,13 @@ function BulkWorkflow({ cfg, onPreview }: { cfg: DataTypeConfig; onPreview: (r: 
   const [rows, setRows] = useState<BulkRow[]>(INITIAL_BULK.rows);
   const [editingRow, setEditingRow] = useState<number | null>(null);
   const [editBuf, setEditBuf] = useState<string[]>([]);
-  const [properties, setProperties] = useState<Property[]>([]);
+  const { properties } = useProperties();
+  const { propertyId: currentPropertyId } = useTopbar();
   const [propertyId, setPropertyId] = useState<string>("");
 
   useEffect(() => {
-    listProperties().then((rows) => {
-      setProperties(rows);
-      if (rows[0]) setPropertyId(rows[0].id);
-    });
-  }, []);
+    if (!propertyId && properties.length) setPropertyId(currentPropertyId ?? properties[0].id);
+  }, [properties, currentPropertyId, propertyId]);
 
   const validCount = rows.filter((r) => r.status === "ok").length;
   const errorCount = rows.filter((r) => r.status === "bad").length;
@@ -1998,16 +2012,14 @@ function AiAssistWorkflow({
   const [qaAnswers, setQaAnswers]       = useState<Record<string, string>>({});
   const [qaIdx, setQaIdx]               = useState(0);
   const [editValues, setEditValues]     = useState<Record<string, string>>({});
-  const [properties, setProperties]     = useState<Property[]>([]);
+  const { properties } = useProperties();
+  const { propertyId: currentPropertyId } = useTopbar();
   const [propertyId, setPropertyId]     = useState<string>("");
   const dropRef                         = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    listProperties().then((rows) => {
-      setProperties(rows);
-      if (rows[0]) setPropertyId(rows[0].id);
-    });
-  }, []);
+    if (!propertyId && properties.length) setPropertyId(currentPropertyId ?? properties[0].id);
+  }, [properties, currentPropertyId, propertyId]);
 
   const questions = AI_QUESTIONS[cfg.key] ?? AI_QUESTIONS["generic"];
   const extracted = AI_EXTRACTED[cfg.key] ?? AI_EXTRACTED["generic"];

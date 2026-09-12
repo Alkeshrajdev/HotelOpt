@@ -21,12 +21,12 @@ import InfoHint from "@/components/ui/InfoHint";
 import {
   CERTIFICATIONS,
   OPERATION_TYPES,
-  PROPERTIES,
   REGIONS,
   type PropertyStatus,
   type RichProperty,
 } from "@/lib/propertiesData";
 import { findHotelMetricsByName, hotelCarbon } from "@/lib/normalise";
+import { useProperties } from "@/lib/data/properties";
 import { carbonBand } from "@/lib/benchmarks";
 import { cn } from "@/lib/utils";
 
@@ -59,17 +59,18 @@ const INITIAL_FILTERS: FilterState = {
 };
 
 export default function Properties() {
+  const { rich: PROPERTIES } = useProperties();
   const [filters, setFilters] = useState<FilterState>(INITIAL_FILTERS);
   const [filterOpen, setFilterOpen] = useState(false);
   const [addOpen, setAddOpen] = useState(false);
 
   const COUNTRIES = useMemo(
     () => Array.from(new Set(PROPERTIES.map((p) => p.country))).sort(),
-    []
+    [PROPERTIES]
   );
   const BRANDS = useMemo(
     () => Array.from(new Set(PROPERTIES.map((p) => p.brand))).sort(),
-    []
+    [PROPERTIES]
   );
 
   const filtered = useMemo(() => {
@@ -95,7 +96,7 @@ export default function Properties() {
       if (filters.poolEligible === "no" && p.poolEligible) return false;
       return true;
     });
-  }, [filters]);
+  }, [filters, PROPERTIES]);
 
   const activeFilterCount =
     (Object.keys(filters) as (keyof FilterState)[])

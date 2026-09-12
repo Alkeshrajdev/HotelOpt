@@ -75,16 +75,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    const { data: sub } = supabase.auth.onAuthStateChange(
-      async (_event, s) => {
-        setSession(s);
-        await loadProfile(s?.user.id);
-        if (!initialised.current) {
-          initialised.current = true;
-          setLoading(false);
-        }
-      }
-    );
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, s) => {
+      setSession(s);
+      // The callback runs while the client holds its auth lock; a query awaited here
+      // would wait on that same lock forever. Defer it to the next tick.
+      setTimeout(() => {
+        void loadProfile(s?.user.id).finally(() => {
+          if (!initialised.current) {
+            initialised.current = true;
+            setLoading(false);
+          }
+        });
+      }, 0);
+    });
 
     const t = setTimeout(() => {
       if (!initialised.current) {

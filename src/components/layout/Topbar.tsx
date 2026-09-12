@@ -32,14 +32,13 @@ import { useAuth } from "@/lib/auth";
 import DashboardFilterBar from "../../pages/dashboard/FilterBar";
 import {
   useTopbar, DATA_BASIS_LABEL, type DataBasis,
-  getTopbarConfig, YEAR_OPTIONS, MONTH_OPTIONS, PROPERTY_NAMES, type OpsGranularity,
+  getTopbarConfig, YEAR_OPTIONS, MONTH_OPTIONS, type OpsGranularity,
 } from "@/lib/topbarContext";
 import { cn } from "@/lib/utils";
 
 /* ── Filter options ────────────────────────────────────────────────────────── */
 // Property-level tools list properties only; "All Properties" exists only for the
 // Portfolio section, which has its own filters (see topbarContext).
-const PROPERTY_OPTIONS = PROPERTY_NAMES;
 
 const REGION_OPTIONS = [
   "All Regions",
@@ -158,7 +157,7 @@ const DATA_BASIS_OPTIONS: DataBasis[] = ["approved", "approved+provisional", "dr
 export default function Topbar({ onMenu }: { onMenu?: () => void }) {
   const { profile, session, signOut } = useAuth();
   const {
-    property, setProperty, region, setRegion, dataBasis, setDataBasis,
+    property, setProperty, propertyNames: PROPERTY_OPTIONS, region, setRegion, dataBasis, setDataBasis,
     year, setYear, month, setMonth, compareYear, setCompareYear,
     opsGranularity, setOpsGranularity, opsCustomStart, setOpsCustomStart,
     opsCustomEnd, setOpsCustomEnd,

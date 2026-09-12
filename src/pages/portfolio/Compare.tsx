@@ -14,6 +14,7 @@ import { CHART } from "@/lib/chartPalette";
 import Slope from "@/components/charts/Slope";
 import Bubble from "@/components/charts/Bubble";
 import { LegendRow } from "@/components/charts/ChartBits";
+import LiveDataNotice from "@/components/ui/LiveDataNotice";
 
 const PILLARS: { key: GpUtility; label: string; icon: typeof Zap }[] = [
   { key: "energy", label: "Energy", icon: Zap },
@@ -80,6 +81,8 @@ export default function Compare() {
           />
         }
       />
+
+      <LiveDataNotice />
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <StatTile label="Best intensity" value={`${best.intensity} ${league.unit}`} hint={best.name} tone="good" />
