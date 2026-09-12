@@ -18,7 +18,7 @@ import { useProperties } from "@/lib/data/properties";
 import { useTopbar } from "@/lib/topbarContext";
 import { CATEGORY_SHORT } from "@/lib/data/factors";
 import {
-  deltaPct, factorLabel, fmtT, reportingYearMonths, usePropertyInventory,
+  deltaPct, factorLabel, factorName, fmtT, reportingYearMonths, usePropertyInventory,
   type CategoryBlock, type Inventory, type InventoryLine,
 } from "@/lib/data/carbon";
 
@@ -29,8 +29,12 @@ export default function CarbonInventory() {
   const mode = useDataMode();
   const { propertyId, propertyName, year } = useTopbar();
   const { properties } = useProperties();
-  const countryCode = properties.find((p) => p.id === propertyId)?.countryCode ?? null;
-  const inv = usePropertyInventory(propertyId, year, countryCode, mode === "live");
+  const property = properties.find((p) => p.id === propertyId);
+  const inv = usePropertyInventory(
+    propertyId, year,
+    { gridCode: property?.gridCode ?? null, country: property?.countryCode ?? null },
+    mode === "live",
+  );
 
   if (mode === "demo") return <DemoInventory />;
   if (inv.loading) return <PageSkeleton />;
@@ -147,16 +151,21 @@ function LiveInventory({ inv }: { inv: Inventory }) {
           </div>
           <div className="mt-auto px-6 py-4 border-t border-ink-100 text-[11px] text-ink-500">
             Scope 3 is {t.gross > 0 ? ((t.scope3 / t.gross) * 100).toFixed(0) : "0"}% of the gross inventory.
-            {" "}{inv.scope3.filter((c) => c.lines.some((l) => l.factor?.standard?.includes("indicative"))).length > 0
-              ? "Spend-based lines use indicative EEIO factors — replace them with supplier data before assurance."
-              : "Every line carries a versioned factor."}
+            {" "}{inv.provisionalFactors.length > 0
+              ? `${inv.provisionalFactors.length} of the ${inv.factorsApplied.length} factors applied are provisional or low-grade — see the factors table.`
+              : "Every line carries a published, versioned factor."}
           </div>
         </Card>
       </div>
 
       <div className="grid grid-cols-12 gap-4 items-stretch">
         <Card className="col-span-12 xl:col-span-7 flex flex-col">
-          <CardHeader title="Scope 1 & 2 by source" hint="Metered consumption × the factor for this property's country" />
+          <CardHeader
+            title="Scope 1 & 2 by source"
+            hint={inv.geoUsed.length
+              ? `Grid factor resolved to ${inv.geoUsed.join(", ")}`
+              : "Metered consumption × the published factor"}
+          />
           <div className="overflow-x-auto flex-1">
             <table className="w-full text-sm">
               <thead>
@@ -264,24 +273,27 @@ function LiveInventory({ inv }: { inv: Inventory }) {
                 <th className="table-th">Factor</th>
                 <th className="table-th">Scope</th>
                 <th className="table-th text-right">Value</th>
-                <th className="table-th">Standard</th>
-                <th className="table-th">Region</th>
-                <th className="table-th">Version</th>
+                <th className="table-th">Source</th>
+                <th className="table-th">Geography</th>
+                <th className="table-th">Vintage · grade</th>
               </tr>
             </thead>
             <tbody>
               {inv.factorsApplied.map((f) => (
                 <tr key={f.id} className="border-t border-ink-100">
-                  <td className="table-td font-medium">{f.factor_key ?? f.source_type}</td>
+                  <td className="table-td font-medium">{factorName(f)}</td>
                   <td className="table-td">
                     <Badge tone={f.scope === 1 ? "warn" : f.scope === 2 ? "info" : "neutral"}>
                       {f.scope === 3 && f.category ? `S3 ${f.category.replace("cat", "Cat ")}` : `Scope ${f.scope}`}
                     </Badge>
                   </td>
                   <td className="table-td text-right tabular-nums">{factorLabel(f)}</td>
-                  <td className="table-td text-[12px] text-ink-600">{f.standard ?? "—"}</td>
-                  <td className="table-td text-[12px]">{f.region ?? "GLOBAL"}</td>
-                  <td className="table-td font-mono text-[11px]">{f.version}</td>
+                  <td className="table-td text-[12px] text-ink-600">{f.source_name ?? "—"}</td>
+                  <td className="table-td text-[12px]">{f.geo_code}</td>
+                  <td className="table-td text-[11px]">
+                    {f.factor_year_label ?? f.factor_year ?? "—"}
+                    {f.reliability && <span className="text-ink-400"> · {f.reliability}</span>}
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -308,7 +320,7 @@ function LiveInventory({ inv }: { inv: Inventory }) {
         <Info size={16} className="text-brand-700 mt-0.5 shrink-0" />
         <div className="text-[13px] text-brand-900">
           Utility lines are recalculated from the factor library on every load; activity lines keep the factor applied when they were
-          captured, so a restatement can show both. GWP set is IPCC AR6 (100-year).
+          captured, so a restatement can show both. GWP set is IPCC AR5 (100-year), matching every dataset in the library.
         </div>
       </div>
     </div>

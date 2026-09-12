@@ -70,8 +70,10 @@ export default function PerformanceShell() {
   const { propertyName, propertyId, year } = useTopbar();
   const mode = useDataMode();
   const { properties } = useProperties();
-  const countryCode = properties.find((p) => p.id === propertyId)?.countryCode ?? null;
-  const perf = usePropertyPerformance(propertyId, year, countryCode, mode === "live");
+  const property = properties.find((p) => p.id === propertyId);
+  // The grid or utility is resolved before the country, so a Dubai site gets the DEWA factor.
+  const geo = { gridCode: property?.gridCode ?? null, country: property?.countryCode ?? null };
+  const perf = usePropertyPerformance(propertyId, year, geo, mode === "live");
 
   // Retired pillar links land on energy
   if (!isPillarKey(pillarParam)) return <Navigate to="/performance/energy/overview" replace />;

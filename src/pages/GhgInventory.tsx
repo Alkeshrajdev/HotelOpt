@@ -12,7 +12,7 @@ import { CARBON, PORTFOLIO } from "@/lib/normalise";
 import { useDataMode } from "@/lib/data/mode";
 import { useProperties } from "@/lib/data/properties";
 import { useTopbar } from "@/lib/topbarContext";
-import { factorLabel, fmtT, usePropertyInventory, type Inventory, type InventoryLine } from "@/lib/data/carbon";
+import { factorLabel, factorName, fmtT, usePropertyInventory, type Inventory, type InventoryLine } from "@/lib/data/carbon";
 
 const PERIOD = "FY 2025 (1 Jan – 31 Dec 2025)";
 const BASE_YEAR = 2019;
@@ -54,7 +54,11 @@ export default function GhgInventory() {
   const { propertyId, propertyName, year } = useTopbar();
   const { properties } = useProperties();
   const property = properties.find((p) => p.id === propertyId) ?? null;
-  const inv = usePropertyInventory(propertyId, year, property?.countryCode ?? null, mode === "live");
+  const inv = usePropertyInventory(
+    propertyId, year,
+    { gridCode: property?.gridCode ?? null, country: property?.countryCode ?? null },
+    mode === "live",
+  );
 
   if (mode === "demo") return <DemoGhgInventory />;
 
@@ -104,20 +108,24 @@ function Breadcrumb() {
 /* Live — one property, computed from approved records                  */
 /* =================================================================== */
 
-type Row = { scope: string; source: string; basis: string; tco2e: number; indent?: boolean };
+type Row = { scope: string; source: string; basis: string; tco2e: number; indent?: boolean; gap?: string };
+
+/** Basis in words: what was multiplied by what, and why a line is empty if it is. */
+function basisOf(l: InventoryLine): string {
+  const qty = l.quantity !== null ? ` · ${l.quantity.toLocaleString("en-US")} ${l.quantityUnit} × ${factorLabel(l.factor)}` : "";
+  return `${l.basis}${qty}`;
+}
 
 function inventoryRows(inv: Inventory): Row[] {
   const rows: Row[] = [];
   const push = (scope: string) => (l: InventoryLine) =>
-    rows.push({ scope, source: l.label, basis: `${l.basis}${l.quantity !== null ? ` · ${l.quantity.toLocaleString("en-US")} ${l.quantityUnit} × ${factorLabel(l.factor)}` : ""}`, tco2e: l.tco2e });
+    rows.push({ scope, source: l.label, basis: basisOf(l), tco2e: l.tco2e, gap: l.gap });
   inv.scope1.forEach(push("Scope 1"));
   inv.scope2.forEach(push("Scope 2"));
   inv.scope3.filter((c) => c.tco2e > 0).forEach((c) => {
     rows.push({ scope: "Scope 3", source: c.label, basis: `${c.lines.length} ${c.lines.length === 1 ? "line" : "lines"} of approved activity data`, tco2e: c.tco2e });
     c.lines.forEach((l) => rows.push({
-      scope: "Scope 3", source: l.label, indent: true,
-      basis: `${l.basis}${l.quantity !== null ? ` · ${l.quantity.toLocaleString("en-US")} ${l.quantityUnit} × ${factorLabel(l.factor)}` : ""}`,
-      tco2e: l.tco2e,
+      scope: "Scope 3", source: l.label, indent: true, basis: basisOf(l), tco2e: l.tco2e, gap: l.gap,
     }));
   });
   return rows;
@@ -133,7 +141,7 @@ function exportCsv(inv: Inventory, propertyName: string) {
     ["Reporting period", periodLabel(inv.year)],
     ["Organisational boundary", `${propertyName} · operational control`],
     ["Base year", "Not configured"],
-    ["GWP set", "IPCC AR6, 100-year"],
+    ["GWP set", "IPCC AR5, 100-year"],
     ["Standard", "GHG Protocol Corporate Standard"],
     ["Scope 2 method", "Location-based (market-based not modelled — no contractual instruments recorded)"],
     ["Basis", "Approved records only"],
@@ -143,7 +151,7 @@ function exportCsv(inv: Inventory, propertyName: string) {
   const body = inventoryRows(inv).map((r) => [
     r.scope,
     (r.indent ? "    " : "") + r.source,
-    r.basis,
+    r.gap ? `${r.basis} — ${r.gap}` : r.basis,
     r.tco2e.toFixed(3),
     inv.totals.gross > 0 ? ((r.tco2e / inv.totals.gross) * 100).toFixed(1) : "0",
   ]);
@@ -159,10 +167,10 @@ function exportCsv(inv: Inventory, propertyName: string) {
     ["Categories reported as not applicable", "", "", "", ""],
     ...inv.notApplicable.map((c) => [c.label, c.reason ?? "", "", "", ""]),
     [],
-    ["Factors applied", "Standard", "Version", "Value", "Region"],
+    ["Factors applied", "Source", "Vintage", "Value", "Geography", "Grade"],
     ...inv.factorsApplied.map((f) => [
-      f.factor_key ?? String(f.source_type), f.standard ?? "", f.version,
-      `${f.ef_value} ${f.ef_unit}`, f.region ?? "GLOBAL",
+      factorName(f), f.source_name ?? "", f.factor_year_label ?? String(f.factor_year ?? ""),
+      `${f.value} ${f.unit_numerator}/${f.unit_denominator}`, f.geo_code, f.reliability ?? "",
     ]),
   ];
   csvDownload([...meta, ...body, ...totals], `GHG-Inventory-${propertyName.replace(/\s+/g, "-")}-${inv.year}.csv`);
@@ -170,7 +178,7 @@ function exportCsv(inv: Inventory, propertyName: string) {
 
 function LiveGhgInventory({ inv, propertyName, rooms }: { inv: Inventory; propertyName: string; rooms: number | null }) {
   const rows = inventoryRows(inv);
-  const indicative = inv.factorsApplied.filter((f) => (f.standard ?? "").toLowerCase().includes("indicative"));
+  const indicative = inv.provisionalFactors;
   const fullMonths = inv.coverage.energy.length === 12 && inv.coverage.water.length === 12 && inv.coverage.waste.length === 12;
 
   return (
@@ -183,13 +191,15 @@ function LiveGhgInventory({ inv, propertyName, rooms }: { inv: Inventory; proper
             <MetaRow label="Reporting period" value={periodLabel(inv.year)} />
             <MetaRow label="Organisational boundary" value={rooms ? `${rooms.toLocaleString("en-US")} rooms · operational control` : "Operational control"} />
             <MetaRow label="Base year" value={<span className="text-ink-500">Not configured</span>} />
-            <MetaRow label="GWP set" value="IPCC AR6 · 100-year" />
+            <MetaRow label="GWP set" value="IPCC AR5 · 100-year" />
             <MetaRow label="Scope 2 method" value="Location-based only" />
             <MetaRow label="Offsets" value="None recorded — never netted into gross" />
           </div>
           <div className="mt-auto px-5 py-3 border-t border-ink-100 text-[11px] text-ink-500">
             Every figure is computed from approved records at load time. Submitted-but-unapproved data is excluded
-            {inv.pending.count > 0 ? ` (${inv.pending.count} rows, ${fmtT(inv.pending.tco2e)} tCO₂e held back)` : ""}.
+            {inv.pending.count > 0
+              ? ` (${inv.pending.count} ${inv.pending.count === 1 ? "row" : "rows"}, ${fmtT(inv.pending.tco2e)} tCO₂e held back)`
+              : ""}.
           </div>
         </Card>
 
@@ -211,8 +221,10 @@ function LiveGhgInventory({ inv, propertyName, rooms }: { inv: Inventory; proper
             </div>
             {indicative.length > 0 && (
               <div className="rounded-xl bg-warn/10 border border-warn/30 p-3 text-[11px] text-warn-700 leading-snug">
-                {indicative.length} of {inv.factorsApplied.length} factors applied are marked indicative
-                (spend-based EEIO). Load the client's own dataset before seeking limited assurance on Scope 3.
+                {indicative.length} of the {inv.factorsApplied.length} factors applied are provisional or
+                low-grade: {indicative.map((f) => factorName(f)).slice(0, 3).join(", ")}
+                {indicative.length > 3 ? ` and ${indicative.length - 3} more` : ""}. Resolve these before
+                seeking limited assurance.
               </div>
             )}
           </div>
@@ -246,7 +258,10 @@ function LiveGhgInventory({ inv, propertyName, rooms }: { inv: Inventory; proper
                     )}
                   </td>
                   <td className={r.indent ? "table-td pl-10 text-[12px] text-ink-700" : "table-td font-medium"}>{r.source}</td>
-                  <td className="table-td text-ink-500 text-[12px]">{r.basis}</td>
+                  <td className="table-td text-ink-500 text-[12px]">
+                    {r.basis}
+                    {r.gap && <div className="text-warn-700">{r.gap}</div>}
+                  </td>
                   <td className="table-td text-right tabular-nums">{fmtT(r.tco2e)}</td>
                   <td className="table-td text-right tabular-nums text-ink-500">
                     {((r.tco2e / inv.totals.gross) * 100).toFixed(1)}%
@@ -290,19 +305,21 @@ function LiveGhgInventory({ inv, propertyName, rooms }: { inv: Inventory; proper
                 <tr className="bg-ink-50 text-left">
                   <th className="table-th">Factor</th>
                   <th className="table-th text-right">Value</th>
-                  <th className="table-th">Standard</th>
-                  <th className="table-th">Region</th>
-                  <th className="table-th">Version</th>
+                  <th className="table-th">Source</th>
+                  <th className="table-th">Geography</th>
+                  <th className="table-th">Vintage</th>
+                  <th className="table-th">Grade</th>
                 </tr>
               </thead>
               <tbody>
                 {inv.factorsApplied.map((f) => (
                   <tr key={f.id} className="border-t border-ink-100">
-                    <td className="table-td font-medium">{f.factor_key ?? f.source_type}</td>
+                    <td className="table-td font-medium">{factorName(f)}</td>
                     <td className="table-td text-right tabular-nums">{factorLabel(f)}</td>
-                    <td className="table-td text-ink-600 text-[12px]">{f.standard ?? "—"}</td>
-                    <td className="table-td text-[12px]">{f.region ?? "GLOBAL"}</td>
-                    <td className="table-td font-mono text-[11px]">{f.version}</td>
+                    <td className="table-td text-ink-600 text-[12px]">{f.source_name ?? "—"}</td>
+                    <td className="table-td text-[12px]">{f.geo_code}</td>
+                    <td className="table-td text-[11px]">{f.factor_year_label ?? f.factor_year ?? "—"}</td>
+                    <td className="table-td text-[12px]">{f.reliability ?? "—"}</td>
                   </tr>
                 ))}
               </tbody>

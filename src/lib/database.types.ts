@@ -155,44 +155,162 @@ export type Database = {
         >;
         Relationships: [];
       };
-      ef_library: {
+      ef_datasets: {
         Row: {
-          basis: string | null;
-          category: string | null;
-          client_id: string;
-          created_at: string;
-          ef_unit: string;
-          ef_value: number;
-          factor_key: string | null;
+          citation: string | null;
+          client_id: string | null;
+          gwp_set: string;
           id: string;
-          is_active: boolean;
+          imported_at: string;
+          licence: string | null;
+          name: string;
           notes: string | null;
-          region: string | null;
-          scope: number;
-          source_type: Database["public"]["Enums"]["energy_source"] | null;
-          standard: string | null;
+          precedence: number;
+          publication_year: number | null;
+          publisher: string;
+          source_url: string | null;
           version: string;
-          year: number;
         };
         Insert: {
-          client_id: string;
-          ef_unit: string;
-          ef_value: number;
-          scope: number;
+          gwp_set: string;
+          name: string;
+          publisher: string;
           version: string;
-          year: number;
-          basis?: string | null;
-          category?: string | null;
-          created_at?: string;
-          factor_key?: string | null;
+          citation?: string | null;
+          client_id?: string | null;
           id?: string;
-          is_active?: boolean;
+          imported_at?: string;
+          licence?: string | null;
           notes?: string | null;
-          region?: string | null;
-          source_type?: Database["public"]["Enums"]["energy_source"] | null;
-          standard?: string | null;
+          precedence?: number;
+          publication_year?: number | null;
+          source_url?: string | null;
         };
-        Update: Partial<Database["public"]["Tables"]["ef_library"]["Insert"]>;
+        Update: Partial<Database["public"]["Tables"]["ef_datasets"]["Insert"]>;
+        Relationships: [];
+      };
+      ef_factors: {
+        Row: {
+          activity: string;
+          activity_key: string;
+          boundary: string;
+          boundary_note: string | null;
+          category: string | null;
+          client_id: string | null;
+          created_at: string;
+          dataset_id: string;
+          domain: string;
+          factor_year: number | null;
+          factor_year_label: string | null;
+          gas_basis: string;
+          geo_code: string;
+          geo_kind: string;
+          geo_label: string | null;
+          id: string;
+          is_default: boolean;
+          naics_code: string | null;
+          notes: string | null;
+          reliability: string | null;
+          scope: number;
+          source_name: string | null;
+          source_url: string | null;
+          status: string;
+          subtype: string | null;
+          unit_denominator: string;
+          unit_numerator: string;
+          valid_from: string | null;
+          valid_to: string | null;
+          value: number;
+          value_biogenic: number | null;
+          value_ch4: number | null;
+          value_co2: number | null;
+          value_n2o: number | null;
+          variant: string | null;
+        };
+        Insert: {
+          activity: string;
+          activity_key: string;
+          boundary: string;
+          dataset_id: string;
+          domain: string;
+          scope: number;
+          unit_denominator: string;
+          value: number;
+          boundary_note?: string | null;
+          category?: string | null;
+          client_id?: string | null;
+          created_at?: string;
+          factor_year?: number | null;
+          factor_year_label?: string | null;
+          gas_basis?: string;
+          geo_code?: string;
+          geo_kind?: string;
+          geo_label?: string | null;
+          id?: string;
+          is_default?: boolean;
+          naics_code?: string | null;
+          notes?: string | null;
+          reliability?: string | null;
+          source_name?: string | null;
+          source_url?: string | null;
+          status?: string;
+          subtype?: string | null;
+          unit_numerator?: string;
+          valid_from?: string | null;
+          valid_to?: string | null;
+          value_biogenic?: number | null;
+          value_ch4?: number | null;
+          value_co2?: number | null;
+          value_n2o?: number | null;
+          variant?: string | null;
+        };
+        Update: Partial<Database["public"]["Tables"]["ef_factors"]["Insert"]>;
+        Relationships: [];
+      };
+      ef_unit_conversions: {
+        Row: {
+          basis: string | null;
+          dataset_id: string | null;
+          factor: number;
+          from_unit: string;
+          fuel: string | null;
+          id: string;
+          notes: string | null;
+          to_unit: string;
+          year: number | null;
+        };
+        Insert: {
+          factor: number;
+          from_unit: string;
+          to_unit: string;
+          basis?: string | null;
+          dataset_id?: string | null;
+          fuel?: string | null;
+          id?: string;
+          notes?: string | null;
+          year?: number | null;
+        };
+        Update: Partial<Database["public"]["Tables"]["ef_unit_conversions"]["Insert"]>;
+        Relationships: [];
+      };
+      ef_haul_definitions: {
+        Row: {
+          dataset_id: string;
+          haul: string;
+          id: string;
+          iso3: string | null;
+          origin_note: string;
+          territory: string;
+        };
+        Insert: {
+          dataset_id: string;
+          haul: string;
+          territory: string;
+          id?: string;
+          iso3?: string | null;
+          origin_note?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["ef_haul_definitions"]["Insert"]>;
         Relationships: [];
       };
       emission_activities: {
@@ -274,6 +392,8 @@ export type Database = {
           created_at: string;
           currency: string;
           gfa_m2: number | null;
+          grid_code: string | null;
+          grid_label: string | null;
           id: string;
           latitude: number | null;
           longitude: number | null;
@@ -294,6 +414,8 @@ export type Database = {
           created_at?: string;
           currency?: string;
           gfa_m2?: number | null;
+          grid_code?: string | null;
+          grid_label?: string | null;
           id?: string;
           latitude?: number | null;
           longitude?: number | null;
@@ -360,7 +482,12 @@ export type Database = {
         Relationships: [];
       };
     };
-    Views: { [_ in never]: never };
+    Views: {
+      ef_facets: {
+        Row: { kind: string | null; value: string | null; factors: number | null };
+        Relationships: [];
+      };
+    };
     Functions: { [_ in never]: never };
     Enums: {
       energy_source:

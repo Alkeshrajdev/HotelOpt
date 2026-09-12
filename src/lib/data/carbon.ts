@@ -1,31 +1,34 @@
 /**
  * The GHG inventory for one property and one reporting year (May → April), computed
- * from approved records rather than from constants.
+ * from approved records against the published factor library.
  *
  * Where each line comes from:
- *   Scope 1   natural gas and diesel from `consumption_records`, plus refrigerant
- *             charge/recovery events from `emission_activities` × the gas's GWP.
- *   Scope 2   grid electricity and district cooling, location-based. Market-based is
- *             not modelled — no contractual instruments are recorded anywhere in the
- *             app, so the figure is reported as unavailable instead of invented.
- *   Scope 3   Cat 1 purchases (spend × EEIO) and water supply/treatment · Cat 2 capital
- *             goods · Cat 3 upstream fuel (WTT) and grid T&D losses, derived from the
- *             same energy records · Cat 4 upstream freight · Cat 5 waste by disposal
- *             route · Cat 6 business travel · Cat 7 commuting. Cat 8–15 are listed as
- *             not applicable with the reason, which is itself a disclosure requirement.
+ *   Scope 1   natural gas and diesel from `consumption_records` at the combustion
+ *             boundary, plus refrigerant events from `emission_activities` × GWP.
+ *   Scope 2   grid electricity and district cooling at the location_based boundary,
+ *             resolved against the property's grid or utility before its country.
+ *             Market-based is not modelled — no contractual instruments are recorded
+ *             anywhere in the app, so the figure is reported as unavailable.
+ *   Scope 3   Cat 1 purchases and water supply/treatment · Cat 2 capital goods ·
+ *             Cat 3 the wtt and t_and_d boundaries of the same energy records ·
+ *             Cat 4 upstream freight · Cat 5 waste by material and route · Cat 6
+ *             business travel · Cat 7 commuting. Cat 8–15 are listed as not
+ *             applicable with the reason, which is itself a disclosure requirement.
  *
- * Activity rows carry the factor that was applied at capture (`tco2e` stored on the
- * row), so a restatement can show what was used. Utility lines are recomputed from the
- * library each time, the same as the performance builder.
+ * Two calculation behaviours, deliberately different:
+ *   * Utility lines are recomputed from the library on every load, so correcting a
+ *     factor restates them.
+ *   * Activity lines use the tCO₂e stored on the row with the factor that produced it,
+ *     so the number an approver saw is the number reported.
  */
 import { useEffect, useMemo, useState } from "react";
 import {
-  listActivity, listEmissionActivities, listFactors, listRecords,
-  type ActivityRecord, type EmissionActivity, type EmissionFactor, type RecordWithProperty,
+  listActivity, listEmissionActivities, listFactorSet, listFactorsByIds, listRecords,
+  type ActivityRecord, type EfFactor, type EmissionActivity, type RecordWithProperty,
 } from "@/lib/api";
 import {
-  CATEGORY_LABEL, TD_GRID_KEY, WATER_RETURN_SHARE, WATER_SUPPLY_KEY, WATER_TREATMENT_KEY,
-  findFactor, normUnit, wasteRouteKey, wttKey,
+  CATEGORY_LABEL, ENERGY_SOURCE_FACTOR, WATER_FACTOR, WATER_RETURN_SHARE,
+  WATER_TREATMENT_KEY, geoChain, isProvisional, normUnit, resolveFactor, wasteFactorFor,
 } from "./factors";
 import { reportingYearRange } from "./performance";
 
@@ -41,7 +44,7 @@ export type InventoryLine = {
   quantity: number | null;
   quantityUnit: string | null;
   tco2e: number;
-  factor: EmissionFactor | null;
+  factor: EfFactor | null;
   /** Set when the line is known to exist but could not be calculated. */
   gap?: string;
 };
@@ -77,7 +80,11 @@ export type Inventory = {
   intensityS1S2: number | null;
   intensityGross: number | null;
   orn: number;
-  factorsApplied: EmissionFactor[];
+  factorsApplied: EfFactor[];
+  /** Factors applied that the report must not present without their warning. */
+  provisionalFactors: EfFactor[];
+  /** Which geographies the Scope 2 lines actually resolved to. */
+  geoUsed: string[];
   /** Rows captured but not yet approved — excluded from every figure above. */
   pending: { count: number; tco2e: number };
   /** The approved months themselves (YYYY-MM), so a mid-year gap shows in the right cell. */
@@ -86,7 +93,7 @@ export type Inventory = {
 
 /* ---------------- unit normalisation ---------------- */
 
-/** Energy records reach the factor library in the unit the factor is published in. */
+/** Energy records reach the library in the unit the factor is published in. */
 function energyQty(consumption: number, unit: string): { qty: number; unit: string } {
   const u = normUnit(unit);
   if (u === "mwh") return { qty: consumption * 1000, unit: "kWh" };
@@ -96,7 +103,8 @@ function energyQty(consumption: number, unit: string): { qty: number; unit: stri
   return { qty: consumption, unit: "kWh" };
 }
 const waterM3 = (v: number, unit: string) => (normUnit(unit) === "l" ? v / 1000 : v);
-const wasteKg = (v: number, unit: string) => (normUnit(unit) === "t" ? v * 1000 : v);
+/** Waste factors are published per tonne. */
+const wasteTonnes = (v: number, unit: string) => (normUnit(unit) === "t" ? v : v / 1000);
 
 const ymOf = (d: string) => d.slice(0, 7);
 const inYear = (periodStart: string, year: number) => periodStart >= `${year}-05-01` && periodStart < `${year + 1}-05-01`;
@@ -109,6 +117,12 @@ const ENERGY_LABEL: Record<string, string> = {
   solar_pv: "On-site solar PV",
 };
 const SCOPE2_SOURCES = ["electricity_grid", "district_cooling", "solar_pv"];
+const SCOPE1_SOURCES = ["natural_gas", "diesel"];
+
+const BOUNDARY_WORDS: Record<string, string> = {
+  combustion: "combustion", location_based: "location-based",
+  t_and_d: "transmission & distribution", wtt: "well-to-tank",
+};
 
 /** Cat 8–15: not applicable for a hotel operator under operational control, with the reason. */
 const NOT_APPLICABLE: { category: string; reason: string }[] = [
@@ -131,64 +145,87 @@ function totalsOf(scope1: InventoryLine[], scope2: InventoryLine[], scope3: Cate
   return { scope1: s1, scope2Location: s2, scope2Market: null, scope3: s3, s1s2: s1 + s2, gross: s1 + s2 + s3 };
 }
 
-type YearParts = { scope1: InventoryLine[]; scope2: InventoryLine[]; scope3: CategoryBlock[]; factors: EmissionFactor[] };
+type YearParts = {
+  scope1: InventoryLine[]; scope2: InventoryLine[]; scope3: CategoryBlock[];
+  factors: EfFactor[]; geoUsed: string[];
+};
 
 function buildYear(
   year: number,
   records: RecordWithProperty[],
   activities: EmissionActivity[],
-  factors: EmissionFactor[],
-  country: string | null,
+  factors: EfFactor[],
+  activityFactors: Map<string, EfFactor>,
+  geo: string[],
 ): YearParts {
   const approved = records.filter((r) => r.status === "approved" && inYear(r.period_start, year));
   const acts = activities.filter((a) => a.status === "approved" && inYear(a.period_start, year));
-  const used = new Map<string, EmissionFactor>();
-  const remember = (f: EmissionFactor | null) => { if (f) used.set(f.id, f); return f; };
+  const used = new Map<string, EfFactor>();
+  const geoUsed = new Set<string>();
+  const remember = (f: EfFactor | null | undefined) => { if (f) used.set(f.id, f); return f ?? null; };
 
   const energy = approved.filter((r) => r.pillar === "energy" && r.energy_source);
   const water = approved.filter((r) => r.pillar === "water");
   const waste = approved.filter((r) => r.pillar === "waste");
 
-  /** Sum one energy source, converting every record into the factor's own unit. */
-  function energyLine(source: string, scope: Scope): InventoryLine | null {
+  /** Sum one energy source at one boundary, converting each record into the factor's unit. */
+  function energyLine(
+    source: string,
+    boundary: "location_based" | "combustion" | "wtt" | "t_and_d",
+    opts: { scope: Scope; category: string | null; label: string; basis: string },
+  ): InventoryLine | null {
     const rows = energy.filter((r) => r.energy_source === source);
     if (!rows.length) return null;
+    const map = ENERGY_SOURCE_FACTOR[source];
+    if (!map) return null;
     let kg = 0, qty = 0, unit = "kWh";
-    let factor: EmissionFactor | null = null;
-    let missing = false;
+    let factor: EfFactor | null = null;
+    let missing = 0;
     rows.forEach((r) => {
       const e = energyQty(r.consumption, r.unit);
-      const f = findFactor(factors, { source, unit: e.unit, region: country });
-      if (!f) { missing = true; return; }
-      factor = f; unit = e.unit;
+      const hit = resolveFactor(factors, {
+        domain: map.domain, activityKey: map.activityKey, boundary, unit: e.unit, year, geo,
+      });
+      if (!hit) { missing += 1; return; }
+      factor = hit.factor; unit = e.unit;
+      if (boundary === "location_based") geoUsed.add(hit.why.geo);
       qty += e.qty;
-      kg += e.qty * Number(f.ef_value);
+      kg += e.qty * hit.value;
     });
+    const key = `${boundary}-${source}`;
+    if (!factor) {
+      return {
+        key, scope: opts.scope, category: opts.category, label: opts.label, basis: opts.basis,
+        quantity: null, quantityUnit: null, tco2e: 0, factor: null,
+        gap: `The library has no ${BOUNDARY_WORDS[boundary] ?? boundary} factor for ${ENERGY_LABEL[source] ?? source} at this location.`,
+      };
+    }
     remember(factor);
     return {
-      key: `energy-${source}`, scope, category: null,
-      label: ENERGY_LABEL[source] ?? source,
-      basis: `Metered consumption × ${source === "electricity_grid" ? "grid" : "published"} factor`,
+      key, scope: opts.scope, category: opts.category, label: opts.label, basis: opts.basis,
       quantity: Math.round(qty), quantityUnit: unit, tco2e: kg / 1000, factor,
-      gap: missing ? "Some records are in a unit the library has no factor for and are excluded." : undefined,
+      gap: missing ? `${missing} record(s) are in a unit the library has no factor for and are excluded.` : undefined,
     };
   }
 
-  /** Group activity rows by factor key and sum the tCO₂e stored at capture. */
+  /** Group activity rows by the factor they stored and sum the tCO₂e computed at capture. */
   function activityLines(scope: Scope, category: string | null, keyPrefix: string): InventoryLine[] {
     const rows = acts.filter((a) => a.scope === scope && (a.category ?? null) === category);
     const groups = new Map<string, EmissionActivity[]>();
     rows.forEach((a) => {
-      const k = a.factor_key ?? a.activity_type;
+      const k = a.ef_id ?? a.factor_key ?? a.activity_type;
       groups.set(k, [...(groups.get(k) ?? []), a]);
     });
-    return [...groups.entries()].map(([k, rs]) => {
-      const factor = remember(factors.find((f) => f.id === rs[0].ef_id) ?? null);
+    return [...groups.entries()].map(([gk, rs]) => {
+      const factor = remember(rs[0].ef_id ? activityFactors.get(rs[0].ef_id) : null);
       const tier = rs[0].tier;
       return {
-        key: `${keyPrefix}-${k}`, scope, category,
-        label: rs[0].description ?? k,
-        basis: tier === 3 ? "Spend × EEIO factor (tier 3)" : tier === 2 ? "Activity × product-class average (tier 2)" : "Supplier-specific / measured (tier 1)",
+        key: `${keyPrefix}-${gk}`,
+        scope, category,
+        label: rs[0].description ?? factor?.activity ?? "Activity",
+        basis: tier === 3 ? "Spend × EEIO factor (tier 3)"
+          : tier === 2 ? "Activity × product-class average (tier 2)"
+          : "Supplier-specific / measured (tier 1)",
         quantity: +rs.reduce((s, a) => s + Number(a.quantity), 0).toFixed(1),
         quantityUnit: rs[0].unit,
         tco2e: rs.reduce((s, a) => s + Number(a.tco2e ?? 0), 0),
@@ -198,102 +235,105 @@ function buildYear(
   }
 
   /* Scope 1 — combustion on site plus fugitive refrigerant */
-  const scope1: InventoryLine[] = [
-    energyLine("natural_gas", 1),
-    energyLine("diesel", 1),
-  ].filter((l): l is InventoryLine => l !== null);
+  const scope1: InventoryLine[] = SCOPE1_SOURCES
+    .map((s) => energyLine(s, "combustion", {
+      scope: 1, category: null, label: ENERGY_LABEL[s] ?? s,
+      basis: "Metered consumption × published combustion factor",
+    }))
+    .filter((l): l is InventoryLine => l !== null);
   activityLines(1, null, "fugitive").forEach((l) => {
-    scope1.push({ ...l, label: "Refrigerant released — charged less recovered", basis: "Material balance × GWP (IPCC AR6)" });
+    scope1.push({
+      ...l,
+      label: `Refrigerant released — ${l.factor?.subtype ?? l.factor?.activity ?? "gas"}`,
+      basis: "Charged less recovered × GWP (IPCC AR5)",
+    });
   });
 
   /* Scope 2 — purchased energy, location-based */
   const scope2: InventoryLine[] = SCOPE2_SOURCES
-    .map((s) => energyLine(s, 2))
+    .map((s) => energyLine(s, "location_based", {
+      scope: 2, category: null, label: ENERGY_LABEL[s] ?? s,
+      basis: s === "electricity_grid"
+        ? "Metered consumption × the grid factor for this site"
+        : "Metered consumption × published factor",
+    }))
     .filter((l): l is InventoryLine => l !== null);
 
-  /* Scope 3 */
+  /* Scope 3 · Cat 1 — purchases, plus water as a purchased upstream service */
   const cat1Lines = activityLines(3, "cat1", "purchase");
-  // Water supply and treatment are a purchased upstream service, so they sit in Cat 1.
   const metered = water.filter((r) => {
     const src = String((r.source_payload as Record<string, unknown> | null)?.source ?? "municipal");
-    return src === "municipal" || src === "borewell";
+    return !!WATER_FACTOR[src];
   });
   if (metered.length) {
     const m3 = metered.reduce((s, r) => s + waterM3(r.consumption, r.unit), 0);
-    const supply = remember(findFactor(factors, { key: WATER_SUPPLY_KEY, unit: "m3" }));
-    const treat = remember(findFactor(factors, { key: WATER_TREATMENT_KEY, unit: "m3" }));
+    const supply = resolveFactor(factors, { domain: "water", activityKey: "water_supply", boundary: "lifecycle", unit: "m3", year, geo });
+    const treat = resolveFactor(factors, { domain: "water", activityKey: WATER_TREATMENT_KEY, boundary: "lifecycle", unit: "m3", year, geo });
     if (supply) {
+      remember(supply.factor);
       cat1Lines.push({
         key: "water-supply", scope: 3, category: "cat1", label: "Water supply",
         basis: "Metered supply × supply factor",
         quantity: Math.round(m3), quantityUnit: "m³",
-        tco2e: (m3 * Number(supply.ef_value)) / 1000, factor: supply,
+        tco2e: (m3 * supply.value) / 1000, factor: supply.factor,
       });
     }
     if (treat) {
+      remember(treat.factor);
       cat1Lines.push({
         key: "water-treatment", scope: 3, category: "cat1", label: "Wastewater treatment",
         basis: `${Math.round(WATER_RETURN_SHARE * 100)}% of metered supply × treatment factor`,
         quantity: Math.round(m3 * WATER_RETURN_SHARE), quantityUnit: "m³",
-        tco2e: (m3 * WATER_RETURN_SHARE * Number(treat.ef_value)) / 1000, factor: treat,
+        tco2e: (m3 * WATER_RETURN_SHARE * treat.value) / 1000, factor: treat.factor,
       });
     }
   }
 
-  // Cat 3 — upstream of the fuels and electricity already in Scope 1 and 2.
+  /* Scope 3 · Cat 3 — the wtt and t_and_d boundaries of the energy already counted */
   const cat3Lines: InventoryLine[] = [];
-  ["electricity_grid", "natural_gas", "diesel", "district_cooling"].forEach((source) => {
-    const rows = energy.filter((r) => r.energy_source === source);
-    if (!rows.length) return;
-    let qty = 0, kg = 0, unit = "kWh";
-    let factor: EmissionFactor | null = null;
-    rows.forEach((r) => {
-      const e = energyQty(r.consumption, r.unit);
-      const f = findFactor(factors, { key: wttKey(source), unit: e.unit });
-      if (!f) return;
-      factor = f; unit = e.unit; qty += e.qty; kg += e.qty * Number(f.ef_value);
-    });
-    if (!factor) return;
-    remember(factor);
-    cat3Lines.push({
-      key: `wtt-${source}`, scope: 3, category: "cat3",
-      // Drop the source's own qualifier so the line does not read "gas — boilers & kitchen — well-to-tank".
+  [...SCOPE1_SOURCES, "electricity_grid", "district_cooling"].forEach((source) => {
+    const line = energyLine(source, "wtt", {
+      scope: 3, category: "cat3",
       label: `${(ENERGY_LABEL[source] ?? source).replace(/ — .*$/, "")} — well-to-tank`,
       basis: "Same consumption × upstream factor",
-      quantity: Math.round(qty), quantityUnit: unit, tco2e: kg / 1000, factor,
     });
+    if (line && (line.tco2e > 0 || line.gap)) cat3Lines.push(line);
   });
-  const gridRows = energy.filter((r) => r.energy_source === "electricity_grid");
-  if (gridRows.length) {
-    const kWh = gridRows.reduce((s, r) => s + energyQty(r.consumption, r.unit).qty, 0);
-    const td = remember(findFactor(factors, { key: TD_GRID_KEY, unit: "kWh" }));
-    if (td) {
-      cat3Lines.push({
-        key: "td-grid", scope: 3, category: "cat3",
-        label: "Grid transmission & distribution losses",
-        basis: "Purchased electricity × T&D loss factor",
-        quantity: Math.round(kWh), quantityUnit: "kWh", tco2e: (kWh * Number(td.ef_value)) / 1000, factor: td,
-      });
-    }
-  }
+  const td = energyLine("electricity_grid", "t_and_d", {
+    scope: 3, category: "cat3", label: "Grid transmission & distribution losses",
+    basis: "Purchased electricity × T&D loss factor",
+  });
+  if (td && (td.tco2e > 0 || td.gap)) cat3Lines.push(td);
 
-  // Cat 5 — waste by disposal route.
-  const routes = new Map<string, RecordWithProperty[]>();
+  /* Scope 3 · Cat 5 — waste by material and route */
+  const buckets = new Map<string, RecordWithProperty[]>();
   waste.forEach((r) => {
-    const route = String((r.source_payload as Record<string, unknown> | null)?.route ?? "landfill");
-    routes.set(route, [...(routes.get(route) ?? []), r]);
+    const p = (r.source_payload as Record<string, unknown> | null) ?? {};
+    const bucket = `${String(p.stream ?? "mixed")}|${String(p.route ?? "landfill")}`;
+    buckets.set(bucket, [...(buckets.get(bucket) ?? []), r]);
   });
-  const cat5Lines: InventoryLine[] = [...routes.entries()].map(([route, rows]) => {
-    const kg = rows.reduce((s, r) => s + wasteKg(r.consumption, r.unit), 0);
-    const factor = remember(findFactor(factors, { key: wasteRouteKey(route), unit: "kg" }));
+  const cat5Lines: InventoryLine[] = [...buckets.entries()].map(([bucket, rows]) => {
+    const [stream, route] = bucket.split("|");
+    const t = rows.reduce((s, r) => s + wasteTonnes(r.consumption, r.unit), 0);
+    const target = wasteFactorFor(stream, route);
+    const hit = target
+      ? resolveFactor(factors, {
+        domain: "waste", activityKey: target.activityKey, boundary: "disposal",
+        unit: "t", year, geo, variant: target.variant,
+      })
+      : null;
+    if (hit) remember(hit.factor);
+    const routeLabel = route === "incineration" ? "energy recovery" : route;
     return {
-      key: `waste-${route}`, scope: 3 as Scope, category: "cat5",
-      label: `Waste — ${route === "incineration" ? "energy recovery" : route}`,
-      basis: "Collected mass × route factor",
-      quantity: +(kg / 1000).toFixed(1), quantityUnit: "t",
-      tco2e: factor ? (kg * Number(factor.ef_value)) / 1000 : 0,
-      factor,
-      gap: factor ? undefined : `No factor in the library for the ${route} route.`,
+      key: `waste-${stream}-${route}`, scope: 3 as Scope, category: "cat5",
+      label: `${hit?.factor.subtype ?? stream} — ${routeLabel}`,
+      basis: "Collected mass × the factor for that material and route",
+      quantity: +t.toFixed(1), quantityUnit: "t",
+      tco2e: hit ? (t * hit.value) / 1000 : 0,
+      factor: hit?.factor ?? null,
+      gap: hit
+        ? undefined
+        : `The library publishes no factor for ${stream} waste sent to ${routeLabel}. Capture the material to calculate it.`,
     };
   }).sort((a, b) => b.tco2e - a.tco2e);
 
@@ -314,7 +354,7 @@ function buildYear(
     reason: lines.length ? undefined : "No approved activity data for this category in the reporting year.",
   }));
 
-  return { scope1, scope2, scope3: blocks, factors: [...used.values()] };
+  return { scope1, scope2, scope3: blocks, factors: [...used.values()], geoUsed: [...geoUsed] };
 }
 
 export function buildInventory(
@@ -322,11 +362,13 @@ export function buildInventory(
   records: RecordWithProperty[],
   activities: EmissionActivity[],
   activityRecords: ActivityRecord[],
-  factors: EmissionFactor[],
-  country: string | null,
+  factors: EfFactor[],
+  activityFactors: EfFactor[],
+  geo: string[],
 ): Inventory {
-  const current = buildYear(year, records, activities, factors, country);
-  const previous = buildYear(year - 1, records, activities, factors, country);
+  const byId = new Map(activityFactors.map((f) => [f.id, f]));
+  const current = buildYear(year, records, activities, factors, byId, geo);
+  const previous = buildYear(year - 1, records, activities, factors, byId, geo);
 
   const totals = totalsOf(current.scope1, current.scope2, current.scope3);
   const priorTotals = totalsOf(previous.scope1, previous.scope2, previous.scope3);
@@ -345,6 +387,11 @@ export function buildInventory(
         .map((r) => ymOf(r.period_start)),
     )].sort();
 
+  const applied = current.factors.sort(
+    (a, b) => a.scope - b.scope
+      || (a.category ?? "").localeCompare(b.category ?? "")
+      || a.activity.localeCompare(b.activity));
+
   return {
     year,
     scope1: current.scope1,
@@ -359,7 +406,9 @@ export function buildInventory(
     intensityS1S2: orn > 0 ? (totals.s1s2 * 1000) / orn : null,
     intensityGross: orn > 0 ? (totals.gross * 1000) / orn : null,
     orn,
-    factorsApplied: current.factors.sort((a, b) => a.scope - b.scope || (a.category ?? "").localeCompare(b.category ?? "")),
+    factorsApplied: applied,
+    provisionalFactors: applied.filter(isProvisional),
+    geoUsed: current.geoUsed,
     pending: { count: pendingRows.length, tco2e: pendingRows.reduce((s, a) => s + Number(a.tco2e ?? 0), 0) },
     coverage: {
       energy: monthsWith("energy"),
@@ -378,37 +427,69 @@ export function reportingYearMonths(year: number): { ym: string; month: number }
   }));
 }
 
+/** The library slice the inventory needs: this site's utility factors, every boundary. */
+const INVENTORY_DOMAINS = ["electricity", "fuel", "heat", "water", "waste"];
+const INVENTORY_BOUNDARIES = ["location_based", "combustion", "wtt", "t_and_d", "lifecycle", "disposal"];
+
 /** Loads the reporting year and the one before it for one property. */
-export function usePropertyInventory(propertyId: string | null, year: number, country: string | null, enabled: boolean) {
+export function usePropertyInventory(
+  propertyId: string | null,
+  year: number,
+  geo: { gridCode?: string | null; country?: string | null },
+  enabled: boolean,
+) {
   const [state, setState] = useState<{ loading: boolean; error: string | null; data: Inventory | null }>({
     loading: enabled, error: null, data: null,
   });
+  const chainKey = `${geo.gridCode ?? ""}|${geo.country ?? ""}`;
   useEffect(() => {
     if (!enabled || !propertyId) { setState({ loading: false, error: null, data: null }); return; }
     let cancelled = false;
     setState((s) => ({ ...s, loading: true }));
     const { from } = reportingYearRange(year - 1);
     const { to } = reportingYearRange(year);
+    const chain = geoChain(geo.gridCode, geo.country);
+
     Promise.all([
       listRecords({ propertyId, from, to, status: "approved", limit: 3000, orderBy: "period_start" }),
       listEmissionActivities({ propertyId, from, to, status: ["approved", "submitted"] }),
       listActivity({ propertyId, from, to }),
-      listFactors(),
+      listFactorSet({ domains: INVENTORY_DOMAINS, geoCodes: chain, boundaries: INVENTORY_BOUNDARIES }),
     ])
-      .then(([records, activities, activityRecords, factors]) => {
+      .then(async ([records, activities, activityRecords, factors]) => {
         if (cancelled) return;
-        setState({ loading: false, error: null, data: buildInventory(year, records, activities, activityRecords, factors, country) });
+        // Activity rows keep the factor they were calculated with; fetch exactly those.
+        const activityFactors = await listFactorsByIds(
+          activities.map((a) => a.ef_id).filter((id): id is string => !!id),
+        );
+        if (cancelled) return;
+        setState({
+          loading: false, error: null,
+          data: buildInventory(year, records, activities, activityRecords, factors, activityFactors, chain),
+        });
       })
       .catch((e: Error) => { if (!cancelled) setState({ loading: false, error: e.message, data: null }); });
     return () => { cancelled = true; };
-  }, [propertyId, year, country, enabled]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [propertyId, year, chainKey, enabled]);
   return useMemo(() => state, [state]);
 }
 
 /* ---------------- formatting helpers shared by the two views ---------------- */
 
 export const fmtT = (n: number) => (n >= 100 ? Math.round(n).toLocaleString("en-US") : n.toFixed(1));
-export const factorLabel = (f: EmissionFactor | null) =>
-  f ? `${Number(f.ef_value).toLocaleString("en-US", { maximumFractionDigits: 4 })} ${f.ef_unit.replace("CO2e", "CO₂e")}` : "—";
+
+export const factorLabel = (f: EfFactor | null | undefined) =>
+  f
+    ? `${Number(f.value).toLocaleString("en-US", { maximumFractionDigits: 5 })} ${f.unit_numerator.replace("CO2e", "CO₂e")}/${f.unit_denominator}`
+    : "—";
+
+/** The factor's own name, for the provenance table. */
+export const factorName = (f: EfFactor | null | undefined) =>
+  f
+    ? (f.subtype && f.subtype !== f.activity ? `${f.activity} — ${f.subtype}` : f.activity)
+      + (f.variant ? ` (${f.variant.replace(/_/g, " ")})` : "")
+    : "—";
+
 export const deltaPct = (now: number, before: number | null | undefined) =>
   before && before > 0 ? +(((now - before) / before) * 100).toFixed(1) : 0;

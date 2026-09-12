@@ -56,7 +56,7 @@ const ADMIN: AdminGroup[] = [
     group: "Configuration",
     tiles: [
       { to: "/admin/property-config", label: "Property configuration", body: "Defaults, GP baseline year per property, enabled pillars, certification programmes.", icon: Layers,    iconBg: "bg-ink-100 text-ink-600" },
-      { to: "/admin/ef-library",      label: "Emission factor library", body: "Versioned EFs by region/year. Audit-logged updates. EEIO + IPCC AR6.",                icon: Database,  iconBg: "bg-ink-100 text-ink-600",       live: true },
+      { to: "/admin/ef-library",      label: "Emission factor library", body: "Published factor sets by geography, boundary and year. DEFRA, EPA eGRID, USEEIO, grid overrides.",                icon: Database,  iconBg: "bg-ink-100 text-ink-600",       live: true },
       { to: "/admin/gp-config",       label: "GP configuration",         body: "Composite weights, normalisation parameters, baseline-year rules.",                  icon: Sparkles,  iconBg: "bg-ink-100 text-ink-600" },
       { to: "/admin/pools",           label: "Comparable pools",         body: "Pool isolation per client. Filter rules: climate, star rating, size band.",          icon: Globe2,    iconBg: "bg-ink-100 text-ink-600",         live: true },
       { to: "/admin/qr",              label: "QR management",            body: "Print sheets, point assignments, deactivation, scan analytics.",                       icon: Boxes,     iconBg: "bg-ink-100 text-ink-600" },

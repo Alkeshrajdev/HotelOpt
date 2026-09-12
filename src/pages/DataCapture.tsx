@@ -52,12 +52,13 @@ import {
   type FieldDef,
   type Method,
 } from "@/lib/dataCaptureConfig";
-import { createEmissionActivity, createRecord, listFactors, uploadEvidence, upsertActivity } from "@/lib/api";
+import { createEmissionActivity, createRecord, listFactorCandidates, uploadEvidence, upsertActivity } from "@/lib/api";
 import {
-  findFactor, purchaseFactorKey, refrigerantKey, toFactorUnit, travelModeKey,
+  TRAVEL_MODE_FACTOR, geoChain, naicsKey, refrigerantKey, resolveFactor,
 } from "@/lib/data/factors";
 import { anomalyFlagsFor } from "@/lib/data/records";
 import { useProperties, type PropertyLite as Property } from "@/lib/data/properties";
+import { reportingYearOf } from "@/lib/data/performance";
 import { useDataMode } from "@/lib/data/mode";
 import { useTopbar } from "@/lib/topbarContext";
 import { cn } from "@/lib/utils";
@@ -145,10 +146,10 @@ function validateOccupancy(values: Record<string, string>): Record<string, strin
 
 /**
  * Scope 1 fugitive and Scope 3 activity capture — purchases, travel/commute and
- * refrigerant events. The factor is resolved here so the stored row carries the value
- * that produced its tCO2e and a restatement can show what was applied. When the library
- * has no factor for the activity, the submission is refused with the reason rather than
- * stored as an uncalculated row.
+ * refrigerant events. The factor is resolved from the published library here, so the
+ * stored row carries the value that produced its tCO2e and a restatement can show what
+ * was applied. When the library has nothing for the activity, the submission is refused
+ * with the reason rather than stored as an uncalculated row.
  *
  * Returns an error message, or null on success.
  */
@@ -156,15 +157,26 @@ async function submitEmissionActivity(opts: {
   key: DataTypeKey;
   values: Record<string, string>;
   propertyId: string;
+  geo: { gridCode?: string | null; country?: string | null };
+  year: number;
   start: string;
   end: string;
   files: File[];
   method: Method;
   anomalyFlags: Record<string, unknown>[];
 }): Promise<string | null> {
-  const { key, values: v, propertyId, start, end, files, method, anomalyFlags } = opts;
+  const { key, values: v, propertyId, geo, year, start, end, files, method, anomalyFlags } = opts;
   const num = (k: string) => (v[k] !== undefined && v[k] !== "" ? parseFloat(v[k]) : null);
-  const factors = await listFactors();
+  const chain = geoChain(geo.gridCode, geo.country);
+
+  /** One narrow query per capture, then the same resolution the inventory uses. */
+  async function resolve(domain: string, activityKey: string, boundary: "gwp" | "lifecycle" | "combustion", unit: string, variant?: string | null) {
+    const candidates = await listFactorCandidates({
+      domain, activityKey, boundary,
+      geoCodes: [...chain, "US"], // USEEIO spend factors are filed under the US economy
+    });
+    return resolveFactor(candidates, { domain, activityKey, boundary, unit, year, geo: [...chain, "US"], variant });
+  }
 
   const evidence = await Promise.all(files.map((f) => uploadEvidence(propertyId, f)));
   const withEvidence = (detail: Record<string, unknown>) =>
@@ -178,18 +190,20 @@ async function submitEmissionActivity(opts: {
     if (released <= 0) {
       return "Recovered is not less than charged, so nothing was released. Record the service visit in Ops events instead — a zero-emission line would only add noise to the inventory.";
     }
-    const factor = findFactor(factors, { key: refrigerantKey(gas), unit: "kg" });
-    if (!factor) return `No GWP on file for ${gas || "this refrigerant"}. Ask the platform admin to add it to the factor library, then resubmit.`;
+    const hit = await resolve("refrigerant", refrigerantKey(gas), "gwp", "kg");
+    if (!hit) return `No GWP on file for ${gas || "this refrigerant"}. Ask the platform admin to add it to the factor library, then resubmit.`;
     await createEmissionActivity({
       property_id: propertyId, scope: 1, category: null, activity_type: "refrigerant",
-      factor_key: factor.factor_key, description: `Refrigerant released — ${gas}`,
+      factor_key: hit.factor.activity_key, description: `Refrigerant released — ${gas}`,
       period_start: start, period_end: end, quantity: released, unit: "kg", tier: 1,
-      ef_id: factor.id, ef_value: factor.ef_value, ef_unit: factor.ef_unit,
-      tco2e: (released * Number(factor.ef_value)) / 1000,
+      ef_id: hit.factor.id, ef_value: hit.value,
+      ef_unit: `${hit.factor.unit_numerator}/${hit.factor.unit_denominator}`,
+      tco2e: (released * hit.value) / 1000,
       notes: v["notes"] || null,
       source_payload: withEvidence({
         charged, recovered, equipmentType: v["equipmentType"] ?? null, date: v["date"] ?? null,
         method: "Simplified material balance: charged minus recovered.",
+        factor: { name: hit.factor.activity, source: hit.factor.source_name, vintage: hit.factor.factor_year_label },
       }),
       anomaly_flags: anomalyFlags, input_method: method, submit: true,
     });
@@ -200,28 +214,29 @@ async function submitEmissionActivity(opts: {
     const category = v["category"] ?? "cat1";
     const unit = v["unit"] ?? "USD";
     const amount = num("amount");
+    const naics = v["commodity"];
     if (amount === null || amount <= 0) return "Enter the amount purchased.";
-    const pick = purchaseFactorKey({ category, unit, description: v["description"] ?? v["vendor"] });
-    if (!pick) {
-      return `The library has no factor for ${category.toUpperCase()} measured in ${unit}. Spend-based factors are USD-denominated; enter the amount in USD, or capture the purchase by mass (kg / tonnes).`;
+    if (!naics) return "Choose what was bought — it selects the spend-based factor.";
+    if (unit !== "USD") {
+      return `The spend-based factors are denominated in 2022 USD, and nothing in the app converts ${unit} to it. Enter the amount in USD, or capture this purchase by mass against a product factor.`;
     }
-    const conv = toFactorUnit(amount, unit);
-    const factor = findFactor(factors, { key: pick.key, unit: conv.unit });
-    if (!factor) return `No ${pick.key} factor in the library for ${conv.unit}. Ask the platform admin to load it, then resubmit.`;
+    const hit = await resolve("spend", naicsKey(naics), "lifecycle", "USD");
+    if (!hit) return `No spend factor in the library for NAICS ${naics}. Ask the platform admin to load it, then resubmit.`;
     await createEmissionActivity({
       property_id: propertyId, scope: 3, category,
       activity_type: category === "cat2" ? "capital" : category === "cat4" ? "upstream_transport" : "purchase",
-      factor_key: factor.factor_key,
-      description: v["description"] || v["vendor"] || "Purchase",
+      factor_key: hit.factor.activity_key,
+      description: v["description"] || v["vendor"] || hit.factor.activity,
       vendor: v["vendor"] || null,
-      period_start: start, period_end: end, quantity: conv.quantity, unit: conv.unit,
-      tier: v["tier"] ? Number(v["tier"]) : null,
-      ef_id: factor.id, ef_value: factor.ef_value, ef_unit: factor.ef_unit,
-      tco2e: (conv.quantity * Number(factor.ef_value)) / 1000,
+      period_start: start, period_end: end, quantity: amount, unit: "USD",
+      tier: v["tier"] ? Number(v["tier"]) : 3,
+      ef_id: hit.factor.id, ef_value: hit.value,
+      ef_unit: `${hit.factor.unit_numerator}/${hit.factor.unit_denominator}`,
+      tco2e: (amount * hit.value) / 1000,
       invoice_ref: v["invoiceRef"] || null, notes: v["notes"] || null,
       source_payload: withEvidence({
-        enteredAmount: amount, enteredUnit: unit, factorKey: pick.key,
-        method: pick.note ?? "Spend x EEIO factor.",
+        naics, method: "Spend x EEIO factor (USEEIO, purchaser price).",
+        factor: { name: hit.factor.activity, source: hit.factor.source_name, vintage: hit.factor.factor_year_label },
       }),
       anomaly_flags: anomalyFlags, input_method: method, submit: true,
     });
@@ -233,29 +248,34 @@ async function submitEmissionActivity(opts: {
   const travelMode = v["mode"] ?? "";
   const unit = v["unit"] ?? "pkm";
   const distance = num("distance");
-  if (distance === null || distance <= 0) {
-    return "Enter the distance travelled in passenger-km. A mode alone cannot be converted to emissions.";
-  }
+  const map = TRAVEL_MODE_FACTOR[travelMode];
+  if (!map) return `No factor mapping for ${travelMode || "this mode"}.`;
   if (unit === "trips") {
     return "Trips cannot be converted without a distance. Enter passenger-km, or record nights for a hotel stay.";
   }
-  const conv = toFactorUnit(distance, unit);
-  const factor = findFactor(factors, { key: travelModeKey(travelMode), unit: conv.unit });
-  if (!factor) {
-    return `No factor in the library for ${travelMode || "this mode"} measured in ${conv.unit}. Ask the platform admin to load it, then resubmit.`;
+  if (distance === null || distance <= 0) {
+    return map.unit === "night"
+      ? "Enter the number of nights."
+      : `Enter the distance travelled in ${map.unit}. A mode alone cannot be converted to emissions.`;
+  }
+  const hit = await resolve("travel", map.activityKey, map.unit === "night" ? "lifecycle" : "combustion", map.unit, map.variant);
+  if (!hit) {
+    return `No factor in the library for ${travelMode} measured in ${map.unit}. Ask the platform admin to load it, then resubmit.`;
   }
   await createEmissionActivity({
     property_id: propertyId, scope: 3, category,
     activity_type: category === "cat7" ? "commute" : "business_travel",
-    factor_key: factor.factor_key,
+    factor_key: hit.factor.activity_key,
     description: `${category === "cat7" ? "Employee commuting" : "Business travel"} — ${travelMode}`,
-    period_start: start, period_end: end, quantity: conv.quantity, unit: conv.unit, tier: 2,
-    ef_id: factor.id, ef_value: factor.ef_value, ef_unit: factor.ef_unit,
-    tco2e: (conv.quantity * Number(factor.ef_value)) / 1000,
+    period_start: start, period_end: end, quantity: distance, unit: map.unit, tier: 2,
+    ef_id: hit.factor.id, ef_value: hit.value,
+    ef_unit: `${hit.factor.unit_numerator}/${hit.factor.unit_denominator}`,
+    tco2e: (distance * hit.value) / 1000,
     notes: v["notes"] || null,
     source_payload: withEvidence({
       mode: travelMode, headcount: num("headcount"), enteredUnit: unit,
-      method: "Distance x mode factor (tier 2).",
+      method: `Distance x mode factor. ${map.unit === "km" ? "Car factors are per vehicle-km, not passenger-km." : ""}`.trim(),
+      factor: { name: hit.factor.activity, source: hit.factor.source_name, vintage: hit.factor.factor_year_label },
     }),
     anomaly_flags: anomalyFlags, input_method: method, submit: true,
   });
@@ -268,6 +288,7 @@ async function submitEmissionActivity(opts: {
 
 export default function DataCapture() {
   const mode = useDataMode();
+  const { properties } = useProperties();
   const [step, setStep] = useState<Step>(1);
   const [dataType, setDataType] = useState<DataTypeKey | null>(null);
   const [method, setMethod] = useState<Method | null>(null);
@@ -337,9 +358,12 @@ export default function DataCapture() {
             notes: v["notes"] || null, submit: true,
           });
         } else if (activityType) {
+          const prop = properties.find((p) => p.id === capture.propertyId);
           const problem = await submitEmissionActivity({
-            key: cfg.key, values: v, propertyId: capture.propertyId, start, end,
-            files: capture.files, method: method ?? "manual",
+            key: cfg.key, values: v, propertyId: capture.propertyId,
+            geo: { gridCode: prop?.gridCode ?? null, country: prop?.countryCode ?? null },
+            year: reportingYearOf(start),
+            start, end, files: capture.files, method: method ?? "manual",
             anomalyFlags: anomalyFlagsFor(capture.anomalies),
           });
           if (problem) { setSubmitError(problem); return; }

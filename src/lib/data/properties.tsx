@@ -11,6 +11,8 @@ import { useDataMode, type DataMode } from "./mode";
 export type PropertyLite = {
   id: string; name: string; shortName: string; region: string; country: string; countryCode: string | null; city: string;
   type: string; brand: string; rooms: number; gfa: number; currency: string; timezone: string; status: string;
+  /** Sub-national grid or utility this site buys electricity from; resolved before the country factor. */
+  gridCode: string | null; gridLabel: string | null;
 };
 
 const COUNTRY_NAME: Record<string, string> = {
@@ -74,9 +76,16 @@ export function toRich(row: Property): RichProperty {
   };
 }
 
-const lite = (p: RichProperty, shortName?: string | null, type?: string | null, countryCode: string | null = null): PropertyLite => ({
+const lite = (
+  p: RichProperty,
+  shortName?: string | null,
+  type?: string | null,
+  countryCode: string | null = null,
+  grid: { code?: string | null; label?: string | null } = {},
+): PropertyLite => ({
   id: p.id, name: p.name, shortName: shortName ?? p.name, region: p.region, country: p.country, countryCode, city: p.city,
   type: type ?? p.operationType, brand: p.brand, rooms: p.rooms, gfa: p.gfa, currency: p.currency, timezone: p.timezone, status: p.status,
+  gridCode: grid.code ?? null, gridLabel: grid.label ?? null,
 });
 
 type Ctx = {
@@ -116,7 +125,7 @@ export function PropertiesProvider({ children }: { children: ReactNode }) {
   const value = useMemo<Ctx>(() => {
     const rich: RichProperty[] = mode === "live" ? (rows ?? []).map(toRich) : PROPERTIES;
     const properties: PropertyLite[] = mode === "live"
-      ? (rows ?? []).map((r) => lite(toRich(r), r.short_name, r.type, r.country))
+      ? (rows ?? []).map((r) => lite(toRich(r), r.short_name, r.type, r.country, { code: r.grid_code, label: r.grid_label }))
       : PROPERTIES.map((p) => lite(p));
     return {
       mode, loading: mode === "live" && loading, error, properties, rich,

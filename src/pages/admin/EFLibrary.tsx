@@ -1,196 +1,289 @@
 import { useEffect, useMemo, useState } from "react";
-import { History, Plus, Search, Upload } from "lucide-react";
+import { Database, Plus, Search, Upload } from "lucide-react";
 import { Card, CardHeader } from "@/components/ui/Card";
 import StatTile from "@/components/ui/StatTile";
 import Badge from "@/components/ui/Badge";
 import EmptyState from "@/components/ui/EmptyState";
 import AdminShell from "./AdminShell";
 import { useDataMode } from "@/lib/data/mode";
-import { listEFs, type EmissionFactor } from "@/lib/api";
+import {
+  factorFacets, listFactorDatasets, queryFactors, type EfDataset, type EfFacet, type EfFactor,
+} from "@/lib/api";
+import { factorLabel, factorName } from "@/lib/data/carbon";
+import { isProvisional } from "@/lib/data/factors";
 
-type EfRow = {
-  id: string;
-  source: string;
-  region: string;
-  year: number;
-  version: string;
-  value: number;
-  unit: string;
-  scope: string;
-  origin: string;
-  active: boolean;
-  versions: number;
+const PAGE = 100;
+
+const BOUNDARY_LABEL: Record<string, string> = {
+  combustion: "Combustion",
+  location_based: "Scope 2 — location",
+  market_based: "Scope 2 — market",
+  t_and_d: "T&D losses",
+  wtt: "Well-to-tank",
+  disposal: "Waste route",
+  gwp: "GWP",
+  lifecycle: "Cradle-to-gate",
+  out_of_scope: "Outside scopes",
 };
 
-// Demo rows — shown only when there is no live session.
-const DEMO_EFS: EfRow[] = [
-  { id: "ef-001", source: "Grid electricity",       region: "AE",     year: 2026, version: "2026-Q2",  value: 0.418, unit: "kgCO₂e/kWh", scope: "Scope 2", origin: "DEFRA", active: true,  versions: 4 },
-  { id: "ef-002", source: "Grid electricity",       region: "ID",     year: 2026, version: "2026-Q2",  value: 0.770, unit: "kgCO₂e/kWh", scope: "Scope 2", origin: "ESDM",  active: true,  versions: 3 },
-  { id: "ef-003", source: "Grid electricity",       region: "CA-BC", year: 2026, version: "2026-Q2",  value: 0.012, unit: "kgCO₂e/kWh", scope: "Scope 2", origin: "ECCC",  active: true,  versions: 5 },
-  { id: "ef-004", source: "Natural gas",             region: "Global",year: 2026, version: "IPCC AR6", value: 2.020, unit: "kgCO₂e/m³",   scope: "Scope 1", origin: "IPCC",  active: true,  versions: 2 },
-  { id: "ef-005", source: "Diesel",                  region: "Global",year: 2026, version: "IPCC AR6", value: 2.680, unit: "kgCO₂e/L",    scope: "Scope 1", origin: "IPCC",  active: true,  versions: 2 },
-  { id: "ef-006", source: "R-410A refrigerant",     region: "Global",year: 2026, version: "IPCC AR6", value: 2088,  unit: "GWP",         scope: "Scope 1", origin: "IPCC",  active: true,  versions: 1 },
-  { id: "ef-007", source: "Linen laundry — supplier",region: "IT",    year: 2026, version: "Supplier 2026", value: 0.92, unit: "kgCO₂e/kg", scope: "Scope 3 Cat 1", origin: "Aurora Linens Co.", active: true, versions: 2 },
-  { id: "ef-008", source: "Grid electricity",       region: "AE",     year: 2025, version: "2025-Q4",  value: 0.432, unit: "kgCO₂e/kWh", scope: "Scope 2", origin: "DEFRA", active: false, versions: 4 },
-];
-
-const SOURCE_LABEL: Record<string, string> = {
-  electricity_grid: "Grid electricity", natural_gas: "Natural gas", district_cooling: "District cooling", diesel: "Diesel", solar_pv: "Solar PV (on-site)",
+const DOMAIN_LABEL: Record<string, string> = {
+  electricity: "Electricity", fuel: "Fuels", bioenergy: "Bioenergy", heat: "Heat & steam",
+  refrigerant: "Refrigerants", water: "Water", waste: "Waste", material: "Materials",
+  travel: "Travel", freight: "Freight", vehicle: "Owned vehicles", hotel_stay: "Hotel stays",
+  homeworking: "Homeworking", spend: "Spend (EEIO)", other: "Other",
 };
-/** Scope 3 rows show the category too, so "Scope 3 Cat 5" filters as its own bucket. */
-function scopeLabel(r: EmissionFactor): string {
-  if (r.scope === 3) return r.category ? `Scope 3 ${r.category.replace(/^cat/, "Cat ")}` : "Scope 3";
-  return `Scope ${r.scope}`;
-}
 
-/** Library rows → table rows. "Versions" counts every row for the same source × region. */
-function fromDb(rows: EmissionFactor[]): EfRow[] {
-  const perKey = new Map<string, number>();
-  const keyOf = (r: EmissionFactor) => `${r.factor_key ?? r.source_type}|${r.region ?? "GLOBAL"}`;
-  rows.forEach((r) => perKey.set(keyOf(r), (perKey.get(keyOf(r)) ?? 0) + 1));
-  return rows.map((r) => ({
-    id: r.id,
-    source: r.factor_key ?? SOURCE_LABEL[r.source_type ?? ""] ?? String(r.source_type),
-    region: r.region ?? "GLOBAL",
-    year: r.year,
-    version: r.version,
-    value: Number(r.ef_value),
-    unit: r.ef_unit.replace("CO2e", "CO₂e"),
-    scope: scopeLabel(r),
-    origin: r.standard ?? (r.version.toUpperCase().startsWith("IPCC") ? "IPCC" : "Hotel Optimizer library"),
-    active: r.is_active,
-    versions: perKey.get(keyOf(r)) ?? 1,
-  }));
-}
+const scopeLabel = (f: EfFactor) =>
+  f.scope === 3 && f.category ? `S3 ${f.category.replace("cat", "Cat ")}` : `Scope ${f.scope}`;
+
+/* =================================================================== */
 
 export default function AdminEFLibrary() {
   const mode = useDataMode();
-  const [rows, setRows] = useState<EfRow[]>(mode === "live" ? [] : DEMO_EFS);
-  const [loading, setLoading] = useState(mode === "live");
+  const live = mode === "live";
+
+  const [datasets, setDatasets] = useState<EfDataset[]>([]);
+  const [facets, setFacets] = useState<{ domains: EfFacet[]; boundaries: EfFacet[]; geoCodes: EfFacet[] }>({
+    domains: [], boundaries: [], geoCodes: [],
+  });
+  const [rows, setRows] = useState<EfFactor[]>([]);
+  const [total, setTotal] = useState(0);
+  const [page, setPage] = useState(0);
+  const [loading, setLoading] = useState(live);
   const [error, setError] = useState<string | null>(null);
-  const [search, setSearch] = useState("");
-  const [scope, setScope] = useState("all");
-  const [region, setRegion] = useState("all");
-  const [status, setStatus] = useState<"active" | "all" | "archived">("all");
+
+  const [term, setTerm] = useState("");
+  const [dataset, setDataset] = useState("all");
+  const [domain, setDomain] = useState("all");
+  const [boundary, setBoundary] = useState("all");
+  const [geo, setGeo] = useState("all");
+  const [provisionalOnly, setProvisionalOnly] = useState(false);
+
+  const filterKey = `${term}|${dataset}|${domain}|${boundary}|${geo}|${provisionalOnly}`;
 
   useEffect(() => {
-    if (mode !== "live") { setRows(DEMO_EFS); setLoading(false); return; }
+    if (!live) return;
+    let cancelled = false;
+    Promise.all([listFactorDatasets(), factorFacets()])
+      .then(([d, f]) => { if (!cancelled) { setDatasets(d); setFacets(f); } })
+      .catch(() => { /* the table's own error message covers it */ });
+    return () => { cancelled = true; };
+  }, [live]);
+
+  // A filter change starts again from the first page.
+  useEffect(() => { setPage(0); }, [filterKey]);
+
+  useEffect(() => {
+    if (!live) { setRows([]); setLoading(false); return; }
     let cancelled = false;
     setLoading(true);
-    listEFs()
-      .then((r) => { if (!cancelled) setRows(fromDb(r)); })
+    setError(null);
+    queryFactors({
+      term: term.trim() || undefined,
+      datasetId: dataset === "all" ? undefined : dataset,
+      domain: domain === "all" ? undefined : domain,
+      boundary: boundary === "all" ? undefined : boundary,
+      geoCode: geo === "all" ? undefined : geo,
+      provisionalOnly: provisionalOnly || undefined,
+      from: page * PAGE,
+      pageSize: PAGE,
+    })
+      .then((r) => {
+        if (cancelled) return;
+        setRows((prev) => (page === 0 ? r.rows : [...prev, ...r.rows]));
+        setTotal(r.total);
+      })
       .catch((e: Error) => { if (!cancelled) setError(e.message); })
       .finally(() => { if (!cancelled) setLoading(false); });
     return () => { cancelled = true; };
-  }, [mode]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [live, filterKey, page]);
 
-  const scopes = useMemo(() => Array.from(new Set(rows.map((r) => r.scope))).sort(), [rows]);
-  const regions = useMemo(() => Array.from(new Set(rows.map((r) => r.region))).sort(), [rows]);
-
-  const q = search.trim().toLowerCase();
-  const filtered = rows.filter((e) =>
-    (!q || [e.source, e.region, e.version, e.scope, e.origin].some((v) => v.toLowerCase().includes(q))) &&
-    (scope === "all" || e.scope === scope) &&
-    (region === "all" || e.region === region) &&
-    (status === "all" || (status === "active" ? e.active : !e.active))
+  const datasetName = useMemo(
+    () => new Map(datasets.map((d) => [d.id, `${d.publisher} ${d.name}`])),
+    [datasets],
   );
 
-  const active = rows.filter((r) => r.active).length;
-  const sources = new Set(rows.map((r) => r.source)).size;
+  const clear = () => {
+    setTerm(""); setDataset("all"); setDomain("all"); setBoundary("all");
+    setGeo("all"); setProvisionalOnly(false);
+  };
 
   return (
     <AdminShell
       eyebrow="Reference data"
       title="Emission factor library"
-      subtitle="Versioned factors by region and year. Carbon in the performance views is consumption × the active factor for the property's country, with GLOBAL as the fallback."
       actions={
         <>
-          <button className="btn-secondary"><Upload size={14} /> Import bulk</button>
-          <button className="btn-primary"><Plus size={14} /> New EF</button>
+          <button className="btn-secondary"><Upload size={14} /> Import dataset</button>
+          <button className="btn-primary"><Plus size={14} /> New factor</button>
         </>
       }
     >
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <StatTile label="Active EFs" value={String(active)} hint={`${rows.length} total`} />
-        <StatTile label="Sources" value={String(sources)} hint="fuel and energy types" />
-        <StatTile label="Regions covered" value={String(regions.length)} hint="incl. GLOBAL fallback" />
-        <StatTile label="Archived" value={String(rows.length - active)} hint="kept for restatement" />
+        <StatTile label="Factors" value={total ? total.toLocaleString("en-US") : "—"} hint="across every dataset" />
+        <StatTile label="Datasets" value={datasets.length ? String(datasets.length) : "—"} hint="published sets and overrides" />
+        <StatTile label="Geographies" value={facets.geoCodes.length ? String(facets.geoCodes.length) : "—"} hint="grids, countries, GLOBAL" />
+        <StatTile label="Boundaries" value={facets.boundaries.length ? String(facets.boundaries.length) : "—"} hint="combustion, T&D, WTT, GWP…" />
       </div>
+
+      {datasets.length > 0 && (
+        <Card>
+          <CardHeader title="Datasets" hint="Lower precedence wins when two sets publish the same factor" />
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-ink-50 text-left">
+                  <th className="table-th">Publisher</th>
+                  <th className="table-th">Set</th>
+                  <th className="table-th">Version</th>
+                  <th className="table-th">GWP set</th>
+                  <th className="table-th text-right">Precedence</th>
+                  <th className="table-th">Notes</th>
+                </tr>
+              </thead>
+              <tbody>
+                {datasets.map((d) => (
+                  <tr key={d.id} className="border-t border-ink-100">
+                    <td className="table-td font-medium">{d.publisher}</td>
+                    <td className="table-td">{d.name}</td>
+                    <td className="table-td font-mono text-[11px]">{d.version}</td>
+                    <td className="table-td"><Badge tone={d.gwp_set === "AR5" ? "good" : "neutral"}>{d.gwp_set}</Badge></td>
+                    <td className="table-td text-right tabular-nums">{d.precedence}</td>
+                    <td className="table-td text-[12px] text-ink-500">{d.notes}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Card>
+      )}
 
       <div className="flex items-center gap-2 flex-wrap">
         <div className="relative w-72">
           <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-400" />
-          <input className="input pl-9" placeholder="Search by source, region, version…" value={search} onChange={(e) => setSearch(e.target.value)} />
+          <input
+            className="input pl-9"
+            placeholder="Search factor, material, country, NAICS…"
+            value={term}
+            onChange={(e) => setTerm(e.target.value)}
+          />
         </div>
-        <select className="input max-w-[160px]" value={scope} onChange={(e) => setScope(e.target.value)}>
-          <option value="all">All scopes</option>
-          {scopes.map((s) => <option key={s} value={s}>{s}</option>)}
+        <select className="input max-w-[190px]" value={dataset} onChange={(e) => setDataset(e.target.value)}>
+          <option value="all">All datasets</option>
+          {datasets.map((d) => <option key={d.id} value={d.id}>{d.publisher} — {d.name}</option>)}
         </select>
-        <select className="input max-w-[160px]" value={region} onChange={(e) => setRegion(e.target.value)}>
-          <option value="all">All regions</option>
-          {regions.map((r) => <option key={r} value={r}>{r}</option>)}
+        <select className="input max-w-[160px]" value={domain} onChange={(e) => setDomain(e.target.value)}>
+          <option value="all">All domains</option>
+          {facets.domains.map((d) => (
+            <option key={d.value} value={d.value}>{DOMAIN_LABEL[d.value] ?? d.value} ({d.factors})</option>
+          ))}
         </select>
-        <select className="input max-w-[160px]" value={status} onChange={(e) => setStatus(e.target.value as typeof status)}>
-          <option value="all">Active and archived</option>
-          <option value="active">Active only</option>
-          <option value="archived">Archived only</option>
+        <select className="input max-w-[180px]" value={boundary} onChange={(e) => setBoundary(e.target.value)}>
+          <option value="all">All boundaries</option>
+          {facets.boundaries.map((b) => (
+            <option key={b.value} value={b.value}>{BOUNDARY_LABEL[b.value] ?? b.value} ({b.factors})</option>
+          ))}
         </select>
+        <select className="input max-w-[140px]" value={geo} onChange={(e) => setGeo(e.target.value)}>
+          <option value="all">All geographies</option>
+          {facets.geoCodes.map((g) => (
+            <option key={g.value} value={g.value}>{g.value} ({g.factors})</option>
+          ))}
+        </select>
+        <button
+          className={provisionalOnly ? "btn-secondary ring-1 ring-warn/40 text-warn-700" : "btn-secondary"}
+          onClick={() => setProvisionalOnly((v) => !v)}
+        >
+          Provisional only
+        </button>
       </div>
 
       <Card>
-        <CardHeader title="Emission factors" hint={mode === "live" ? "Live library for this client" : "Sample library"} />
+        <CardHeader
+          title="Emission factors"
+          hint={live
+            ? `${rows.length.toLocaleString("en-US")} of ${total.toLocaleString("en-US")} shown`
+            : "Sign in to a live session to browse the library"}
+        />
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[960px]">
+          <table className="w-full min-w-[1040px] text-sm">
             <thead>
-              <tr className="bg-ink-50">
-                <th className="table-th">Source</th>
+              <tr className="bg-ink-50 text-left">
+                <th className="table-th">Factor</th>
                 <th className="table-th">Scope</th>
-                <th className="table-th">Region</th>
-                <th className="table-th">Year</th>
-                <th className="table-th">Version</th>
-                <th className="table-th">Value</th>
-                <th className="table-th">Origin</th>
-                <th className="table-th">Versions</th>
-                <th className="table-th">Status</th>
+                <th className="table-th">Boundary</th>
+                <th className="table-th">Geography</th>
+                <th className="table-th">Vintage</th>
+                <th className="table-th text-right">Value</th>
+                <th className="table-th">Source</th>
+                <th className="table-th">Grade</th>
               </tr>
             </thead>
             <tbody>
-              {loading && (
-                <tr><td colSpan={9} className="table-td text-ink-500">Loading emission factors…</td></tr>
+              {loading && page === 0 && (
+                <tr><td colSpan={8} className="table-td text-ink-500">Loading the factor library…</td></tr>
               )}
               {!loading && error && (
-                <tr><td colSpan={9} className="table-td text-bad-700">Could not load the library: {error}</td></tr>
+                <tr><td colSpan={8} className="table-td text-bad-700">Could not load the library: {error}</td></tr>
               )}
-              {!loading && !error && filtered.length === 0 && (
+              {!loading && !error && rows.length === 0 && (
                 <tr>
-                  <td colSpan={9} className="p-0">
-                    <EmptyState inset icon={<Search size={20} />} title="No emission factors match" description="Try a different source, region or version." action={<button className="btn-secondary" onClick={() => { setSearch(""); setScope("all"); setRegion("all"); setStatus("all"); }}>Clear filters</button>} />
+                  <td colSpan={8} className="p-0">
+                    <EmptyState
+                      inset
+                      icon={live ? <Search size={20} /> : <Database size={20} />}
+                      title={live ? "No factors match" : "The library is only available live"}
+                      description={live
+                        ? "Try a different dataset, domain or geography."
+                        : "The demo dataset carries no factor library — sign in to see the published sets."}
+                      action={live ? <button className="btn-secondary" onClick={clear}>Clear filters</button> : undefined}
+                    />
                   </td>
                 </tr>
               )}
-              {!loading && !error && filtered.map((e) => (
-                <tr key={e.id} className="hover:bg-ink-50/60">
-                  <td className="table-td font-medium">{e.source}</td>
-                  <td className="table-td">{e.scope}</td>
-                  <td className="table-td">{e.region}</td>
-                  <td className="table-td tabular-nums">{e.year}</td>
-                  <td className="table-td font-mono text-[11px]">{e.version}</td>
-                  <td className="table-td tabular-nums">{e.value} <span className="text-[11px] text-ink-500">{e.unit}</span></td>
-                  <td className="table-td">{e.origin}</td>
-                  <td className="table-td">
-                    <button className="btn-ghost h-7 px-2 text-[12px] text-brand-700">
-                      <History size={11} /> {e.versions}
-                    </button>
+              {!error && rows.map((f) => (
+                <tr key={f.id} className="border-t border-ink-100 hover:bg-ink-50/60">
+                  <td className="table-td font-medium">
+                    {factorName(f)}
+                    <div className="text-[11px] text-ink-400">
+                      {DOMAIN_LABEL[f.domain] ?? f.domain}{f.naics_code ? ` · NAICS ${f.naics_code}` : ""}
+                    </div>
                   </td>
                   <td className="table-td">
-                    <Badge tone={e.active ? "good" : "neutral"}>
-                      {e.active ? "Active" : "Archived"}
-                    </Badge>
+                    <Badge tone={f.scope === 1 ? "warn" : f.scope === 2 ? "info" : "neutral"}>{scopeLabel(f)}</Badge>
+                  </td>
+                  <td className="table-td text-[12px]">{BOUNDARY_LABEL[f.boundary] ?? f.boundary}</td>
+                  <td className="table-td text-[12px]">
+                    {f.geo_code}
+                    {f.geo_label && <div className="text-[11px] text-ink-400 truncate max-w-[180px]">{f.geo_label}</div>}
+                  </td>
+                  <td className="table-td text-[11px]">{f.factor_year_label ?? f.factor_year ?? "—"}</td>
+                  <td className="table-td text-right tabular-nums">{factorLabel(f)}</td>
+                  <td className="table-td text-[12px] text-ink-600">
+                    {f.source_name ?? datasetName.get(f.dataset_id) ?? "—"}
+                  </td>
+                  <td className="table-td">
+                    {isProvisional(f)
+                      ? <Badge tone="warn">{f.reliability ?? f.status}</Badge>
+                      : <Badge tone="good">{f.reliability ?? "production"}</Badge>}
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
+        </div>
+        {live && !error && rows.length < total && (
+          <div className="px-5 py-3 border-t border-ink-100">
+            <button className="btn-secondary" disabled={loading} onClick={() => setPage((p) => p + 1)}>
+              {loading ? "Loading…" : `Load ${Math.min(PAGE, total - rows.length)} more`}
+            </button>
+          </div>
+        )}
+        <div className="px-5 py-2.5 text-[11px] text-ink-400 border-t border-ink-100">
+          A factor is resolved by domain, activity, boundary and unit, then by geography
+          (grid or utility → country → GLOBAL) and the newest vintage at or before the reporting
+          year. Grid, T&D and well-to-tank are separate boundaries and are never summed into Scope 2.
         </div>
       </Card>
     </AdminShell>

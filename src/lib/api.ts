@@ -7,7 +7,9 @@ import type { Inserts, Tables } from "./database.types";
 export type Property = Tables<"properties">;
 export type ConsumptionRecord = Tables<"consumption_records">;
 export type ActivityRecord = Tables<"activity_records">;
-export type EmissionFactor = Tables<"ef_library">;
+export type EfFactor = Tables<"ef_factors">;
+export type EfDataset = Tables<"ef_datasets">;
+export type EfUnitConversion = Tables<"ef_unit_conversions">;
 export type EmissionActivity = Tables<"emission_activities">;
 export type Profile = Tables<"user_profiles">;
 export type AuditRow = Tables<"audit_log">;
@@ -36,40 +38,139 @@ export async function listProfiles(): Promise<Profile[]> {
   return data ?? [];
 }
 
-/* ---------------- EF Library ---------------- */
+/* ---------------- Emission factor library ---------------- */
 
-export async function listEnergyEFs(): Promise<EmissionFactor[]> {
-  const { data, error } = await supabase!.from("ef_library").select("*").eq("is_active", true).order("source_type");
+/**
+ * A narrow slice of the factor library. The library holds thousands of rows across four
+ * published datasets, so a page asks only for the domains and geographies it needs —
+ * loading all of it into the browser would be several megabytes for no benefit.
+ */
+export async function listFactorSet(opts: {
+  domains: string[];
+  /** Geography codes to include, e.g. ["AE-DEWA", "AE", "GLOBAL"]. */
+  geoCodes: string[];
+  boundaries?: string[];
+  /** Narrow further when the caller knows exactly which activities it will resolve. */
+  activityKeys?: string[];
+  fromYear?: number;
+  limit?: number;
+}): Promise<EfFactor[]> {
+  let q = supabase!
+    .from("ef_factors")
+    .select("*")
+    .in("domain", opts.domains)
+    .in("geo_code", opts.geoCodes)
+    .order("factor_year", { ascending: false })
+    .limit(opts.limit ?? 4000);
+  if (opts.boundaries) q = q.in("boundary", opts.boundaries);
+  if (opts.activityKeys) q = q.in("activity_key", opts.activityKeys);
+  if (opts.fromYear) q = q.or(`factor_year.is.null,factor_year.gte.${opts.fromYear}`);
+  const { data, error } = await q;
+  if (error) throw error;
+  return data ?? [];
+}
+
+/** The exact rows a set of stored records was calculated with — the report's provenance. */
+export async function listFactorsByIds(ids: string[]): Promise<EfFactor[]> {
+  const unique = [...new Set(ids.filter(Boolean))];
+  if (!unique.length) return [];
+  const { data, error } = await supabase!.from("ef_factors").select("*").in("id", unique);
+  if (error) throw error;
+  return data ?? [];
+}
+
+/** One activity's candidates, for resolving a single capture at submit time. */
+export async function listFactorCandidates(opts: {
+  domain: string;
+  activityKey: string;
+  boundary: string;
+  geoCodes: string[];
+}): Promise<EfFactor[]> {
+  const { data, error } = await supabase!
+    .from("ef_factors")
+    .select("*")
+    .eq("domain", opts.domain)
+    .eq("activity_key", opts.activityKey)
+    .eq("boundary", opts.boundary)
+    .in("geo_code", opts.geoCodes);
+  if (error) throw error;
+  return data ?? [];
+}
+
+/** Search the library by name or NAICS code — the purchase form and the admin view. */
+export async function searchFactors(opts: {
+  domain?: string;
+  term?: string;
+  limit?: number;
+}): Promise<EfFactor[]> {
+  let q = supabase!.from("ef_factors").select("*").order("activity").limit(opts.limit ?? 50);
+  if (opts.domain) q = q.eq("domain", opts.domain);
+  if (opts.term) {
+    const t = opts.term.replace(/[%,()]/g, " ").trim();
+    if (t) q = q.or(`activity.ilike.%${t}%,subtype.ilike.%${t}%,naics_code.ilike.${t}%`);
+  }
+  const { data, error } = await q;
+  if (error) throw error;
+  return data ?? [];
+}
+
+export async function listFactorDatasets(): Promise<EfDataset[]> {
+  const { data, error } = await supabase!.from("ef_datasets").select("*").order("precedence");
   if (error) throw error;
   return data ?? [];
 }
 
 /**
- * Every active factor in the library — energy rows plus the Scope 1 fugitive and
- * Scope 3 rows keyed by `factor_key`. The inventory builder needs all of them.
+ * The admin library browser. Every filter is applied server-side and the result is
+ * paged — the library is thousands of rows and the page must not pull all of them.
  */
-export async function listFactors(): Promise<EmissionFactor[]> {
-  const { data, error } = await supabase!
-    .from("ef_library")
-    .select("*")
-    .eq("is_active", true)
-    .order("scope")
-    .order("category")
-    .order("source_type");
+export async function queryFactors(opts: {
+  datasetId?: string;
+  domain?: string;
+  boundary?: string;
+  geoCode?: string;
+  scope?: number;
+  provisionalOnly?: boolean;
+  term?: string;
+  from?: number;
+  pageSize?: number;
+}): Promise<{ rows: EfFactor[]; total: number }> {
+  const size = opts.pageSize ?? 100;
+  const from = opts.from ?? 0;
+  let q = supabase!.from("ef_factors").select("*", { count: "exact" });
+  if (opts.datasetId) q = q.eq("dataset_id", opts.datasetId);
+  if (opts.domain) q = q.eq("domain", opts.domain);
+  if (opts.boundary) q = q.eq("boundary", opts.boundary);
+  if (opts.geoCode) q = q.eq("geo_code", opts.geoCode);
+  if (opts.scope) q = q.eq("scope", opts.scope);
+  if (opts.provisionalOnly) q = q.or("status.neq.production,reliability.in.(B-,C,Hold)");
+  if (opts.term) {
+    const t = opts.term.replace(/[%,()]/g, " ").trim();
+    if (t) q = q.or(`activity.ilike.%${t}%,subtype.ilike.%${t}%,activity_key.ilike.%${t}%,geo_label.ilike.%${t}%,naics_code.ilike.${t}%`);
+  }
+  const { data, error, count } = await q
+    .order("domain")
+    .order("activity")
+    .order("geo_code")
+    .order("factor_year", { ascending: false })
+    .range(from, from + size - 1);
   if (error) throw error;
-  return data ?? [];
+  return { rows: data ?? [], total: count ?? 0 };
 }
 
-/** Every factor, active or archived — the admin library view. */
-export async function listEFs(): Promise<EmissionFactor[]> {
-  const { data, error } = await supabase!
-    .from("ef_library")
-    .select("*")
-    .order("source_type")
-    .order("region")
-    .order("year", { ascending: false });
+export type EfFacet = { kind: string; value: string; factors: number };
+
+/**
+ * Distinct domains, boundaries and geographies, from the ef_facets view. Selecting
+ * these from ef_factors directly would only see the first page PostgREST returns, so
+ * most values never reached the dropdowns.
+ */
+export async function factorFacets(): Promise<{ domains: EfFacet[]; boundaries: EfFacet[]; geoCodes: EfFacet[] }> {
+  const { data, error } = await supabase!.from("ef_facets").select("*").order("value");
   if (error) throw error;
-  return data ?? [];
+  const rows = (data ?? []) as EfFacet[];
+  const of = (kind: string) => rows.filter((r) => r.kind === kind);
+  return { domains: of("domain"), boundaries: of("boundary"), geoCodes: of("geo") };
 }
 
 /* ---------------- Consumption records ---------------- */

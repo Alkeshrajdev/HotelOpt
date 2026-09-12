@@ -6,7 +6,8 @@
  * activity records only — no denominator, no intensity.
  */
 import { useEffect, useMemo, useState } from "react";
-import { listActivity, listEnergyEFs, listRecords, type ActivityRecord, type EmissionFactor, type RecordWithProperty } from "@/lib/api";
+import { listActivity, listFactorSet, listRecords, type ActivityRecord, type EfFactor, type RecordWithProperty } from "@/lib/api";
+import { ENERGY_SOURCE_FACTOR, geoChain, resolveFactor } from "./factors";
 import { CHART } from "@/lib/chartPalette";
 
 export const MONTH_ORDER = [5, 6, 7, 8, 9, 10, 11, 12, 1, 2, 3, 4];
@@ -61,10 +62,23 @@ const CARBON_SHADOW_PRICE = 50; // $/t, for the cost line only
 
 const normUnit = (u: string) => u.replace("³", "3").toLowerCase();
 
-function efFor(efs: EmissionFactor[], source: string, unit: string, country: string | null): number {
-  const u = normUnit(unit);
-  const match = (region: string | null) => efs.find((e) => e.source_type === source && normUnit(e.ef_unit.split("/")[1] ?? "") === u && (e.region ?? "GLOBAL") === (region ?? "GLOBAL"));
-  return match(country)?.ef_value ?? match("GLOBAL")?.ef_value ?? match(null)?.ef_value ?? 0;
+/**
+ * kgCO₂e per unit for one energy source at this property. Scope 2 sources resolve at
+ * the location-based boundary and Scope 1 sources at combustion — never the Cat 3
+ * boundaries, which belong to the inventory's own lines.
+ */
+function efFor(factors: EfFactor[], source: string, unit: string, year: number, geo: string[]): number {
+  const map = ENERGY_SOURCE_FACTOR[source];
+  if (!map) return 0;
+  const boundary = source === "electricity_grid" || source === "district_cooling" || source === "solar_pv"
+    ? "location_based" as const
+    : "combustion" as const;
+  const u = normUnit(unit) === "mwh" ? "kWh" : unit;
+  const hit = resolveFactor(factors, {
+    domain: map.domain, activityKey: map.activityKey, boundary,
+    unit: u, year, geo,
+  });
+  return hit ? hit.value * (normUnit(unit) === "mwh" ? 1000 : 1) : 0;
 }
 
 const toKwh = (v: number, unit: string) => (normUnit(unit) === "mwh" ? v * 1000 : normUnit(unit) === "mj" ? v / 3.6 : v);
@@ -76,7 +90,7 @@ function delta(ty: number, py: number) {
 }
 
 /** Build the four pillar views for one property and reporting year from raw rows. */
-export function buildPerformance(year: number, records: RecordWithProperty[], activity: ActivityRecord[], efs: EmissionFactor[], country: string | null): PropertyPerformance {
+export function buildPerformance(year: number, records: RecordWithProperty[], activity: ActivityRecord[], factors: EfFactor[], geo: string[]): PropertyPerformance {
   const months = MONTH_ORDER.map((m) => ({ ty: `${m >= 5 ? year : year + 1}-${String(m).padStart(2, "0")}`, py: `${m >= 5 ? year - 1 : year}-${String(m).padStart(2, "0")}`, label: MONTH_SHORT[m - 1] }));
   const approved = records.filter((r) => r.status === "approved");
   const act = activity.filter((a) => a.status === "approved");
@@ -123,7 +137,7 @@ export function buildPerformance(year: number, records: RecordWithProperty[], ac
   // Carbon (tCO₂e Scope 1+2) from energy × EF
   const carbonOf = (rows: RecordWithProperty[]) => rows.reduce((acc, r) => {
     if (r.pillar !== "energy" || !r.energy_source) return acc;
-    const t = (r.consumption * efFor(efs, r.energy_source, r.unit, country)) / 1000;
+    const t = (r.consumption * efFor(factors, r.energy_source, r.unit, year, geo)) / 1000;
     if (r.energy_source === "electricity_grid" || r.energy_source === "district_cooling") acc.scope2 += t; else acc.scope1 += t;
     return acc;
   }, { scope1: 0, scope2: 0 });
@@ -199,23 +213,36 @@ export function buildPerformance(year: number, records: RecordWithProperty[], ac
 }
 
 /** Loads two reporting years for one property. `enabled` false (demo) does nothing. */
-export function usePropertyPerformance(propertyId: string | null, year: number, country: string | null, enabled: boolean) {
+export function usePropertyPerformance(
+  propertyId: string | null,
+  year: number,
+  geo: { gridCode?: string | null; country?: string | null },
+  enabled: boolean,
+) {
   const [state, setState] = useState<{ loading: boolean; error: string | null; data: PropertyPerformance | null }>({ loading: enabled, error: null, data: null });
+  const chainKey = `${geo.gridCode ?? ""}|${geo.country ?? ""}`;
   useEffect(() => {
     if (!enabled || !propertyId) { setState({ loading: false, error: null, data: null }); return; }
     let cancelled = false;
     setState((s) => ({ ...s, loading: true }));
     const { from } = reportingYearRange(year - 1);
     const { to } = reportingYearRange(year);
+    const chain = geoChain(geo.gridCode, geo.country);
     Promise.all([
       listRecords({ propertyId, from, to, status: "approved", limit: 2000, orderBy: "period_start" }),
       listActivity({ propertyId, from, to }),
-      listEnergyEFs(),
-    ]).then(([records, activity, efs]) => {
+      listFactorSet({
+        domains: ["electricity", "fuel", "heat"],
+        geoCodes: chain,
+        boundaries: ["location_based", "combustion"],
+        activityKeys: Object.values(ENERGY_SOURCE_FACTOR).map((m) => m.activityKey),
+      }),
+    ]).then(([records, activity, factors]) => {
       if (cancelled) return;
-      setState({ loading: false, error: null, data: buildPerformance(year, records, activity, efs, country) });
+      setState({ loading: false, error: null, data: buildPerformance(year, records, activity, factors, chain) });
     }).catch((e: Error) => { if (!cancelled) setState({ loading: false, error: e.message, data: null }); });
     return () => { cancelled = true; };
-  }, [propertyId, year, country, enabled]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [propertyId, year, chainKey, enabled]);
   return useMemo(() => state, [state]);
 }
