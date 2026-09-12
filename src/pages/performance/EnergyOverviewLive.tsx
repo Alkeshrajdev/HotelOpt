@@ -12,7 +12,7 @@ import { Activity, Building2, Zap } from "lucide-react";
 import KpiTile from "@/components/ui/KpiTile";
 import { Card, CardHeader } from "@/components/ui/Card";
 import InsufficientData from "@/components/ui/InsufficientData";
-import { useTopbar, ALL_PROPERTIES } from "@/lib/topbarContext";
+import { useTopbar } from "@/lib/topbarContext";
 import { useProperties } from "@/lib/live/properties";
 import { useHotelOverview } from "@/lib/live/overview";
 import { LiveChip } from "@/lib/live/mode";
@@ -69,9 +69,9 @@ function LiveTooltip({ active, payload, label, unit }: {
 }
 
 export default function EnergyOverviewLive() {
-  const { property } = useTopbar();
+  const { propertyName } = useTopbar();
   const { properties, loading, error } = useProperties();
-  const chosen = property === ALL_PROPERTIES ? properties[0] : properties.find((p) => p.name === property);
+  const chosen = properties.find((p) => p.name === propertyName);
   const overview = useHotelOverview(chosen?.id ?? null);
 
   if (loading) return <InsufficientData title="Reading your hotels" body="One moment — the registry is loading from the platform." />;
@@ -112,9 +112,6 @@ export default function EnergyOverviewLive() {
         <span>·</span>
         <span>{model.header.periodLabel}</span>
         {model.comparisonLabel && <span>· compared with {model.comparisonLabel}</span>}
-        {property === ALL_PROPERTIES && properties.length > 1 && (
-          <span className="text-ink-400">· choose a property above; portfolio totals are coming</span>
-        )}
         <LiveChip />
       </div>
 

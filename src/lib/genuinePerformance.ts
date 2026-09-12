@@ -251,3 +251,76 @@ export function gpPortfolioCost() {
 }
 
 export { SENSITIVITY };
+
+// ── Property-level context: events and initiatives that sit on the GP timeline ──
+// Operational events are non-routine changes; GP recalculates before and after
+// each so its impact is isolated from the drivers. They belong to a property.
+export type GpEvent = {
+  date: string; event: string; pillars: GpUtility[]; property: string; desc: string; status: "Approved" | "Pending";
+};
+
+export const GP_EVENTS: GpEvent[] = [
+  { date: "2026-04-14", event: "F&B refurbishment (re-opened)", pillars: ["energy", "water", "waste"], property: "Skyline Dubai", desc: "3 new outlets — chillers ran 24/7 for commissioning", status: "Approved" },
+  { date: "2025-11-22", event: "Solar PV phase 1 commissioned", pillars: ["energy", "carbon"], property: "Skyline Dubai", desc: "240 kWp rooftop array", status: "Approved" },
+  { date: "2026-02-02", event: "LED retrofit — back-of-house", pillars: ["energy"], property: "Peaks Resort Zermatt", desc: "3,200 fittings replaced", status: "Approved" },
+  { date: "2025-11-22", event: "Solar PV phase 1 commissioned", pillars: ["energy", "carbon"], property: "Marina Residences Barcelona", desc: "240 kWp rooftop array", status: "Approved" },
+  { date: "2026-03-09", event: "Tower B floors 9–12 closed", pillars: ["energy", "water", "carbon"], property: "Airport Hotel Dubai", desc: "Refurbishment, Feb–Mar 2026 (WO-2026-041)", status: "Pending" },
+];
+
+export type GpInitiative = {
+  name: string; category: string; startYear: number; startMonth: number; endYear: number | null; endMonth: number | null;
+  status: "completed" | "in-progress"; savingPotential: string;
+};
+
+export const GP_INITIATIVES: Record<GpUtility, GpInitiative[]> = {
+  energy: [
+    { name: "LED lighting retrofit",  category: "Lighting",   startYear: 2024, startMonth: 9,  endYear: 2025, endMonth: 3,  status: "completed",   savingPotential: "35–55 MWh/yr" },
+    { name: "BMS optimisation",       category: "Controls",   startYear: 2025, startMonth: 1,  endYear: null, endMonth: null, status: "in-progress", savingPotential: "60–90 MWh/yr" },
+    { name: "Heat pump upgrade",      category: "HVAC",       startYear: 2025, startMonth: 6,  endYear: 2025, endMonth: 11, status: "completed",   savingPotential: "45–70 MWh/yr" },
+    { name: "Solar PV expansion",     category: "Renewables", startYear: 2024, startMonth: 3,  endYear: 2024, endMonth: 8,  status: "completed",   savingPotential: "80–110 MWh/yr" },
+    { name: "Variable speed drives",  category: "HVAC",       startYear: 2023, startMonth: 11, endYear: 2024, endMonth: 2,  status: "completed",   savingPotential: "20–35 MWh/yr" },
+    { name: "Chiller plant upgrade",  category: "HVAC",       startYear: 2026, startMonth: 2,  endYear: null, endMonth: null, status: "in-progress", savingPotential: "90–120 MWh/yr" },
+  ],
+  water: [
+    { name: "Low-flow fixture rollout",    category: "Fixtures",   startYear: 2024, startMonth: 6,  endYear: 2025, endMonth: 4,  status: "completed",   savingPotential: "4,000–6,000 m³/yr" },
+    { name: "Greywater recycling system",  category: "Recycling",  startYear: 2025, startMonth: 2,  endYear: null, endMonth: null, status: "in-progress", savingPotential: "6,000–9,000 m³/yr" },
+    { name: "Leak detection upgrade",      category: "Monitoring", startYear: 2025, startMonth: 8,  endYear: 2025, endMonth: 11, status: "completed",   savingPotential: "2,000–4,000 m³/yr" },
+    { name: "Smart irrigation controller", category: "Irrigation", startYear: 2023, startMonth: 10, endYear: 2024, endMonth: 3,  status: "completed",   savingPotential: "1,000–2,000 m³/yr" },
+    { name: "Cooling tower optimisation",  category: "HVAC",       startYear: 2026, startMonth: 1,  endYear: null, endMonth: null, status: "in-progress", savingPotential: "3,000–5,000 m³/yr" },
+  ],
+  waste: [
+    { name: "Food waste monitoring",        category: "Food & Bev",  startYear: 2024, startMonth: 5, endYear: null, endMonth: null, status: "in-progress", savingPotential: "15–25 t/yr" },
+    { name: "Segregation improvement",      category: "Operations",  startYear: 2025, startMonth: 1, endYear: 2025, endMonth: 9,  status: "completed",   savingPotential: "20–30 t/yr" },
+    { name: "On-site composting",           category: "Composting",  startYear: 2025, startMonth: 4, endYear: null, endMonth: null, status: "in-progress", savingPotential: "10–18 t/yr" },
+    { name: "Supplier packaging reduction", category: "Procurement", startYear: 2024, startMonth: 9, endYear: 2025, endMonth: 12, status: "completed",   savingPotential: "8–14 t/yr" },
+    { name: "Hazardous waste audit",        category: "Compliance",  startYear: 2026, startMonth: 3, endYear: 2026, endMonth: 6,  status: "in-progress", savingPotential: "2–4 t/yr" },
+  ],
+  carbon: [
+    { name: "Renewable PPA",               category: "Energy",       startYear: 2024, startMonth: 7, endYear: null, endMonth: null, status: "in-progress", savingPotential: "400–600 tCO₂e/yr" },
+    { name: "Scope 3 supplier engagement", category: "Supply chain", startYear: 2025, startMonth: 1, endYear: null, endMonth: null, status: "in-progress", savingPotential: "500–800 tCO₂e/yr" },
+    { name: "HVAC efficiency upgrade",     category: "HVAC",         startYear: 2025, startMonth: 5, endYear: 2025, endMonth: 11, status: "completed",   savingPotential: "150–220 tCO₂e/yr" },
+    { name: "EV fleet transition",         category: "Transport",    startYear: 2024, startMonth: 3, endYear: 2025, endMonth: 8,  status: "completed",   savingPotential: "40–70 tCO₂e/yr" },
+    { name: "I-REC certification",         category: "Renewables",   startYear: 2026, startMonth: 1, endYear: null, endMonth: null, status: "in-progress", savingPotential: "200–350 tCO₂e/yr" },
+  ],
+};
+
+/** The year-on-year bridge in native units: last year → each driver → genuine → this year. Reconciles by construction. */
+export type GpBridgeStep = { name: string; base: number; value: number; kind: "total" | "external" | "genuine-good" | "genuine-bad"; delta: number };
+
+export function gpBridge(r: GpResult): GpBridgeStep[] {
+  const B = r.baseline;
+  const steps: GpBridgeStep[] = [{ name: "Last year", base: 0, value: B, kind: "total", delta: B }];
+  let run = B;
+  for (const d of r.decomposition) {
+    const v = (B * d.pct) / 100;
+    steps.push({
+      name: d.key === "weather" ? "Weather" : d.key === "occupancy" ? "Occupancy" : d.key === "activity" ? "Activity" : "Genuine",
+      base: Math.min(run, run + v), value: Math.abs(v),
+      kind: d.key === "genuine" ? (v <= 0 ? "genuine-good" : "genuine-bad") : "external",
+      delta: v,
+    });
+    run += v;
+  }
+  steps.push({ name: "This year", base: 0, value: r.measured, kind: "total", delta: r.measured });
+  return steps;
+}

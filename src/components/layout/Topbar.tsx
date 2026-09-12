@@ -32,14 +32,15 @@ import { useAuth } from "@/lib/auth";
 import DashboardFilterBar from "../../pages/dashboard/FilterBar";
 import {
   useTopbar, DATA_BASIS_LABEL, type DataBasis,
-  getTopbarConfig, YEAR_OPTIONS, MONTH_OPTIONS, ALL_PROPERTIES, type OpsGranularity,
+  getTopbarConfig, YEAR_OPTIONS, MONTH_OPTIONS, type OpsGranularity,
 } from "@/lib/topbarContext";
-import { useProperties } from "@/lib/live/properties";
 import { cn } from "@/lib/utils";
 
 /* ── Filter options ────────────────────────────────────────────────────────── */
-// The property list comes from the registry — the platform's hotels when signed in, the
-// sample dataset in the demo — so the selector never names a hotel the reader cannot open.
+// Property-level tools list properties only; "All Properties" exists only for the
+// Portfolio section, which has its own filters. The list itself comes from the registry
+// (see topbarContext) — the platform's hotels when signed in, the sample dataset in the
+// demo — so the selector never names a hotel the reader cannot open.
 
 const REGION_OPTIONS = [
   "All Regions",
@@ -158,7 +159,7 @@ const DATA_BASIS_OPTIONS: DataBasis[] = ["approved", "approved+provisional", "dr
 export default function Topbar({ onMenu }: { onMenu?: () => void }) {
   const { profile, session, signOut } = useAuth();
   const {
-    property, setProperty, region, setRegion, dataBasis, setDataBasis,
+    property, setProperty, propertyNames, region, setRegion, dataBasis, setDataBasis,
     year, setYear, month, setMonth, compareYear, setCompareYear,
     opsGranularity, setOpsGranularity, opsCustomStart, setOpsCustomStart,
     opsCustomEnd, setOpsCustomEnd,
@@ -166,8 +167,7 @@ export default function Topbar({ onMenu }: { onMenu?: () => void }) {
   const navigate     = useNavigate();
   const location     = useLocation();
   const cfg          = getTopbarConfig(location.pathname);
-  const { properties: registry } = useProperties();
-  const PROPERTY_OPTIONS = [ALL_PROPERTIES, ...registry.map((p) => p.name)];
+  const PROPERTY_OPTIONS = propertyNames;
   const isDashboard  = location.pathname.startsWith("/portfolio/dashboard") || location.pathname === "/dashboard";
 
   const [menuOpen,        setMenuOpen]        = useState(false);
