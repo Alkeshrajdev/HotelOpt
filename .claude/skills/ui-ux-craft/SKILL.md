@@ -21,6 +21,16 @@ repo's tokens. When in doubt, the rule wins over the existing code.
   (`toLocaleString()`, `tabular-nums`), zero/empty (`EmptyState`), and many rows (tables, not cards).
 - Pick the component from the data: trend → line/bars; share → stacked bar/donut; ranking → table or
   horizontal bars; a single number with context → `KpiTile`.
+- **Chart vocabulary (`src/components/charts/`, user asked for "all sorts of charts", Sep 2026).**
+  Use the form that carries the information, not bars by default: flow between categories
+  (source → use, source → scope → total) → `Sankey`; three variables per item → `Bubble`;
+  composition of a whole → `Donut` (legend carries the figures); progress to a target → `RadialGauge`;
+  baseline → current → target with pace → `Bullet`; two periods per item → `Dumbbell` (few rows,
+  labels) or `Slope` (rank changes, crossings); every item on one axis vs a target → `StripPlot`;
+  item × period → `Heatmap`; "which few make 80%" → `Pareto`; composition over time →
+  `StackedArea` (a ComposedChart, so prior-year and target lines render); one item's shape across
+  metrics vs a reference → `RadarProfile` (also compact, as small multiples); how one total became
+  another → `Waterfall`. Tooltips and legends come from `ChartBits` so every chart reads the same.
 - **A fact is a picture before it is a sentence** (user feedback, Sep 2026: "too text heavy, more
   visualization"). A deviation is a bar against its threshold tick (`DeviationTrack` / `FactBar`),
   persistence is a strip of day cells, a count-by-status is a `SegmentStrip`, a period on a calendar

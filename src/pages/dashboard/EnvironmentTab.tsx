@@ -1,1261 +1,560 @@
-import { useState, useLayoutEffect, useRef } from "react";
+import { useMemo, useState, useLayoutEffect, useRef } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, ShieldCheck, Info, X, ChevronRight } from "lucide-react";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  LineChart,
-  Line,
-  CartesianGrid,
-  ReferenceLine,
-  PieChart,
-  Pie,
-  Cell,
-  Legend,
-  ComposedChart,
-  LabelList,
-} from "recharts";
+import { ArrowRight, ChevronRight, ShieldCheck, X } from "lucide-react";
+import { Bar, BarChart, CartesianGrid, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { Card, CardHeader } from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
+import Tabs from "@/components/ui/Tabs";
 import {
-  PORTFOLIO_HOTELS,
-  PORTFOLIO_SCOPE3_CATEGORIES,
-  PORTFOLIO_ENERGY_SOURCES,
-  PORTFOLIO_WATER_SOURCES,
-  PORTFOLIO_WASTE_STREAMS,
-  PORTFOLIO_MONTHLY_TREND,
-  SCOPE1_BREAKDOWN,
-  SCOPE2_METHODS,
-  ENERGY_END_USE,
-  WATER_END_USE,
-  WASTE_BY_SOURCE,
+  PORTFOLIO_HOTELS, PORTFOLIO_SCOPE3_CATEGORIES, PORTFOLIO_ENERGY_SOURCES, PORTFOLIO_WATER_SOURCES, PORTFOLIO_WASTE_STREAMS,
+  PORTFOLIO_MONTHLY_TREND, SCOPE1_BREAKDOWN, SCOPE2_METHODS, ENERGY_END_USE, WATER_END_USE, WASTE_BY_SOURCE,
 } from "@/lib/mock";
 import { DRILLDOWN_DATA } from "@/lib/drilldownData";
+import { CARBON_SANKEY, ENERGY_SANKEY, HOTEL_FUEL_MIX, MONTHS, WASTE_SANKEY, WATER_SANKEY, hotelMonthly } from "@/lib/flows";
+import { rawYoyPct } from "@/lib/genuinePerformance";
+import { hotelCarbon } from "@/lib/normalise";
+import { CHART } from "@/lib/chartPalette";
 import { cn } from "@/lib/utils";
+import Sankey from "@/components/charts/Sankey";
+import Donut from "@/components/charts/Donut";
+import Pareto from "@/components/charts/Pareto";
+import Dumbbell from "@/components/charts/Dumbbell";
+import Heatmap from "@/components/charts/Heatmap";
+import StackedArea from "@/components/charts/StackedArea";
+import Waterfall from "@/components/charts/Waterfall";
+import RadialGauge from "@/components/charts/RadialGauge";
+import StripPlot from "@/components/charts/StripPlot";
+import { AXIS_TICK, ChartTip, LegendRow, fmtN, kFmt } from "@/components/charts/ChartBits";
 
 type Section = "carbon" | "energy" | "water" | "waste";
 const SECTIONS: { key: Section; label: string }[] = [
-  { key: "carbon", label: "Carbon" },
-  { key: "energy", label: "Energy" },
-  { key: "water",  label: "Water"  },
-  { key: "waste",  label: "Waste"  },
+  { key: "carbon", label: "Carbon" }, { key: "energy", label: "Energy" }, { key: "water", label: "Water" }, { key: "waste", label: "Waste" },
 ];
+const AVG_CONFIDENCE = Math.round(PORTFOLIO_HOTELS.reduce((s, h) => s + h.dataConfidence, 0) / PORTFOLIO_HOTELS.length);
 
-const AVG_CONFIDENCE = Math.round(
-  PORTFOLIO_HOTELS.reduce((s, h) => s + h.dataConfidence, 0) / PORTFOLIO_HOTELS.length
-);
+/* ─── Shared bits ──────────────────────────────────────────────────────────── */
 
-// ─── shared helpers ───────────────────────────────────────────────────────────
-
-function DataConfidenceBadge({ pct }: { pct: number }) {
+function MetricStrip({ items }: { items: { label: string; value: string; sub?: string; tone?: "good" | "warn" | "bad" }[] }) {
   return (
-    <div className="flex items-center gap-1.5 text-[11px] text-ink-500">
-      <ShieldCheck size={12} className={pct >= 85 ? "text-good" : pct >= 70 ? "text-warn" : "text-bad"} />
-      <span>Data confidence:</span>
-      <span className={cn("font-semibold", pct >= 85 ? "text-good" : pct >= 70 ? "text-warn" : "text-bad")}>
-        {pct}%
-      </span>
-      <span className="text-ink-400">portfolio-wide</span>
-    </div>
-  );
-}
-
-function MetricStrip({ items }: {
-  items: { label: string; value: string; sub?: string; tone?: "good" | "warn" | "bad" }[]
-}) {
-  return (
-    <div className="flex divide-x divide-ink-100 overflow-x-auto rounded-xl border border-ink-100 bg-white mb-5">
-      {items.map((item) => (
-        <div key={item.label} className="px-5 py-4 min-w-[140px] flex-1">
-          <div className="text-[10px] uppercase font-semibold tracking-wider text-ink-400 truncate">{item.label}</div>
-          <div className="text-xl font-bold text-ink-900 tabular-nums mt-1">{item.value}</div>
-          {item.sub && (
-            <div className={cn("text-[11px] mt-0.5 font-medium",
-              item.tone === "good" ? "text-good" : item.tone === "warn" ? "text-warn" : item.tone === "bad" ? "text-bad" : "text-ink-400"
-            )}>
-              {item.sub}
-            </div>
-          )}
+    <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4">
+      {items.map((it) => (
+        <div key={it.label} className="card px-5 py-4">
+          <div className="text-[10px] uppercase font-semibold tracking-[0.06em] text-ink-400 truncate">{it.label}</div>
+          <div className="text-stat font-bold text-ink-900 tabular-nums mt-1 leading-none">{it.value}</div>
+          <div className={cn("text-[11px] mt-1.5 font-medium truncate", it.tone === "good" ? "text-good-700" : it.tone === "warn" ? "text-warn-700" : it.tone === "bad" ? "text-bad-700" : "text-ink-400")}>{it.sub ?? " "}</div>
         </div>
       ))}
     </div>
   );
 }
 
-function HubLink({ to, label }: { to: string; label: string }) {
+function SectionHeader({ hubTo, hubLabel }: { hubTo: string; hubLabel: string }) {
+  const pct = AVG_CONFIDENCE;
   return (
-    <Link to={to} className="text-[12px] font-semibold text-brand-700 hover:text-brand-800 inline-flex items-center gap-1">
-      {label} <ArrowRight size={12} />
-    </Link>
-  );
-}
-
-function SectionHeader({ confidence, hubTo, hubLabel }: { confidence: number; hubTo: string; hubLabel: string }) {
-  return (
-    <div className="flex items-center justify-between mb-4">
-      <DataConfidenceBadge pct={confidence} />
-      <HubLink to={hubTo} label={hubLabel} />
+    <div className="flex items-center justify-between">
+      <div className="flex items-center gap-1.5 text-[11px] text-ink-500">
+        <ShieldCheck size={12} className={pct >= 85 ? "text-good-700" : pct >= 70 ? "text-warn-700" : "text-bad-700"} />
+        <span>Data confidence</span>
+        <span className={cn("font-semibold", pct >= 85 ? "text-good-700" : pct >= 70 ? "text-warn-700" : "text-bad-700")}>{pct}%</span>
+        <span className="text-ink-400">portfolio-wide</span>
+      </div>
+      <Link to={hubTo} className="text-[12px] font-semibold text-brand-700 hover:text-brand-900 inline-flex items-center gap-1">{hubLabel} <ArrowRight size={12} /></Link>
     </div>
   );
 }
 
-type TargetStatus = "bad" | "warn";
-function TargetBanner({
-  baseline, baseYear, current, target, targetYear, gap, status, owner,
-}: {
-  baseline: string; baseYear: number; current: string; target: string;
-  targetYear: number; gap: string; status: TargetStatus; owner: string;
+function TargetLine({ baseline, baseYear, current, target, targetYear, gap, status, owner }: {
+  baseline: string; baseYear: number; current: string; target: string; targetYear: number; gap: string; status: "bad" | "warn" | "good"; owner: string;
 }) {
   return (
-    <div className={cn(
-      "flex items-center gap-0 rounded-xl border overflow-hidden text-[11px] mb-1",
-      status === "bad" ? "border-bad/20 bg-bad/5" : "border-warn/20 bg-warn/5"
-    )}>
-      <div className="px-3 py-2 border-r border-ink-100 text-center shrink-0">
-        <div className="text-[10px] text-ink-400 uppercase tracking-wide font-semibold">Baseline {baseYear}</div>
-        <div className="font-bold text-ink-600 tabular-nums">{baseline}</div>
-      </div>
-      <div className="flex-1 px-3 py-2 flex items-center gap-2">
-        <div className="flex-1">
-          <span className="text-ink-500">Current: </span>
-          <span className={cn("font-bold tabular-nums", status === "bad" ? "text-bad" : "text-warn")}>{current}</span>
-          <span className="mx-2 text-ink-300">·</span>
-          <span className="text-ink-500">Gap: </span>
-          <span className={cn("font-semibold", status === "bad" ? "text-bad" : "text-warn")}>{gap}</span>
-        </div>
-        <span className={cn(
-          "shrink-0 px-2 py-0.5 rounded-full text-[10px] font-bold",
-          status === "bad" ? "bg-bad/15 text-bad" : "bg-warn/15 text-warn"
-        )}>
-          {status === "bad" ? "Off Track" : "At Risk"}
-        </span>
-      </div>
-      <div className="px-3 py-2 border-l border-ink-100 text-center shrink-0">
-        <div className="text-[10px] text-ink-400 uppercase tracking-wide font-semibold">Target {targetYear}</div>
-        <div className="font-bold text-good tabular-nums">{target}</div>
-      </div>
-      <div className="px-3 py-2 border-l border-ink-100 shrink-0 hidden lg:block">
-        <div className="text-[10px] text-ink-400 uppercase tracking-wide font-semibold">Owner</div>
-        <div className="font-semibold text-ink-700">{owner}</div>
-      </div>
+    <div className="grid grid-cols-2 md:grid-cols-5 gap-3 px-6 py-4 border-t border-ink-100">
+      <div><div className="text-[10px] uppercase tracking-[0.06em] font-semibold text-ink-400">Baseline {baseYear}</div><div className="text-[12px] font-semibold text-ink-900 tabular-nums">{baseline}</div></div>
+      <div><div className="text-[10px] uppercase tracking-[0.06em] font-semibold text-ink-400">Current</div><div className={cn("text-[12px] font-semibold tabular-nums", status === "bad" ? "text-bad-700" : status === "warn" ? "text-warn-700" : "text-good-700")}>{current}</div></div>
+      <div><div className="text-[10px] uppercase tracking-[0.06em] font-semibold text-ink-400">Target {targetYear}</div><div className="text-[12px] font-semibold text-ink-900 tabular-nums">{target}</div></div>
+      <div><div className="text-[10px] uppercase tracking-[0.06em] font-semibold text-ink-400">Gap</div><div className="text-[12px] font-semibold text-ink-900">{gap}</div></div>
+      <div className="flex items-center justify-between gap-2"><div><div className="text-[10px] uppercase tracking-[0.06em] font-semibold text-ink-400">Owner</div><div className="text-[12px] font-semibold text-ink-900">{owner}</div></div><Badge tone={status}>{status === "bad" ? "Off track" : status === "warn" ? "At risk" : "On track"}</Badge></div>
     </div>
   );
 }
 
-// ─── DRILL-DOWN PANEL ────────────────────────────────────────────────────────
+/* ─── Drill-down (contribution by property for a chosen slice) ─────────────── */
+type Drill = { key: string; label: string } | null;
 
-type DrilldownState = { key: string; label: string } | null;
-
-function DrilldownPanel({
-  drilldownKey,
-  label,
-  onClose,
-}: {
-  drilldownKey: string;
-  label: string;
-  onClose: () => void;
-}) {
+function DrilldownPanel({ drilldownKey, label, onClose }: { drilldownKey: string; label: string; onClose: () => void }) {
   const data = DRILLDOWN_DATA[drilldownKey];
-  const panelRef = useRef<HTMLDivElement>(null);
-
+  const ref = useRef<HTMLDivElement>(null);
   useLayoutEffect(() => {
-    const panel = panelRef.current;
-    if (!panel) return;
+    const el = ref.current;
+    if (!el) return;
     requestAnimationFrame(() => {
-      const scrollContainer = document.querySelector("main");
-      if (!scrollContainer) return;
-      const containerRect = scrollContainer.getBoundingClientRect();
-      const panelRect = panel.getBoundingClientRect();
-      const offset = panelRect.top - containerRect.top + scrollContainer.scrollTop - 16;
-      scrollContainer.scrollTo({ top: offset, behavior: "smooth" });
+      const main = document.querySelector("main");
+      if (!main) return;
+      main.scrollTo({ top: el.getBoundingClientRect().top - main.getBoundingClientRect().top + main.scrollTop - 16, behavior: "smooth" });
     });
   }, [drilldownKey]);
-
   if (!data) return null;
-
   const sorted = [...data.hotels].sort((a, b) => b.value - a.value);
   const total = sorted.reduce((s, h) => s + h.value, 0);
-
-  const barColor = (flag?: "bad" | "warn" | "good") =>
-    flag === "bad" ? "#B33650" : flag === "warn" ? "#CDB872" : flag === "good" ? "#807245" : data.color;
-
+  const color = (flag?: "bad" | "warn" | "good") => (flag === "bad" ? CHART.rose : flag === "warn" ? CHART.sand : flag === "good" ? CHART.olive : data.color);
   return (
-    <div ref={panelRef} className="rounded-2xl border-2 border-brand-200 bg-white shadow-card overflow-hidden">
-      {/* Header */}
-      <div className="px-5 pt-4 pb-3 border-b border-ink-100 flex items-center justify-between gap-4">
-        <div className="min-w-0">
-          <div className="flex items-center gap-1.5 text-[10px] text-ink-400 uppercase tracking-wider mb-0.5">
-            {data.parentLabel.split(" → ").map((seg, i, arr) => (
-              <span key={seg} className="flex items-center gap-1">
-                {seg}
-                {i < arr.length - 1 && <ChevronRight size={9} />}
-              </span>
-            ))}
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="w-3 h-3 rounded-full shrink-0" style={{ background: data.color }} />
-            <span className="text-[15px] font-bold text-ink-900 leading-tight">{label}</span>
-            <span className="text-[12px] text-ink-400 font-medium">
-              {total.toLocaleString()} {data.unit} total · all 10 properties
-            </span>
-          </div>
-        </div>
-        <button
-          onClick={onClose}
-          className="shrink-0 p-1.5 rounded-lg hover:bg-ink-100 text-ink-400 transition-colors"
-          title="Close"
-        >
-          <X size={15} />
-        </button>
-      </div>
-
-      {/* Content */}
-      <div className="p-5 grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {/* Chart */}
-        <div>
-          <div className="text-[11px] font-semibold text-ink-500 mb-3 uppercase tracking-wide">
-            Contribution by property — {data.unit}
-          </div>
-          <ResponsiveContainer width="100%" height={290}>
-            <BarChart
-              data={sorted}
-              layout="vertical"
-              margin={{ top: 0, right: 60, bottom: 0, left: 110 }}
-            >
-              <XAxis
-                type="number"
-                tick={{ fontSize: 10, fill: "#7B8285" }}
-                axisLine={false}
-                tickLine={false}
-                tickFormatter={(v) =>
-                  v >= 1000 ? `${(v / 1000).toFixed(1)}k` : String(v)
-                }
-              />
-              <YAxis
-                type="category"
-                dataKey="name"
-                width={106}
-                tick={{ fontSize: 11, fill: "#383B3D" }}
-                axisLine={false}
-                tickLine={false}
-              />
-              <Tooltip
-                contentStyle={{ fontSize: 12, borderRadius: 8, border: "1px solid #EDEFF0" }}
-                formatter={(v: number) => [`${v.toLocaleString()} ${data.unit}`, ""]}
-              />
-              <Bar isAnimationActive={false} dataKey="value" radius={[0, 4, 4, 0]} maxBarSize={20}>
-                {sorted.map((h) => (
-                  <Cell key={h.name} fill={barColor(h.flag)} />
-                ))}
+    <Card className="ring-1 ring-ink-900/10">
+      <div ref={ref} />
+      <CardHeader
+        title={label}
+        hint={`${data.parentLabel} · ${fmtN(total)} ${data.unit} across all properties`}
+        right={<button onClick={onClose} className="btn-ghost w-8 h-8 p-0 rounded-full" title="Close"><X size={14} /></button>}
+      />
+      <div className="px-6 pt-4 pb-5 grid grid-cols-12 gap-6">
+        <div className="col-span-12 lg:col-span-7">
+          <ResponsiveContainer width="100%" height={280}>
+            <BarChart data={sorted} layout="vertical" margin={{ top: 0, right: 40, bottom: 0, left: 0 }}>
+              <XAxis type="number" tick={AXIS_TICK} axisLine={false} tickLine={false} tickFormatter={kFmt} />
+              <YAxis type="category" dataKey="name" width={120} tick={{ fontSize: 11, fill: CHART.label }} axisLine={false} tickLine={false} />
+              <Tooltip content={<ChartTip unit={data.unit} />} cursor={{ fill: CHART.grid }} />
+              <Bar dataKey="value" name="Contribution" radius={[0, 4, 4, 0]} maxBarSize={18} isAnimationActive={false}>
+                {sorted.map((h) => <Cell key={h.name} fill={color(h.flag)} />)}
               </Bar>
             </BarChart>
           </ResponsiveContainer>
-          {/* Legend */}
-          <div className="flex items-center gap-4 mt-2 text-[10px] text-ink-400">
-            <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-chart-rose inline-block" />Action required</span>
-            <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-chart-sand inline-block" />Monitor</span>
-            <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-chart-olive inline-block" />On track</span>
-          </div>
+          <LegendRow className="mt-1" items={[{ label: "Action required", color: CHART.rose }, { label: "Monitor", color: CHART.sand }, { label: "On track", color: CHART.olive }]} />
         </div>
-
-        {/* Hotel list */}
-        <div>
-          <div className="text-[11px] font-semibold text-ink-500 mb-3 uppercase tracking-wide">
-            Property detail
-          </div>
-          <div className="space-y-1.5 max-h-[340px] overflow-y-auto pr-1">
-            {sorted.map((h) => {
-              const pct = total > 0 ? ((h.value / total) * 100).toFixed(1) : "0.0";
-              return (
-                <div
-                  key={h.name}
-                  className="flex items-start gap-2.5 rounded-lg px-3 py-2.5 bg-ink-50 border"
-                >
-                  <span
-                    className="w-2.5 h-2.5 rounded-full shrink-0 mt-1"
-                    style={{ background: barColor(h.flag) }}
-                  />
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between gap-2">
-                      <span className="text-[12px] font-semibold text-ink-800 leading-snug">
-                        {h.name}
-                      </span>
-                      <div className="flex items-center gap-2 shrink-0 tabular-nums">
-                        <span className="text-[10px] text-ink-400">{pct}%</span>
-                        <span className="text-[12px] font-bold text-ink-900">
-                          {h.value.toLocaleString()}
-                        </span>
-                      </div>
-                    </div>
-                    {h.secondary && (
-                      <div className="text-[10px] text-ink-500 mt-0.5">{h.secondary}</div>
-                    )}
-                    <div className="text-[10px] text-ink-400 mt-0.5 leading-snug">
-                      {h.context}
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+        <div className="col-span-12 lg:col-span-5 space-y-2">
+          {sorted.slice(0, 5).map((h) => (
+            <div key={h.name} className="rounded-xl2 bg-ink-50 px-3 py-2.5">
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-[12px] font-semibold text-ink-900 truncate">{h.name}</span>
+                <span className="text-[12px] font-bold text-ink-900 tabular-nums">{fmtN(h.value)} <span className="text-[10px] font-normal text-ink-400">{total ? ((h.value / total) * 100).toFixed(1) : 0}%</span></span>
+              </div>
+              <div className="text-[10px] text-ink-500 mt-0.5 leading-snug">{h.context}</div>
+            </div>
+          ))}
+          <div className="text-[11px] text-ink-600 leading-snug pt-1">{data.insight}</div>
         </div>
       </div>
-
-      {/* Insight */}
-      <div className="mx-5 mb-5 flex items-start gap-2 rounded-xl bg-brand-50 border border-brand-100 px-4 py-3 text-[12px] text-brand-800">
-        <Info size={13} className="shrink-0 mt-0.5 text-brand-600" />
-        <span>{data.insight}</span>
-      </div>
-    </div>
+    </Card>
   );
 }
 
-// ─── CARBON ──────────────────────────────────────────────────────────────────
+/* ─── CARBON ───────────────────────────────────────────────────────────────── */
 
 function CarbonSection() {
-  const [drilldown, setDrilldown] = useState<DrilldownState>(null);
-  const hotelScopeData = [...PORTFOLIO_HOTELS]
-    .sort((a, b) => b.carbon_t - a.carbon_t)
-    .map((h) => ({
-      name: h.shortName,
-      scope1: Math.round(h.carbon_t * 0.08),
-      scope2: Math.round(h.carbon_t * 0.34),
-      scope3: Math.round(h.carbon_t * 0.58),
-    }));
+  const [drill, setDrill] = useState<Drill>(null);
+  const [share, setShare] = useState(false);
+  const [row, setRow] = useState<string | null>(null);
+  const totalS1 = SCOPE1_BREAKDOWN.reduce((s, x) => s + x.tco2e, 0);
+  const totalS3 = PORTFOLIO_SCOPE3_CATEGORIES.reduce((s, x) => s + x.tco2e, 0);
+  const total = totalS1 + SCOPE2_METHODS.locationBased.tco2e + totalS3;
+  const hotels = [...PORTFOLIO_HOTELS].sort((a, b) => b.carbon_t - a.carbon_t).map((h) => {
+    const c = hotelCarbon(h);
+    const s1 = c.s1s2 * (totalS1 / (totalS1 + SCOPE2_METHODS.locationBased.tco2e));
+    const s2 = c.s1s2 - s1;
+    const t = share ? 100 : 1;
+    return { name: h.shortName, "Scope 1": Math.round((s1 / (share ? h.carbon_t : 1)) * t), "Scope 2": Math.round((s2 / (share ? h.carbon_t : 1)) * t), "Scope 3": Math.round((c.s3 / (share ? h.carbon_t : 1)) * t), total: h.carbon_t };
+  });
+  const heat = useMemo(() => hotelMonthly("carbon"), []);
+  const nodeDrill = (id: string) => {
+    const i = Number(id.split("-")[1]);
+    if (id.startsWith("s1-") && SCOPE1_BREAKDOWN[i]?.drilldownKey) setDrill({ key: SCOPE1_BREAKDOWN[i].drilldownKey, label: SCOPE1_BREAKDOWN[i].source });
+    if (id.startsWith("s3-") && PORTFOLIO_SCOPE3_CATEGORIES[i]?.drilldownKey) setDrill({ key: PORTFOLIO_SCOPE3_CATEGORIES[i].drilldownKey, label: PORTFOLIO_SCOPE3_CATEGORIES[i].category });
+  };
+  const trend = PORTFOLIO_MONTHLY_TREND.map((m) => ({ month: m.month, "Scope 1+2": Math.round(m.carbon * 0.42), "Scope 3": Math.round(m.carbon * 0.58), target: m.carbonTarget }));
 
   return (
     <div className="space-y-5">
       <MetricStrip items={[
-        { label: "Total Emissions",      value: "42,850 tCO₂e",     sub: "−4.2% YoY",     tone: "good" },
-        { label: "Scope 1 — Direct",     value: "3,428 tCO₂e",      sub: "8% of total" },
-        { label: "Scope 2 — Electricity",value: "14,569 tCO₂e",     sub: "34% of total (location-based)" },
-        { label: "Scope 3 — Value chain",value: "24,853 tCO₂e",     sub: "58% of total" },
-        { label: "Carbon Intensity",     value: "59.5 kgCO₂e/RN",   sub: "−3.8 vs prior year", tone: "good" },
-        { label: "Renewable Coverage",   value: "12%",               sub: "of electricity (RECs + on-site)", tone: "warn" },
+        { label: "Total emissions", value: `${fmtN(total)} t`, sub: "−4.2% YoY · tCO₂e", tone: "good" },
+        { label: "Scope 1 · direct", value: `${fmtN(totalS1)} t`, sub: `${((totalS1 / total) * 100).toFixed(0)}% of total` },
+        { label: "Scope 2 · electricity", value: `${fmtN(SCOPE2_METHODS.locationBased.tco2e)} t`, sub: `${((SCOPE2_METHODS.locationBased.tco2e / total) * 100).toFixed(0)}% · location-based` },
+        { label: "Scope 3 · value chain", value: `${fmtN(totalS3)} t`, sub: `${((totalS3 / total) * 100).toFixed(0)}% of total` },
+        { label: "Carbon intensity", value: "59.5 kg/RN", sub: "−3.8 vs prior year", tone: "good" },
+        { label: "Renewable coverage", value: `${SCOPE2_METHODS.recCoverage.pct}%`, sub: "of electricity · RECs + on-site", tone: "warn" },
       ]} />
+      <SectionHeader hubTo="/performance/carbon/overview" hubLabel="Open carbon hub" />
 
-      <SectionHeader confidence={AVG_CONFIDENCE} hubTo="/performance/carbon/overview" hubLabel="Open Carbon Hub" />
-
-      {/* Scope 1 + Scope 2 + Scope 3 breakdown — 3 columns */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-
-        {/* Scope 1 detail */}
-        <Card className="flex flex-col">
-          <CardHeader
-            title="Scope 1 — Source Breakdown"
-            hint="3,428 tCO₂e · direct combustion & fugitives"
-          />
-          <div className="px-4 pb-4 pt-2 flex-1 flex flex-col gap-4">
-            <ResponsiveContainer width="100%" height={160}>
-              <BarChart data={SCOPE1_BREAKDOWN} layout="vertical" margin={{ top: 0, right: 40, bottom: 0, left: 0 }}>
-                <XAxis type="number" tick={{ fontSize: 9, fill: "#7B8285" }} axisLine={false} tickLine={false} />
-                <YAxis type="category" dataKey="source" width={0} tick={false} axisLine={false} tickLine={false} />
-                <Tooltip
-                  contentStyle={{ fontSize: 11, borderRadius: 8, border: "1px solid #EDEFF0" }}
-                  formatter={(v: number) => [`${v.toLocaleString()} tCO₂e`, ""]}
-                />
-                <Bar isAnimationActive={false} dataKey="tco2e" radius={[0, 4, 4, 0]} maxBarSize={14}>
-                  {SCOPE1_BREAKDOWN.map((s) => <Cell key={s.source} fill={s.color} />)}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-            <ul className="space-y-1">
-              {SCOPE1_BREAKDOWN.map((s) => (
-                <li
-                  key={s.source}
-                  className={cn(
-                    "flex items-start gap-2 rounded-lg px-2 py-1.5 -mx-2 transition-colors",
-                    s.drilldownKey
-                      ? "cursor-pointer hover:bg-ink-50 group"
-                      : ""
-                  )}
-                  onClick={() => s.drilldownKey && setDrilldown({ key: s.drilldownKey, label: s.source })}
-                >
-                  <span className="w-2 h-2 rounded-full shrink-0 mt-1.5" style={{ background: s.color }} />
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between gap-2">
-                      <span className={cn("text-[11px] font-semibold leading-snug",
-                        s.drilldownKey ? "text-brand-700 group-hover:underline" : "text-ink-800"
-                      )}>
-                        {s.source}
-                      </span>
-                      <div className="flex items-center gap-1 shrink-0">
-                        <span className="text-[11px] tabular-nums font-bold text-ink-900">{s.pct}%</span>
-                        {s.drilldownKey && <ChevronRight size={10} className="text-ink-300 group-hover:text-brand-600" />}
-                      </div>
-                    </div>
-                    <div className="text-[10px] text-ink-400">{s.note} · {s.tco2e.toLocaleString()} tCO₂e</div>
-                  </div>
-                </li>
-              ))}
-            </ul>
-            <div className="flex items-start gap-1.5 rounded-lg bg-warn/10 px-3 py-2 text-[11px] text-warn mt-auto">
-              <Info size={11} className="shrink-0 mt-0.5" />
-              <span>Refrigerant leaks are the highest Scope 1 reduction opportunity — survey all HVAC units annually.</span>
-            </div>
+      <div className="grid grid-cols-12 gap-4">
+        <Card className="col-span-12 xl:col-span-7 flex flex-col">
+          <CardHeader title="Where the emissions come from" hint="Source → scope → total · tCO₂e · click a source with a breakdown to see it by property" />
+          <div className="px-4 pt-3 pb-2 flex-1">
+            <Sankey nodes={CARBON_SANKEY.nodes} links={CARBON_SANKEY.links} height={380} unit="t" labelWidth={168} onNodeClick={nodeDrill} selectedId={drill ? null : undefined} />
+          </div>
+          <div className="mt-auto px-6 py-4 border-t border-ink-100 flex items-center justify-between gap-3 text-[11px] text-ink-500">
+            <LegendRow items={[{ label: "Scope 1", color: CHART.moss }, { label: "Scope 2", color: CHART.mauve }, { label: "Scope 3", color: CHART.blush }]} />
+            <span>Scope 2 shown location-based; market-based is {fmtN(SCOPE2_METHODS.marketBased.tco2e)} t after RECs.</span>
           </div>
         </Card>
 
-        {/* Scope 2 methods */}
-        <Card className="flex flex-col">
-          <CardHeader
-            title="Scope 2 — Location vs Market"
-            hint="both methods required by GHG Protocol"
-          />
-          <div className="px-4 pb-4 pt-2 flex-1 flex flex-col gap-4">
-            <div className="grid grid-cols-2 gap-3">
-              <div className="card-level-3 p-3 rounded-lg">
-                <div className="text-[10px] text-ink-500 font-semibold uppercase tracking-wide mb-1">Location-based</div>
-                <div className="text-xl font-bold text-ink-900 tabular-nums">14,569</div>
-                <div className="text-[10px] text-ink-400">tCO₂e · grid avg factor</div>
-                <div className="text-[10px] text-ink-500 mt-1">0.251 kgCO₂/kWh</div>
-              </div>
-              <div className="card-level-3 p-3 rounded-lg border border-good/20">
-                <div className="text-[10px] text-good font-semibold uppercase tracking-wide mb-1">Market-based</div>
-                <div className="text-xl font-bold text-good tabular-nums">12,400</div>
-                <div className="text-[10px] text-ink-400">tCO₂e · after RECs</div>
-                <div className="text-[10px] text-good mt-1">−2,169 tCO₂e vs location</div>
-              </div>
-            </div>
-
-            {/* Month-by-month view of the two methods — the insight this card was missing,
-                and it gives the card the same depth as its neighbours. */}
-            <div>
-              <div className="flex justify-between text-[11px] mb-1">
-                <span className="text-ink-500">Monthly · location vs market</span>
-                <span className="text-ink-400">tCO₂e</span>
-              </div>
-              <div className="h-24">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={SCOPE2_MONTHLY} barGap={1} barCategoryGap="28%">
-                    <XAxis dataKey="m" tick={{ fontSize: 10, fill: "#7B8285" }} axisLine={false} tickLine={false} interval={1} />
-                    <Tooltip
-                      cursor={{ fill: "#EDEFF0" }}
-                      contentStyle={{ borderRadius: 12, border: "none", boxShadow: "0 6px 16px -4px rgba(16,24,40,.14)", fontSize: 11 }}
-                    />
-                    <Bar dataKey="loc" name="Location-based" fill="#AF8D84" radius={[3, 3, 0, 0]} isAnimationActive={false} />
-                    <Bar dataKey="mkt" name="Market-based"   fill="#807245" radius={[3, 3, 0, 0]} isAnimationActive={false} />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-              <div className="mt-1 flex items-center gap-3 text-[10px] text-ink-400">
-                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-chart-mauve inline-block" />Location</span>
-                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-chart-olive inline-block" />Market</span>
-              </div>
-            </div>
-
-            <div>
-              <div className="flex justify-between text-[11px] mb-1">
-                <span className="text-ink-500">Renewable electricity coverage</span>
-                <span className="font-bold text-ink-900">{SCOPE2_METHODS.recCoverage.pct}%</span>
-              </div>
-              <div className="h-2 bg-ink-100 rounded-full overflow-hidden">
-                <div className="h-full bg-chart-olive rounded-full" style={{ width: `${SCOPE2_METHODS.recCoverage.pct}%` }} />
-              </div>
-              <div className="mt-1.5 text-[10px] text-ink-400">
-                {SCOPE2_METHODS.recCoverage.mwh.toLocaleString()} MWh covered · target: 100% by 2030
-              </div>
-            </div>
-
-            <ul className="space-y-2 text-[11px]">
-              <li className="flex justify-between">
-                <span className="text-ink-500">RECs purchased</span>
-                <span className="font-semibold text-ink-900">6,984 MWh</span>
-              </li>
-              <li className="flex justify-between">
-                <span className="text-ink-500">On-site solar (PV)</span>
-                <span className="font-semibold text-ink-900">3,900 MWh</span>
-              </li>
-              <li className="flex justify-between">
-                <span className="text-ink-500">Gap to 100% renewable</span>
-                <span className="font-semibold text-bad">47,316 MWh</span>
-              </li>
-              <li className="flex justify-between">
-                <span className="text-ink-500">Abatement from RECs</span>
-                <span className="font-semibold text-good">−2,169 tCO₂e (15%)</span>
-              </li>
-            </ul>
-
-            <div className="flex items-start gap-1.5 rounded-lg bg-brand-50 px-3 py-2 text-[11px] text-brand-700 mt-auto">
-              <Info size={11} className="shrink-0 mt-0.5" />
-              <span>PPAs would allow full market-based abatement — Bay View SG chiller PPA in feasibility.</span>
-            </div>
+        <Card className="col-span-12 xl:col-span-5 flex flex-col">
+          <CardHeader title="Scope 3 — the few that make 80%" hint="Categories ranked · line = cumulative share" />
+          <div className="px-3 pt-3 flex-1">
+            <Pareto height={250} unit="t" items={PORTFOLIO_SCOPE3_CATEGORIES.map((c) => ({ id: c.drilldownKey || c.category, label: c.category, value: c.tco2e, color: c.drilldownKey ? CHART.olive : CHART.moss }))} onSelect={(id) => { const c = PORTFOLIO_SCOPE3_CATEGORIES.find((x) => (x.drilldownKey || x.category) === id); if (c?.drilldownKey) setDrill({ key: c.drilldownKey, label: c.category }); }} />
           </div>
-        </Card>
-
-        {/* Scope 3 categories */}
-        <Card className="flex flex-col">
-          <CardHeader
-            title="Scope 3 — Category Breakdown"
-            hint="24,853 tCO₂e · upstream & downstream"
-          />
-          <div className="px-4 pb-4 pt-2 flex-1 flex flex-col gap-3">
-            <ResponsiveContainer width="100%" height={170}>
-              <BarChart data={PORTFOLIO_SCOPE3_CATEGORIES} layout="vertical"
-                margin={{ top: 0, right: 40, bottom: 0, left: 0 }}>
-                <XAxis type="number" tick={{ fontSize: 9, fill: "#7B8285" }} axisLine={false} tickLine={false} />
-                <YAxis type="category" dataKey="category" width={0} tick={false} axisLine={false} tickLine={false} />
-                <Tooltip contentStyle={{ fontSize: 11, borderRadius: 8, border: "1px solid #EDEFF0" }}
-                  formatter={(v: number) => [`${v.toLocaleString()} tCO₂e`, ""]} />
-                <Bar isAnimationActive={false} dataKey="tco2e" fill="#807245" radius={[0, 4, 4, 0]} maxBarSize={14} />
-              </BarChart>
-            </ResponsiveContainer>
-            <ul className="space-y-1">
-              {PORTFOLIO_SCOPE3_CATEGORIES.map((c) => (
-                <li
-                  key={c.category}
-                  className={cn(
-                    "flex items-center justify-between text-[11px] gap-2 rounded-lg px-2 py-1.5 -mx-2 transition-colors",
-                    c.drilldownKey ? "cursor-pointer hover:bg-ink-50 group" : ""
-                  )}
-                  onClick={() => c.drilldownKey && setDrilldown({ key: c.drilldownKey, label: c.category })}
-                >
-                  <span className={cn("truncate", c.drilldownKey ? "text-brand-700 group-hover:underline font-medium" : "text-ink-700")}>
-                    {c.category}
-                  </span>
-                  <div className="flex items-center gap-2 shrink-0">
-                    <div className="w-12 h-1 bg-ink-100 rounded-full overflow-hidden">
-                      <div className="h-full bg-chart-mauve rounded-full" style={{ width: `${c.pct}%` }} />
-                    </div>
-                    <span className="font-semibold text-ink-900 w-8 text-right">{c.pct}%</span>
-                    {c.drilldownKey && <ChevronRight size={10} className="text-ink-300 group-hover:text-brand-600" />}
-                  </div>
-                </li>
-              ))}
-            </ul>
-            <div className="flex items-start gap-1.5 rounded-lg bg-warn/10 px-3 py-2 text-[11px] text-warn mt-auto">
-              <Info size={11} className="shrink-0 mt-0.5" />
-              <span>Purchased goods & services (50%) dominates — 18 suppliers still using default emission factors.</span>
-            </div>
+          <div className="mt-auto px-6 py-4 border-t border-ink-100 text-[11px] text-ink-500">
+            Purchased goods and business travel are two thirds of Scope 3; 18 suppliers still report on default emission factors.
           </div>
         </Card>
       </div>
 
-      {drilldown && (
-        <DrilldownPanel
-          drilldownKey={drilldown.key}
-          label={drilldown.label}
-          onClose={() => setDrilldown(null)}
-        />
-      )}
+      {drill && <DrilldownPanel drilldownKey={drill.key} label={drill.label} onClose={() => setDrill(null)} />}
 
-      {/* Emissions by hotel — stacked scope split */}
-      <Card>
-        <CardHeader title="Emissions by Hotel — Scope Split" hint="tCO₂e ranked by total, stacked by scope" />
-        <div className="px-4 pb-4 pt-2">
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={hotelScopeData} layout="vertical" margin={{ top: 0, right: 16, bottom: 0, left: 110 }}>
-              <XAxis type="number" tick={{ fontSize: 10, fill: "#7B8285" }} axisLine={false} tickLine={false}
-                tickFormatter={(v) => v >= 1000 ? `${(v / 1000).toFixed(0)}k` : String(v)} />
-              <YAxis type="category" dataKey="name" width={106} tick={{ fontSize: 11, fill: "#383B3D" }} axisLine={false} tickLine={false} />
-              <Tooltip contentStyle={{ fontSize: 12, borderRadius: 8, border: "1px solid #EDEFF0" }}
-                formatter={(v: number, n: string) => [`${v.toLocaleString()} tCO₂e`, n === "scope1" ? "Scope 1" : n === "scope2" ? "Scope 2" : "Scope 3"]} />
-              <Legend iconSize={8} wrapperStyle={{ fontSize: 11 }} formatter={(v) => <span style={{ color: "#7B8285" }}>{v === "scope1" ? "Scope 1" : v === "scope2" ? "Scope 2" : "Scope 3"}</span>} />
-              <Bar isAnimationActive={false} dataKey="scope1" name="scope1" stackId="a" fill="#959891" maxBarSize={18} />
-              <Bar isAnimationActive={false} dataKey="scope2" name="scope2" stackId="a" fill="#AF8D84" maxBarSize={18} />
-              <Bar isAnimationActive={false} dataKey="scope3" name="scope3" stackId="a" fill="#F6C8CC" radius={[0, 4, 4, 0]} maxBarSize={18} />
-            </BarChart>
-          </ResponsiveContainer>
+      <div className="grid grid-cols-12 gap-4">
+        <Card className="col-span-12 xl:col-span-7 flex flex-col">
+          <CardHeader
+            title="Emissions by hotel, by scope"
+            hint={share ? "Share of each hotel's footprint" : "tCO₂e · ranked by total"}
+            right={<Tabs variant="segmented" size="sm" ariaLabel="Mode" items={[{ key: "abs", label: "tCO₂e" }, { key: "share", label: "Share" }]} value={share ? "share" : "abs"} onChange={(k) => setShare(k === "share")} />}
+          />
+          <div className="px-3 pt-3 flex-1">
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={hotels} layout="vertical" margin={{ top: 0, right: 16, bottom: 0, left: 0 }} barCategoryGap="28%">
+                <CartesianGrid horizontal={false} stroke={CHART.grid} />
+                <XAxis type="number" tick={AXIS_TICK} axisLine={false} tickLine={false} tickFormatter={(v) => (share ? `${v}%` : kFmt(v))} domain={share ? [0, 100] : ["auto", "auto"]} />
+                <YAxis type="category" dataKey="name" width={110} tick={{ fontSize: 11, fill: CHART.label }} axisLine={false} tickLine={false} />
+                <Tooltip content={<ChartTip unit={share ? "%" : "t"} hide={["total"]} />} cursor={{ fill: CHART.grid }} />
+                <Bar dataKey="Scope 1" stackId="a" fill={CHART.moss} maxBarSize={16} isAnimationActive={false} />
+                <Bar dataKey="Scope 2" stackId="a" fill={CHART.mauve} maxBarSize={16} isAnimationActive={false} />
+                <Bar dataKey="Scope 3" stackId="a" fill={CHART.blush} radius={[0, 4, 4, 0]} maxBarSize={16} isAnimationActive={false} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+          <div className="mt-auto px-6 py-4 border-t border-ink-100">
+            <LegendRow items={[{ label: "Scope 1", color: CHART.moss }, { label: "Scope 2", color: CHART.mauve }, { label: "Scope 3", color: CHART.blush }]} />
+          </div>
+        </Card>
+
+        <Card className="col-span-12 xl:col-span-5 flex flex-col">
+          <CardHeader title="Scope 2 — location vs market" hint="Both methods are required · the gap is what RECs and green tariffs remove" />
+          <div className="px-6 pt-4 grid grid-cols-2 gap-3">
+            <div className="rounded-xl2 bg-ink-50 p-3"><div className="text-[10px] uppercase tracking-[0.06em] font-semibold text-ink-400">Location-based</div><div className="text-[17px] font-bold text-ink-900 tabular-nums">{fmtN(SCOPE2_METHODS.locationBased.tco2e)} t</div><div className="text-[10px] text-ink-500">grid factor {SCOPE2_METHODS.gridEF.value} {SCOPE2_METHODS.gridEF.unit}</div></div>
+            <div className="rounded-xl2 bg-ink-50 p-3"><div className="text-[10px] uppercase tracking-[0.06em] font-semibold text-ink-400">Market-based</div><div className="text-[17px] font-bold text-good-700 tabular-nums">{fmtN(SCOPE2_METHODS.marketBased.tco2e)} t</div><div className="text-[10px] text-ink-500">−{fmtN(SCOPE2_METHODS.saving.tco2e)} t after RECs</div></div>
+          </div>
+          <div className="px-3 pt-3 flex-1">
+            <ResponsiveContainer width="100%" height={150}>
+              <BarChart data={SCOPE2_MONTHLY} barGap={1} barCategoryGap="30%" margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+                <CartesianGrid vertical={false} stroke={CHART.grid} />
+                <XAxis dataKey="m" tick={AXIS_TICK} axisLine={false} tickLine={false} interval={1} />
+                <YAxis tick={AXIS_TICK} axisLine={false} tickLine={false} width={36} tickFormatter={kFmt} />
+                <Tooltip content={<ChartTip unit="t" />} cursor={{ fill: CHART.grid }} />
+                <Bar dataKey="loc" name="Location-based" fill={CHART.mauve} radius={[3, 3, 0, 0]} isAnimationActive={false} />
+                <Bar dataKey="mkt" name="Market-based" fill={CHART.olive} radius={[3, 3, 0, 0]} isAnimationActive={false} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+          <div className="px-6 pt-2 pb-4 flex items-center gap-4">
+            <RadialGauge value={SCOPE2_METHODS.recCoverage.pct} size={72} stroke={8} color={CHART.olive} />
+            <div className="text-[11px] text-ink-600 leading-snug"><span className="font-semibold text-ink-900">{SCOPE2_METHODS.recCoverage.pct}% renewable electricity</span> · {fmtN(SCOPE2_METHODS.recCoverage.mwh)} MWh covered by RECs and on-site solar · target 100% by 2030 · gap {fmtN(47316)} MWh</div>
+          </div>
+          <div className="mt-auto px-6 py-3 border-t border-ink-100">
+            <LegendRow items={[{ label: "Location-based", color: CHART.mauve }, { label: "Market-based", color: CHART.olive }]} />
+          </div>
+        </Card>
+      </div>
+
+      <Card className="flex flex-col">
+        <CardHeader title="Monthly emissions against the 2030 trajectory" hint="tCO₂e · Scope 1+2 and Scope 3 stacked · dotted = target path" />
+        <div className="px-3 pt-3">
+          <StackedArea data={trend} xKey="month" height={230} unit="t" series={[{ key: "Scope 1+2", name: "Scope 1+2", color: CHART.mauve }, { key: "Scope 3", name: "Scope 3", color: CHART.blush }]} targetKey="target" targetName="2030 trajectory" />
         </div>
+        <TargetLine baseline="54,900 t" baseYear={2019} current="42,850 t (−22%)" target="−40%" targetYear={2030} gap="18% remaining" status="bad" owner="Sarah Chen" />
       </Card>
 
-      {/* Monthly trend + target */}
       <Card>
-        <CardHeader title="Monthly Emissions Trend" hint="tCO₂e · solid = actual · dashed = 2030 target trajectory" />
-        <div className="px-4 pb-2 pt-1">
-          <TargetBanner
-            baseline="54,900 tCO₂e" baseYear={2019}
-            current="42,850 tCO₂e (−22%)" target="−40% reduction" targetYear={2030}
-            gap="18% remaining" status="bad" owner="Sarah Chen"
-          />
-        </div>
-        <div className="px-6 pb-6 pt-1">
-          <ResponsiveContainer width="100%" height={200}>
-            <LineChart data={PORTFOLIO_MONTHLY_TREND} margin={{ top: 4, right: 8, bottom: 0, left: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#EDEFF0" vertical={false} />
-              <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#7B8285" }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 11, fill: "#7B8285" }} axisLine={false} tickLine={false} width={45}
-                tickFormatter={(v) => `${(v / 1000).toFixed(1)}k`} />
-              <Tooltip contentStyle={{ fontSize: 12, borderRadius: 8, border: "1px solid #EDEFF0" }}
-                formatter={(v: number, name: string) => [
-                  `${v.toLocaleString()} tCO₂e`,
-                  name === "carbonTarget" ? "2030 target" : "Actual"
-                ]} />
-              <Line isAnimationActive={false} type="monotone" dataKey="carbon" name="carbon" stroke="#AF8D84" strokeWidth={2.5} dot={false} activeDot={{ r: 5, strokeWidth: 0 }} />
-              <Line isAnimationActive={false} type="monotone" dataKey="carbonTarget" name="carbonTarget" stroke="#AF8D84" strokeWidth={1.5} strokeDasharray="5 4" dot={false} activeDot={{ r: 4, strokeWidth: 0 }} opacity={0.5} />
-            </LineChart>
-          </ResponsiveContainer>
-          <div className="flex items-center gap-5 mt-1 text-[10px] text-ink-400 justify-center">
-            <span className="flex items-center gap-1.5"><span className="inline-block w-6 h-0.5 bg-[#AF8D84] rounded" />Actual</span>
-            <span className="flex items-center gap-1.5"><span className="inline-block w-6 h-0.5 bg-[#AF8D84] rounded opacity-50" style={{ backgroundImage: "repeating-linear-gradient(90deg,#AF8D84 0,#AF8D84 4px,transparent 4px,transparent 8px)" }} />Target trajectory</span>
-          </div>
+        <CardHeader title="Carbon intensity by hotel and month" hint="kgCO₂e per room night · seasonality is the shape, the hotel is the level · click a row to keep it" />
+        <div className="px-6 pt-4 pb-5">
+          <Heatmap rows={heat.map((h) => h.hotel)} cols={MONTHS} values={heat.map((h) => h.values)} format={(v) => fmtN(v, 0)} unit="kgCO₂e/RN" rowTotals={heat.map((h) => h.total)} onRowClick={(r) => setRow(r === row ? null : r)} selectedRow={row} />
         </div>
       </Card>
     </div>
   );
 }
 
-// ─── ENERGY ──────────────────────────────────────────────────────────────────
+/* ─── ENERGY ───────────────────────────────────────────────────────────────── */
 
 function EnergySection() {
-  const [drilldown, setDrilldown] = useState<DrilldownState>(null);
-  const intensityData = [...PORTFOLIO_HOTELS]
-    .sort((a, b) => b.energyIntensity - a.energyIntensity)
-    .map((h) => ({ name: h.shortName, intensity: h.energyIntensity, total: h.energy_mwh }));
-
+  const [drill, setDrill] = useState<Drill>(null);
+  const [hotel, setHotel] = useState<string | null>(null);
+  const total = PORTFOLIO_ENERGY_SOURCES.reduce((s, x) => s + x.mwh, 0);
+  const renewables = PORTFOLIO_ENERGY_SOURCES.find((s) => s.source === "Renewables")?.mwh ?? 0;
+  const dumbbell = [...PORTFOLIO_HOTELS].sort((a, b) => b.energyIntensity - a.energyIntensity).map((h) => ({ id: h.id, label: h.shortName, a: +(h.energyIntensity / (1 + h.yoyEnergy / 100)).toFixed(1), b: h.energyIntensity }));
+  const avg = PORTFOLIO_HOTELS.reduce((s, h) => s + h.energyIntensity * h.orn, 0) / PORTFOLIO_HOTELS.reduce((s, h) => s + h.orn, 0);
+  const mix = [...PORTFOLIO_HOTELS].sort((a, b) => b.renewablePct - a.renewablePct).map((h) => ({ name: h.shortName, ...HOTEL_FUEL_MIX[h.name] }));
+  const trend = PORTFOLIO_MONTHLY_TREND.map((m) => {
+    const t = m.energy;
+    return { month: m.month, Grid: Math.round(t * 0.691), "Natural gas": Math.round(t * 0.199), Diesel: Math.round(t * 0.063), Renewables: Math.round(t * 0.047), target: m.energyTarget };
+  });
+  const nodeDrill = (id: string) => {
+    if (!id.startsWith("use-")) return;
+    const u = ENERGY_END_USE[Number(id.split("-")[1])];
+    if (u?.drilldownKey) setDrill({ key: u.drilldownKey, label: u.system });
+  };
   return (
     <div className="space-y-5">
       <MetricStrip items={[
-        { label: "Total Energy Use",   value: "84.2 GWh",       sub: "−6.1% YoY",        tone: "good" },
-        { label: "Energy Intensity",   value: "116.9 kWh/RN",   sub: "−8.3 vs prior yr",  tone: "good" },
-        { label: "Renewable Share",    value: "12%",             sub: "of electricity",     tone: "warn" },
-        { label: "HVAC & Cooling",     value: "43.7%",           sub: "of total energy — largest system" },
-        { label: "Natural Gas",        value: "19.9%",           sub: "of energy mix" },
-        { label: "Diesel",             value: "6.3%",            sub: "high-impact fuel",   tone: "bad" },
+        { label: "Total energy", value: "84.2 GWh", sub: "−6.1% YoY", tone: "good" },
+        { label: "Energy intensity", value: "116.9 kWh/RN", sub: "−8.3 vs prior year", tone: "good" },
+        { label: "Renewable share", value: `${((renewables / total) * 100).toFixed(1)}%`, sub: "of energy · 12% of electricity", tone: "warn" },
+        { label: "HVAC & cooling", value: "43.7%", sub: "largest system · 36.8 GWh" },
+        { label: "Natural gas", value: "19.9%", sub: "of the mix" },
+        { label: "Diesel", value: "6.3%", sub: "highest carbon per kWh", tone: "bad" },
       ]} />
+      <SectionHeader hubTo="/performance/energy/overview" hubLabel="Open energy hub" />
 
-      <SectionHeader confidence={AVG_CONFIDENCE} hubTo="/performance/energy/overview" hubLabel="Open Energy Hub" />
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-
-        {/* Energy by system */}
-        <Card>
-          <CardHeader
-            title="Energy by System / End-Use"
-            hint="84,200 MWh · where energy is consumed"
-          />
-          <div className="px-4 pb-4 pt-2 space-y-4">
-            <ResponsiveContainer width="100%" height={170}>
-              <BarChart data={ENERGY_END_USE} layout="vertical" margin={{ top: 0, right: 50, bottom: 0, left: 0 }}>
-                <XAxis type="number" tick={{ fontSize: 9, fill: "#7B8285" }} axisLine={false} tickLine={false}
-                  tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`} />
-                <YAxis type="category" dataKey="system" width={0} tick={false} axisLine={false} tickLine={false} />
-                <Tooltip contentStyle={{ fontSize: 11, borderRadius: 8, border: "1px solid #EDEFF0" }}
-                  formatter={(v: number) => [`${v.toLocaleString()} MWh`, ""]} />
-                <Bar isAnimationActive={false} dataKey="mwh" radius={[0, 4, 4, 0]} maxBarSize={16}>
-                  {ENERGY_END_USE.map((s) => <Cell key={s.system} fill={s.color} />)}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-            <ul className="space-y-1">
-              {ENERGY_END_USE.map((s) => (
-                <li
-                  key={s.system}
-                  className={cn(
-                    "flex items-start gap-2 rounded-lg px-2 py-1.5 -mx-2 transition-colors",
-                    s.drilldownKey ? "cursor-pointer hover:bg-ink-50 group" : ""
-                  )}
-                  onClick={() => s.drilldownKey && setDrilldown({ key: s.drilldownKey, label: s.system })}
-                >
-                  <span className="w-2 h-2 rounded-full shrink-0 mt-1.5" style={{ background: s.color }} />
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between gap-2">
-                      <span className={cn("text-[11px] font-semibold leading-snug",
-                        s.drilldownKey ? "text-brand-700 group-hover:underline" : "text-ink-800"
-                      )}>
-                        {s.system}
-                      </span>
-                      <div className="flex items-center gap-1 shrink-0">
-                        <span className="text-[11px] font-bold text-ink-900 tabular-nums">{s.pct}%</span>
-                        {s.drilldownKey && <ChevronRight size={10} className="text-ink-300 group-hover:text-brand-600" />}
-                      </div>
-                    </div>
-                    <div className="text-[10px] text-ink-400">{s.note} · {s.mwh.toLocaleString()} MWh</div>
-                  </div>
-                </li>
-              ))}
-            </ul>
-            <div className="flex items-start gap-1.5 rounded-lg bg-brand-50 px-3 py-2 text-[11px] text-brand-700">
-              <Info size={11} className="shrink-0 mt-0.5" />
-              <span>HVAC alone (43.7%) represents 36.8 GWh — BMS optimisation across 8 hotels targets a 12% reduction.</span>
-            </div>
+      <div className="grid grid-cols-12 gap-4">
+        <Card className="col-span-12 xl:col-span-7 flex flex-col">
+          <CardHeader title="From fuel to use" hint="Where each energy source ends up · MWh · click a system to see it by property" />
+          <div className="px-4 pt-3 pb-2 flex-1">
+            <Sankey nodes={ENERGY_SANKEY.nodes} links={ENERGY_SANKEY.links} height={330} unit="MWh" labelWidth={150} onNodeClick={nodeDrill} />
+          </div>
+          <div className="mt-auto px-6 py-4 border-t border-ink-100 text-[11px] text-ink-500">
+            Gas feeds heating, kitchens and laundry; diesel is generator and plant load. Splits are fitted to the metered source and system totals.
           </div>
         </Card>
 
-        {/* Fuel mix */}
-        <Card>
-          <CardHeader title="Energy Sources — Fuel Mix" hint="by primary source of energy input" />
-          <div className="px-4 pb-4 pt-4 flex flex-col items-center">
-            <ResponsiveContainer width="100%" height={200}>
-              <PieChart>
-                <Pie isAnimationActive={false} data={PORTFOLIO_ENERGY_SOURCES} dataKey="pct" nameKey="source" cx="50%" cy="50%"
-                  innerRadius={55} outerRadius={85} paddingAngle={2}>
-                  {PORTFOLIO_ENERGY_SOURCES.map((s) => <Cell key={s.source} fill={s.color} />)}
-                </Pie>
-                <Tooltip contentStyle={{ fontSize: 12, borderRadius: 8, border: "1px solid #EDEFF0" }}
-                  formatter={(v: number) => [`${v}%`, ""]} />
-              </PieChart>
-            </ResponsiveContainer>
-            <ul className="w-full space-y-2 mt-2">
-              {PORTFOLIO_ENERGY_SOURCES.map((s) => (
-                <li key={s.source} className="flex items-center justify-between text-[12px]">
-                  <span className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: s.color }} />
-                    <span className="text-ink-700">{s.source}</span>
-                  </span>
-                  <div className="flex items-center gap-3">
-                    <span className="text-ink-400 tabular-nums">{s.mwh.toLocaleString()} MWh</span>
-                    <span className="font-bold text-ink-900 tabular-nums w-10 text-right">{s.pct}%</span>
-                  </div>
-                </li>
-              ))}
-            </ul>
-            <div className="mt-3 w-full flex items-start gap-1.5 rounded-lg bg-bad/10 px-3 py-2 text-[11px] text-bad">
-              <Info size={11} className="shrink-0 mt-0.5" />
-              <span>Diesel (5,300 MWh, 6.3%) generates disproportionate Scope 1 carbon — generator reduction is high priority.</span>
-            </div>
+        <Card className="col-span-12 xl:col-span-5 flex flex-col">
+          <CardHeader title="Fuel mix" hint="By primary energy input" />
+          <div className="px-6 pt-4 flex-1">
+            <Donut legend="below" height={170} unit="MWh" centre={{ value: "84.2 GWh", label: "this year" }} data={PORTFOLIO_ENERGY_SOURCES.map((s) => ({ name: s.source, value: s.mwh, color: s.color }))} />
+          </div>
+          <div className="mt-auto px-6 py-4 border-t border-ink-100 flex items-center gap-4">
+            <RadialGauge value={12} size={64} stroke={7} color={CHART.olive} />
+            <div className="text-[11px] text-ink-600 leading-snug"><span className="font-semibold text-ink-900">12% of electricity is renewable</span> · target 100% by 2030. Diesel's 5,300 MWh carries a disproportionate share of Scope 1.</div>
           </div>
         </Card>
       </div>
 
-      {drilldown && (
-        <DrilldownPanel
-          drilldownKey={drilldown.key}
-          label={drilldown.label}
-          onClose={() => setDrilldown(null)}
-        />
-      )}
+      {drill && <DrilldownPanel drilldownKey={drill.key} label={drill.label} onClose={() => setDrill(null)} />}
 
-      {/* Intensity by hotel */}
-      <Card>
-        <CardHeader title="Energy Intensity by Hotel" hint="kWh per room night — portfolio average 116.9" />
-        <div className="px-4 pb-4 pt-2">
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={intensityData} layout="vertical" margin={{ top: 0, right: 60, bottom: 0, left: 110 }}>
-              <XAxis type="number" tick={{ fontSize: 10, fill: "#7B8285" }} axisLine={false} tickLine={false} />
-              <YAxis type="category" dataKey="name" width={106} tick={{ fontSize: 11, fill: "#383B3D" }} axisLine={false} tickLine={false} />
-              <Tooltip contentStyle={{ fontSize: 12, borderRadius: 8, border: "1px solid #EDEFF0" }}
-                formatter={(v: number, _n, p) => [`${v.toFixed(1)} kWh/RN · ${p.payload.total.toLocaleString()} MWh total`, "Intensity"]} />
-              <Bar isAnimationActive={false} dataKey="intensity" radius={[0, 4, 4, 0]} maxBarSize={18}>
-                {intensityData.map((d) => (
-                  <Cell key={d.name} fill={d.intensity > 150 ? "#B33650" : d.intensity > 100 ? "#CDB872" : "#807245"} />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-      </Card>
-
-      {/* Trend + target */}
-      <Card>
-        <CardHeader title="Monthly Energy Trend" hint="MWh · solid = actual · dashed = 2026 target trajectory" />
-        <div className="px-4 pb-2 pt-1">
-          <TargetBanner
-            baseline="22.5 kWh/RN" baseYear={2022}
-            current="116.9 kWh/RN total" target="16.5 kWh/RN" targetYear={2025}
-            gap="1.9 kWh/RN above target" status="warn" owner="Sarah Chen"
-          />
-        </div>
-        <div className="px-6 pb-6 pt-1">
-          <ResponsiveContainer width="100%" height={200}>
-            <LineChart data={PORTFOLIO_MONTHLY_TREND} margin={{ top: 4, right: 8, bottom: 0, left: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#EDEFF0" vertical={false} />
-              <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#7B8285" }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 11, fill: "#7B8285" }} axisLine={false} tickLine={false} width={50}
-                tickFormatter={(v) => `${(v / 1000).toFixed(1)}k`} />
-              <Tooltip contentStyle={{ fontSize: 12, borderRadius: 8, border: "1px solid #EDEFF0" }}
-                formatter={(v: number, name: string) => [
-                  `${v.toLocaleString()} MWh`,
-                  name === "energyTarget" ? "Target" : "Actual"
-                ]} />
-              <Line isAnimationActive={false} type="monotone" dataKey="energy" name="energy" stroke="#CDB872" strokeWidth={2.5} dot={false} activeDot={{ r: 5, strokeWidth: 0 }} />
-              <Line isAnimationActive={false} type="monotone" dataKey="energyTarget" name="energyTarget" stroke="#CDB872" strokeWidth={1.5} strokeDasharray="5 4" dot={false} activeDot={{ r: 4, strokeWidth: 0 }} opacity={0.5} />
-            </LineChart>
-          </ResponsiveContainer>
-          <div className="flex items-center gap-5 mt-1 text-[10px] text-ink-400 justify-center">
-            <span className="flex items-center gap-1.5"><span className="inline-block w-6 h-0.5 bg-[#CDB872] rounded" />Actual</span>
-            <span className="flex items-center gap-1.5"><span className="inline-block w-6 h-0.5 bg-[#CDB872] rounded opacity-50" style={{ backgroundImage: "repeating-linear-gradient(90deg,#CDB872 0,#CDB872 4px,transparent 4px,transparent 8px)" }} />Target</span>
+      <div className="grid grid-cols-12 gap-4">
+        <Card className="col-span-12 xl:col-span-7 flex flex-col">
+          <CardHeader title="Intensity by hotel — last year to this year" hint="kWh per room night · highest first · line = portfolio average" />
+          <div className="px-6 pt-4 pb-2 flex-1">
+            <Dumbbell rows={dumbbell} unit="kWh/RN" avg={+avg.toFixed(1)} onSelect={(id) => setHotel(id === hotel ? null : id)} selectedId={hotel} />
           </div>
+          <div className="mt-auto px-6 py-4 border-t border-ink-100 text-[11px] text-ink-500">Every hotel moved down; the spread between best and worst is still 2.5×.</div>
+        </Card>
+
+        <Card className="col-span-12 xl:col-span-5 flex flex-col">
+          <CardHeader title="Fuel mix by hotel" hint="Share of each hotel's energy · sorted by renewable share" />
+          <div className="px-3 pt-3 flex-1">
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={mix} layout="vertical" margin={{ top: 0, right: 12, bottom: 0, left: 0 }} barCategoryGap="30%">
+                <XAxis type="number" domain={[0, 100]} tick={AXIS_TICK} axisLine={false} tickLine={false} tickFormatter={(v) => `${v}%`} />
+                <YAxis type="category" dataKey="name" width={108} tick={{ fontSize: 11, fill: CHART.label }} axisLine={false} tickLine={false} />
+                <Tooltip content={<ChartTip unit="%" />} cursor={{ fill: CHART.grid }} />
+                <Bar dataKey="renewables" name="Renewables" stackId="a" fill={CHART.olive} maxBarSize={14} isAnimationActive={false} />
+                <Bar dataKey="grid" name="Grid" stackId="a" fill={CHART.moss} maxBarSize={14} isAnimationActive={false} />
+                <Bar dataKey="gas" name="Natural gas" stackId="a" fill={CHART.mauve} maxBarSize={14} isAnimationActive={false} />
+                <Bar dataKey="diesel" name="Diesel" stackId="a" fill={CHART.rose} radius={[0, 4, 4, 0]} maxBarSize={14} isAnimationActive={false} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+          <div className="mt-auto px-6 py-4 border-t border-ink-100">
+            <LegendRow items={[{ label: "Renewables", color: CHART.olive }, { label: "Grid", color: CHART.moss }, { label: "Natural gas", color: CHART.mauve }, { label: "Diesel", color: CHART.rose }]} />
+          </div>
+        </Card>
+      </div>
+
+      <Card className="flex flex-col">
+        <CardHeader title="Monthly energy by source against the trajectory" hint="MWh · stacked by fuel · dotted = target path" />
+        <div className="px-3 pt-3">
+          <StackedArea data={trend} xKey="month" height={230} unit="MWh" series={[{ key: "Grid", name: "Grid", color: CHART.moss }, { key: "Natural gas", name: "Natural gas", color: CHART.mauve }, { key: "Diesel", name: "Diesel", color: CHART.rose }, { key: "Renewables", name: "Renewables", color: CHART.olive }]} targetKey="target" targetName="Target path" />
         </div>
+        <TargetLine baseline="22.5 kWh/RN" baseYear={2022} current="116.9 kWh/RN" target="16.5 kWh/RN" targetYear={2025} gap="1.9 kWh/RN above" status="warn" owner="Sarah Chen" />
       </Card>
     </div>
   );
 }
 
-// ─── WATER ───────────────────────────────────────────────────────────────────
+/* ─── WATER ────────────────────────────────────────────────────────────────── */
 
 function WaterSection() {
-  const [drilldown, setDrilldown] = useState<DrilldownState>(null);
-  const intensityData = [...PORTFOLIO_HOTELS]
-    .sort((a, b) => b.waterIntensity - a.waterIntensity)
-    .map((h) => ({ name: h.shortName, intensity: h.waterIntensity, total: h.water_m3 }));
-
+  const [drill, setDrill] = useState<Drill>(null);
+  const [hotel, setHotel] = useState<string | null>(null);
+  const total = PORTFOLIO_WATER_SOURCES.reduce((s, x) => s + x.m3, 0);
+  const recycled = PORTFOLIO_WATER_SOURCES.find((s) => s.source.startsWith("Recycled"))?.m3 ?? 0;
+  const dumbbell = [...PORTFOLIO_HOTELS].sort((a, b) => b.waterIntensity - a.waterIntensity).map((h) => ({ id: h.id, label: h.shortName, a: Math.round(h.waterIntensity / (1 + rawYoyPct(h.name, "water") / 100)), b: h.waterIntensity }));
+  const avg = Math.round(PORTFOLIO_HOTELS.reduce((s, h) => s + h.waterIntensity * h.gn, 0) / PORTFOLIO_HOTELS.reduce((s, h) => s + h.gn, 0));
+  const points = PORTFOLIO_HOTELS.map((h) => ({ id: h.id, label: h.shortName, value: h.waterIntensity }));
+  const over = points.filter((p) => p.value > 532).length;
+  const trend = PORTFOLIO_MONTHLY_TREND.map((m) => ({ month: m.month, Rooms: Math.round(m.waterM3 * 0.35), Laundry: Math.round(m.waterM3 * 0.24), Kitchen: Math.round(m.waterM3 * 0.18), "Pool & spa": Math.round(m.waterM3 * 0.12), Other: Math.round(m.waterM3 * 0.11), target: m.waterTarget }));
+  const nodeDrill = (id: string) => {
+    if (!id.startsWith("use-")) return;
+    const u = WATER_END_USE[Number(id.split("-")[1])];
+    if (u?.drilldownKey) setDrill({ key: u.drilldownKey, label: u.use });
+  };
   return (
     <div className="space-y-5">
       <MetricStrip items={[
-        { label: "Total Water Use",    value: "552,000 m³",    sub: "−3.8% YoY",      tone: "good" },
-        { label: "Water Intensity",    value: "532 L/GN",      sub: "−22 vs prior yr", tone: "good" },
-        { label: "Recycled Water",     value: "6%",            sub: "of total",         tone: "warn" },
-        { label: "Guest Rooms",        value: "35%",           sub: "largest end-use — 193,200 m³" },
-        { label: "Laundry",            value: "24%",           sub: "132,480 m³ — high reduction potential" },
-        { label: "Hotels over Target", value: "7 / 10",        sub: "above 532 L/GN",  tone: "warn" },
+        { label: "Total water", value: "552,000 m³", sub: "−3.8% YoY", tone: "good" },
+        { label: "Water intensity", value: "532 L/GN", sub: "−22 vs prior year", tone: "good" },
+        { label: "Recycled water", value: `${((recycled / total) * 100).toFixed(0)}%`, sub: "of supply · target 20% by 2027", tone: "warn" },
+        { label: "Guest rooms", value: "35%", sub: "largest end-use · 193,200 m³" },
+        { label: "Laundry", value: "24%", sub: "132,480 m³ · best reduction case" },
+        { label: "Hotels over target", value: `${over} / 10`, sub: "above 532 L/GN", tone: "warn" },
       ]} />
+      <SectionHeader hubTo="/performance/water/overview" hubLabel="Open water hub" />
 
-      <SectionHeader confidence={AVG_CONFIDENCE} hubTo="/performance/water/overview" hubLabel="Open Water Hub" />
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-
-        {/* Water by end-use */}
-        <Card>
-          <CardHeader
-            title="Water by End-Use"
-            hint="552,000 m³ · where water is consumed"
-          />
-          <div className="px-4 pb-4 pt-2 space-y-4">
-            <ResponsiveContainer width="100%" height={170}>
-              <BarChart data={WATER_END_USE} layout="vertical" margin={{ top: 0, right: 50, bottom: 0, left: 0 }}>
-                <XAxis type="number" tick={{ fontSize: 9, fill: "#7B8285" }} axisLine={false} tickLine={false}
-                  tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`} />
-                <YAxis type="category" dataKey="use" width={0} tick={false} axisLine={false} tickLine={false} />
-                <Tooltip contentStyle={{ fontSize: 11, borderRadius: 8, border: "1px solid #EDEFF0" }}
-                  formatter={(v: number) => [`${v.toLocaleString()} m³`, ""]} />
-                <Bar isAnimationActive={false} dataKey="m3" radius={[0, 4, 4, 0]} maxBarSize={16}>
-                  {WATER_END_USE.map((u) => <Cell key={u.use} fill={u.color} />)}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-            <ul className="space-y-1">
-              {WATER_END_USE.map((u) => (
-                <li
-                  key={u.use}
-                  className={cn(
-                    "flex items-start gap-2 rounded-lg px-2 py-1.5 -mx-2 transition-colors",
-                    u.drilldownKey ? "cursor-pointer hover:bg-ink-50 group" : ""
-                  )}
-                  onClick={() => u.drilldownKey && setDrilldown({ key: u.drilldownKey, label: u.use })}
-                >
-                  <span className="w-2 h-2 rounded-full shrink-0 mt-1.5" style={{ background: u.color }} />
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between gap-2">
-                      <span className={cn("text-[11px] font-semibold leading-snug",
-                        u.drilldownKey ? "text-brand-700 group-hover:underline" : "text-ink-800"
-                      )}>
-                        {u.use}
-                      </span>
-                      <div className="flex items-center gap-1 shrink-0">
-                        <span className="text-[11px] font-bold text-ink-900 tabular-nums">{u.pct}%</span>
-                        {u.drilldownKey && <ChevronRight size={10} className="text-ink-300 group-hover:text-brand-600" />}
-                      </div>
-                    </div>
-                    <div className="text-[10px] text-ink-400">
-                      {u.note} · {u.litresPerGN} L/GN
-                    </div>
-                  </div>
-                </li>
-              ))}
-            </ul>
-            <div className="flex items-start gap-1.5 rounded-lg bg-brand-50 px-3 py-2 text-[11px] text-brand-700">
-              <Info size={11} className="shrink-0 mt-0.5" />
-              <span>Laundry (24%) is the best ROI: linen reuse + optimised wash cycles can cut 30–40 L/GN with no capital outlay.</span>
-            </div>
+      <div className="grid grid-cols-12 gap-4">
+        <Card className="col-span-12 xl:col-span-7 flex flex-col">
+          <CardHeader title="From supply to use" hint="Where each source ends up · m³ · click an end-use to see it by property" />
+          <div className="px-4 pt-3 pb-2 flex-1">
+            <Sankey nodes={WATER_SANKEY.nodes} links={WATER_SANKEY.links} height={330} unit="m³" labelWidth={160} onNodeClick={nodeDrill} />
           </div>
+          <div className="mt-auto px-6 py-4 border-t border-ink-100 text-[11px] text-ink-500">Recycled water goes to irrigation, cooling makeup and laundry rinse — never to rooms or kitchens.</div>
         </Card>
 
-        {/* Water sources */}
-        <Card>
-          <CardHeader title="Water Supply Sources" hint="where water comes from" />
-          <div className="px-4 pb-4 pt-4 flex flex-col items-center">
-            <ResponsiveContainer width="100%" height={200}>
-              <PieChart>
-                <Pie isAnimationActive={false} data={PORTFOLIO_WATER_SOURCES} dataKey="pct" nameKey="source" cx="50%" cy="50%"
-                  innerRadius={55} outerRadius={85} paddingAngle={2}>
-                  {PORTFOLIO_WATER_SOURCES.map((s) => <Cell key={s.source} fill={s.color} />)}
-                </Pie>
-                <Tooltip contentStyle={{ fontSize: 12, borderRadius: 8, border: "1px solid #EDEFF0" }}
-                  formatter={(v: number) => [`${v}%`, ""]} />
-              </PieChart>
-            </ResponsiveContainer>
-            <ul className="w-full space-y-2 mt-2">
-              {PORTFOLIO_WATER_SOURCES.map((s) => (
-                <li key={s.source} className="flex items-center justify-between text-[12px]">
-                  <span className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: s.color }} />
-                    <span className="text-ink-700">{s.source}</span>
-                  </span>
-                  <div className="flex items-center gap-3">
-                    <span className="text-ink-400 tabular-nums">{s.m3.toLocaleString()} m³</span>
-                    <span className="font-bold text-ink-900 tabular-nums w-10 text-right">{s.pct}%</span>
-                  </div>
-                </li>
-              ))}
-            </ul>
-            <div className="mt-3 w-full">
-              <div className="flex justify-between text-[11px] mb-1">
-                <span className="text-ink-500">Recycled / reused water share</span>
-                <span className="font-semibold text-warn">6% · target 20% by 2027</span>
-              </div>
-              <div className="h-2 bg-ink-100 rounded-full overflow-hidden">
-                <div className="h-full bg-chart-sand rounded-full" style={{ width: "6%" }} />
-              </div>
-              <div className="mt-1 text-[10px] text-ink-400">Greywater reuse at Skyline Dubai (approved, AED 120k) will add ~3%</div>
-            </div>
+        <Card className="col-span-12 xl:col-span-5 flex flex-col">
+          <CardHeader title="Supply sources" hint="Where the water comes from" />
+          <div className="px-6 pt-4 flex-1">
+            <Donut legend="below" height={170} unit="m³" centre={{ value: "552k m³", label: "this year" }} data={PORTFOLIO_WATER_SOURCES.map((s) => ({ name: s.source, value: s.m3, color: s.color }))} />
+          </div>
+          <div className="mt-auto px-6 py-4 border-t border-ink-100 flex items-center gap-4">
+            <RadialGauge value={(6 / 20) * 100} size={64} stroke={7} color={CHART.sand} valueText="6%" />
+            <div className="text-[11px] text-ink-600 leading-snug"><span className="font-semibold text-ink-900">6% recycled against a 20% target</span> for 2027. Greywater reuse at Skyline Dubai (approved) adds about 3 points.</div>
           </div>
         </Card>
       </div>
 
-      {drilldown && (
-        <DrilldownPanel
-          drilldownKey={drilldown.key}
-          label={drilldown.label}
-          onClose={() => setDrilldown(null)}
-        />
-      )}
+      {drill && <DrilldownPanel drilldownKey={drill.key} label={drill.label} onClose={() => setDrill(null)} />}
 
-      {/* Intensity by hotel */}
-      <Card>
-        <CardHeader title="Water Intensity by Hotel" hint="litres per guest night — portfolio average 532" />
-        <div className="px-4 pb-4 pt-2">
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={intensityData} layout="vertical" margin={{ top: 0, right: 60, bottom: 0, left: 110 }}>
-              <XAxis type="number" tick={{ fontSize: 10, fill: "#7B8285" }} axisLine={false} tickLine={false} />
-              <YAxis type="category" dataKey="name" width={106} tick={{ fontSize: 11, fill: "#383B3D" }} axisLine={false} tickLine={false} />
-              <Tooltip contentStyle={{ fontSize: 12, borderRadius: 8, border: "1px solid #EDEFF0" }}
-                formatter={(v: number, _n, p) => [`${v.toFixed(0)} L/GN · ${p.payload.total.toLocaleString()} m³ total`, "Intensity"]} />
-              <Bar isAnimationActive={false} dataKey="intensity" radius={[0, 4, 4, 0]} maxBarSize={18}>
-                {intensityData.map((d) => (
-                  <Cell key={d.name} fill={d.intensity > 700 ? "#B33650" : d.intensity > 500 ? "#CDB872" : "#807245"} />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-      </Card>
-
-      {/* Trend + target */}
-      <Card>
-        <CardHeader title="Monthly Water Trend" hint="m³ · solid = actual · dashed = target trajectory" />
-        <div className="px-4 pb-2 pt-1">
-          <TargetBanner
-            baseline="374 L/GN" baseYear={2022}
-            current="532 L/GN" target="310 L/GN" targetYear={2025}
-            gap="32 L/GN above target" status="warn" owner="Jin Park"
-          />
-        </div>
-        <div className="px-6 pb-6 pt-1">
-          <ResponsiveContainer width="100%" height={200}>
-            <LineChart data={PORTFOLIO_MONTHLY_TREND} margin={{ top: 4, right: 8, bottom: 0, left: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#EDEFF0" vertical={false} />
-              <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#7B8285" }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 11, fill: "#7B8285" }} axisLine={false} tickLine={false} width={50}
-                tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`} />
-              <Tooltip contentStyle={{ fontSize: 12, borderRadius: 8, border: "1px solid #EDEFF0" }}
-                formatter={(v: number, name: string) => [
-                  `${v.toLocaleString()} m³`,
-                  name === "waterTarget" ? "Target" : "Actual"
-                ]} />
-              <Line isAnimationActive={false} type="monotone" dataKey="waterM3" name="waterM3" stroke="#AF8D84" strokeWidth={2.5} dot={false} activeDot={{ r: 5, strokeWidth: 0 }} />
-              <Line isAnimationActive={false} type="monotone" dataKey="waterTarget" name="waterTarget" stroke="#AF8D84" strokeWidth={1.5} strokeDasharray="5 4" dot={false} activeDot={{ r: 4, strokeWidth: 0 }} opacity={0.5} />
-            </LineChart>
-          </ResponsiveContainer>
-          <div className="flex items-center gap-5 mt-1 text-[10px] text-ink-400 justify-center">
-            <span className="flex items-center gap-1.5"><span className="inline-block w-6 h-0.5 bg-[#AF8D84] rounded" />Actual</span>
-            <span className="flex items-center gap-1.5"><span className="inline-block w-6 h-0.5 bg-[#AF8D84] rounded opacity-50" style={{ backgroundImage: "repeating-linear-gradient(90deg,#AF8D84 0,#AF8D84 4px,transparent 4px,transparent 8px)" }} />Target</span>
+      <div className="grid grid-cols-12 gap-4">
+        <Card className="col-span-12 xl:col-span-7 flex flex-col">
+          <CardHeader title="Intensity by hotel — last year to this year" hint="Litres per guest night · highest first · line = portfolio average" />
+          <div className="px-6 pt-4 pb-2 flex-1">
+            <Dumbbell rows={dumbbell} unit="L/GN" avg={avg} format={(v) => fmtN(v, 0)} onSelect={(id) => setHotel(id === hotel ? null : id)} selectedId={hotel} />
           </div>
+          <div className="mt-auto px-6 py-4 border-t border-ink-100 text-[11px] text-ink-500">Three hotels moved the wrong way; Airport Dubai and Riverside Bangkok carry the largest gap to the average.</div>
+        </Card>
+
+        <Card className="col-span-12 xl:col-span-5 flex flex-col">
+          <CardHeader title="Hotels against the 532 L/GN target" hint="Each dot is a hotel · left of the line is inside target" />
+          <div className="px-6 pt-8 flex-1">
+            <StripPlot points={points} target={532} avg={avg} unit="L/GN" onSelect={(id) => setHotel(id === hotel ? null : id)} selectedId={hotel} />
+            <div className="mt-6 grid grid-cols-2 gap-3">
+              <div className="rounded-xl2 bg-ink-50 p-3"><div className="text-[10px] uppercase tracking-[0.06em] font-semibold text-ink-400">Inside target</div><div className="text-[17px] font-bold text-good-700 tabular-nums">{10 - over}</div></div>
+              <div className="rounded-xl2 bg-ink-50 p-3"><div className="text-[10px] uppercase tracking-[0.06em] font-semibold text-ink-400">Over target</div><div className="text-[17px] font-bold text-bad-700 tabular-nums">{over}</div></div>
+            </div>
+          </div>
+          <div className="mt-auto px-6 py-4 border-t border-ink-100 text-[11px] text-ink-500">Laundry is the best return: linen reuse and optimised cycles cut 30–40 L/GN with no capital outlay.</div>
+        </Card>
+      </div>
+
+      <Card className="flex flex-col">
+        <CardHeader title="Monthly water by end-use against the trajectory" hint="m³ · stacked by end-use · dotted = target path" />
+        <div className="px-3 pt-3">
+          <StackedArea data={trend} xKey="month" height={230} unit="m³" series={[{ key: "Rooms", name: "Rooms", color: CHART.olive }, { key: "Laundry", name: "Laundry", color: CHART.mauve }, { key: "Kitchen", name: "Kitchen", color: CHART.moss }, { key: "Pool & spa", name: "Pool & spa", color: CHART.blush }, { key: "Other", name: "Other", color: CHART.sage }]} targetKey="target" targetName="Target path" />
         </div>
+        <TargetLine baseline="374 L/GN" baseYear={2022} current="532 L/GN" target="310 L/GN" targetYear={2025} gap="32 L/GN above" status="warn" owner="Jin Park" />
       </Card>
     </div>
   );
 }
 
-// ─── WASTE ───────────────────────────────────────────────────────────────────
-
-// Waterfall: YoY diversion change per stream. base = invisible stack offset for waterfall effect.
-const WASTE_WATERFALL = [
-  { name: "F&B",       value:  +6, base: 0  },
-  { name: "General",   value:  -3, base: 3  },
-  { name: "Events",    value:  +2, base: 0  },
-  { name: "Hazardous", value:  -1, base: 1  },
-  { name: "Kitchen",   value:  +4, base: 0  },
-  { name: "Net Change",value:  +8, base: 0  },
-];
+/* ─── WASTE ────────────────────────────────────────────────────────────────── */
 
 function WasteSection() {
-  const [drilldown, setDrilldown] = useState<DrilldownState>(null);
-  const diversionData = [...PORTFOLIO_HOTELS]
-    .sort((a, b) => a.diversion_pct - b.diversion_pct)
-    .map((h) => ({ name: h.shortName, diversion: h.diversion_pct, total: h.waste_t }));
-
-  // Stacked data: show diversion vs landfill per source
-  const sourceStackData = WASTE_BY_SOURCE.map((s) => ({
-    source: s.source.replace(" & ", "\n& "),
-    recycled:   s.streams.recycled,
-    composted:  s.streams.composted,
-    energyRec:  s.streams.energyRec,
-    landfill:   s.streams.landfill,
-    diversion:  s.diversionPct,
-  }));
-
+  const [drill, setDrill] = useState<Drill>(null);
+  const [hotel, setHotel] = useState<string | null>(null);
+  const total = PORTFOLIO_WASTE_STREAMS.reduce((s, x) => s + x.tonnes, 0);
+  const landfill = PORTFOLIO_WASTE_STREAMS.find((s) => s.stream === "Landfill")?.tonnes ?? 0;
+  const points = PORTFOLIO_HOTELS.map((h) => ({ id: h.id, label: h.shortName, value: h.diversion_pct }));
+  const below = points.filter((p) => p.value < 60).length;
+  const trend = PORTFOLIO_MONTHLY_TREND.map((m) => ({ month: m.month, diversion: m.diversion, target: m.diversionTarget }));
+  const nodeDrill = (id: string) => {
+    if (!id.startsWith("src-")) return;
+    const s = WASTE_BY_SOURCE[Number(id.split("-")[1])];
+    if (s?.drilldownKey) setDrill({ key: s.drilldownKey, label: s.source });
+  };
   return (
     <div className="space-y-5">
       <MetricStrip items={[
-        { label: "Total Waste",        value: "8,420 t",       sub: "+1.4% YoY",           tone: "bad" },
-        { label: "Diversion Rate",     value: "42%",           sub: "vs 60% target",        tone: "bad" },
-        { label: "Landfill",           value: "3,883 t",       sub: "46.1% — urgent reduction needed", tone: "bad" },
-        { label: "F&B Waste",          value: "43%",           sub: "of total — highest source" },
-        { label: "Best Diversion",     value: "62%",           sub: "F&B — composting programme" },
-        { label: "Food Waste",         value: "82 g/cover",    sub: "−8.6% YoY",           tone: "good" },
+        { label: "Total waste", value: "8,420 t", sub: "+1.4% YoY", tone: "bad" },
+        { label: "Diversion rate", value: "42%", sub: "vs 60% target · excl. WtE", tone: "bad" },
+        { label: "Landfill", value: `${fmtN(landfill)} t`, sub: `${((landfill / total) * 100).toFixed(1)}% of total`, tone: "bad" },
+        { label: "F&B waste", value: "43%", sub: "of total · highest source" },
+        { label: "Best diversion", value: "62%", sub: "F&B · composting programme", tone: "good" },
+        { label: "Food waste", value: "82 g/cover", sub: "−8.6% YoY", tone: "good" },
       ]} />
+      <SectionHeader hubTo="/performance/waste/overview" hubLabel="Open waste hub" />
 
-      <SectionHeader confidence={AVG_CONFIDENCE} hubTo="/performance/waste/overview" hubLabel="Open Waste Hub" />
-
-      {/* Waterfall — YoY diversion change by stream */}
-      <Card>
-        <CardHeader
-          title="Diversion Change by Stream — YoY Waterfall"
-          hint="positive = improved diversion · negative = worsened · net portfolio change"
-        />
-        <div className="px-4 pb-4 pt-2">
-          <ResponsiveContainer width="100%" height={220}>
-            <ComposedChart
-              data={WASTE_WATERFALL}
-              margin={{ top: 10, right: 20, bottom: 0, left: 10 }}
-              barCategoryGap="25%"
-            >
-              <CartesianGrid vertical={false} stroke="#EDEFF0" />
-              <XAxis dataKey="name" tick={{ fontSize: 10, fill: "#7B8285" }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 10, fill: "#7B8285" }} axisLine={false} tickLine={false}
-                tickFormatter={(v) => `${v > 0 ? "+" : ""}${v}%`} />
-              <Tooltip
-                contentStyle={{ fontSize: 11, borderRadius: 8, border: "1px solid #EDEFF0" }}
-                formatter={(v: number, name: string) =>
-                  name === "invisible" ? null : [`${v > 0 ? "+" : ""}${v}%`, "Diversion change"]
-                }
-              />
-              <ReferenceLine y={0} stroke="#BABEB5" />
-              {/* invisible base bar for waterfall stacking */}
-              <Bar isAnimationActive={false} dataKey="base" stackId="wf" fill="transparent" radius={0} />
-              <Bar isAnimationActive={false} dataKey="value" stackId="wf" radius={4} maxBarSize={40}>
-                <LabelList
-                  dataKey="value"
-                  position="top"
-                  style={{ fontSize: 10, fontWeight: 700, fill: "#383B3D" }}
-                  formatter={(v: number) => `${v > 0 ? "+" : ""}${v}%`}
-                />
-                {WASTE_WATERFALL.map((entry) => (
-                  <Cell
-                    key={entry.name}
-                    fill={entry.name === "Net Change" ? "#AF8D84" : entry.value >= 0 ? "#807245" : "#B33650"}
-                    fillOpacity={entry.name === "Net Change" ? 1 : 0.75}
-                  />
-                ))}
-              </Bar>
-            </ComposedChart>
-          </ResponsiveContainer>
-        </div>
-      </Card>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-
-        {/* Waste by source — stacked streams */}
-        <Card>
-          <CardHeader
-            title="Waste by Source & Disposal Route"
-            hint="8,420 t · stacked by stream · diversion % labelled"
-          />
-          <div className="px-4 pb-4 pt-2 space-y-4">
-            <ResponsiveContainer width="100%" height={200}>
-              <BarChart data={sourceStackData} margin={{ top: 0, right: 8, bottom: 20, left: 0 }}>
-                <XAxis dataKey="source" tick={{ fontSize: 9, fill: "#7B8285" }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fontSize: 9, fill: "#7B8285" }} axisLine={false} tickLine={false} width={35}
-                  tickFormatter={(v) => `${(v / 1000).toFixed(1)}k`} />
-                <Tooltip contentStyle={{ fontSize: 11, borderRadius: 8, border: "1px solid #EDEFF0" }}
-                  formatter={(v: number, n: string) => [`${v.toLocaleString()} t`, n]} />
-                <Bar isAnimationActive={false} dataKey="recycled"  name="Recycled"     stackId="a" fill="#807245" maxBarSize={48} />
-                <Bar isAnimationActive={false} dataKey="composted" name="Composted"    stackId="a" fill="#F6C8CC" maxBarSize={48} />
-                <Bar isAnimationActive={false} dataKey="energyRec" name="Energy rec."  stackId="a" fill="#CDB872" maxBarSize={48} />
-                <Bar isAnimationActive={false} dataKey="landfill"  name="Landfill"     stackId="a" fill="#B33650" radius={[4, 4, 0, 0]} maxBarSize={48} />
-              </BarChart>
-            </ResponsiveContainer>
-            <ul className="space-y-1">
-              {WASTE_BY_SOURCE.map((s) => (
-                <li
-                  key={s.source}
-                  className={cn(
-                    "flex items-start gap-2 rounded-lg px-2 py-1.5 -mx-2 transition-colors",
-                    s.drilldownKey ? "cursor-pointer hover:bg-ink-50 group" : ""
-                  )}
-                  onClick={() => s.drilldownKey && setDrilldown({ key: s.drilldownKey, label: s.source })}
-                >
-                  <span className="w-2 h-2 rounded-full shrink-0 mt-1.5" style={{ background: s.color }} />
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between gap-2">
-                      <span className={cn("text-[11px] font-semibold leading-snug",
-                        s.drilldownKey ? "text-brand-700 group-hover:underline" : "text-ink-800"
-                      )}>
-                        {s.source}
-                      </span>
-                      <div className="flex items-center gap-1 shrink-0">
-                        <Badge tone={s.diversionPct >= 55 ? "good" : s.diversionPct >= 35 ? "warn" : "bad"}>
-                          {s.diversionPct}% diverted
-                        </Badge>
-                        {s.drilldownKey && <ChevronRight size={10} className="text-ink-300 group-hover:text-brand-600" />}
-                      </div>
-                    </div>
-                    <div className="text-[10px] text-ink-400">
-                      {s.tonnes.toLocaleString()} t · {s.pct}% of portfolio
-                    </div>
-                  </div>
-                </li>
-              ))}
-            </ul>
-            <div className="flex items-start gap-1.5 rounded-lg bg-warn/10 px-3 py-2 text-[11px] text-warn">
-              <Info size={11} className="shrink-0 mt-0.5" />
-              <span>Events & Conferences (20% diversion) is the weakest stream — mandatory segregation bins at source needed.</span>
-            </div>
+      <div className="grid grid-cols-12 gap-4">
+        <Card className="col-span-12 xl:col-span-7 flex flex-col">
+          <CardHeader title="From source to disposal route" hint="Tonnes · what each department's waste becomes · click a source to see it by property" />
+          <div className="px-4 pt-3 pb-2 flex-1">
+            <Sankey nodes={WASTE_SANKEY.nodes} links={WASTE_SANKEY.links} height={300} unit="t" labelWidth={160} onNodeClick={nodeDrill} />
           </div>
+          <div className="mt-auto px-6 py-4 border-t border-ink-100 text-[11px] text-ink-500">Grey bands are landfill. Events & conferences send 70% of their waste there — segregation at source is the gap.</div>
         </Card>
 
-        {/* Waste streams — overall portfolio mix */}
-        <Card>
-          <CardHeader title="Waste Streams — Portfolio Mix" hint="by disposal method" />
-          <div className="px-4 pb-4 pt-4 flex flex-col items-center">
-            <ResponsiveContainer width="100%" height={200}>
-              <PieChart>
-                <Pie isAnimationActive={false} data={PORTFOLIO_WASTE_STREAMS} dataKey="tonnes" nameKey="stream" cx="50%" cy="50%"
-                  innerRadius={55} outerRadius={85} paddingAngle={2}>
-                  {PORTFOLIO_WASTE_STREAMS.map((s) => <Cell key={s.stream} fill={s.color} />)}
-                </Pie>
-                <Tooltip contentStyle={{ fontSize: 12, borderRadius: 8, border: "1px solid #EDEFF0" }}
-                  formatter={(v: number) => [`${v.toLocaleString()} t`, ""]} />
-              </PieChart>
-            </ResponsiveContainer>
-            <ul className="w-full space-y-2 mt-2">
-              {PORTFOLIO_WASTE_STREAMS.map((s) => (
-                <li key={s.stream} className="flex items-center justify-between text-[12px]">
-                  <span className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: s.color }} />
-                    <span className="text-ink-700">{s.stream}</span>
-                  </span>
-                  <div className="flex items-center gap-3">
-                    <span className="text-ink-400 tabular-nums">{s.tonnes.toLocaleString()} t</span>
-                    <span className="font-bold text-ink-900 tabular-nums w-10 text-right">{s.pct}%</span>
-                  </div>
-                </li>
-              ))}
-            </ul>
-            <div className="mt-3 w-full">
-              <div className="flex justify-between text-[11px] mb-1">
-                <span className="text-ink-500">Diversion rate (non-landfill)</span>
-                <span className="font-semibold text-bad">42% · target 60% by 2025</span>
-              </div>
-              <div className="h-2 bg-ink-100 rounded-full overflow-hidden">
-                <div className="h-full rounded-full" style={{ width: "42%", background: "linear-gradient(to right, #807245, #F6C8CC, #CDB872)" }} />
-              </div>
-              <div className="mt-1 text-[10px] text-ink-400">9 hotels below target · biggest gap: Zermatt 18%, Airport Dubai 24%</div>
-            </div>
+        <Card className="col-span-12 xl:col-span-5 flex flex-col">
+          <CardHeader title="Disposal mix" hint="Portfolio · by route" />
+          <div className="px-6 pt-4 flex-1">
+            <Donut legend="below" height={170} unit="t" centre={{ value: "8,420 t", label: "this year" }} data={PORTFOLIO_WASTE_STREAMS.map((s) => ({ name: s.stream, value: s.tonnes, color: s.stream === "Landfill" ? CHART.remainder : s.stream === "Energy rec." ? CHART.sand : s.color }))} />
+          </div>
+          <div className="mt-auto px-6 py-4 border-t border-ink-100 flex items-center gap-4">
+            <RadialGauge value={(42 / 60) * 100} size={64} stroke={7} color={CHART.rose} valueText="42%" />
+            <div className="text-[11px] text-ink-600 leading-snug"><span className="font-semibold text-ink-900">42% true diversion against 60%</span> · 54% once energy recovery is counted. WtE is never folded into the green number.</div>
           </div>
         </Card>
       </div>
 
-      {drilldown && (
-        <DrilldownPanel
-          drilldownKey={drilldown.key}
-          label={drilldown.label}
-          onClose={() => setDrilldown(null)}
-        />
-      )}
+      {drill && <DrilldownPanel drilldownKey={drill.key} label={drill.label} onClose={() => setDrill(null)} />}
 
-      {/* Diversion by hotel */}
-      <Card>
-        <CardHeader title="Diversion Rate by Hotel" hint="% diverted from landfill — worst first" />
-        <div className="px-4 pb-4 pt-2">
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={diversionData} layout="vertical" margin={{ top: 0, right: 60, bottom: 0, left: 110 }}>
-              <XAxis type="number" domain={[0, 80]} tick={{ fontSize: 10, fill: "#7B8285" }} axisLine={false} tickLine={false}
-                tickFormatter={(v) => `${v}%`} />
-              <YAxis type="category" dataKey="name" width={106} tick={{ fontSize: 11, fill: "#383B3D" }} axisLine={false} tickLine={false} />
-              <Tooltip contentStyle={{ fontSize: 12, borderRadius: 8, border: "1px solid #EDEFF0" }}
-                formatter={(v: number, _n, p) => [`${v}% diversion · ${p.payload.total.toLocaleString()} t total`, "Diversion"]} />
-              <Bar isAnimationActive={false} dataKey="diversion" radius={[0, 4, 4, 0]} maxBarSize={18}>
-                {diversionData.map((d) => (
-                  <Cell key={d.name} fill={d.diversion >= 50 ? "#807245" : d.diversion >= 35 ? "#CDB872" : "#B33650"} />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-      </Card>
-
-      {/* Trend + target */}
-      <Card>
-        <CardHeader title="Monthly Diversion Rate Trend" hint="% · solid = actual · dashed = 60% target" />
-        <div className="px-4 pb-2 pt-1">
-          <TargetBanner
-            baseline="24% diversion" baseYear={2022}
-            current="42% diversion" target="60% diversion" targetYear={2025}
-            gap="18% below target" status="bad" owner="Marco Rossi"
-          />
-        </div>
-        <div className="px-6 pb-6 pt-1">
-          <ResponsiveContainer width="100%" height={200}>
-            <LineChart data={PORTFOLIO_MONTHLY_TREND} margin={{ top: 4, right: 8, bottom: 0, left: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#EDEFF0" vertical={false} />
-              <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#7B8285" }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 11, fill: "#7B8285" }} axisLine={false} tickLine={false} width={35}
-                tickFormatter={(v) => `${v}%`} domain={[35, 65]} />
-              <Tooltip contentStyle={{ fontSize: 12, borderRadius: 8, border: "1px solid #EDEFF0" }}
-                formatter={(v: number, name: string) => [
-                  `${v}%`,
-                  name === "diversionTarget" ? "Target" : "Actual"
-                ]} />
-              <Line isAnimationActive={false} type="monotone" dataKey="diversion" name="diversion" stroke="#959891" strokeWidth={2.5} dot={false} activeDot={{ r: 5, strokeWidth: 0 }} />
-              <Line isAnimationActive={false} type="monotone" dataKey="diversionTarget" name="diversionTarget" stroke="#959891" strokeWidth={1.5} strokeDasharray="5 4" dot={false} activeDot={{ r: 4, strokeWidth: 0 }} opacity={0.5} />
-            </LineChart>
-          </ResponsiveContainer>
-          <div className="flex items-center gap-5 mt-1 text-[10px] text-ink-400 justify-center">
-            <span className="flex items-center gap-1.5"><span className="inline-block w-6 h-0.5 bg-[#959891] rounded" />Actual</span>
-            <span className="flex items-center gap-1.5"><span className="inline-block w-6 h-0.5 bg-[#959891] rounded opacity-50" style={{ backgroundImage: "repeating-linear-gradient(90deg,#959891 0,#959891 4px,transparent 4px,transparent 8px)" }} />Target (60%)</span>
+      <div className="grid grid-cols-12 gap-4">
+        <Card className="col-span-12 xl:col-span-7 flex flex-col">
+          <CardHeader title="Diversion change by stream" hint="Percentage points year on year · net portfolio change" />
+          <div className="px-3 pt-3 flex-1">
+            <Waterfall height={240} unit="pp" fromZero decreaseIsGood={false} format={(v) => fmtN(v)} yFormat={(v) => `${v > 0 ? "+" : ""}${v}`} steps={[
+              { name: "F&B", delta: 6 }, { name: "General", delta: -3 }, { name: "Events", delta: 2 }, { name: "Hazardous", delta: -1 }, { name: "Kitchen", delta: 4 }, { name: "Net change", total: 8 },
+            ]} />
           </div>
+          <div className="mt-auto px-6 py-4 border-t border-ink-100">
+            <LegendRow items={[{ label: "Improved", color: CHART.olive }, { label: "Worsened", color: CHART.rose }, { label: "Net", color: CHART.prior }]} />
+          </div>
+        </Card>
+
+        <Card className="col-span-12 xl:col-span-5 flex flex-col">
+          <CardHeader title="Hotels against the 60% target" hint="Each dot is a hotel · right of the line has reached it" />
+          <div className="px-6 pt-8 flex-1">
+            <StripPlot points={points} target={60} avg={42} higherIsBetter unit="%" onSelect={(id) => setHotel(id === hotel ? null : id)} selectedId={hotel} />
+            <div className="mt-6 grid grid-cols-2 gap-3">
+              <div className="rounded-xl2 bg-ink-50 p-3"><div className="text-[10px] uppercase tracking-[0.06em] font-semibold text-ink-400">At target</div><div className="text-[17px] font-bold text-good-700 tabular-nums">{10 - below}</div></div>
+              <div className="rounded-xl2 bg-ink-50 p-3"><div className="text-[10px] uppercase tracking-[0.06em] font-semibold text-ink-400">Below target</div><div className="text-[17px] font-bold text-bad-700 tabular-nums">{below}</div></div>
+            </div>
+          </div>
+          <div className="mt-auto px-6 py-4 border-t border-ink-100 text-[11px] text-ink-500">Zermatt (18%) and Airport Dubai (24%) are the two furthest from the line.</div>
+        </Card>
+      </div>
+
+      <Card className="flex flex-col">
+        <CardHeader title="Monthly diversion rate against the target" hint="% diverted excluding energy recovery · dotted = 60% target" />
+        <div className="px-3 pt-3">
+          <StackedArea data={trend} xKey="month" height={200} unit="%" series={[{ key: "diversion", name: "Diversion", color: CHART.moss }]} targetKey="target" targetName="Target" yFormat={(v) => `${v}%`} yDomain={[0, 70]} />
         </div>
+        <TargetLine baseline="24%" baseYear={2022} current="42%" target="60%" targetYear={2025} gap="18 pp below" status="bad" owner="Marco Rossi" />
       </Card>
     </div>
   );
 }
 
-// ─── ROOT COMPONENT ───────────────────────────────────────────────────────────
+/* ─── ROOT ─────────────────────────────────────────────────────────────────── */
 
 export default function EnvironmentTab() {
   const [section, setSection] = useState<Section>("carbon");
-
   return (
     <div className="space-y-5">
-      <div className="inline-flex max-w-full items-center gap-1 rounded-full bg-ink-100 p-1 overflow-x-auto">
-        {SECTIONS.map((s) => (
-          <button
-            key={s.key}
-            onClick={() => setSection(s.key)}
-            className={cn(
-              "px-4 py-2 text-[13px] font-medium rounded-full whitespace-nowrap transition-colors",
-              section === s.key
-                ? "bg-white shadow-card text-ink-900"
-                : "text-ink-500 hover:text-ink-900"
-            )}
-          >
-            {s.label}
-          </button>
-        ))}
-      </div>
-
+      <Tabs variant="segmented" ariaLabel="Environment section" items={SECTIONS.map((s) => ({ key: s.key, label: s.label }))} value={section} onChange={(k) => setSection(k as Section)} />
       {section === "carbon" && <CarbonSection />}
       {section === "energy" && <EnergySection />}
-      {section === "water"  && <WaterSection />}
-      {section === "waste"  && <WasteSection />}
+      {section === "water" && <WaterSection />}
+      {section === "waste" && <WasteSection />}
+      <div className="text-[11px] text-ink-400 inline-flex items-center gap-1">Every breakdown reconciles to the portfolio totals; drill into a slice to see it by property. <ChevronRight size={11} /></div>
     </div>
   );
 }
 
-/* Scope 2 by month, tCO₂e — location-based (grid average factor) vs market-based (after
-   RECs). Seasonal shape follows the portfolio energy profile; totals reconcile to the
-   annual figures shown in the Scope 2 card (14,569 / 12,400). */
+/* Scope 2 by month — location-based vs market-based, reconciling to the annual figures above. */
 const SCOPE2_MONTHLY = [
-  { m: "May", loc: 1130, mkt: 960 },  { m: "Jun", loc: 1240, mkt: 1055 },
-  { m: "Jul", loc: 1380, mkt: 1175 }, { m: "Aug", loc: 1400, mkt: 1190 },
-  { m: "Sep", loc: 1265, mkt: 1075 }, { m: "Oct", loc: 1210, mkt: 1030 },
-  { m: "Nov", loc: 1140, mkt: 970 },  { m: "Dec", loc: 1180, mkt: 1005 },
-  { m: "Jan", loc: 1110, mkt: 945 },  { m: "Feb", loc: 1040, mkt: 885 },
-  { m: "Mar", loc: 1195, mkt: 1015 }, { m: "Apr", loc: 1279, mkt: 1095 },
+  { m: "May", loc: 1130, mkt: 960 }, { m: "Jun", loc: 1240, mkt: 1055 }, { m: "Jul", loc: 1380, mkt: 1175 }, { m: "Aug", loc: 1400, mkt: 1190 },
+  { m: "Sep", loc: 1265, mkt: 1075 }, { m: "Oct", loc: 1210, mkt: 1030 }, { m: "Nov", loc: 1140, mkt: 970 }, { m: "Dec", loc: 1180, mkt: 1005 },
+  { m: "Jan", loc: 1110, mkt: 945 }, { m: "Feb", loc: 1040, mkt: 885 }, { m: "Mar", loc: 1195, mkt: 1015 }, { m: "Apr", loc: 1279, mkt: 1095 },
 ];
