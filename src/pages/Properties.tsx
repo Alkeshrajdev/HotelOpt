@@ -21,12 +21,12 @@ import InfoHint from "@/components/ui/InfoHint";
 import {
   CERTIFICATIONS,
   OPERATION_TYPES,
-  PROPERTIES,
   REGIONS,
   type PropertyStatus,
   type RichProperty,
 } from "@/lib/propertiesData";
 import { findHotelMetricsByName, hotelCarbon } from "@/lib/normalise";
+import { useProperties } from "@/lib/live/properties";
 import { carbonBand } from "@/lib/benchmarks";
 import { cn } from "@/lib/utils";
 
@@ -62,18 +62,19 @@ export default function Properties() {
   const [filters, setFilters] = useState<FilterState>(INITIAL_FILTERS);
   const [filterOpen, setFilterOpen] = useState(false);
   const [addOpen, setAddOpen] = useState(false);
+  const { properties: registry, loading, error, mode } = useProperties();
 
   const COUNTRIES = useMemo(
-    () => Array.from(new Set(PROPERTIES.map((p) => p.country))).sort(),
-    []
+    () => Array.from(new Set(registry.map((p) => p.country))).sort(),
+    [registry]
   );
   const BRANDS = useMemo(
-    () => Array.from(new Set(PROPERTIES.map((p) => p.brand))).sort(),
-    []
+    () => Array.from(new Set(registry.map((p) => p.brand))).filter(Boolean).sort(),
+    [registry]
   );
 
   const filtered = useMemo(() => {
-    return PROPERTIES.filter((p) => {
+    return registry.filter((p) => {
       if (
         filters.search &&
         !`${p.name} ${p.city} ${p.country}`.toLowerCase().includes(filters.search.toLowerCase())
@@ -95,7 +96,7 @@ export default function Properties() {
       if (filters.poolEligible === "no" && p.poolEligible) return false;
       return true;
     });
-  }, [filters]);
+  }, [filters, registry]);
 
   const activeFilterCount =
     (Object.keys(filters) as (keyof FilterState)[])
@@ -120,7 +121,7 @@ export default function Properties() {
   return (
     <div>
       <PageHeader
-        eyebrow="Configuration hub"
+        eyebrow={mode === "live" ? "Configuration hub · your hotels" : "Configuration hub"}
         title="Properties"
         subtitle="Master data for every hotel on the platform. Click a property to open its full configuration page."
         actions={
@@ -143,7 +144,7 @@ export default function Properties() {
 
       {/* Summary strip */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-        <StatTile label="Total properties" value={String(summary.total)} hint={`${PROPERTIES.length} on platform`} />
+        <StatTile label="Total properties" value={String(summary.total)} hint={`${registry.length} on platform`} />
         <StatTile label="At/above CHSB median" value={`${summary.total - summary.belowMedian} / ${summary.total}`} hint="carbon/ORN vs cohort" tone="good" />
         <StatTile label="Data completeness" value={`${summary.avgCompleteness}%`} hint="approved records" tone="info" />
         <StatTile label="GP ready"          value={`${summary.gpReady} / ${summary.total}`} hint="full baseline + 12 mo data" tone="good" />
@@ -294,16 +295,39 @@ export default function Properties() {
               {filtered.map((p) => (
                 <PropertyRow key={p.id} p={p} />
               ))}
-              {filtered.length === 0 && (
+              {loading && (
+                <tr>
+                  <td colSpan={11} className="table-td text-center py-10 text-ink-500">
+                    Reading your hotels from the platform…
+                  </td>
+                </tr>
+              )}
+              {error && (
+                <tr>
+                  <td colSpan={11} className="table-td text-center py-10 text-bad-700">
+                    Your hotels could not be read: {error}
+                  </td>
+                </tr>
+              )}
+              {!loading && !error && filtered.length === 0 && (
                 <tr>
                   <td colSpan={11} className="p-0">
-                    <EmptyState
-                      inset
-                      icon={<Search size={20} />}
-                      title="No properties match"
-                      description="Try a different search, or clear the active filters."
-                      action={<button className="btn-secondary" onClick={() => setFilters(INITIAL_FILTERS)}>Clear filters</button>}
-                    />
+                    {registry.length === 0 && mode === "live" ? (
+                      <EmptyState
+                        inset
+                        icon={<Building2 size={20} />}
+                        title="No property is in your access"
+                        description="A portfolio or property administrator grants access to a hotel; once granted, it appears here."
+                      />
+                    ) : (
+                      <EmptyState
+                        inset
+                        icon={<Search size={20} />}
+                        title="No properties match"
+                        description="Try a different search, or clear the active filters."
+                        action={<button className="btn-secondary" onClick={() => setFilters(INITIAL_FILTERS)}>Clear filters</button>}
+                      />
+                    )}
                   </td>
                 </tr>
               )}

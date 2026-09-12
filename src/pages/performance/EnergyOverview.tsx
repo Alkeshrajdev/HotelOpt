@@ -15,6 +15,8 @@ import { Zap, DollarSign, Leaf, Activity } from "lucide-react";
 import KpiTile from "@/components/ui/KpiTile";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { cn } from "@/lib/utils";
+import { useDataMode } from "@/lib/live/mode";
+import EnergyOverviewLive from "./EnergyOverviewLive";
 
 /* ─── Monthly data ──────────────────────────────────────────────────────────
    TY = May 2025 – Apr 2026  |  PY = May 2024 – Apr 2025
@@ -175,6 +177,12 @@ function SourceChart({
 
 /* ─── Main component ────────────────────────────────────────────────────────*/
 export default function EnergyOverview() {
+  const mode = useDataMode();
+  if (mode === "live") return <EnergyOverviewLive />;
+  return <EnergyOverviewSample />;
+}
+
+function EnergyOverviewSample() {
   const [showCost, setShowCost] = useState(true);
 
   const yoyPct = ((TOTAL_TY - TOTAL_PY) / TOTAL_PY) * 100;

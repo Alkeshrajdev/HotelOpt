@@ -5,6 +5,7 @@ import { PageSkeleton } from "@/components/ui/Skeleton";
 import Sidebar from "./Sidebar";
 import Topbar from "./Topbar";
 import EntitlementGuard from "./EntitlementGuard";
+import { SampleDataNotice } from "@/lib/live/mode";
 import { TopbarProvider } from "@/lib/topbarContext";
 import { ToastProvider } from "@/components/ui/Toast";
 
@@ -44,6 +45,7 @@ export default function AppShell() {
         />
         <div className="flex-1 flex flex-col min-w-0">
           <Topbar onMenu={() => setMobileOpen(true)} />
+          <SampleDataNotice />
           <main className="flex-1 overflow-y-auto">
             <div className="px-4 sm:px-6 py-5 max-w-[1600px] mx-auto">
               {/* Page chunks load here; the shell stays put (see App.tsx). A structured

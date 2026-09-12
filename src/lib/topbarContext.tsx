@@ -1,19 +1,23 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { useLocation } from "react-router-dom";
-import { PROPERTIES } from "./propertiesData";
+import { useProperties } from "./live/properties";
 
 /* ─── Property context ───────────────────────────────────────────────────────
  * The Portfolio section is the only place the product looks across hotels.
  * Every other tool works on ONE property: the selector there lists properties
  * only, and "All Properties" is not a valid state. Entering a property-level
  * route with nothing chosen picks the last-used property (or the first).
+ *
+ * The list of names comes from the registry (`useProperties`): the platform's
+ * hotels when signed in, the sample dataset in the demo. It is never a fixed
+ * constant, so the count is not part of the label and a remembered name is
+ * honoured only while it is still in the reader's access.
  */
-export const ALL_PROPERTIES = "All Properties (10)";
-export const PROPERTY_NAMES: string[] = PROPERTIES.map((p) => p.name);
+export const ALL_PROPERTIES = "All Properties";
 const LAST_PROPERTY_KEY = "ho.lastProperty";
 
 function readLastProperty(): string | null {
-  try { const v = localStorage.getItem(LAST_PROPERTY_KEY); return v && PROPERTY_NAMES.includes(v) ? v : null; } catch { return null; }
+  try { return localStorage.getItem(LAST_PROPERTY_KEY); } catch { return null; }
 }
 function writeLastProperty(name: string) {
   try { localStorage.setItem(LAST_PROPERTY_KEY, name); } catch { /* storage unavailable */ }
@@ -118,6 +122,8 @@ type TopbarCtx = {
   setProperty:       (v: string) => void;
   /** The property every property-level tool works on — never "all". */
   propertyName:      string;
+  /** The names the selector offers, from the registry; empty while a live registry loads. */
+  propertyNames:     string[];
   region:            string;
   setRegion:         (v: string) => void;
   dataBasis:         DataBasis;
@@ -155,14 +161,20 @@ export function TopbarProvider({ children }: { children: ReactNode }) {
   const [opsCustomEnd,   setOpsCustomEnd]   = useState("2026-05-31");
   const [property,       setPropertyState] = useState<string>(() => readLastProperty() ?? ALL_PROPERTIES);
   const { pathname } = useLocation();
+  const { properties: registry } = useProperties();
+  const propertyNames = useMemo(() => registry.map((p) => p.name), [registry]);
   const setProperty = (v: string) => { setPropertyState(v); if (v !== ALL_PROPERTIES) writeLastProperty(v); };
-  const propertyName = property !== ALL_PROPERTIES ? property : (readLastProperty() ?? PROPERTY_NAMES[0]);
+  const known = (v: string | null) => (v && propertyNames.includes(v) ? v : null);
+  const propertyName = known(property) ?? known(readLastProperty()) ?? propertyNames[0] ?? "";
 
-  // A property-level route always has a property. Landing there with "all" selected
-  // (only possible from a portfolio page) resolves to the last-used property.
+  // A property-level route always has a property the reader can open. Landing there
+  // with "all" selected (only possible from a portfolio page), or with a name that is
+  // no longer in the registry (a demo name after a real sign-in), resolves to the
+  // last-used property or the first. Nothing is resolved while a live registry loads.
   useEffect(() => {
-    if (getTopbarConfig(pathname).showProperty && property === ALL_PROPERTIES) setPropertyState(propertyName);
-  }, [pathname, property, propertyName]);
+    if (propertyNames.length === 0) return;
+    if (getTopbarConfig(pathname).showProperty && property !== propertyName) setPropertyState(propertyName);
+  }, [pathname, property, propertyName, propertyNames]);
   const [region,         setRegion]         = useState("All Regions");
   const [dataBasis,      setDataBasis]      = useState<DataBasis>("approved");
   const [lastRefreshed]                     = useState(new Date());
@@ -183,7 +195,7 @@ export function TopbarProvider({ children }: { children: ReactNode }) {
   const contextLine = [
     "Acme Hotels",
     region !== "All Regions" ? region : null,
-    property !== ALL_PROPERTIES ? property : "All Properties",
+    property,
     String(year),
     DATA_BASIS_LABEL[dataBasis],
     `Last refreshed ${hhmm}`,
@@ -199,6 +211,7 @@ export function TopbarProvider({ children }: { children: ReactNode }) {
       opsCustomEnd,   setOpsCustomEnd,
       property,       setProperty,
       propertyName,
+      propertyNames,
       region,         setRegion,
       dataBasis,      setDataBasis,
       dashHotelIds,   setDashHotelIds,

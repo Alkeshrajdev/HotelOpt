@@ -1,0 +1,28 @@
+export {
+  bandRoomCount,
+  bandGfa,
+  assertNoIdentifiers,
+  evaluateAssignment,
+  averageOfComparators,
+  comparatorCell,
+  assertDualDenominator,
+  assertDisplayPermitted,
+  operationalComparisonBasis,
+  ReIdentificationError,
+  DisplayRuleError,
+  MIN_ELIGIBLE_POOL,
+  FORBIDDEN_IDENTIFIER_KEYS,
+  DUAL_DENOMINATOR_METRICS,
+  PROHIBITED_DISPLAY,
+} from './comparator'
+export type {
+  RoomCountBand,
+  GfaBand,
+  ComparatorProfile,
+  ComparatorSnapshot,
+  AssignmentRequest,
+  AssignmentOutcome,
+  ComparisonCell,
+  ComparisonRow,
+  ProhibitedDisplay,
+} from './comparator'
