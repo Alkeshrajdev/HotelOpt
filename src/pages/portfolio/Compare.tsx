@@ -10,6 +10,10 @@ import { cn } from "@/lib/utils";
 import { useTopbar } from "@/lib/topbarContext";
 import { LEAGUE, type Rag } from "@/lib/portfolioCompare";
 import { gpLeaderboard, gpPortfolioCost, GP_UTILITY_META, type GpUtility } from "@/lib/genuinePerformance";
+import { CHART } from "@/lib/chartPalette";
+import Slope from "@/components/charts/Slope";
+import Bubble from "@/components/charts/Bubble";
+import { LegendRow } from "@/components/charts/ChartBits";
 
 const PILLARS: { key: GpUtility; label: string; icon: typeof Zap }[] = [
   { key: "energy", label: "Energy", icon: Zap },
@@ -18,6 +22,7 @@ const PILLARS: { key: GpUtility; label: string; icon: typeof Zap }[] = [
   { key: "carbon", label: "Carbon", icon: Cloud },
 ];
 const RAG_BAR: Record<Rag, string> = { green: "bg-chart-olive", amber: "bg-chart-sand", red: "bg-chart-rose" };
+const RAG_HEX: Record<Rag, string> = { green: CHART.olive, amber: CHART.sand, red: CHART.rose };
 const RAG_TONE: Record<Rag, "good" | "warn" | "bad"> = { green: "good", amber: "warn", red: "bad" };
 const RAG_LABEL: Record<Rag, string> = { green: "On track", amber: "Monitor", red: "Action needed" };
 
@@ -52,6 +57,10 @@ export default function Compare() {
   const best = league.rows[0];
   const worst = league.rows[league.rows.length - 1];
   const spread = worst.intensity - best.intensity;
+
+  const slopeRows = league.rows.map((r) => ({ id: r.name, label: r.name, a: +(r.intensity / (1 + r.yoy / 100)).toFixed(pillar === "water" ? 2 : 1), b: r.intensity }));
+  const bubblePoints = league.rows.map((r) => ({ id: r.name, label: r.name.split(" ")[0] === "The" ? r.name.split(" ").slice(0, 2).join(" ") : r.name.split(" ")[0], x: r.intensity, y: gpByName.get(r.name)?.byUtility[pillar] ?? 0, z: r.total, color: RAG_HEX[r.rag], note: `${r.name} · ${fmtTotal(r.total)} ${league.totalUnit}` }));
+  const intensityDigits = pillar === "water" ? 2 : 1;
 
   const openProperty = (name: string) => {
     setProperty(name);
@@ -133,6 +142,27 @@ export default function Compare() {
           </div>
           <div className="mt-auto px-6 py-4 border-t border-ink-100 text-[11px] text-ink-500">
             Genuine strips out weather, occupancy and activity. A hotel can cut raw consumption and still worsen here if it simply ran emptier.
+          </div>
+        </Card>
+      </div>
+
+      <div className="grid grid-cols-12 gap-4">
+        <Card className="col-span-12 lg:col-span-7 flex flex-col">
+          <CardHeader title="Last year to this year" hint={`${league.unit} · one line per property · crossings are rank changes`} />
+          <div className="px-4 pt-2 flex-1">
+            <Slope rows={slopeRows} height={340} format={(v) => v.toFixed(intensityDigits)} onSelect={openProperty} />
+          </div>
+          <div className="mt-auto px-6 py-4 border-t border-ink-100">
+            <LegendRow items={[{ label: "Improved", color: CHART.olive }, { label: "Worsened", color: CHART.rose }, { label: "Prior year", color: CHART.prior }]} />
+          </div>
+        </Card>
+        <Card className="col-span-12 lg:col-span-5 flex flex-col">
+          <CardHeader title="Intensity against genuine change" hint="Bubble = annual volume · colour = status · bottom-left is efficient and improving" />
+          <div className="px-2 pt-2 flex-1">
+            <Bubble data={bubblePoints} height={300} xLabel="Intensity" xUnit={league.unit} yLabel="Genuine" yUnit="%" zLabel="Volume" zUnit={league.totalUnit} yAvg={0} onSelect={openProperty} xFormat={(v) => v.toFixed(intensityDigits)} yFormat={(v) => pct(v)} />
+          </div>
+          <div className="mt-auto px-6 py-4 border-t border-ink-100 text-[11px] text-ink-500">
+            Above the line a hotel used more than its drivers predicted, whatever its raw intensity.
           </div>
         </Card>
       </div>

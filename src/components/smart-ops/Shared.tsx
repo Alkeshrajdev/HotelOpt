@@ -279,36 +279,5 @@ export function MiniBars({ values, className = "bg-chart-olive", height = "h-10"
   );
 }
 
-/* ── Chart furniture: a tooltip with palette dots, and a legend swatch ── */
-
-type TipItem = { name?: string; value?: number | string; color?: string; dataKey?: string; payload?: Record<string, unknown> };
-
-export function ChartTip({ active, payload, label, unit = "", format }: {
-  active?: boolean; payload?: TipItem[]; label?: string; unit?: string; format?: (v: number) => string;
-}) {
-  if (!active || !payload?.length) return null;
-  const items = payload.filter((p) => p.value !== null && p.value !== undefined && p.name !== "_base");
-  if (!items.length) return null;
-  return (
-    <div className="popover rounded-xl px-3 py-2 text-[12px] min-w-[140px]">
-      {label && <div className="text-[11px] font-semibold text-ink-900 mb-1">{label}</div>}
-      {items.map((p, i) => (
-        <div key={i} className="flex items-center justify-between gap-4 py-0.5">
-          <span className="inline-flex items-center gap-1.5 text-ink-600"><span className="w-2 h-2 rounded-full" style={{ backgroundColor: p.color }} />{p.name}</span>
-          <span className="font-medium text-ink-900 tabular-nums">{typeof p.value === "number" ? (format ? format(p.value) : p.value.toLocaleString("en-US")) : p.value}{unit ? ` ${unit}` : ""}</span>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-export function Swatch({ color, className, label, dashed = false }: { color?: string; className?: string; label: string; dashed?: boolean }) {
-  return (
-    <span className="inline-flex items-center gap-1.5 text-[11px] text-ink-600 whitespace-nowrap">
-      {dashed
-        ? <span className="w-4 border-t-2 border-dashed" style={{ borderColor: color }} />
-        : <span className={cn("w-2.5 h-2.5 rounded-full", className)} style={color ? { backgroundColor: color } : undefined} />}
-      {label}
-    </span>
-  );
-}
+/* ── Chart furniture lives with the charts; re-exported here for the Smart Ops pages ── */
+export { ChartTip, Swatch } from "@/components/charts/ChartBits";

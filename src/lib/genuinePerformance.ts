@@ -111,6 +111,13 @@ function rawPctFor(h: NonNullable<ReturnType<typeof hotel>>, u: GpUtility, d: Dr
        : d.rawWastePct;
 }
 
+/** Raw year-on-year change for a property and utility, as the bill would show it. */
+export function rawYoyPct(propertyName: string, utility: GpUtility): number {
+  const h = hotel(propertyName);
+  if (!h) return 0;
+  return rawPctFor(h, utility, DRIVERS[propertyName] ?? DEFAULT_DRIVERS);
+}
+
 /** Compute the Measured / Expected / Genuine result for one property + utility. */
 export function gpResult(propertyName: string, utility: GpUtility): GpResult | null {
   const h = hotel(propertyName);
