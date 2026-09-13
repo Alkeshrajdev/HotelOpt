@@ -364,7 +364,7 @@ export const DATA_TYPES: DataTypeConfig[] = [
         label: "Exchange rate (USD per 1 unit)",
         type: "number",
         showWhen: { field: "currency", equals: ["AED", "EUR", "GBP", "SGD", "CHF", "THB", "ZAR", "AUD", "CAD", "INR", "JPY", "MYR", "IDR"] },
-        help: "Filled from the rate table when the year is loaded. Otherwise enter the annual-average rate you are using.",
+        help: "Only needed when no rate is on file for that currency and year — a platform admin loads those under Admin → Currency & price basis.",
       },
       {
         key: "fxSource",

@@ -133,6 +133,49 @@ export async function listMoneyBasis(year: number): Promise<{ fx: EfFxRate[]; in
   return { fx: fx.data ?? [], index: index.data ?? [] };
 }
 
+/** Every loaded rate, for the admin screen. */
+export async function listFxRates(): Promise<EfFxRate[]> {
+  const { data, error } = await supabase!
+    .from("ef_fx_rates").select("*").order("year", { ascending: false }).order("from_currency");
+  if (error) throw error;
+  return data ?? [];
+}
+
+export async function listPriceIndices(): Promise<EfPriceIndex[]> {
+  const { data, error } = await supabase!
+    .from("ef_price_index").select("*").order("region").order("series").order("year", { ascending: false });
+  if (error) throw error;
+  return data ?? [];
+}
+
+/**
+ * Rates and indices are reference data a super admin loads; RLS enforces that. Both
+ * upsert on their natural key so re-loading a year corrects it rather than duplicating.
+ */
+export async function saveFxRates(rows: Inserts<"ef_fx_rates">[]): Promise<void> {
+  const { error } = await supabase!
+    .from("ef_fx_rates")
+    .upsert(rows, { onConflict: "client_id,from_currency,to_currency,year,basis" });
+  if (error) throw error;
+}
+
+export async function savePriceIndices(rows: Inserts<"ef_price_index">[]): Promise<void> {
+  const { error } = await supabase!
+    .from("ef_price_index")
+    .upsert(rows, { onConflict: "client_id,region,series,year" });
+  if (error) throw error;
+}
+
+export async function deleteFxRate(id: string): Promise<void> {
+  const { error } = await supabase!.from("ef_fx_rates").delete().eq("id", id);
+  if (error) throw error;
+}
+
+export async function deletePriceIndex(id: string): Promise<void> {
+  const { error } = await supabase!.from("ef_price_index").delete().eq("id", id);
+  if (error) throw error;
+}
+
 /** DEFRA's per-fuel calorific values and densities, plus the plain unit conversions. */
 export async function listUnitConversions(): Promise<EfUnitConversion[]> {
   const { data, error } = await supabase!.from("ef_unit_conversions").select("*").limit(1000);

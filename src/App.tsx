@@ -31,6 +31,7 @@ const Marketplace         = lazy(() => import("./pages/Marketplace"));
 const Admin               = lazy(() => import("./pages/Admin"));
 const AdminClients        = lazy(() => import("./pages/admin/Clients"));
 const AdminEFLibrary      = lazy(() => import("./pages/admin/EFLibrary"));
+const AdminMoneyBasis     = lazy(() => import("./pages/admin/MoneyBasis"));
 const AdminUsers          = lazy(() => import("./pages/admin/Users"));
 const AdminPools          = lazy(() => import("./pages/admin/Pools"));
 const AdminStub           = lazy(() => import("./pages/admin/Stub"));
@@ -111,6 +112,7 @@ export default function App() {
           <Route path="/admin" element={<Admin />} />
           <Route path="/admin/clients"    element={<AdminClients />} />
           <Route path="/admin/ef-library" element={<AdminEFLibrary />} />
+          <Route path="/admin/money-basis" element={<AdminMoneyBasis />} />
           <Route path="/admin/users"      element={<AdminUsers />} />
           <Route path="/admin/pools"      element={<AdminPools />} />
           <Route path="/admin/:section"   element={<AdminStub />} />
