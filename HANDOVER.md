@@ -82,7 +82,7 @@ Status of every route. **Live** = reads/writes the Supabase project. **Demo** = 
 | Portfolio › Setup | `/portfolio/setup` | Demo | Targets, groups, users, rules, escalations are local state. |
 | Portfolio › Reporting Readiness | `/portfolio/reports-certifications` | Demo | |
 | Performance › Overview | `/performance/:pillar/overview` | **Live** for energy, water, waste, carbon | `usePropertyPerformance()` → `buildPerformance()`: two reporting years of approved records, sources, monthly series, totals, intensities per ORN/GN. Social and governance overviews are mock. |
-| Performance › Genuine performance | `…/genuine-performance` | Demo | Fixed-share engine on mock hotels (see §7). |
+| Performance › Genuine performance | `…/genuine-performance` | **Live** | OLS regression on approved monthly data against degree days and activity, fitted on the property's own baseline year, gated on ASHRAE G14 criteria, with a prediction interval and a three-tier fallback that always names its own tier (§7). Weather comes from `weather_monthly`, filled by the `weather-backfill` function from Open-Meteo. Demo mode still shows the old fixed-share engine on mock hotels. Carbon has no GP view by design. |
 | Performance › Carbon inventory | `/performance/carbon/carbon-inventory` | **Live** | `usePropertyInventory()` → `buildInventory()`: Scope 1 (gas, diesel, refrigerant), Scope 2 location-based, Scope 3 Cat 1–7, Cat 8–15 as N/A with reasons, factors applied, approved-month coverage strips, and a banner for captured-but-unapproved rows. Demo mode keeps the old illustrative view. |
 | Performance › Benchmarks, External comparison | | Demo | CHSB-style cohorts are mock numbers. |
 | Data Capture | `/data-capture` | **Live** for manual entry of energy (grid, gas, district cooling, diesel, solar PV), water, waste, occupancy, purchases (Cat 1/2/4), business travel & commute (Cat 6/7), refrigerants and the owned fleet (Scope 1) | Writes `consumption_records` (status `submitted`) or `activity_records`. Evidence files upload to the private `evidence` bucket and the record stores pointers in `source_payload.evidence`. Capture-time anomaly messages are persisted as typed `anomaly_flags`. Purchases, travel/commute and refrigerants write `emission_activities` with the factor resolved at capture (`ef_id`, `ef_value`, `tco2e`); if the library has no factor the submission is refused with the reason. In live mode the other methods (OCR, bulk, QR, API, survey, AI assist) are shown as "Not connected yet", and the remaining data types (ops events, cert evidence, custom) refuse to submit with a clear message instead of a fake success. In demo mode everything is simulated. |
@@ -207,13 +207,61 @@ Measured against the live project on 2026-09-13:
 4. **Admin → AI provider page.** `set_ai_provider_key` exists as an RPC; nothing calls it,
    so adding or rotating a key is a SQL statement today.
 
-## 7. Genuine performance — engine vs spec
+## 7. Genuine performance — live regression
 
-**What exists** (`src/lib/genuinePerformance.ts`): `Expected = baseline × (base + weather·CDD ratio + occupancy·ORN ratio + activity·covers ratio)` with fixed `SENSITIVITY` shares per utility and hard-coded per-hotel `DRIVERS`; `Genuine = (Measured − Expected) / Expected`; `gpBridge()`, `GP_EVENTS`, `GP_INITIATIVES` are illustrative. It runs on `PORTFOLIO_HOTELS` (mock), never on database records.
+**Built and running on approved data** (`src/lib/data/genuine.ts`, `src/pages/performance/GenuinePerformanceLive.tsx`). The Shell routes by data mode: live gets the regression, demo keeps the old fixed-share engine in `src/lib/genuinePerformance.ts` over `PORTFOLIO_HOTELS`.
 
-**What the v2 spec asks for**: a monthly regression of consumption on drivers (CDD/HDD, ORN, covers, laundry kg) over the baseline year; fit gates CV(RMSE) ≤ 25 % and NMBE within ±5 % (ASHRAE Guideline 14); a prediction interval so small deviations are not reported as genuine; a materiality floor; a three-tier fallback (regression → ratio normalisation → raw YoY) when data is thin; an operational-events register that explains residuals.
+    Genuine % = (Measured − Expected) / Expected        negative = a real saving
 
-**What is missing to build it on live data**: weather. Open-Meteo is listed as an integration but never called; properties have no coordinates. Plan: add `lat`/`lng` to `properties`, a `weather_monthly` table (property, month, cdd, hdd, mean temp), an edge function that backfills from the Open-Meteo archive API (no key needed) on a schedule, then implement the regression in `src/lib/data/genuine.ts` reading `buildPerformance()` output plus `activity_records`.
+Expected comes from an OLS regression of monthly consumption on the drivers, fitted on the property's own baseline year (May → April) and applied to the reporting year's drivers.
+
+### Three tiers, and every result names its own
+
+| Tier | Method | When |
+| --- | --- | --- |
+| 1 | Regression on degree days + activity | 12 approved baseline months, weather present, fit criteria met |
+| 2 | Ratio normalisation per occupied room night | tier 1 unavailable; holds occupancy constant but **not** weather |
+| 3 | Raw year-on-year | no driver data at all; explicitly "not a performance result" |
+
+The result carries `why` — a sentence saying why it did not qualify for the tier above. This is the factor library's rule applied to statistics: state the gap, never substitute silently.
+
+### The parts that are easy to get wrong
+
+- **NMBE is cross-validated.** For OLS with an intercept the baseline NMBE is **zero by construction**, so gating on it proves nothing. The gate runs on a leave-one-out figure; the in-sample value is reported as `nmbe` only so its absence is not read as an omission. A check asserts it is exactly 0.
+- **Coefficients must be physically possible.** Forward selection rejects any fit where a driver comes out negative. Without it, Cape Town fitted energy at R² 0.99 with `cdd = −0.62` — more cooling degree days, *less* energy — and Lisbon, Barcelona and Singapore were similarly backwards. Fits that predict well and mean nothing are worse than no fit, because the driver table is user-facing.
+- **Per-pillar candidates.** energy: cdd, hdd, orn, covers, laundry · water: the same minus hdd · waste: orn, covers, laundry. Heating degree days do not draw water; weather does not generate waste.
+- **Forward selection on adjusted R²**, stopping while `n − k − 1 ≥ 6`. Twelve baseline months support two or three drivers, not five.
+- **Zero-variance drivers are excluded** — Bangkok and Singapore have HDD = 0 every month, which would make XᵀX singular.
+- **The prediction interval is on the annual total**, with the estimation-covariance terms across months, not twelve independent intervals summed. Measured inside the band ⇒ "no efficiency change is demonstrated either way".
+- **A materiality floor of 3 %** on top of the interval.
+- **A month the model cannot reach is dropped and named**, not guessed. It matters: Bangkok's April 2026 activity is still in draft, and falling to tier 2 over that one month called water **+8.5 % and significant** where the regression says **+0.1 % and not significant**.
+- **The chart covers exactly the months the headline numbers cover**, so adding up the chart reconciles with the tiles.
+- **Carbon has no GP view** — it is energy/water/waste × emission factors, so a decarbonising grid would read as an efficiency gain the property never made. The page says that and points to Energy.
+
+Thresholds live at the top of `genuine.ts`: `MAX_CVRMSE = 25`, `MAX_NMBE = 5`, `MIN_DOF = 6`, `MATERIALITY_PCT = 3`. ASHRAE G14's monthly CV(RMSE) criterion is stricter (15 %); 25 % is IPMVP's whole-building allowance and the product's choice, and the figure is always shown so a reader can apply their own standard.
+
+### Weather
+
+`supabase/functions/weather-backfill` fetches Open-Meteo's archive (no key) and writes `weather_monthly` (property, month, base temp, hdd, cdd, mean temp, `days_covered`). Degree days are computed by **hourly integration**, not the daily-mean shortcut, which understates both whenever a day's swing crosses the base — most days in a shoulder month. `days_covered` is stored so a partial month can be excluded rather than read as a mild one.
+
+```bash
+curl -X POST "$SUPABASE_URL/functions/v1/weather-backfill" \
+  -H "Authorization: Bearer <session token>" -H "apikey: <anon>" \
+  -H "Content-Type: application/json" -d '{"from":"2024-04-01","to":"2026-06-30"}'
+```
+
+270 property-months loaded in 7 s and check out physically: Zermatt 5,426 HDD / 4 CDD, Dubai 3,857 CDD / 21 HDD, Bangkok and Singapore 0 HDD, London 2,186 HDD (published ~2,000–2,200). The function is not yet on a schedule — see §11.
+
+### Checks
+
+`npm run check:genuine` runs 19 assertions over the pure engine (esbuild bundles it with React and the api layer stubbed; no database, no DOM). It covers coefficient recovery from synthetic data, detection of an injected 8 % saving, refusal to claim a 1 % one, each tier's fallback, the zero-variance guard, the pillar driver restriction, and **94.0 % coverage of the 95 % prediction interval over 200 null runs** — the one check that proves the interval is calibrated rather than decorative.
+
+### Still open
+
+- The backfill runs by hand. It should be a cron (pg_cron or a scheduled function), monthly, with the archive's few-day lag in mind.
+- Base temperature is fixed at 18 °C. The base a building actually responds to is a property of the building; `weather_monthly` is keyed to allow several, but nothing varies it.
+- No operational-events register, so an unexplained residual has nowhere to point. This is what the old demo timeline was illustrating.
+- Portfolio-level GP is untouched — Portfolio remains the only cross-property section.
 
 ---
 
@@ -366,7 +414,11 @@ The workbooks live in `/Users/alkeshrajdev/Documents/Cloude/EF` (not in the repo
      schema of meter/period/quantity/unit/amount, and the same rule that the library
      decides the factor.
    - **Admin → AI provider** page over the existing `set_ai_provider_key` RPC.
-4. **Genuine performance on live data** (§7): coordinates, weather ingestion, regression with fit gates, events register, then point the Performance › Genuine performance view and Portfolio › Compare at it.
+4. ~~**Genuine performance on live data**~~ — **done** (§7): coordinates were already on `properties`, weather now arrives from Open-Meteo into `weather_monthly`, and the regression with fit gates, prediction interval and three-tier fallback runs the live page. `npm run check:genuine` covers it. What is left here:
+   - **Put the weather backfill on a schedule.** It runs by hand today; monthly via pg_cron or a scheduled function, allowing for the archive's few-day lag.
+   - **An operational-events register**, so a residual outside the prediction interval has somewhere to point (a chiller replacement, a closed floor, a refit). The demo timeline was illustrating exactly this.
+   - **Variable base temperature.** Fixed at 18 °C; `weather_monthly` is keyed on it so a property can carry its own, but nothing sets one.
+   - **Portfolio › Compare on live data** still needs the aggregation described in item 5.
 5. **Portfolio dashboard and Compare on live data**: aggregate `buildPerformance()` across properties or add a SQL view of monthly totals per property × source; keep the chart vocabulary.
 6. **Integrations** in the order of §8, starting with CSV bulk import (all-or-none commit into `consumption_records`) since the bucket and queue already exist.
 7. **Users**: invitations and password reset via an edge function holding the service role; disable public sign-up.
