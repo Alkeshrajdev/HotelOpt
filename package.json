@@ -8,7 +8,8 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "check:genuine": "node scripts/checks/run.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.105.1",

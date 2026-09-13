@@ -428,6 +428,38 @@ export async function listActivity(opts?: { propertyId?: string; from?: string; 
   return data ?? [];
 }
 
+/* ---------------- Weather (genuine-performance drivers) ---------------- */
+
+/**
+ * Degree days per property-month, filled by the `weather-backfill` edge function from
+ * Open-Meteo. Read-only here: nothing in the app writes weather, so a figure can always
+ * be traced back to the archive rather than to an operator's keyboard.
+ */
+export type WeatherMonth = {
+  id: string;
+  property_id: string;
+  month: string;
+  base_temp_c: number;
+  hdd: number;
+  cdd: number;
+  mean_temp_c: number | null;
+  days_covered: number;
+  source: string;
+};
+
+export async function listWeatherMonthly(opts?: {
+  propertyId?: string; from?: string; to?: string; baseTempC?: number;
+}): Promise<WeatherMonth[]> {
+  let q = supabase!.from("weather_monthly").select("*").order("month", { ascending: true }).limit(500);
+  if (opts?.propertyId) q = q.eq("property_id", opts.propertyId);
+  if (opts?.from) q = q.gte("month", opts.from);
+  if (opts?.to) q = q.lte("month", opts.to);
+  q = q.eq("base_temp_c", opts?.baseTempC ?? 18);
+  const { data, error } = await q;
+  if (error) throw error;
+  return (data ?? []) as unknown as WeatherMonth[];
+}
+
 export async function upsertActivity(payload: {
   property_id: string; period_start: string; period_end: string;
   occupied_room_nights: number; available_room_nights?: number | null; guest_nights?: number | null; fb_covers?: number | null; laundry_kg?: number | null;

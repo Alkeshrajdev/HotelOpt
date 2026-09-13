@@ -557,6 +557,34 @@ export type Database = {
         Update: Partial<Database["public"]["Tables"]["user_properties"]["Row"]>;
         Relationships: [];
       };
+      weather_monthly: {
+        Row: {
+          id: string;
+          property_id: string;
+          month: string;
+          base_temp_c: number;
+          hdd: number;
+          cdd: number;
+          mean_temp_c: number | null;
+          days_covered: number;
+          source: string;
+          retrieved_at: string;
+        };
+        Insert: {
+          id?: string;
+          property_id: string;
+          month: string;
+          base_temp_c?: number;
+          hdd: number;
+          cdd: number;
+          mean_temp_c?: number | null;
+          days_covered: number;
+          source?: string;
+          retrieved_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["weather_monthly"]["Row"]>;
+        Relationships: [];
+      };
     };
     Views: {
       ef_facets: {

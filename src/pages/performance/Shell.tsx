@@ -17,6 +17,7 @@ import EnergyBenchmarksView from "./EnergyBenchmarks";
 import PillarOverviewView from "./PillarOverview";
 import PillarBenchmarksView from "./PillarBenchmarks";
 import GenuinePerformanceView from "./GenuinePerformance";
+import GenuinePerformanceLiveView from "./GenuinePerformanceLive";
 
 /** The product covers the four environmental pillars only (owner decision, Sep 2026). */
 export type PillarKey = "energy" | "water" | "waste" | "carbon";
@@ -127,7 +128,9 @@ export default function PerformanceShell() {
       {view === "overview" && mode === "demo" && pillar === "energy" && <EnergyOverviewView />}
       {view === "overview" && mode === "demo" && pillar !== "energy" && <PillarOverviewView pillar={pillar} />}
 
-      {view === "genuine-performance" && <GenuinePerformanceView pillar={pillar} />}
+      {view === "genuine-performance" && (mode === "live"
+        ? <GenuinePerformanceLiveView pillar={pillar} />
+        : <GenuinePerformanceView pillar={pillar} />)}
 
       {view === "benchmarks" && pillar === "energy" && <EnergyBenchmarksView />}
       {view === "benchmarks" && pillar !== "energy" && <PillarBenchmarksView pillar={pillar} />}
