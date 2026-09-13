@@ -182,6 +182,8 @@ Migrations (all applied via the MCP; SQL is not in the repo — pull it with `li
 | 17 | ef_bridge_factors | Six rows for what nothing publishes: district cooling (graded C, an unsourced estimate), on-site solar at zero, mixed recyclables, donated food. Each states its derivation. |
 | 18 | spend_factor_category_is_per_purchase | A NAICS factor has no Scope 3 category of its own — the same factor is Cat 1 for food, Cat 2 for furniture, Cat 4 for freight. Spend rows carry `category` null. |
 | 19 | migrate_activities_to_ef_factors | Repoints `emission_activities.ef_id` at `ef_factors`, restates the AR6 refrigerants to AR5 and the indicative EEIO placeholders to real NAICS factors (the reason is written into each row's `source_payload.restated_2026_09`), then drops `ef_library`. |
+| 21 | spend_currency_and_price_year | `emission_activities` gains the money trail (`amount_original`, `currency_original`, `fx_rate`, `fx_source`, `price_year`, `deflator`, `deflator_source`); `ef_fx_rates` and `ef_price_index` reference tables, both deliberately empty; `ef_datasets.currency_code` / `currency_base_year`. |
+| 22 | label_seeded_spend_rows | Marks the 882 seeded spend rows as nominal USD with no FX and no deflation, so they do not read as converted invoices. |
 | 20 | ef_facets_view | `ef_facets` view (distinct domain / boundary / geo_code with counts). The library browser's filters were being built from whatever PostgREST returned first, which caps at 1,000 rows, so most values never appeared. |
 
 Enums: `pillar` energy/water/waste/carbon/social/governance · `energy_source` electricity_grid/natural_gas/district_cooling/diesel/solar_pv · `record_status` draft/submitted/queried/approved/rejected · `user_role` maker/checker/property_sm/super_admin. `emission_activities.scope` (1 or 3), `category` (`cat1`…`cat15`) and `activity_type` (refrigerant / purchase / capital / upstream_transport / business_travel / commute) are checked text, not enums.
@@ -206,6 +208,18 @@ Enums: `pillar` energy/water/waste/carbon/social/governance · `energy_source` e
 | US EPA GHG Emission Factors Hub 2025 | 85 | 26 eGRID subregions (lb/MWh → kgCO₂e/kWh, loss rate as a separate `t_and_d` row) and the AR5 GWP tables. Tables 1–5 and 8–10 are **not** loaded — DEFRA covers those activities and no property reports in US units. |
 | US EPA / USEEIO v1.3.0 (NAICS, USD 2022) | 1,016 | **With margins**: invoice spend is a purchaser price. `category` is null — it depends on the purchase. |
 | Hotel Optimizer — Bridge factors 2026.1 | 6 | District cooling (grade C, unsourced estimate), on-site solar = 0, mixed recyclables, donated food. Each row's `notes` records its derivation. |
+
+### Spend-based Scope 3: currency and price year
+
+A spend factor is denominated in a currency **and** a price year — USEEIO is kgCO₂e per **2022 USD at purchaser price**. Every hotel in the portfolio invoices in something else, so an invoice is restated twice before it touches the factor:
+
+```
+usd_nominal = amount_original × fx_rate        (fx_rate = USD per 1 unit of currency)
+usd_base    = usd_nominal     × deflator       (deflator = base-year index / spend-year index)
+quantity    = usd_base                          ← what the factor multiplies
+```
+
+Every term is stored on the row with its source. `ef_fx_rates` and `ef_price_index` start **empty on purpose**: a wrong exchange rate is exactly the kind of plausible-looking number this product will not invent. The capture form pre-fills from them when a row exists; with no rate and none on file it **refuses**, naming the currency and year; with no price index it proceeds at a deflator of 1 and raises an anomaly flag saying the figure is overstated. Loading real annual-average rates and a US price series is a data task for the platform admin, not a code change.
 
 **GWP set is AR5 throughout**, matching both published sets. `ef_unit_conversions` (210 rows) holds DEFRA's conversions and per-fuel calorific values, so litres→kWh is data rather than a constant. `ef_haul_definitions` (215) is flagged UK-origin and so cannot classify flights for this portfolio.
 
@@ -240,6 +254,9 @@ The workbooks live in `/Users/alkeshrajdev/Documents/Cloude/EF` (not in the repo
 - **PostgREST caps a select at 1,000 rows**, so deriving distinct values by selecting a column and de-duplicating in the browser silently truncates. Use a view — that is what `ef_facets` is for.
 - **Never `select *` from `ef_factors` without filters.** It is 3,718 rows; every page asks for the slice it needs (§9).
 - DEFRA names blends by ASHRAE number without a hyphen (`R410A`) but pure gases by chemical designation (`HFC-134a`), while the capture form and EPA hyphenate throughout. `refrigerantKey` in `factors.ts` carries the alias map.
+- **Never let a unit fall through to a default.** The old `energyQty` returned `kWh` for anything it did not recognise, so 100 kg of LPG became 100 kWh. Units now convert through `ef_unit_conversions` (which carries DEFRA's per-fuel calorific values and densities) or the record is excluded and counted.
+- **Never let an unmapped enum fall back to a sibling.** `wasteFactorFor` used to return the mixed-refuse key for any stream it did not know, so hazardous waste was priced as household landfill. An unmapped stream returns null and the inventory states the gap.
+- Two views of the same pillar must be computed the same way. The Carbon pillar summed twelve *rounded* months and omitted refrigerants, so it sat 30 tCO₂e away from the Carbon inventory tab for the same property.
 - The trigger overwrites `client_id`; the API passes a placeholder on insert.
 - RLS: a maker or checker sees a property only with a `user_properties` row; the seed covers all ten.
 - zsh globbing in the tool shell: quote `--include='*.ts'`; the working directory sometimes resets — use absolute paths or `git -C`.
@@ -252,12 +269,20 @@ The workbooks live in `/Users/alkeshrajdev/Documents/Cloude/EF` (not in the repo
 ## 11. Next-session plan (priority order)
 
 1. **Vercel env vars** (§1) so production runs live. Five minutes.
-2. ~~**Full Scope 1 + Scope 3 data model.**~~ ~~**The real factor library.**~~ **Both done** (migrations 10–20, `lib/data/factors.ts`, `lib/data/carbon.ts`, `scripts/ef-import`, §9). What they left open, in priority order:
+2. ~~**Full Scope 1 + Scope 3 data model.**~~ ~~**The real factor library.**~~ ~~**Calculation audit.**~~ **Done** (migrations 10–22, `lib/data/factors.ts`, `lib/data/carbon.ts`, `scripts/ef-import`, §9).
+
+   The audit of 2026-09-13 found and fixed seven defects — hotel-stay capture that could never resolve, hazardous waste silently becoming mixed refuse, three unit conversions that relabelled rather than converted, the Carbon pillar disagreeing with its own inventory tab, and a resolver that did not implement the documented order. All were latent on the uniform seed data and all reachable from the capture forms; see the commit for each. It also added cabin class to flights (long-haul business is 2.2× average passenger), DEFRA's material list to waste, the spend money model, and a searchable picker over all 1,016 NAICS codes.
+
+   What is still open, in priority order:
    - **Approve Scope 1/3 activity.** `emission_activities` rows are submitted but the queue only reads `consumption_records`, so no one can approve them. Generalise `record_comments.record_id` (drop the FK or add a `table_name`), extend `useReviewRecords` / `transitionRecord` in `src/lib/data/records.ts` to cover both tables, and add a filter so a checker can see activity rows. This closes capture → approve → report for Scope 3, and is still the biggest hole.
    - **Assign the remaining grid overrides.** Only the two Dubai hotels have a `grid_code`. Malaysia, Australia, Canada, Indonesia and the US eGRID subregions all have A+ sub-national factors sitting unused, and the Properties detail page has no field to set one.
+   - **AI classification and OCR** (§6). The searchable NAICS picker is in; the next step is the edge function that reads an invoice line and proposes the code with a confidence, flagging anything under ~0.8 for the checker. There is still **no AI anywhere in the product** — seven runtime dependencies, none of them a model client.
+   - **Load the FX rates and a US price index.** `ef_fx_rates` and `ef_price_index` are empty by design, so every foreign invoice currently needs a hand-typed rate and no spend is deflated (each undeflated row carries a flag saying so). Annual averages for the seven portfolio currencies plus a US PPI/CPI series would automate both.
+   - **Owned vehicles (Scope 1 fleet).** 318 factors loaded, no `energy_source` value and no capture form. The remaining item from the capture-priority list.
    - **Client factor overrides.** The schema supports them (`ef_factors.client_id`, which wins during resolution) but nothing in the UI can add a supplier-specific factor, which is what tier 1 Cat 1 actually needs.
    - **Scope 2 market-based.** Needs a contractual-instruments table (RECs, PPAs, green tariffs, supplier factors) plus residual-mix factors; the `market_based` boundary already exists and is empty. The report states that it is not modelled.
-   - **Owned vehicles and the missing Scope 1 fuels.** DEFRA's vehicle, LPG, heat/steam and bioenergy factors are all loaded; what is missing is `energy_source` enum values and a capture path.
+   - **The missing Scope 1 fuels.** DEFRA's LPG, heat/steam and bioenergy factors are loaded; what is missing is `energy_source` enum values and a capture path.
+   - **Unwired reference data**: `ef_haul_definitions` (215 rows) and the `value_co2 / ch4 / n2o` gas split on most DEFRA rows are stored and never read. The gas split is what CDP asks for.
    - **District cooling** is a grade-C unsourced estimate. Empower and Tabreed publish intensities — load one and delete the bridge row.
    - **Base year** is not in the data model; the report prints "Not configured".
    - **Portfolio-level GHG reporting** is still out of scope by the product rule (Portfolio is the only cross-property section) — if the owner wants a consolidated corporate inventory, that is a Portfolio page, not this report.
