@@ -252,6 +252,18 @@ function buildYear(
     return [...groups.entries()].map(([gk, rs]) => {
       const factor = remember(rs[0].ef_id ? activityFactors.get(rs[0].ef_id) : null);
       const tier = rs[0].tier;
+      // A spend line that came from a foreign invoice has to show its conversion.
+      const converted = rs.filter((a) => a.currency_original && a.currency_original !== a.unit);
+      const undeflated = rs.filter((a) => a.deflator !== null && Number(a.deflator) === 1 && a.price_year !== null
+        && (a.deflator_source ?? "").startsWith("Not deflated"));
+      const money = [
+        converted.length
+          ? `${converted.length} of ${rs.length} line(s) converted from ${[...new Set(converted.map((a) => a.currency_original))].join(", ")}.`
+          : null,
+        undeflated.length
+          ? `${undeflated.length} line(s) were not restated to the factor's price year.`
+          : null,
+      ].filter(Boolean).join(" ");
       return {
         key: `${keyPrefix}-${gk}`,
         scope, category,
@@ -263,6 +275,7 @@ function buildYear(
         quantityUnit: rs[0].unit,
         tco2e: rs.reduce((s, a) => s + Number(a.tco2e ?? 0), 0),
         factor,
+        note: money || undefined,
       } satisfies InventoryLine;
     }).sort((a, b) => b.tco2e - a.tco2e);
   }

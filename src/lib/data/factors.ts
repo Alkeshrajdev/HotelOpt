@@ -25,7 +25,7 @@
  *
  * Nothing is invented. When no factor matches, the caller gets null and says so.
  */
-import type { EfFactor, EfUnitConversion } from "@/lib/api";
+import type { EfFactor, EfFxRate, EfPriceIndex, EfUnitConversion } from "@/lib/api";
 
 /** A factor with its dataset's precedence, which is what breaks a tie between sources. */
 export type EfFactorRow = EfFactor & { dataset?: { precedence: number; publisher: string } | null };
@@ -349,6 +349,104 @@ export const refrigerantKey = (gas: string) => {
 
 /** Spend-based purchases resolve by NAICS-6. */
 export const naicsKey = (code: string) => `naics_${code.trim()}`;
+
+/* ---------------- spend: currency and price year ---------------- */
+
+export type MoneyBasis = {
+  amountOriginal: number;
+  currencyOriginal: string;
+  fxRate: number;
+  fxSource: string | null;
+  priceYear: number;
+  deflator: number;
+  deflatorSource: string | null;
+  /** The figure the emission factor multiplies: base-year currency of the dataset. */
+  amountBase: number;
+  /** Anything the checker and the report should be told about this conversion. */
+  caveats: string[];
+};
+
+/**
+ * Restate an invoice into the currency and price year the spend factor is denominated
+ * in. USEEIO is 2022 USD at purchaser price, so a 2026 dirham invoice needs an exchange
+ * rate and a deflator, and both have to be recorded to be reproducible.
+ *
+ *   usd_nominal = amount × fx_rate          (fx_rate = USD per 1 unit of currency)
+ *   usd_base    = usd_nominal × deflator    (deflator = base-year index / spend-year index)
+ *
+ * Returns a string when it cannot proceed — there is no sensible default exchange rate,
+ * and guessing one would put an invented number into the inventory.
+ */
+export function spendToBase(opts: {
+  amount: number;
+  currency: string;
+  priceYear: number;
+  baseCurrency: string;
+  baseYear: number;
+  rates: EfFxRate[];
+  index: EfPriceIndex[];
+  /** Region of the factor's economy, not the buyer's country. */
+  indexRegion?: string;
+  /** A rate the user supplied when the table had none. */
+  manualRate?: number | null;
+  manualRateSource?: string | null;
+}): MoneyBasis | string {
+  const caveats: string[] = [];
+  const cur = opts.currency.trim().toUpperCase();
+  const base = opts.baseCurrency.trim().toUpperCase();
+
+  let fxRate = 1;
+  let fxSource: string | null = null;
+  if (cur !== base) {
+    const onFile = opts.rates.find(
+      (r) => r.from_currency.toUpperCase() === cur && r.to_currency.toUpperCase() === base && r.year === opts.priceYear,
+    );
+    if (onFile) {
+      fxRate = Number(onFile.rate);
+      fxSource = `${onFile.source ?? "Loaded rate"} · ${onFile.basis.replace(/_/g, " ")} ${onFile.year}`;
+    } else if (opts.manualRate && opts.manualRate > 0) {
+      fxRate = opts.manualRate;
+      fxSource = opts.manualRateSource?.trim() || "Entered at capture, source not stated";
+      if (!opts.manualRateSource?.trim()) caveats.push("The exchange rate was entered by hand without a source.");
+    } else {
+      return `No ${cur}→${base} rate for ${opts.priceYear} is on file. Enter the rate you are using and where it came from, or ask the platform admin to load the year's rates.`;
+    }
+  }
+
+  // Deflation to the factor's base year. Missing indices are a stated caveat rather
+  // than a blocker: the spend is still real, it is simply not restated.
+  const region = opts.indexRegion ?? "US";
+  const at = (y: number) =>
+    opts.index.find((i) => i.region === region && i.year === y);
+  const spendIdx = at(opts.priceYear);
+  const baseIdx = at(opts.baseYear);
+  let deflator = 1;
+  let deflatorSource: string | null = null;
+  if (opts.priceYear === opts.baseYear) {
+    deflatorSource = `Spend is already in ${opts.baseYear} ${base}; no deflation needed.`;
+  } else if (spendIdx && baseIdx && Number(spendIdx.index_value) !== 0) {
+    deflator = Number(baseIdx.index_value) / Number(spendIdx.index_value);
+    deflatorSource = `${baseIdx.series} (${region}) ${opts.baseYear}/${opts.priceYear} = ${deflator.toFixed(4)}`;
+  } else {
+    deflatorSource = `Not deflated — no ${region} price index on file for ${opts.priceYear} and ${opts.baseYear}.`;
+    caveats.push(
+      `Spend from ${opts.priceYear} is being multiplied by a ${opts.baseYear} ${base} factor without deflation, which overstates the result by whatever prices have moved since.`,
+    );
+  }
+
+  const nominal = opts.amount * fxRate;
+  return {
+    amountOriginal: opts.amount,
+    currencyOriginal: cur,
+    fxRate,
+    fxSource,
+    priceYear: opts.priceYear,
+    deflator,
+    deflatorSource,
+    amountBase: nominal * deflator,
+    caveats,
+  };
+}
 
 /** Human labels for the fifteen Scope 3 categories. */
 export const CATEGORY_LABEL: Record<string, string> = {

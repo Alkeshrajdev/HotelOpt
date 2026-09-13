@@ -12,6 +12,8 @@ export type EfFactor = Tables<"ef_factors">;
 export type EfFactorWithDataset = EfFactor & { dataset: { precedence: number; publisher: string } | null };
 export type EfDataset = Tables<"ef_datasets">;
 export type EfUnitConversion = Tables<"ef_unit_conversions">;
+export type EfFxRate = Tables<"ef_fx_rates">;
+export type EfPriceIndex = Tables<"ef_price_index">;
 export type EmissionActivity = Tables<"emission_activities">;
 export type Profile = Tables<"user_profiles">;
 export type AuditRow = Tables<"audit_log">;
@@ -114,6 +116,21 @@ export async function searchFactors(opts: {
   const { data, error } = await q;
   if (error) throw error;
   return data ?? [];
+}
+
+/**
+ * Annual-average FX rates and price indices for spend-based Scope 3. Both tables start
+ * empty — a wrong rate is exactly the kind of plausible number this product will not
+ * invent — so the capture form falls back to asking the user when nothing is on file.
+ */
+export async function listMoneyBasis(year: number): Promise<{ fx: EfFxRate[]; index: EfPriceIndex[] }> {
+  const [fx, index] = await Promise.all([
+    supabase!.from("ef_fx_rates").select("*").eq("year", year),
+    supabase!.from("ef_price_index").select("*"),
+  ]);
+  if (fx.error) throw fx.error;
+  if (index.error) throw index.error;
+  return { fx: fx.data ?? [], index: index.data ?? [] };
 }
 
 /** DEFRA's per-fuel calorific values and densities, plus the plain unit conversions. */
@@ -403,6 +420,14 @@ export async function createEmissionActivity(payload: {
   tco2e?: number | null;
   invoice_ref?: string | null;
   notes?: string | null;
+  /** Spend rows carry the money trail: what was invoiced, in what, at which rate and price year. */
+  amount_original?: number | null;
+  currency_original?: string | null;
+  fx_rate?: number | null;
+  fx_source?: string | null;
+  price_year?: number | null;
+  deflator?: number | null;
+  deflator_source?: string | null;
   source_payload?: Record<string, unknown> | null;
   anomaly_flags?: Record<string, unknown>[];
   input_method?: string;
@@ -429,6 +454,13 @@ export async function createEmissionActivity(payload: {
     tco2e: payload.tco2e ?? null,
     invoice_ref: payload.invoice_ref ?? null,
     notes: payload.notes ?? null,
+    amount_original: payload.amount_original ?? null,
+    currency_original: payload.currency_original ?? null,
+    fx_rate: payload.fx_rate ?? null,
+    fx_source: payload.fx_source ?? null,
+    price_year: payload.price_year ?? null,
+    deflator: payload.deflator ?? null,
+    deflator_source: payload.deflator_source ?? null,
     source_payload: (payload.source_payload ?? null) as Inserts<"emission_activities">["source_payload"],
     anomaly_flags: (payload.anomaly_flags ?? []) as Inserts<"emission_activities">["anomaly_flags"],
     status: payload.submit ? "submitted" : "draft",

@@ -52,10 +52,13 @@ import {
   type FieldDef,
   type Method,
 } from "@/lib/dataCaptureConfig";
-import { createEmissionActivity, createRecord, listFactorCandidates, uploadEvidence, upsertActivity } from "@/lib/api";
+import {
+  createEmissionActivity, createRecord, listFactorCandidates, listFactorDatasets,
+  listMoneyBasis, uploadEvidence, upsertActivity,
+} from "@/lib/api";
 import {
   TRAVEL_MODE_FACTOR, flightKey, geoChain, hotelStayKey, isFlight, naicsKey,
-  refrigerantKey, resolveFactor,
+  refrigerantKey, resolveFactor, spendToBase,
 } from "@/lib/data/factors";
 import { anomalyFlagsFor } from "@/lib/data/records";
 import { useProperties, type PropertyLite as Property } from "@/lib/data/properties";
@@ -213,33 +216,60 @@ async function submitEmissionActivity(opts: {
 
   if (key === "procurement") {
     const category = v["category"] ?? "cat1";
-    const unit = v["unit"] ?? "USD";
+    const currency = (v["currency"] ?? "USD").toUpperCase();
     const amount = num("amount");
     const naics = v["commodity"];
-    if (amount === null || amount <= 0) return "Enter the amount purchased.";
+    if (amount === null || amount <= 0) return "Enter the amount as invoiced.";
     if (!naics) return "Choose what was bought — it selects the spend-based factor.";
-    if (unit !== "USD") {
-      return `The spend-based factors are denominated in 2022 USD, and nothing in the app converts ${unit} to it. Enter the amount in USD, or capture this purchase by mass against a product factor.`;
-    }
+
     const hit = await resolve("spend", naicsKey(naics), "lifecycle", "USD");
     if (!hit) return `No spend factor in the library for NAICS ${naics}. Ask the platform admin to load it, then resubmit.`;
+
+    // The factor is denominated in a currency and a price year; the invoice has to be
+    // restated into both before it can be multiplied, and every term is kept on the row.
+    const priceYear = Number(start.slice(0, 4));
+    const [datasets, money] = await Promise.all([listFactorDatasets(), listMoneyBasis(priceYear)]);
+    const dataset = datasets.find((d) => d.id === hit.factor.dataset_id);
+    const basis = spendToBase({
+      amount, currency, priceYear,
+      baseCurrency: dataset?.currency_code ?? "USD",
+      baseYear: dataset?.currency_base_year ?? priceYear,
+      rates: money.fx, index: money.index,
+      manualRate: num("fxRate"), manualRateSource: v["fxSource"] ?? null,
+    });
+    if (typeof basis === "string") return basis;
+
+    const flags = [...anomalyFlags];
+    basis.caveats.forEach((c) =>
+      flags.push({ type: "method", severity: "info", message: c }));
+
     await createEmissionActivity({
       property_id: propertyId, scope: 3, category,
       activity_type: category === "cat2" ? "capital" : category === "cat4" ? "upstream_transport" : "purchase",
       factor_key: hit.factor.activity_key,
       description: v["description"] || v["vendor"] || hit.factor.activity,
       vendor: v["vendor"] || null,
-      period_start: start, period_end: end, quantity: amount, unit: "USD",
+      period_start: start, period_end: end,
+      quantity: +basis.amountBase.toFixed(2),
+      unit: dataset?.currency_code ?? "USD",
       tier: v["tier"] ? Number(v["tier"]) : 3,
       ef_id: hit.factor.id, ef_value: hit.value,
       ef_unit: `${hit.factor.unit_numerator}/${hit.factor.unit_denominator}`,
-      tco2e: (amount * hit.value) / 1000,
+      tco2e: (basis.amountBase * hit.value) / 1000,
       invoice_ref: v["invoiceRef"] || null, notes: v["notes"] || null,
+      amount_original: basis.amountOriginal,
+      currency_original: basis.currencyOriginal,
+      fx_rate: basis.fxRate,
+      fx_source: basis.fxSource,
+      price_year: basis.priceYear,
+      deflator: basis.deflator,
+      deflator_source: basis.deflatorSource,
       source_payload: withEvidence({
-        naics, method: "Spend x EEIO factor (USEEIO, purchaser price).",
+        naics,
+        method: `Spend × EEIO factor (USEEIO, purchaser price). ${basis.amountOriginal.toLocaleString()} ${basis.currencyOriginal} × ${basis.fxRate} × ${basis.deflator.toFixed(4)} = ${basis.amountBase.toFixed(2)} ${dataset?.currency_base_year ?? ""} ${dataset?.currency_code ?? "USD"}.`,
         factor: { name: hit.factor.activity, source: hit.factor.source_name, vintage: hit.factor.factor_year_label },
       }),
-      anomaly_flags: anomalyFlags, input_method: method, submit: true,
+      anomaly_flags: flags, input_method: method, submit: true,
     });
     return null;
   }

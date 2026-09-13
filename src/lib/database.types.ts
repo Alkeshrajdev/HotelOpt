@@ -159,6 +159,8 @@ export type Database = {
         Row: {
           citation: string | null;
           client_id: string | null;
+          currency_base_year: number | null;
+          currency_code: string | null;
           gwp_set: string;
           id: string;
           imported_at: string;
@@ -178,6 +180,8 @@ export type Database = {
           version: string;
           citation?: string | null;
           client_id?: string | null;
+          currency_base_year?: number | null;
+          currency_code?: string | null;
           id?: string;
           imported_at?: string;
           licence?: string | null;
@@ -293,6 +297,60 @@ export type Database = {
         Update: Partial<Database["public"]["Tables"]["ef_unit_conversions"]["Insert"]>;
         Relationships: [];
       };
+      ef_fx_rates: {
+        Row: {
+          basis: string;
+          client_id: string | null;
+          created_at: string;
+          from_currency: string;
+          id: string;
+          rate: number;
+          source: string | null;
+          source_url: string | null;
+          to_currency: string;
+          year: number;
+        };
+        Insert: {
+          from_currency: string;
+          rate: number;
+          year: number;
+          basis?: string;
+          client_id?: string | null;
+          created_at?: string;
+          id?: string;
+          source?: string | null;
+          source_url?: string | null;
+          to_currency?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["ef_fx_rates"]["Insert"]>;
+        Relationships: [];
+      };
+      ef_price_index: {
+        Row: {
+          client_id: string | null;
+          created_at: string;
+          id: string;
+          index_value: number;
+          region: string;
+          series: string;
+          source: string | null;
+          source_url: string | null;
+          year: number;
+        };
+        Insert: {
+          index_value: number;
+          series: string;
+          year: number;
+          client_id?: string | null;
+          created_at?: string;
+          id?: string;
+          region?: string;
+          source?: string | null;
+          source_url?: string | null;
+        };
+        Update: Partial<Database["public"]["Tables"]["ef_price_index"]["Insert"]>;
+        Relationships: [];
+      };
       ef_haul_definitions: {
         Row: {
           dataset_id: string;
@@ -316,21 +374,29 @@ export type Database = {
       emission_activities: {
         Row: {
           activity_type: string;
+          amount_original: number | null;
           anomaly_flags: Json;
           category: string | null;
           client_id: string;
           created_at: string;
+          currency_original: string | null;
+          deflator: number | null;
+          deflator_source: string | null;
           description: string | null;
           ef_id: string | null;
           ef_unit: string | null;
           ef_value: number | null;
           factor_key: string | null;
+          fx_rate: number | null;
+          fx_rate_date: string | null;
+          fx_source: string | null;
           id: string;
           input_method: string;
           invoice_ref: string | null;
           notes: string | null;
           period_end: string;
           period_start: string;
+          price_year: number | null;
           property_id: string;
           quantity: number;
           reviewed_at: string | null;
@@ -355,10 +421,18 @@ export type Database = {
           quantity: number;
           scope: number;
           unit: string;
+          amount_original?: number | null;
           anomaly_flags?: Json;
           category?: string | null;
           created_at?: string;
+          currency_original?: string | null;
+          deflator?: number | null;
+          deflator_source?: string | null;
           description?: string | null;
+          fx_rate?: number | null;
+          fx_rate_date?: string | null;
+          fx_source?: string | null;
+          price_year?: number | null;
           ef_id?: string | null;
           ef_unit?: string | null;
           ef_value?: number | null;
