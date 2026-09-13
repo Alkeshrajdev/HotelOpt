@@ -45,7 +45,9 @@ export type FieldType =
   | "file"
   | "tier"
   | "boolean"
-  | "pillar-multi";
+  | "pillar-multi"
+  /** Search the factor library itself — used for spend, where the list is 1,016 NAICS codes. */
+  | "factor-search";
 
 export type FieldDef = {
   key: string;
@@ -314,9 +316,9 @@ export const DATA_TYPES: DataTypeConfig[] = [
       {
         key: "commodity",
         label: "What was bought",
-        type: "select",
+        type: "factor-search",
         required: true,
-        help: "Picks the spend-based factor (US EPA / USEEIO, by NAICS). Choose the closest match — the report prints which one was applied.",
+        help: "Picks the spend-based factor (US EPA / USEEIO, by NAICS). Start from a common purchase or search all 1,016 codes — the report prints which one was applied.",
         options: [
           { value: "311999", label: "Food & beverage — mixed / general" },
           { value: "311611", label: "Food — meat & poultry" },

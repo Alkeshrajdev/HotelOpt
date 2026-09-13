@@ -54,7 +54,7 @@ import {
 } from "@/lib/dataCaptureConfig";
 import {
   createEmissionActivity, createRecord, listFactorCandidates, listFactorDatasets,
-  listMoneyBasis, uploadEvidence, upsertActivity,
+  listMoneyBasis, searchFactors, uploadEvidence, upsertActivity, type EfFactor,
 } from "@/lib/api";
 import {
   TRAVEL_MODE_FACTOR, flightKey, geoChain, hotelStayKey, isFlight, naicsKey,
@@ -146,6 +146,100 @@ function validateOccupancy(values: Record<string, string>): Record<string, strin
     }
   }
   return errs;
+}
+
+/**
+ * Picking a spend factor out of 1,016 NAICS codes. The common hotel purchases stay as
+ * one-click shortcuts; anything else is found by searching the library itself, so a
+ * classification is never forced into the nearest shortcut.
+ */
+function FactorSearch({
+  f, value, onChange, error,
+}: {
+  f: FieldDef;
+  value: string;
+  onChange: (v: string) => void;
+  error?: string;
+}) {
+  const [term, setTerm] = useState("");
+  const [hits, setHits] = useState<EfFactor[]>([]);
+  const [searching, setSearching] = useState(false);
+  const chosen = f.options?.find((o) => o.value === value);
+  const [chosenLabel, setChosenLabel] = useState<string | null>(null);
+
+  useEffect(() => {
+    const q = term.trim();
+    if (q.length < 2) { setHits([]); return; }
+    let cancelled = false;
+    setSearching(true);
+    const t = setTimeout(() => {
+      searchFactors({ domain: "spend", term: q, limit: 25 })
+        .then((r) => { if (!cancelled) setHits(r); })
+        .catch(() => { if (!cancelled) setHits([]); })
+        .finally(() => { if (!cancelled) setSearching(false); });
+    }, 250);
+    return () => { cancelled = true; clearTimeout(t); };
+  }, [term]);
+
+  const label = chosen?.label ?? chosenLabel;
+
+  return (
+    <div className="space-y-2">
+      {value && (
+        <div className="flex items-center justify-between gap-2 rounded-xl bg-brand-50 border border-brand-100 px-3 py-2">
+          <span className="text-[13px] text-brand-900 min-w-0 truncate">
+            {label ?? value} <span className="text-brand-700/70">· NAICS {value}</span>
+          </span>
+          <button type="button" className="btn-ghost h-7 px-2 text-[12px]" onClick={() => { onChange(""); setChosenLabel(null); }}>
+            Change
+          </button>
+        </div>
+      )}
+      {!value && (
+        <>
+          <div className="flex flex-wrap gap-1.5">
+            {f.options?.map((o) => (
+              <button
+                key={o.value}
+                type="button"
+                className="chip rounded-full border border-ink-200 bg-white px-2.5 py-1 text-[12px] text-ink-700 hover:bg-ink-50 transition-colors"
+                onClick={() => { onChange(o.value); setChosenLabel(o.label); }}
+              >
+                {o.label}
+              </button>
+            ))}
+          </div>
+          <input
+            className={cn("input", error && "border-bad")}
+            placeholder="…or search all 1,016 codes — e.g. laundry, mattress, wine, 3221"
+            value={term}
+            onChange={(e) => setTerm(e.target.value)}
+          />
+          {term.trim().length >= 2 && (
+            <div className="popover max-h-56 overflow-y-auto rounded-xl">
+              {searching && <div className="px-3 py-2 text-[12px] text-ink-500">Searching the library…</div>}
+              {!searching && hits.length === 0 && (
+                <div className="px-3 py-2 text-[12px] text-ink-500">Nothing in the library matches "{term.trim()}".</div>
+              )}
+              {hits.map((h) => (
+                <button
+                  key={h.id}
+                  type="button"
+                  className="w-full text-left px-3 py-2 hover:bg-ink-50/60 transition-colors border-b border-ink-100 last:border-0"
+                  onClick={() => { onChange(h.naics_code ?? ""); setChosenLabel(h.activity); setTerm(""); }}
+                >
+                  <div className="text-[13px] text-ink-900">{h.activity}</div>
+                  <div className="text-[11px] text-ink-400 tabular-nums">
+                    NAICS {h.naics_code} · {Number(h.value).toFixed(3)} kgCO₂e/USD
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  );
 }
 
 /**
@@ -1196,6 +1290,9 @@ function FormField({
           {f.options?.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
         </select>
       );
+      break;
+    case "factor-search":
+      input = <FactorSearch f={f} value={value} onChange={onChange} error={error} />;
       break;
     case "unit":
       input = (
