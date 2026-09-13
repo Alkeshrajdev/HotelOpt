@@ -94,7 +94,8 @@ Status of every route. **Live** = reads/writes the Supabase project. **Demo** = 
 | Reports (index) | `/reports` | Demo | |
 | Certifications | `/certifications` | Demo | |
 | Marketplace | `/marketplace` | Demo | |
-| Supplier Portal, AI Assistant, Guest Engagement | `/supplier-portal`, `/ai-assistant`, `/guest-engagement` | Demo | AI Assistant answers are canned strings; no model is called anywhere in the app. |
+| Supplier Portal, AI Assistant, Guest Engagement | `/supplier-portal`, `/ai-assistant`, `/guest-engagement` | Demo | AI Assistant answers are canned strings. A real model layer now exists (§6) but no page calls it yet. |
+| AI purchase classification | `ai-classify` edge function | **Live (no UI)** | Provider-agnostic (Gemini / OpenAI-compatible / Anthropic; key in Vault). Batch-classifies procurement lines to NAICS against all 1,016 spend factors, caches every decision, never overwrites a human ruling, and prints a gap rather than substituting when no code fits. Verified on the live project; §6 has the numbers. Nothing in the app calls it — the Data Capture "bulk" method is still "Not connected yet". |
 | Billing | `/billing` | Demo | |
 | Admin › Clients | `/admin/clients` | Demo | Account type / module entitlements live in `localStorage` (`src/lib/account.tsx`), not the database. |
 | Admin › Users | `/admin/users` | Demo | Mock list; "Invite user" is not wired. |
@@ -133,16 +134,78 @@ What the user asked: "all emission sources? Scope 1, 2, 3 categories 1–7?" Ans
 
 ## 6. AI integration — status
 
-There is **no AI or OCR integration**. `package.json` depends only on supabase-js, clsx, lucide-react, react, react-dom, react-router-dom and recharts. What looks like AI is scripted: `AI_QUESTIONS` / `AI_EXTRACTED` and `SAMPLE_OCR` in `src/lib/dataCaptureConfig.ts` drive the AI-assist and OCR wizards; the AI Assistant page returns canned text; Actions' "AI recommendations" are static rows.
+**Live, provider-agnostic, and used by one feature so far.** The `ai-classify` edge
+function (v6) classifies procurement lines to NAICS codes for spend-based Scope 3.
+Everything else that looks like AI is still scripted: `AI_QUESTIONS` / `AI_EXTRACTED`
+and `SAMPLE_OCR` in `src/lib/dataCaptureConfig.ts` drive the capture wizards, the AI
+Assistant page returns canned text, and Actions' "AI recommendations" are static rows.
 
-Recommended shape for the real thing (keeps keys server-side):
+### The provider layer — `supabase/functions/ai-classify/provider.ts`
 
-1. A Supabase Edge Function `classify-purchase` that takes invoice text or line items (or the evidence file path, read from the bucket with the service role) and calls Claude (`claude-sonnet-5` for cost, `claude-opus-5` where accuracy matters) with a JSON schema: `{ category: cat1|cat2|cat4, commodity: <UNSPSC/NACE code>, ef_match: <ef_library id>, quantity, unit, confidence }`.
-2. Persist to `emission_activities` (it exists — §9) with `ai_confidence`, `ai_model` and `ai_rationale` in `source_payload`; rows under 0.8 confidence get an `ai-low` entry in `anomaly_flags` so the checker sees them first (the queue already renders that flag shape). The function should resolve the factor the same way `lib/data/factors.ts` does, so an AI-classified purchase and a hand-entered one are calculated identically.
-3. OCR: the same function family with Claude vision on PDFs/images already stored in `evidence`.
-4. Function secrets hold `ANTHROPIC_API_KEY`; the Vite bundle never sees it.
+Nothing above this file knows which vendor answers. A row in `ai_providers` names the
+provider, model and optional base URL; adapters shape the request for Gemini,
+OpenAI-compatible and Anthropic wire formats and normalise the reply to plain text.
+Adding a provider is one function and one line in `adapterFor`.
 
----
+- **Resolution order**: the caller's own client row → the deployment default
+  (`client_id is null`) → `AI_PROVIDER` / `AI_MODEL` / `AI_BASE_URL` in the function
+  environment. So a client can bring their own key without redeploying anything.
+- **Keys are never in a readable column.** `ai_providers` holds a Vault secret id;
+  `get_ai_provider_key(uuid)` is SECURITY DEFINER with execute granted to `service_role`
+  alone (migration 26). The Vite bundle never sees a key. The current deployment default
+  is Gemini `gemini-3.6-flash`.
+- **`Part` carries text or an inline image**, so the same layer will serve bill and meter
+  OCR without a second integration.
+- `ask()` retries 429/503/500 with backoff and gives up on anything else rather than
+  papering over it. `parseJson()` tolerates fences and stray prose.
+- Gemini is a reasoning model: thought parts are filtered out of the reply and
+  `thinkingLevel` is held to `low`. An undersized `maxOutputTokens` truncates the *answer*,
+  not the reasoning — that is what produced the half-emitted classifications on v3.
+
+### The classifier — `supabase/functions/ai-classify/index.ts`
+
+Built for how the data actually arrives: a spreadsheet of hundreds of lines, not one
+invoice at a time.
+
+- **Unique work only.** Lines are deduped on normalised vendor + description, so a
+  thousand-row file with forty distinct suppliers costs forty decisions.
+- **Cached.** Every decision is written to `purchase_classifications` (migration 27),
+  keyed `(client_id, vendor_norm, description_norm)`. A re-upload of the same file costs
+  nothing and — the point — cannot come back with different answers.
+- **A human ruling is never overwritten.** The cache upsert uses `ignoreDuplicates`, so a
+  corrected row survives any later model run and is returned flagged `cache-human`.
+- **The whole taxonomy goes in the prompt** — all 1,016 codes, ~12k tokens, amortised
+  across a chunk of 25 lines. This replaced keyword retrieval, which was the cause of the
+  two worst misclassifications (below).
+- **The library decides, not the model.** A proposed code is checked against `ef_factors`;
+  anything else becomes an unclassified line with a stated gap. No substituted factor.
+- Accepts `{lines:[{id,description,vendor}]}` or a single `{description,vendor}`; caps at
+  500 lines per call. Returns per-line `origin` (`cache-human` | `cache-ai` | `model` |
+  `unresolved`), the resolved factor, and a summary with `modelCalls` and `lowConfidence`.
+
+Measured against the live project on 2026-09-13:
+
+| Case | Result |
+| --- | --- |
+| 30 lines, 28 unknown | 2 model calls, 8.0 s, 2 unresolved (correctly) |
+| Same 12 lines, second call | 12/12 from cache, 0 model calls, 77 ms |
+| Human ruling vs a cache-bypassed run | survived, returned `cache-human` |
+| "Bulk laundry and dry cleaning" | 314120 @ 0.10 → **812320 Drycleaning and Laundry @ 0.95** |
+| "Consultancy for the 2026 ESG report" | 561492 Court Reporting @ 0.05 → **541620 Environmental Consulting @ 0.90** |
+
+### What is still missing
+
+1. **No UI.** The function has no caller in the app — the Data Capture "bulk" method is
+   still "not connected". The Excel/CSV upload and a confidence-sorted review grid are the
+   next piece: bulk-accept the high-confidence rows, hand-fix the rest, write corrections
+   back as `source='human'`.
+2. **Nothing is persisted to `emission_activities` yet.** A classified line should land
+   there with `ai_confidence`, `ai_model` and `ai_rationale` in `source_payload`, and rows
+   under 0.8 should get an `ai-low` entry in `anomaly_flags` so the checker sees them first
+   (the queue already renders that flag shape).
+3. **`ai-extract` for OCR** — energy and water bills, reusing `provider.ts` unchanged.
+4. **Admin → AI provider page.** `set_ai_provider_key` exists as an RPC; nothing calls it,
+   so adding or rotating a key is a SQL statement today.
 
 ## 7. Genuine performance — engine vs spec
 
@@ -279,7 +342,7 @@ The workbooks live in `/Users/alkeshrajdev/Documents/Cloude/EF` (not in the repo
 
    What is still open, in priority order:
    - **Assign the remaining grid overrides.** Only the two Dubai hotels have a `grid_code`. Malaysia, Australia, Canada, Indonesia and the US eGRID subregions all have A+ sub-national factors sitting unused, and the Properties detail page has no field to set one.
-   - **AI classification and OCR** (§6). The searchable NAICS picker is in; the next step is the edge function that reads an invoice line and proposes the code with a confidence, flagging anything under ~0.8 for the checker. There is still **no AI anywhere in the product** — seven runtime dependencies, none of them a model client.
+   - ~~**AI classification and OCR**~~ — the classifier is **built, deployed and verified** (§6): a provider-agnostic AI layer over Gemini/OpenAI/Anthropic, batch classification of procurement lines against all 1,016 NAICS codes, a cache that a human ruling always wins, and gaps printed rather than substituted. What is left is the *UI*: the Excel/CSV bulk upload, a confidence-sorted review grid, persistence into `emission_activities` with `ai-low` flags, and the `ai-extract` OCR sibling for bills.
    - **Load the FX rates and a US price index.** `ef_fx_rates` and `ef_price_index` are empty by design, so every foreign invoice currently needs a hand-typed rate and no spend is deflated (each undeflated row carries a flag saying so). Annual averages for the seven portfolio currencies plus a US PPI/CPI series would automate both.
    - **Client factor overrides.** The schema supports them (`ef_factors.client_id`, which wins during resolution) but nothing in the UI can add a supplier-specific factor, which is what tier 1 Cat 1 actually needs.
    - **Scope 2 market-based.** Needs a contractual-instruments table (RECs, PPAs, green tariffs, supplier factors) plus residual-mix factors; the `market_based` boundary already exists and is empty. The report states that it is not modelled.
@@ -288,7 +351,21 @@ The workbooks live in `/Users/alkeshrajdev/Documents/Cloude/EF` (not in the repo
    - **District cooling** is a grade-C unsourced estimate. Empower and Tabreed publish intensities — load one and delete the bridge row.
    - **Base year** is not in the data model; the report prints "Not configured".
    - **Portfolio-level GHG reporting** is still out of scope by the product rule (Portfolio is the only cross-property section) — if the owner wants a consolidated corporate inventory, that is a Portfolio page, not this report.
-3. **AI classification for purchases + OCR** (§6) as edge functions; wire the AI-assist and OCR wizards to them and persist their output with confidence flags.
+3. **Wire the classifier into the product** (§6) — the engine is done, the UI is not:
+   - **Excel/CSV bulk procurement upload.** Parse the sheet, map columns to
+     `{description, vendor, amount, currency, date}`, POST in batches of ≤500 to
+     `ai-classify`. This is where the batch design pays off.
+   - **Review grid**, sorted by confidence ascending so the doubtful rows are at the top.
+     Bulk-accept above a threshold; hand-fix below it. Every correction writes
+     `purchase_classifications` with `source='human'`, which then binds for good.
+   - **Persist to `emission_activities`** with `ai_confidence` / `ai_model` /
+     `ai_rationale` in `source_payload`, and an `ai-low` anomaly flag under 0.8, so an
+     AI-classified purchase and a hand-entered one calculate identically through
+     `lib/data/factors.ts`.
+   - **`ai-extract`** for energy and water bills: same `provider.ts`, image parts, a JSON
+     schema of meter/period/quantity/unit/amount, and the same rule that the library
+     decides the factor.
+   - **Admin → AI provider** page over the existing `set_ai_provider_key` RPC.
 4. **Genuine performance on live data** (§7): coordinates, weather ingestion, regression with fit gates, events register, then point the Performance › Genuine performance view and Portfolio › Compare at it.
 5. **Portfolio dashboard and Compare on live data**: aggregate `buildPerformance()` across properties or add a SQL view of monthly totals per property × source; keep the chart vocabulary.
 6. **Integrations** in the order of §8, starting with CSV bulk import (all-or-none commit into `consumption_records`) since the bucket and queue already exist.
