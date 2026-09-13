@@ -24,11 +24,14 @@
 import { useEffect, useMemo, useState } from "react";
 import {
   listActivity, listEmissionActivities, listFactorSet, listFactorsByIds, listRecords,
-  type ActivityRecord, type EfFactor, type EmissionActivity, type RecordWithProperty,
+  listUnitConversions,
+  type ActivityRecord, type EfFactor, type EfUnitConversion, type EmissionActivity,
+  type RecordWithProperty,
 } from "@/lib/api";
 import {
-  CATEGORY_LABEL, ENERGY_SOURCE_FACTOR, WATER_FACTOR, WATER_RETURN_SHARE,
-  WATER_TREATMENT_KEY, geoChain, isProvisional, normUnit, resolveFactor, wasteFactorFor,
+  CATEGORY_LABEL, ENERGY_SOURCE_FACTOR, SCOPE2_ENERGY_SOURCES, WASTE_STREAMS_WITHOUT_FACTORS,
+  WATER_FACTOR, WATER_RETURN_SHARE, WATER_TREATMENT_KEY, convertUnit, geoChain, isProvisional,
+  normUnit, resolveFactor, wasteFactorFor, type EfFactorRow,
 } from "./factors";
 import { reportingYearRange } from "./performance";
 
@@ -47,6 +50,8 @@ export type InventoryLine = {
   factor: EfFactor | null;
   /** Set when the line is known to exist but could not be calculated. */
   gap?: string;
+  /** A calculation detail worth stating that is not a problem — e.g. a unit conversion. */
+  note?: string;
 };
 
 export type CategoryBlock = {
@@ -93,13 +98,21 @@ export type Inventory = {
 
 /* ---------------- unit normalisation ---------------- */
 
-/** Energy records reach the library in the unit the factor is published in. */
+/**
+ * The record's quantity in a unit the library might publish. Only the energy-to-energy
+ * conversions are done here; anything else (a mass or a volume of fuel) is left alone so
+ * `energyLine` can try the library at that unit first and fall back to a real calorific
+ * value. The old version relabelled every unrecognised unit as kWh, which turned 100 kg
+ * of LPG into 100 kWh without a word.
+ */
 function energyQty(consumption: number, unit: string): { qty: number; unit: string } {
   const u = normUnit(unit);
   if (u === "mwh") return { qty: consumption * 1000, unit: "kWh" };
   if (u === "mj") return { qty: consumption / 3.6, unit: "kWh" };
   if (u === "m3") return { qty: consumption, unit: "m3" };
   if (u === "l") return { qty: consumption, unit: "L" };
+  if (u === "kg") return { qty: consumption, unit: "kg" };
+  if (u === "t") return { qty: consumption, unit: "t" };
   return { qty: consumption, unit: "kWh" };
 }
 const waterM3 = (v: number, unit: string) => (normUnit(unit) === "l" ? v / 1000 : v);
@@ -116,7 +129,7 @@ const ENERGY_LABEL: Record<string, string> = {
   diesel: "Diesel — standby generators",
   solar_pv: "On-site solar PV",
 };
-const SCOPE2_SOURCES = ["electricity_grid", "district_cooling", "solar_pv"];
+const SCOPE2_SOURCES = SCOPE2_ENERGY_SOURCES;
 const SCOPE1_SOURCES = ["natural_gas", "diesel"];
 
 const BOUNDARY_WORDS: Record<string, string> = {
@@ -154,7 +167,8 @@ function buildYear(
   year: number,
   records: RecordWithProperty[],
   activities: EmissionActivity[],
-  factors: EfFactor[],
+  factors: EfFactorRow[],
+  conversions: EfUnitConversion[],
   activityFactors: Map<string, EfFactor>,
   geo: string[],
 ): YearParts {
@@ -181,16 +195,30 @@ function buildYear(
     let kg = 0, qty = 0, unit = "kWh";
     let factor: EfFactor | null = null;
     let missing = 0;
+    let converted = 0;
     rows.forEach((r) => {
       const e = energyQty(r.consumption, r.unit);
-      const hit = resolveFactor(factors, {
+      // The library publishes natural gas per m3 and diesel per litre, so try the
+      // record's own unit first and only convert when there is nothing to match.
+      let hit = resolveFactor(factors, {
         domain: map.domain, activityKey: map.activityKey, boundary, unit: e.unit, year, geo,
       });
+      let useQty = e.qty;
+      let useUnit = e.unit;
+      if (!hit) {
+        const conv = convertUnit(conversions, e.qty, e.unit, "kWh", map.fuelName);
+        if (conv) {
+          const viaKwh = resolveFactor(factors, {
+            domain: map.domain, activityKey: map.activityKey, boundary, unit: "kWh", year, geo,
+          });
+          if (viaKwh) { hit = viaKwh; useQty = conv.value; useUnit = "kWh"; converted += 1; }
+        }
+      }
       if (!hit) { missing += 1; return; }
-      factor = hit.factor; unit = e.unit;
+      factor = hit.factor; unit = useUnit;
       if (boundary === "location_based") geoUsed.add(hit.why.geo);
-      qty += e.qty;
-      kg += e.qty * hit.value;
+      qty += useQty;
+      kg += useQty * hit.value;
     });
     const key = `${boundary}-${source}`;
     if (!factor) {
@@ -204,7 +232,12 @@ function buildYear(
     return {
       key, scope: opts.scope, category: opts.category, label: opts.label, basis: opts.basis,
       quantity: Math.round(qty), quantityUnit: unit, tco2e: kg / 1000, factor,
-      gap: missing ? `${missing} record(s) are in a unit the library has no factor for and are excluded.` : undefined,
+      gap: missing
+        ? `${missing} record(s) are in a unit neither the library nor its conversion table can reach, and are excluded.`
+        : converted
+          ? undefined
+          : undefined,
+      note: converted ? `${converted} record(s) converted to kWh using the fuel's published calorific value.` : undefined,
     };
   }
 
@@ -323,7 +356,8 @@ function buildYear(
       })
       : null;
     if (hit) remember(hit.factor);
-    const routeLabel = route === "incineration" ? "energy recovery" : route;
+    const routeLabel = route === "incineration" ? "energy recovery" : route.replace(/-/g, " ");
+    const known = WASTE_STREAMS_WITHOUT_FACTORS[stream];
     return {
       key: `waste-${stream}-${route}`, scope: 3 as Scope, category: "cat5",
       label: `${hit?.factor.subtype ?? stream} — ${routeLabel}`,
@@ -333,7 +367,7 @@ function buildYear(
       factor: hit?.factor ?? null,
       gap: hit
         ? undefined
-        : `The library publishes no factor for ${stream} waste sent to ${routeLabel}. Capture the material to calculate it.`,
+        : known ?? `No published factor for ${stream} waste sent to ${routeLabel}. The mass is recorded; the emissions cannot be calculated from it.`,
     };
   }).sort((a, b) => b.tco2e - a.tco2e);
 
@@ -362,13 +396,14 @@ export function buildInventory(
   records: RecordWithProperty[],
   activities: EmissionActivity[],
   activityRecords: ActivityRecord[],
-  factors: EfFactor[],
+  factors: EfFactorRow[],
+  conversions: EfUnitConversion[],
   activityFactors: EfFactor[],
   geo: string[],
 ): Inventory {
   const byId = new Map(activityFactors.map((f) => [f.id, f]));
-  const current = buildYear(year, records, activities, factors, byId, geo);
-  const previous = buildYear(year - 1, records, activities, factors, byId, geo);
+  const current = buildYear(year, records, activities, factors, conversions, byId, geo);
+  const previous = buildYear(year - 1, records, activities, factors, conversions, byId, geo);
 
   const totals = totalsOf(current.scope1, current.scope2, current.scope3);
   const priorTotals = totalsOf(previous.scope1, previous.scope2, previous.scope3);
@@ -455,8 +490,9 @@ export function usePropertyInventory(
       listEmissionActivities({ propertyId, from, to, status: ["approved", "submitted"] }),
       listActivity({ propertyId, from, to }),
       listFactorSet({ domains: INVENTORY_DOMAINS, geoCodes: chain, boundaries: INVENTORY_BOUNDARIES }),
+      listUnitConversions(),
     ])
-      .then(async ([records, activities, activityRecords, factors]) => {
+      .then(async ([records, activities, activityRecords, factors, conversions]) => {
         if (cancelled) return;
         // Activity rows keep the factor they were calculated with; fetch exactly those.
         const activityFactors = await listFactorsByIds(
@@ -465,7 +501,7 @@ export function usePropertyInventory(
         if (cancelled) return;
         setState({
           loading: false, error: null,
-          data: buildInventory(year, records, activities, activityRecords, factors, activityFactors, chain),
+          data: buildInventory(year, records, activities, activityRecords, factors, conversions, activityFactors, chain),
         });
       })
       .catch((e: Error) => { if (!cancelled) setState({ loading: false, error: e.message, data: null }); });

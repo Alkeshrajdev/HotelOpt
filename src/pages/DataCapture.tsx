@@ -54,7 +54,8 @@ import {
 } from "@/lib/dataCaptureConfig";
 import { createEmissionActivity, createRecord, listFactorCandidates, uploadEvidence, upsertActivity } from "@/lib/api";
 import {
-  TRAVEL_MODE_FACTOR, geoChain, naicsKey, refrigerantKey, resolveFactor,
+  TRAVEL_MODE_FACTOR, flightKey, geoChain, hotelStayKey, isFlight, naicsKey,
+  refrigerantKey, resolveFactor,
 } from "@/lib/data/factors";
 import { anomalyFlagsFor } from "@/lib/data/records";
 import { useProperties, type PropertyLite as Property } from "@/lib/data/properties";
@@ -258,9 +259,23 @@ async function submitEmissionActivity(opts: {
       ? "Enter the number of nights."
       : `Enter the distance travelled in ${map.unit}. A mode alone cannot be converted to emissions.`;
   }
-  const hit = await resolve("travel", map.activityKey, map.unit === "night" ? "lifecycle" : "combustion", map.unit, map.variant);
+
+  // Flights resolve per haul and cabin class; hotel stays resolve per country.
+  let activityKey = map.activityKey;
+  if (isFlight(travelMode)) {
+    activityKey = flightKey(travelMode, v["cabinClass"]) ?? "";
+  } else if (travelMode === "hotel-stay") {
+    const key = hotelStayKey(v["stayCountry"]);
+    if (!key) {
+      return "Choose the country stayed in — hotel-stay factors are published per country, and the library has none for this one.";
+    }
+    activityKey = key;
+  }
+
+  const domain = travelMode === "hotel-stay" ? "hotel_stay" : "travel";
+  const hit = await resolve(domain, activityKey, map.unit === "night" ? "lifecycle" : "combustion", map.unit, map.variant);
   if (!hit) {
-    return `No factor in the library for ${travelMode} measured in ${map.unit}. Ask the platform admin to load it, then resubmit.`;
+    return `No factor in the library for ${travelMode}${v["cabinClass"] ? ` (${v["cabinClass"]})` : ""} measured in ${map.unit}. Ask the platform admin to load it, then resubmit.`;
   }
   await createEmissionActivity({
     property_id: propertyId, scope: 3, category,
@@ -273,7 +288,8 @@ async function submitEmissionActivity(opts: {
     tco2e: (distance * hit.value) / 1000,
     notes: v["notes"] || null,
     source_payload: withEvidence({
-      mode: travelMode, headcount: num("headcount"), enteredUnit: unit,
+      mode: travelMode, cabinClass: v["cabinClass"] ?? null, stayCountry: v["stayCountry"] ?? null,
+      headcount: num("headcount"), enteredUnit: unit,
       method: `Distance x mode factor. ${map.unit === "km" ? "Car factors are per vehicle-km, not passenger-km." : ""}`.trim(),
       factor: { name: hit.factor.activity, source: hit.factor.source_name, vintage: hit.factor.factor_year_label },
     }),
@@ -1046,7 +1062,9 @@ function ManualWorkflow({
       </div>
 
       <div className="grid grid-cols-2 gap-4 px-5 pt-4 pb-5">
-        {cfg.fields.map((f) => (
+        {cfg.fields
+          .filter((f) => !f.showWhen || f.showWhen.equals.includes(values[f.showWhen.field] ?? ""))
+          .map((f) => (
           <FormField
             key={f.key}
             f={f}

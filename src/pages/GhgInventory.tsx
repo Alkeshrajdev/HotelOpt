@@ -108,7 +108,7 @@ function Breadcrumb() {
 /* Live — one property, computed from approved records                  */
 /* =================================================================== */
 
-type Row = { scope: string; source: string; basis: string; tco2e: number; indent?: boolean; gap?: string };
+type Row = { scope: string; source: string; basis: string; tco2e: number; indent?: boolean; gap?: string; note?: string };
 
 /** Basis in words: what was multiplied by what, and why a line is empty if it is. */
 function basisOf(l: InventoryLine): string {
@@ -119,13 +119,13 @@ function basisOf(l: InventoryLine): string {
 function inventoryRows(inv: Inventory): Row[] {
   const rows: Row[] = [];
   const push = (scope: string) => (l: InventoryLine) =>
-    rows.push({ scope, source: l.label, basis: basisOf(l), tco2e: l.tco2e, gap: l.gap });
+    rows.push({ scope, source: l.label, basis: basisOf(l), tco2e: l.tco2e, gap: l.gap, note: l.note });
   inv.scope1.forEach(push("Scope 1"));
   inv.scope2.forEach(push("Scope 2"));
   inv.scope3.filter((c) => c.tco2e > 0).forEach((c) => {
     rows.push({ scope: "Scope 3", source: c.label, basis: `${c.lines.length} ${c.lines.length === 1 ? "line" : "lines"} of approved activity data`, tco2e: c.tco2e });
     c.lines.forEach((l) => rows.push({
-      scope: "Scope 3", source: l.label, indent: true, basis: basisOf(l), tco2e: l.tco2e, gap: l.gap,
+      scope: "Scope 3", source: l.label, indent: true, basis: basisOf(l), tco2e: l.tco2e, gap: l.gap, note: l.note,
     }));
   });
   return rows;
@@ -151,7 +151,7 @@ function exportCsv(inv: Inventory, propertyName: string) {
   const body = inventoryRows(inv).map((r) => [
     r.scope,
     (r.indent ? "    " : "") + r.source,
-    r.gap ? `${r.basis} — ${r.gap}` : r.basis,
+    [r.basis, r.note, r.gap].filter(Boolean).join(" — "),
     r.tco2e.toFixed(3),
     inv.totals.gross > 0 ? ((r.tco2e / inv.totals.gross) * 100).toFixed(1) : "0",
   ]);
@@ -260,6 +260,7 @@ function LiveGhgInventory({ inv, propertyName, rooms }: { inv: Inventory; proper
                   <td className={r.indent ? "table-td pl-10 text-[12px] text-ink-700" : "table-td font-medium"}>{r.source}</td>
                   <td className="table-td text-ink-500 text-[12px]">
                     {r.basis}
+                    {r.note && <div className="text-ink-400">{r.note}</div>}
                     {r.gap && <div className="text-warn-700">{r.gap}</div>}
                   </td>
                   <td className="table-td text-right tabular-nums">{fmtT(r.tco2e)}</td>

@@ -25,7 +25,10 @@
  *
  * Nothing is invented. When no factor matches, the caller gets null and says so.
  */
-import type { EfFactor } from "@/lib/api";
+import type { EfFactor, EfUnitConversion } from "@/lib/api";
+
+/** A factor with its dataset's precedence, which is what breaks a tie between sources. */
+export type EfFactorRow = EfFactor & { dataset?: { precedence: number; publisher: string } | null };
 
 export type Boundary =
   | "combustion" | "location_based" | "market_based" | "t_and_d" | "wtt"
@@ -65,11 +68,19 @@ export type Resolved = {
 };
 
 /**
- * Where a variant is not requested, prefer the plainest reading of the factor:
- * no column-group at all, then the Kyoto basket (the reporting basis) over the
+ * Where a variant is not requested, prefer the plainest reading of the factor: no
+ * column-group at all, then the Kyoto basket (the reporting basis) over the
  * total-including-non-Kyoto memo column, then radiative forcing included.
+ *
+ * This is the *last* tie-break, not the first. Choosing a variant before choosing a
+ * source used to hand R-410A to EPA's unvarianted row instead of DEFRA's Kyoto column,
+ * because `null` sorts first here.
  */
 const VARIANT_PREFERENCE = [null, "kyoto", "with_rf", "total"];
+const variantRank = (v: string | null) => {
+  const i = VARIANT_PREFERENCE.indexOf(v);
+  return i === -1 ? VARIANT_PREFERENCE.length : i;
+};
 
 /** Geography chain for a property: its grid or utility, then its country, then GLOBAL. */
 export function geoChain(gridCode?: string | null, country?: string | null): string[] {
@@ -86,7 +97,7 @@ export function geoChain(gridCode?: string | null, country?: string | null): str
 }
 
 /** The one factor to apply, or null when the library has nothing for this activity. */
-export function resolveFactor(factors: EfFactor[], q: FactorQuery): Resolved | null {
+export function resolveFactor(factors: EfFactorRow[], q: FactorQuery): Resolved | null {
   const unit = canonicalUnit(q.unit);
   let pool = factors.filter(
     (f) =>
@@ -98,13 +109,11 @@ export function resolveFactor(factors: EfFactor[], q: FactorQuery): Resolved | n
   );
   if (!pool.length) return null;
 
+  // An explicitly requested variant is a filter; an unrequested one is only a tie-break.
   if (q.variant !== undefined) {
     pool = pool.filter((f) => (f.variant ?? null) === (q.variant ?? null));
-  } else {
-    const ranked = VARIANT_PREFERENCE.map((v) => pool.filter((f) => (f.variant ?? null) === v)).find((g) => g.length);
-    pool = ranked ?? pool;
+    if (!pool.length) return null;
   }
-  if (!pool.length) return null;
 
   // Geography: the first link in the chain that has anything.
   const chain = (q.geo?.filter(Boolean) as string[] | undefined) ?? ["GLOBAL"];
@@ -114,30 +123,73 @@ export function resolveFactor(factors: EfFactor[], q: FactorQuery): Resolved | n
 
   // Year: the newest at or before the reporting year; only reach forward if nothing older exists.
   const atOrBefore = pool.filter((f) => f.factor_year !== null && f.factor_year <= q.year);
-  const yearIsLater = atOrBefore.length === 0 && pool.some((f) => f.factor_year !== null);
-  const byYear = atOrBefore.length
-    ? atOrBefore
-    : pool.some((f) => f.factor_year !== null)
-      ? [...pool].sort((a, b) => (a.factor_year ?? 0) - (b.factor_year ?? 0))
-      : pool;
+  const dated = pool.filter((f) => f.factor_year !== null);
+  const yearIsLater = atOrBefore.length === 0 && dated.length > 0;
   const bestYear = atOrBefore.length
     ? Math.max(...atOrBefore.map((f) => f.factor_year as number))
-    : byYear[0]?.factor_year ?? null;
-  let chosen = byYear.filter((f) => (f.factor_year ?? null) === bestYear);
-  if (!chosen.length) chosen = byYear;
+    : dated.length
+      ? Math.min(...dated.map((f) => f.factor_year as number))
+      : null;
+  const sameYear = pool.filter((f) => (f.factor_year ?? null) === bestYear);
+  const candidates = sameYear.length ? sameYear : pool;
 
-  // A client's own factor wins; then dataset precedence, then the default flag.
-  chosen.sort((a, b) =>
-    Number(Boolean(b.client_id)) - Number(Boolean(a.client_id)) ||
-    Number(b.is_default) - Number(a.is_default) ||
-    a.activity.localeCompare(b.activity));
+  // The documented order, all of it: a client's own factor, then the dataset that the
+  // library prefers, then the default flag, then the variant.
+  const ranked = [...candidates].sort((a, b) =>
+    Number(Boolean(b.client_id)) - Number(Boolean(a.client_id))
+    || (a.dataset?.precedence ?? 99) - (b.dataset?.precedence ?? 99)
+    || Number(b.is_default) - Number(a.is_default)
+    || variantRank(a.variant ?? null) - variantRank(b.variant ?? null)
+    || a.activity.localeCompare(b.activity));
 
-  const factor = chosen[0];
+  const factor = ranked[0];
   return {
     factor,
     value: Number(factor.value),
     why: { geo, year: factor.factor_year, yearIsLater, candidates: pool.length },
   };
+}
+
+/* ---------------- unit conversion ---------------- */
+
+/**
+ * Convert a quantity between units using the library's own conversion table, which
+ * carries DEFRA's per-fuel calorific values and densities. Tries a direct hop, then one
+ * hop through kilograms (natural gas reaches kWh as m3 -> kg -> kWh, 0.802 x 14.077).
+ *
+ * Returns null when no path exists — the caller reports that rather than guessing, which
+ * is what the old catch-all did when it relabelled kilograms as kWh.
+ */
+export function convertUnit(
+  conversions: EfUnitConversion[],
+  value: number,
+  from: string,
+  to: string,
+  fuel?: string | null,
+): { value: number; path: string } | null {
+  const f = canonicalUnit(from);
+  const t = canonicalUnit(to);
+  if (f === t) return { value, path: f };
+
+  // Fuel-specific rows first; the generic ones (t->kg, MWh->kWh) carry no fuel.
+  const usable = conversions.filter((c) => !c.fuel || (fuel && c.fuel.toLowerCase() === fuel.toLowerCase()));
+  const direct = usable.find((c) => canonicalUnit(c.from_unit) === f && canonicalUnit(c.to_unit) === t);
+  if (direct) return { value: value * Number(direct.factor), path: `${f} → ${t}` };
+
+  const inverse = usable.find((c) => canonicalUnit(c.from_unit) === t && canonicalUnit(c.to_unit) === f);
+  if (inverse && Number(inverse.factor) !== 0) {
+    return { value: value / Number(inverse.factor), path: `${f} → ${t}` };
+  }
+
+  for (const via of ["kg", "t", "L"]) {
+    if (via === f || via === t) continue;
+    const a = usable.find((c) => canonicalUnit(c.from_unit) === f && canonicalUnit(c.to_unit) === via);
+    const b = usable.find((c) => canonicalUnit(c.from_unit) === via && canonicalUnit(c.to_unit) === t);
+    if (a && b) {
+      return { value: value * Number(a.factor) * Number(b.factor), path: `${f} → ${via} → ${t}` };
+    }
+  }
+  return null;
 }
 
 /** kgCO₂e for a quantity, or null when no factor applies. */
@@ -149,14 +201,17 @@ export function applyFactor(factors: EfFactor[], q: FactorQuery, quantity: numbe
 /* ---------------- capture form values → the library's taxonomy ---------------- */
 
 /** What the energy capture form calls a source, and what the library calls it. */
-export const ENERGY_SOURCE_FACTOR: Record<string, { domain: string; activityKey: string }> = {
+export const ENERGY_SOURCE_FACTOR: Record<string, { domain: string; activityKey: string; fuelName?: string }> = {
   electricity_grid: { domain: "electricity", activityKey: "electricity_grid" },
   solar_pv:         { domain: "electricity", activityKey: "solar_pv" },
   district_cooling: { domain: "heat",        activityKey: "district_cooling" },
-  natural_gas:      { domain: "fuel",        activityKey: "natural_gas" },
+  natural_gas:      { domain: "fuel",        activityKey: "natural_gas", fuelName: "Natural Gas" },
   // DEFRA separates road diesel from gas oil; a standby generator burns the mineral grade.
-  diesel:           { domain: "fuel",        activityKey: "diesel_100_pct_mineral_diesel" },
+  diesel:           { domain: "fuel",        activityKey: "diesel_100_pct_mineral_diesel", fuelName: "Diesel (100% mineral diesel)" },
 };
+
+/** Sources whose emissions are Scope 2 (purchased or self-generated electricity and heat). */
+export const SCOPE2_ENERGY_SOURCES = ["electricity_grid", "district_cooling", "solar_pv"];
 
 /** Water capture supply type → the library's water rows. Recycled and rainwater carry no supply factor. */
 export const WATER_FACTOR: Record<string, string | null> = {
@@ -168,51 +223,108 @@ export const WATER_RETURN_SHARE = 0.95;
 
 /**
  * Waste is material × route in every published set, so the capture form's stream and
- * disposal route resolve together. A combination the library does not cover returns
- * null and the inventory reports the gap rather than borrowing another material's factor.
+ * disposal route resolve together. A stream the library does not cover returns null and
+ * the inventory reports the gap — it does not borrow another material's factor, which is
+ * what "hazardous" used to do by silently becoming mixed commercial refuse.
  */
 export const WASTE_STREAM_KEY: Record<string, string> = {
   mixed: "commercial_and_industrial_waste",
   landfill: "commercial_and_industrial_waste",
+  household: "household_residual_waste",
   organic: "organic_mixed_food_and_garden_waste",
+  "organic-food": "organic_food_and_drink_waste",
+  "organic-garden": "organic_garden_waste",
   recyclable: "mixed_recyclables",
-  glass: "glass",
   paper: "paper_and_board_mixed",
+  card: "paper_and_board_board",
+  glass: "glass",
   plastic: "plastics_average_plastics",
+  "plastic-film": "plastics_average_plastic_film",
   metal: "metal_mixed_cans",
+  "metal-scrap": "metal_scrap_metal",
   ewaste: "weee_mixed",
+  batteries: "batteries",
+  textiles: "clothing",
   construction: "average_construction",
+  oil: "mineral_oil",
 };
 
-export const WASTE_ROUTE_VARIANT: Record<string, string | null> = {
+export const WASTE_ROUTE_VARIANT: Record<string, string> = {
   landfill: "landfill",
   incineration: "energy_recovery",
   recycled: "open_loop",
+  "recycled-closed": "closed_loop",
   composted: "composting",
+  anaerobic: "anaerobic_digestion",
   donated: "donated",
+};
+
+/** Streams the forms offer that no published set prices. The mass is still recorded. */
+export const WASTE_STREAMS_WITHOUT_FACTORS: Record<string, string> = {
+  hazardous: "No published set prices a generic hazardous stream — only asbestos, which is its own line.",
 };
 
 export function wasteFactorFor(stream: string | null | undefined, route: string | null | undefined) {
   const r = route ?? "landfill";
   if (r === "donated") return { activityKey: "donated_food", variant: "donated" };
-  const key = WASTE_STREAM_KEY[stream ?? "mixed"] ?? WASTE_STREAM_KEY.mixed;
+  const key = WASTE_STREAM_KEY[stream ?? "mixed"];
   const variant = WASTE_ROUTE_VARIANT[r];
-  return variant ? { activityKey: key, variant } : null;
+  if (!key || !variant) return null;
+  return { activityKey: key, variant };
 }
 
 /** Travel and commute mode → the library's row. */
 export const TRAVEL_MODE_FACTOR: Record<string, { activityKey: string; variant?: string | null; unit: string }> = {
-  "air-short":     { activityKey: "short_haul_to_from_uk_average_passenger", variant: "with_rf", unit: "pkm" },
-  "air-long":      { activityKey: "long_haul_to_from_uk_average_passenger", variant: "with_rf", unit: "pkm" },
-  "air-intl":      { activityKey: "international_to_from_non_uk_average_passenger", variant: "with_rf", unit: "pkm" },
+  "air-short":     { activityKey: "short_haul_to_from_uk", variant: "with_rf", unit: "pkm" },
+  "air-long":      { activityKey: "long_haul_to_from_uk", variant: "with_rf", unit: "pkm" },
+  "air-intl":      { activityKey: "international_to_from_non_uk", variant: "with_rf", unit: "pkm" },
   rail:            { activityKey: "national_rail", variant: null, unit: "pkm" },
   bus:             { activityKey: "average_local_bus", variant: null, unit: "pkm" },
   // Car factors are published per vehicle-km, not per passenger-km.
   "car-petrol":    { activityKey: "average_car", variant: "petrol", unit: "km" },
   "car-diesel":    { activityKey: "average_car", variant: "diesel", unit: "km" },
   "car-ev":        { activityKey: "average_car", variant: "battery_electric_vehicle", unit: "km" },
-  "hotel-stay":    { activityKey: "hotel_stay", variant: null, unit: "night" },
+  // Hotel stays are filed per country, so the key comes from `hotelStayKey` and the
+  // capture form has to ask where the stay was.
+  "hotel-stay":    { activityKey: "", variant: null, unit: "night" },
 };
+
+/**
+ * ISO2 of the country stayed in → the library's hotel-stay row. DEFRA files these by
+ * country name, so the key is the slug of that name; London has its own row.
+ */
+export const HOTEL_STAY_KEY: Record<string, string> = {
+  GB: "uk", "GB-LND": "uk_london", AU: "australia", BE: "belgium", BR: "brazil",
+  CA: "canada", CL: "chile", CN: "china", CO: "colombia", EG: "egypt", FR: "france",
+  DE: "germany", IN: "india", ID: "indonesia", IT: "italy", JP: "japan", JO: "jordan",
+  MY: "malaysia", MV: "maldives", MX: "mexico", NL: "netherlands", OM: "oman",
+  PH: "philippines", PT: "portugal", QA: "qatar", SA: "saudi_arabia", SG: "singapore",
+  ZA: "south_africa", ES: "spain", CH: "switzerland", TH: "thailand", TR: "turkey",
+  AE: "united_arab_emirates", VN: "vietnam",
+};
+
+export const hotelStayKey = (iso2: string | null | undefined) =>
+  (iso2 ? HOTEL_STAY_KEY[iso2] : undefined) ?? null;
+
+/**
+ * Flights are published per haul *and* per cabin class; the difference between economy
+ * and business on a long-haul is roughly 2.2x, so the class is not a detail.
+ */
+const CABIN_SUFFIX: Record<string, string> = {
+  average: "average_passenger",
+  economy: "economy_class",
+  premium: "premium_economy_class",
+  business: "business_class",
+  first: "first_class",
+};
+
+export const flightKey = (mode: string, cabinClass?: string | null) => {
+  const base = TRAVEL_MODE_FACTOR[mode]?.activityKey;
+  if (!base) return null;
+  return `${base}_${CABIN_SUFFIX[cabinClass ?? "average"] ?? CABIN_SUFFIX.average}`;
+};
+
+export const isFlight = (mode: string) => mode.startsWith("air-");
 
 /**
  * Refrigerant gas code → the library's slug.

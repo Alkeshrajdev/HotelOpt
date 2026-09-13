@@ -6,8 +6,8 @@
  * activity records only — no denominator, no intensity.
  */
 import { useEffect, useMemo, useState } from "react";
-import { listActivity, listFactorSet, listRecords, type ActivityRecord, type EfFactor, type RecordWithProperty } from "@/lib/api";
-import { ENERGY_SOURCE_FACTOR, geoChain, resolveFactor } from "./factors";
+import { listActivity, listEmissionActivities, listFactorSet, listRecords, listUnitConversions, type ActivityRecord, type EfUnitConversion, type EmissionActivity, type RecordWithProperty } from "@/lib/api";
+import { ENERGY_SOURCE_FACTOR, SCOPE2_ENERGY_SOURCES, convertUnit, geoChain, resolveFactor, type EfFactorRow } from "./factors";
 import { CHART } from "@/lib/chartPalette";
 
 export const MONTH_ORDER = [5, 6, 7, 8, 9, 10, 11, 12, 1, 2, 3, 4];
@@ -31,7 +31,12 @@ export type PillarLive = {
   monthly: MonthRow[]; sources: SourceDef[]; kpis: Kpi[];
   totalTY: number; totalPY: number; intensityTY: number | null; intensityPY: number | null; monthsApproved: number;
 };
-export type PropertyPerformance = { energy: PillarLive; water: PillarLive; waste: PillarLive; carbon: PillarLive; activity: { ornTY: number; ornPY: number; gnTY: number; gnPY: number } };
+export type PropertyPerformance = {
+  energy: PillarLive; water: PillarLive; waste: PillarLive; carbon: PillarLive;
+  activity: { ornTY: number; ornPY: number; gnTY: number; gnPY: number };
+  /** Records whose unit no conversion could reach, so they are not in the totals above. */
+  excludedRecords: number;
+};
 
 const ENERGY_SOURCES: SourceDef[] = [
   { key: "grid", label: "Grid", fullLabel: "Grid electricity", color: CHART.olive },
@@ -67,21 +72,30 @@ const normUnit = (u: string) => u.replace("³", "3").toLowerCase();
  * the location-based boundary and Scope 1 sources at combustion — never the Cat 3
  * boundaries, which belong to the inventory's own lines.
  */
-function efFor(factors: EfFactor[], source: string, unit: string, year: number, geo: string[]): number {
+function efFor(factors: EfFactorRow[], source: string, unit: string, year: number, geo: string[]): number {
   const map = ENERGY_SOURCE_FACTOR[source];
   if (!map) return 0;
-  const boundary = source === "electricity_grid" || source === "district_cooling" || source === "solar_pv"
-    ? "location_based" as const
-    : "combustion" as const;
-  const u = normUnit(unit) === "mwh" ? "kWh" : unit;
+  const boundary = SCOPE2_ENERGY_SOURCES.includes(source) ? ("location_based" as const) : ("combustion" as const);
   const hit = resolveFactor(factors, {
-    domain: map.domain, activityKey: map.activityKey, boundary,
-    unit: u, year, geo,
+    domain: map.domain, activityKey: map.activityKey, boundary, unit, year, geo,
   });
-  return hit ? hit.value * (normUnit(unit) === "mwh" ? 1000 : 1) : 0;
+  return hit ? hit.value : 0;
 }
 
-const toKwh = (v: number, unit: string) => (normUnit(unit) === "mwh" ? v * 1000 : normUnit(unit) === "mj" ? v / 3.6 : v);
+/**
+ * Energy in kWh, for the physical-energy totals. Anything that is not already an energy
+ * unit needs the fuel's own calorific value — a cubic metre of natural gas is about 11
+ * kWh, and the old version counted it as 1. Returns null when no conversion exists, so
+ * the record is excluded and counted rather than silently mis-stated.
+ */
+function toKwh(conversions: EfUnitConversion[], v: number, unit: string, source: string): number | null {
+  const u = normUnit(unit);
+  if (u === "kwh") return v;
+  if (u === "mwh") return v * 1000;
+  if (u === "mj") return v / 3.6;
+  const hit = convertUnit(conversions, v, unit, "kWh", ENERGY_SOURCE_FACTOR[source]?.fuelName);
+  return hit ? hit.value : null;
+}
 const toM3 = (v: number, unit: string) => (normUnit(unit) === "l" ? v / 1000 : v);
 const toKg = (v: number, unit: string) => (normUnit(unit) === "t" ? v * 1000 : v);
 
@@ -90,7 +104,20 @@ function delta(ty: number, py: number) {
 }
 
 /** Build the four pillar views for one property and reporting year from raw rows. */
-export function buildPerformance(year: number, records: RecordWithProperty[], activity: ActivityRecord[], factors: EfFactor[], geo: string[]): PropertyPerformance {
+/**
+ * `emissionActivities` carries the Scope 1 fugitive rows. Without them the Carbon pillar
+ * and the Carbon inventory tab reported different Scope 1+2 totals for the same property.
+ */
+export function buildPerformance(
+  year: number,
+  records: RecordWithProperty[],
+  activity: ActivityRecord[],
+  factors: EfFactorRow[],
+  conversions: EfUnitConversion[],
+  emissionActivities: EmissionActivity[],
+  geo: string[],
+): PropertyPerformance {
+  let unconvertible = 0;
   const months = MONTH_ORDER.map((m) => ({ ty: `${m >= 5 ? year : year + 1}-${String(m).padStart(2, "0")}`, py: `${m >= 5 ? year - 1 : year}-${String(m).padStart(2, "0")}`, label: MONTH_SHORT[m - 1] }));
   const approved = records.filter((r) => r.status === "approved");
   const act = activity.filter((a) => a.status === "approved");
@@ -105,8 +132,17 @@ export function buildPerformance(year: number, records: RecordWithProperty[], ac
   const energyRows: MonthRow[] = months.map(({ ty, py, label }) => {
     const row: MonthRow = { month: label, ty: 0, py: 0, costTY: 0, costPY: 0 };
     ENERGY_SOURCES.forEach((s) => { row[s.key] = 0; });
-    pick("energy", ty).forEach((r) => { const k = ENERGY_KEY[r.energy_source ?? ""] ?? "grid"; const mwh = toKwh(r.consumption, r.unit) / 1000; row[k] = (row[k] as number) + mwh; row.ty += mwh; });
-    pick("energy", py).forEach((r) => { row.py += toKwh(r.consumption, r.unit) / 1000; });
+    pick("energy", ty).forEach((r) => {
+      const kwh = toKwh(conversions, r.consumption, r.unit, r.energy_source ?? "");
+      if (kwh === null) { unconvertible += 1; return; }
+      const k = ENERGY_KEY[r.energy_source ?? ""] ?? "grid";
+      const mwh = kwh / 1000;
+      row[k] = (row[k] as number) + mwh; row.ty += mwh;
+    });
+    pick("energy", py).forEach((r) => {
+      const kwh = toKwh(conversions, r.consumption, r.unit, r.energy_source ?? "");
+      if (kwh !== null) row.py += kwh / 1000;
+    });
     row.costTY = +cost(pick("energy", ty)).toFixed(1); row.costPY = +cost(pick("energy", py)).toFixed(1);
     ENERGY_SOURCES.forEach((s) => { row[s.key] = Math.round(row[s.key] as number); });
     row.ty = Math.round(row.ty); row.py = Math.round(row.py);
@@ -138,12 +174,22 @@ export function buildPerformance(year: number, records: RecordWithProperty[], ac
   const carbonOf = (rows: RecordWithProperty[]) => rows.reduce((acc, r) => {
     if (r.pillar !== "energy" || !r.energy_source) return acc;
     const t = (r.consumption * efFor(factors, r.energy_source, r.unit, year, geo)) / 1000;
-    if (r.energy_source === "electricity_grid" || r.energy_source === "district_cooling") acc.scope2 += t; else acc.scope1 += t;
+    if (SCOPE2_ENERGY_SOURCES.includes(r.energy_source)) acc.scope2 += t; else acc.scope1 += t;
     return acc;
   }, { scope1: 0, scope2: 0 });
+  const fugitive = (ym: string) => emissionActivities
+    .filter((a) => a.status === "approved" && a.scope === 1 && ymOf(a.period_start) === ym)
+    .reduce((s, a) => s + Number(a.tco2e ?? 0), 0);
+  // The chart wants whole tonnes per month, but the year total must not be a sum of
+  // twelve roundings — that is what left this tab two tonnes away from the Carbon
+  // inventory for the same property.
+  const carbonExact = { ty: 0, py: 0, scope1: 0, scope2: 0 };
   const carbonRows: MonthRow[] = months.map(({ ty, py, label }) => {
     const c = carbonOf(pick("energy", ty)), cp = carbonOf(pick("energy", py));
+    c.scope1 += fugitive(ty); cp.scope1 += fugitive(py);
     const tyT = c.scope1 + c.scope2, pyT = cp.scope1 + cp.scope2;
+    carbonExact.ty += tyT; carbonExact.py += pyT;
+    carbonExact.scope1 += c.scope1; carbonExact.scope2 += c.scope2;
     return { month: label, ty: Math.round(tyT), py: Math.round(pyT), costTY: +((tyT * CARBON_SHADOW_PRICE) / 1000).toFixed(1), costPY: +((pyT * CARBON_SHADOW_PRICE) / 1000).toFixed(1), scope1: Math.round(c.scope1), scope2: Math.round(c.scope2) };
   });
 
@@ -196,7 +242,7 @@ export function buildPerformance(year: number, records: RecordWithProperty[], ac
       { label: "Food waste", value: coversTY ? Math.round((wasteRows.reduce((s, r) => s + (r.composted as number), 0) * 1e6) / coversTY).toLocaleString("en-US") : "—", unit: "g / cover", delta: 0, goodDir: "down", iconBg: "bg-pillar-waste/10 text-pillar-waste" },
     ],
   };
-  const cTY = sum(carbonRows, "ty"), cPY = sum(carbonRows, "py");
+  const cTY = carbonExact.ty, cPY = carbonExact.py;
   const cInt = intensity(cTY, ornTY, 1000), cIntPY = intensity(cPY, ornPY, 1000);
   const carbon: PillarLive = {
     unit: "tCO₂e", costUnit: `carbon cost $${CARBON_SHADOW_PRICE}/t`, totalLabel: "Scope 1+2 emissions", intensityLabel: "Carbon intensity", intensityUnit: "kgCO₂e / ORN",
@@ -205,11 +251,11 @@ export function buildPerformance(year: number, records: RecordWithProperty[], ac
     kpis: [
       { label: "Scope 1+2 total", value: Math.round(cTY).toLocaleString("en-US"), unit: "tCO₂e", delta: delta(cTY, cPY), goodDir: "down", iconBg: "bg-pillar-carbon/10 text-pillar-carbon" },
       { label: "Carbon intensity", value: cInt !== null ? cInt.toFixed(1) : "—", unit: "kgCO₂e / ORN", delta: cInt !== null && cIntPY !== null ? delta(cInt, cIntPY) : 0, goodDir: "down", iconBg: "bg-warn/10 text-warn" },
-      { label: "Scope 1 (direct)", value: Math.round(carbonRows.reduce((s, r) => s + (r.scope1 as number), 0)).toLocaleString("en-US"), unit: "tCO₂e", delta: 0, goodDir: "down", iconBg: "bg-pillar-carbon/10 text-pillar-carbon" },
+      { label: "Scope 1 (direct)", value: Math.round(carbonExact.scope1).toLocaleString("en-US"), unit: "tCO₂e", delta: 0, goodDir: "down", iconBg: "bg-pillar-carbon/10 text-pillar-carbon" },
       { label: "Renewable share", value: eTY ? ((renewTY / eTY) * 100).toFixed(1) : "—", unit: "%", delta: 0, goodDir: "up", iconBg: "bg-brand-50 text-brand-700" },
     ],
   };
-  return { energy, water, waste, carbon, activity: { ornTY, ornPY, gnTY, gnPY } };
+  return { energy, water, waste, carbon, activity: { ornTY, ornPY, gnTY, gnPY }, excludedRecords: unconvertible };
 }
 
 /** Loads two reporting years for one property. `enabled` false (demo) does nothing. */
@@ -237,9 +283,14 @@ export function usePropertyPerformance(
         boundaries: ["location_based", "combustion"],
         activityKeys: Object.values(ENERGY_SOURCE_FACTOR).map((m) => m.activityKey),
       }),
-    ]).then(([records, activity, factors]) => {
+      listUnitConversions(),
+      listEmissionActivities({ propertyId, from, to, status: "approved", scope: 1 }),
+    ]).then(([records, activity, factors, conversions, emissionActivities]) => {
       if (cancelled) return;
-      setState({ loading: false, error: null, data: buildPerformance(year, records, activity, factors, chain) });
+      setState({
+        loading: false, error: null,
+        data: buildPerformance(year, records, activity, factors, conversions, emissionActivities, chain),
+      });
     }).catch((e: Error) => { if (!cancelled) setState({ loading: false, error: e.message, data: null }); });
     return () => { cancelled = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps

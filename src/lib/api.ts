@@ -8,6 +8,8 @@ export type Property = Tables<"properties">;
 export type ConsumptionRecord = Tables<"consumption_records">;
 export type ActivityRecord = Tables<"activity_records">;
 export type EfFactor = Tables<"ef_factors">;
+/** A factor with its dataset's precedence — what breaks a tie between two sources. */
+export type EfFactorWithDataset = EfFactor & { dataset: { precedence: number; publisher: string } | null };
 export type EfDataset = Tables<"ef_datasets">;
 export type EfUnitConversion = Tables<"ef_unit_conversions">;
 export type EmissionActivity = Tables<"emission_activities">;
@@ -54,10 +56,10 @@ export async function listFactorSet(opts: {
   activityKeys?: string[];
   fromYear?: number;
   limit?: number;
-}): Promise<EfFactor[]> {
+}): Promise<EfFactorWithDataset[]> {
   let q = supabase!
     .from("ef_factors")
-    .select("*")
+    .select("*, dataset:ef_datasets(precedence,publisher)")
     .in("domain", opts.domains)
     .in("geo_code", opts.geoCodes)
     .order("factor_year", { ascending: false })
@@ -67,7 +69,7 @@ export async function listFactorSet(opts: {
   if (opts.fromYear) q = q.or(`factor_year.is.null,factor_year.gte.${opts.fromYear}`);
   const { data, error } = await q;
   if (error) throw error;
-  return data ?? [];
+  return (data ?? []) as unknown as EfFactorWithDataset[];
 }
 
 /** The exact rows a set of stored records was calculated with — the report's provenance. */
@@ -85,16 +87,16 @@ export async function listFactorCandidates(opts: {
   activityKey: string;
   boundary: string;
   geoCodes: string[];
-}): Promise<EfFactor[]> {
+}): Promise<EfFactorWithDataset[]> {
   const { data, error } = await supabase!
     .from("ef_factors")
-    .select("*")
+    .select("*, dataset:ef_datasets(precedence,publisher)")
     .eq("domain", opts.domain)
     .eq("activity_key", opts.activityKey)
     .eq("boundary", opts.boundary)
     .in("geo_code", opts.geoCodes);
   if (error) throw error;
-  return data ?? [];
+  return (data ?? []) as unknown as EfFactorWithDataset[];
 }
 
 /** Search the library by name or NAICS code — the purchase form and the admin view. */
@@ -110,6 +112,13 @@ export async function searchFactors(opts: {
     if (t) q = q.or(`activity.ilike.%${t}%,subtype.ilike.%${t}%,naics_code.ilike.${t}%`);
   }
   const { data, error } = await q;
+  if (error) throw error;
+  return data ?? [];
+}
+
+/** DEFRA's per-fuel calorific values and densities, plus the plain unit conversions. */
+export async function listUnitConversions(): Promise<EfUnitConversion[]> {
+  const { data, error } = await supabase!.from("ef_unit_conversions").select("*").limit(1000);
   if (error) throw error;
   return data ?? [];
 }

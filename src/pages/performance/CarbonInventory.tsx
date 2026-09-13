@@ -405,6 +405,7 @@ function LineRow({ line }: { line: InventoryLine }) {
       <td className="table-td text-[12px] text-ink-500" colSpan={2}>
         {line.basis}
         {line.quantity !== null && <span className="tabular-nums"> · {line.quantity.toLocaleString("en-US")} {line.quantityUnit} × {factorLabel(line.factor)}</span>}
+        {line.note && <span className="text-ink-400"> · {line.note}</span>}
         {line.gap && <span className="text-warn-700"> · {line.gap}</span>}
       </td>
       <td className="table-td text-right tabular-nums text-[12px]">{fmtT(line.tco2e)}</td>
