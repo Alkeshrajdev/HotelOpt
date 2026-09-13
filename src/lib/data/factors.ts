@@ -326,6 +326,46 @@ export const flightKey = (mode: string, cabinClass?: string | null) => {
 
 export const isFlight = (mode: string) => mode.startsWith("air-");
 
+/* ---------------- owned vehicles (Scope 1 mobile combustion) ---------------- */
+
+/**
+ * GHG Protocol prefers the fuel-based method: what the fleet actually burned is measured,
+ * where a distance estimate is not. Both are supported, and the form says which is which.
+ */
+export const FLEET_FUEL: Record<string, { activityKey: string; fuelName: string }> = {
+  petrol:        { activityKey: "petrol_average_biofuel_blend", fuelName: "Petrol (average biofuel blend)" },
+  "petrol-pure": { activityKey: "petrol_100_pct_mineral_petrol", fuelName: "Petrol (100% mineral petrol)" },
+  diesel:        { activityKey: "diesel_average_biofuel_blend", fuelName: "Diesel (average biofuel blend)" },
+  "diesel-pure": { activityKey: "diesel_100_pct_mineral_diesel", fuelName: "Diesel (100% mineral diesel)" },
+  lpg:           { activityKey: "lpg", fuelName: "LPG" },
+  cng:           { activityKey: "cng", fuelName: "CNG" },
+};
+
+/** Vehicle class → the library's row. The fuel is the column-group, so it is the variant. */
+export const FLEET_VEHICLE: Record<string, { activityKey: string; label: string }> = {
+  "car-average":   { activityKey: "average_car", label: "Car — average" },
+  "car-small":     { activityKey: "small_car", label: "Car — small" },
+  "car-medium":    { activityKey: "medium_car", label: "Car — medium" },
+  "car-large":     { activityKey: "large_car", label: "Car — large" },
+  "car-mpv":       { activityKey: "mpv", label: "Car — MPV / people carrier" },
+  "car-4x4":       { activityKey: "dual_purpose_4x4", label: "Car — 4x4 / dual purpose" },
+  "car-executive": { activityKey: "executive", label: "Car — executive" },
+  "car-luxury":    { activityKey: "luxury", label: "Car — luxury" },
+  "van-average":   { activityKey: "average_up_to_3_5_tonnes", label: "Van — average (up to 3.5 t)" },
+  "van-small":     { activityKey: "class_i_up_to_1_305_tonnes", label: "Van — Class I (up to 1.305 t)" },
+  "van-medium":    { activityKey: "class_ii_1_305_to_1_74_tonnes", label: "Van — Class II (1.305–1.74 t)" },
+  "van-large":     { activityKey: "class_iii_1_74_to_3_5_tonnes", label: "Van — Class III (1.74–3.5 t)" },
+  motorbike:       { activityKey: "average", label: "Motorbike — average" },
+  hgv:             { activityKey: "all_hgvs", label: "HGV — all (average laden)" },
+};
+
+/** Motorbikes are published without a fuel split; HGVs are split by load instead. */
+export const fleetVariantFor = (vehicle: string, fuel: string | null | undefined) => {
+  if (vehicle === "motorbike") return null;
+  if (vehicle === "hgv") return "average_laden";
+  return fuel || "unknown";
+};
+
 /**
  * Refrigerant gas code → the library's slug.
  *

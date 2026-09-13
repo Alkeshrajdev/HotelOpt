@@ -57,8 +57,8 @@ import {
   listMoneyBasis, searchFactors, uploadEvidence, upsertActivity, type EfFactor,
 } from "@/lib/api";
 import {
-  TRAVEL_MODE_FACTOR, flightKey, geoChain, hotelStayKey, isFlight, naicsKey,
-  refrigerantKey, resolveFactor, spendToBase,
+  FLEET_FUEL, FLEET_VEHICLE, TRAVEL_MODE_FACTOR, fleetVariantFor, flightKey, geoChain,
+  hotelStayKey, isFlight, naicsKey, refrigerantKey, resolveFactor, spendToBase,
 } from "@/lib/data/factors";
 import { anomalyFlagsFor } from "@/lib/data/records";
 import { useProperties, type PropertyLite as Property } from "@/lib/data/properties";
@@ -106,11 +106,19 @@ function validateRequiredFields(
 ): Record<string, string> {
   const errs: Record<string, string> = {};
   for (const f of fields) {
+    // A field hidden by showWhen cannot be filled in, so it cannot be required —
+    // otherwise the fleet form's vehicle field blocks a fuel-based submission.
+    if (!isFieldVisible(f, values)) continue;
     if (f.required && !values[f.key]?.trim()) {
       errs[f.key] = `${f.label} is required.`;
     }
   }
   return errs;
+}
+
+/** Whether a conditional field currently applies. */
+export function isFieldVisible(f: FieldDef, values: Record<string, string>): boolean {
+  return !f.showWhen || f.showWhen.equals.includes(values[f.showWhen.field] ?? "");
 }
 
 // Days in a "YYYY-MM" period; falls back to 30 if unparseable.
@@ -368,6 +376,65 @@ async function submitEmissionActivity(opts: {
     return null;
   }
 
+  if (key === "fleet") {
+    const basis = v["basis"] ?? "fuel";
+    const quantity = num("quantity");
+    const unit = v["unit"] ?? (basis === "fuel" ? "L" : "km");
+    if (quantity === null || quantity <= 0) {
+      return basis === "fuel" ? "Enter the quantity of fuel purchased." : "Enter the distance driven.";
+    }
+
+    // Fuel-based is activity x a fuel factor; distance-based is activity x a vehicle
+    // factor, where the fuel is the column-group rather than the row.
+    const target = basis === "fuel"
+      ? (() => {
+          const f = FLEET_FUEL[v["fuelType"] ?? ""];
+          return f ? { domain: "fuel", activityKey: f.activityKey, variant: undefined, label: v["fuelType"] } : null;
+        })()
+      : (() => {
+          const vehicle = v["vehicleType"] ?? "";
+          const m = FLEET_VEHICLE[vehicle];
+          return m
+            ? { domain: "vehicle", activityKey: m.activityKey, variant: fleetVariantFor(vehicle, v["vehicleFuel"]), label: m.label }
+            : null;
+        })();
+    if (!target) return basis === "fuel" ? "Choose the fuel." : "Choose the vehicle.";
+
+    const hit = await resolve(target.domain, target.activityKey, "combustion", unit, target.variant);
+    if (!hit) {
+      return basis === "fuel"
+        ? `No combustion factor in the library for that fuel measured in ${unit}. Fuel is published per litre, per kilogram and per kWh.`
+        : `No factor in the library for ${target.label} on ${v["vehicleFuel"] || "that fuel"} measured in ${unit}. Distance factors are published per km and per mile.`;
+    }
+
+    await createEmissionActivity({
+      property_id: propertyId, scope: 1, category: null, activity_type: "vehicle",
+      factor_key: hit.factor.activity_key,
+      description: basis === "fuel"
+        ? `Fleet fuel — ${hit.factor.subtype ?? hit.factor.activity}`
+        : `Fleet distance — ${target.label}`,
+      period_start: start, period_end: end,
+      quantity, unit,
+      // Fuel burned is measured; a distance estimate is a product-class average.
+      tier: basis === "fuel" ? 1 : 2,
+      ef_id: hit.factor.id, ef_value: hit.value,
+      ef_unit: `${hit.factor.unit_numerator}/${hit.factor.unit_denominator}`,
+      tco2e: (quantity * hit.value) / 1000,
+      notes: v["notes"] || null,
+      source_payload: withEvidence({
+        basis, vehicleRef: v["vehicleRef"] || null,
+        vehicleType: v["vehicleType"] ?? null, vehicleFuel: v["vehicleFuel"] ?? null,
+        fuelType: v["fuelType"] ?? null,
+        method: basis === "fuel"
+          ? "Fuel purchased × combustion factor (GHG Protocol fuel-based method)."
+          : "Distance × vehicle factor (GHG Protocol distance-based method). Fuel-based is preferred where fuel records exist.",
+        factor: { name: hit.factor.activity, source: hit.factor.source_name, vintage: hit.factor.factor_year_label },
+      }),
+      anomaly_flags: anomalyFlags, input_method: method, submit: true,
+    });
+    return null;
+  }
+
   // travel & commute
   const category = v["category"] ?? "cat6";
   const travelMode = v["mode"] ?? "";
@@ -469,11 +536,12 @@ export default function DataCapture() {
     try {
       const v = capture.values;
       const utilityType = cfg.key === "energy" || cfg.key === "water" || cfg.key === "waste" || cfg.key === "occupancy";
-      const activityType = cfg.key === "procurement" || cfg.key === "travel-commute" || cfg.key === "refrigerants";
+      const activityType = cfg.key === "procurement" || cfg.key === "travel-commute"
+        || cfg.key === "refrigerants" || cfg.key === "fleet";
       if (mode === "live") {
         // Be honest rather than show a fake success: only these types and manual entry reach the database today.
         if (!utilityType && !activityType) {
-          setSubmitError(`${cfg.label} is not stored by the backend yet. Energy, water, waste, occupancy, purchases, business travel / commute and refrigerants are; the rest is on the roadmap in HANDOVER.md.`);
+          setSubmitError(`${cfg.label} is not stored by the backend yet. Energy, water, waste, occupancy, purchases, business travel / commute, refrigerants and the owned fleet are; the rest is on the roadmap in HANDOVER.md.`);
           return;
         }
         if (method !== "manual") {
@@ -1114,7 +1182,7 @@ function ManualWorkflow({
   }
 
   function handleBlur(f: FieldDef) {
-    if (f.required && !values[f.key]?.trim()) {
+    if (f.required && isFieldVisible(f, values) && !values[f.key]?.trim()) {
       setErrors((e) => ({ ...e, [f.key]: `${f.label} is required.` }));
     }
   }
@@ -1187,7 +1255,7 @@ function ManualWorkflow({
 
       <div className="grid grid-cols-2 gap-4 px-5 pt-4 pb-5">
         {cfg.fields
-          .filter((f) => !f.showWhen || f.showWhen.equals.includes(values[f.showWhen.field] ?? ""))
+          .filter((f) => isFieldVisible(f, values))
           .map((f) => (
           <FormField
             key={f.key}

@@ -371,7 +371,7 @@ export async function upsertActivity(payload: {
 
 /* ---------------- Emission activities (Scope 1 fugitive + Scope 3) ---------------- */
 
-export type ActivityType = "refrigerant" | "purchase" | "capital" | "upstream_transport" | "business_travel" | "commute";
+export type ActivityType = "refrigerant" | "vehicle" | "purchase" | "capital" | "upstream_transport" | "business_travel" | "commute";
 
 export async function listEmissionActivities(opts?: {
   propertyId?: string;

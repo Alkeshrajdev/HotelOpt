@@ -287,12 +287,19 @@ function buildYear(
       basis: "Metered consumption × published combustion factor",
     }))
     .filter((l): l is InventoryLine => l !== null);
-  activityLines(1, null, "fugitive").forEach((l) => {
-    scope1.push({
-      ...l,
-      label: `Refrigerant released — ${l.factor?.subtype ?? l.factor?.activity ?? "gas"}`,
-      basis: "Charged less recovered × GWP (IPCC AR5)",
-    });
+  // Scope 1 activity is refrigerant *or* fleet; labelling every row as a refrigerant was
+  // fine while refrigerants were the only kind.
+  activityLines(1, null, "scope1").forEach((l) => {
+    const kind = acts.find((a) => l.key.endsWith(a.ef_id ?? a.factor_key ?? a.activity_type))?.activity_type;
+    scope1.push(
+      kind === "vehicle"
+        ? { ...l, basis: (l.factor?.domain === "vehicle" ? "Distance × vehicle factor" : "Fuel purchased × combustion factor") }
+        : {
+          ...l,
+          label: `Refrigerant released — ${l.factor?.subtype ?? l.factor?.activity ?? "gas"}`,
+          basis: "Charged less recovered × GWP (IPCC AR5)",
+        },
+    );
   });
 
   /* Scope 2 — purchased energy, location-based */
