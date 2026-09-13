@@ -2,7 +2,7 @@
 // Only called when the session is live (see lib/data/mode.ts).
 
 import { supabase } from "./supabase";
-import type { Inserts, Tables } from "./database.types";
+import type { Inserts, Tables, Updates } from "./database.types";
 
 export type Property = Tables<"properties">;
 export type ConsumptionRecord = Tables<"consumption_records">;
@@ -317,6 +317,48 @@ export async function transitionRecord(id: string, next: RecordStatus, comment?:
   return data;
 }
 
+/** Which queue a row came from. Both kinds flow through the same review screen. */
+export type QueueKind = "record" | "activity";
+
+/** Checker decision on a Scope 1/3 activity row. */
+export async function transitionActivity(id: string, next: RecordStatus, comment?: string): Promise<EmissionActivity> {
+  const me = await uid();
+  const { data, error } = await supabase!
+    .from("emission_activities")
+    .update({ status: next, reviewed_by: me, reviewed_at: new Date().toISOString() })
+    .eq("id", id)
+    .select()
+    .single();
+  if (error) throw error;
+  if (comment) await addComment(id, comment, "activity");
+  return data;
+}
+
+/** Maker answers a query on an activity row. Correcting the quantity restates its tCO2e. */
+export async function resubmitActivity(
+  id: string,
+  comment: string,
+  patch?: { quantity?: number; notes?: string | null },
+): Promise<EmissionActivity> {
+  const update: Updates<"emission_activities"> = { status: "submitted", submitted_at: new Date().toISOString() };
+  if (patch?.notes !== undefined) update.notes = patch.notes;
+  if (patch?.quantity !== undefined) {
+    // The factor stays as captured, so a corrected quantity has to carry its result with it.
+    const { data: current, error: readError } = await supabase!
+      .from("emission_activities").select("ef_value").eq("id", id).single();
+    if (readError) throw readError;
+    update.quantity = patch.quantity;
+    if (current?.ef_value != null) {
+      update.tco2e = Math.round(patch.quantity * Number(current.ef_value) / 1000 * 10000) / 10000;
+    }
+  }
+  const { data, error } = await supabase!
+    .from("emission_activities").update(update).eq("id", id).select().single();
+  if (error) throw error;
+  if (comment) await addComment(id, comment, "activity");
+  return data;
+}
+
 /** Maker answers a query: optional corrected value, then back to the queue. */
 export async function resubmitRecord(id: string, comment: string, patch?: { consumption?: number; notes?: string | null }): Promise<ConsumptionRecord> {
   const { data, error } = await supabase!
@@ -372,6 +414,26 @@ export async function upsertActivity(payload: {
 /* ---------------- Emission activities (Scope 1 fugitive + Scope 3) ---------------- */
 
 export type ActivityType = "refrigerant" | "vehicle" | "purchase" | "capital" | "upstream_transport" | "business_travel" | "commute";
+
+export type ActivityWithProperty = EmissionActivity & {
+  property: Pick<Property, "id" | "name" | "region" | "short_name"> | null;
+};
+
+/** The queue's view: activity rows with the property they belong to. */
+export async function listActivitiesForReview(opts?: {
+  status?: RecordStatus | RecordStatus[];
+  limit?: number;
+}): Promise<ActivityWithProperty[]> {
+  let q = supabase!
+    .from("emission_activities")
+    .select("*, property:properties(id,name,region,short_name)")
+    .order("submitted_at", { ascending: false })
+    .limit(opts?.limit ?? 300);
+  if (opts?.status) q = Array.isArray(opts.status) ? q.in("status", opts.status) : q.eq("status", opts.status);
+  const { data, error } = await q;
+  if (error) throw error;
+  return (data ?? []) as unknown as ActivityWithProperty[];
+}
 
 export async function listEmissionActivities(opts?: {
   propertyId?: string;
@@ -479,19 +541,21 @@ export type Comment = Tables<"record_comments"> & {
   author: { id: string; full_name: string | null; role: string } | null;
 };
 
-export async function listComments(recordId: string): Promise<Comment[]> {
+/** Ids are unique across both tables, so one query covers a record or an activity. */
+export async function listComments(id: string): Promise<Comment[]> {
   const { data, error } = await supabase!
     .from("record_comments")
     .select("*, author:user_profiles(id,full_name,role)")
-    .eq("record_id", recordId)
+    .or(`record_id.eq.${id},activity_id.eq.${id}`)
     .order("created_at");
   if (error) throw error;
   return (data ?? []) as unknown as Comment[];
 }
 
-export async function addComment(recordId: string, body: string): Promise<void> {
+export async function addComment(id: string, body: string, kind: QueueKind = "record"): Promise<void> {
   const me = await uid();
-  const { error } = await supabase!.from("record_comments").insert({ record_id: recordId, author_id: me, body });
+  const target = kind === "activity" ? { activity_id: id } : { record_id: id };
+  const { error } = await supabase!.from("record_comments").insert({ ...target, author_id: me, body });
   if (error) throw error;
 }
 

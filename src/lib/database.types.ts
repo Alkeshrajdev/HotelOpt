@@ -505,20 +505,22 @@ export type Database = {
       };
       record_comments: {
         Row: {
+          activity_id: string | null;
           author_id: string;
           body: string;
           created_at: string;
           id: string;
           is_resolved: boolean;
-          record_id: string;
+          record_id: string | null;
         };
         Insert: {
           author_id: string;
           body: string;
-          record_id: string;
+          activity_id?: string | null;
           created_at?: string;
           id?: string;
           is_resolved?: boolean;
+          record_id?: string | null;
         };
         Update: Partial<
           Database["public"]["Tables"]["record_comments"]["Insert"]
@@ -587,5 +589,7 @@ export type Tables<T extends keyof Database["public"]["Tables"]> =
   Database["public"]["Tables"][T]["Row"];
 export type Inserts<T extends keyof Database["public"]["Tables"]> =
   Database["public"]["Tables"][T]["Insert"];
+export type Updates<T extends keyof Database["public"]["Tables"]> =
+  Database["public"]["Tables"][T]["Update"];
 export type DBEnum<T extends keyof Database["public"]["Enums"]> =
   Database["public"]["Enums"][T];

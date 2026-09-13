@@ -4,8 +4,10 @@
  */
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
-  listAudit, listComments, listProfiles, listRecords, resubmitRecord, transitionRecord,
-  type AuditRow, type Comment as DbComment, type EvidencePointer, type Profile, type RecordWithProperty,
+  listActivitiesForReview, listAudit, listComments, listProfiles, listRecords,
+  resubmitActivity, resubmitRecord, transitionActivity, transitionRecord,
+  type ActivityWithProperty, type AuditRow, type Comment as DbComment, type EvidencePointer,
+  type Profile, type QueueKind, type RecordWithProperty,
 } from "@/lib/api";
 import type { AnomalyFlag, AuditEntry, Comment, EvidenceFile, QueryRound, ReviewRecord, Role, Status } from "@/lib/reviewMock";
 
@@ -114,6 +116,62 @@ export function toReviewRecord(r: RecordWithProperty, profiles: Map<string, Prof
   };
 }
 
+const ACTIVITY_LABEL: Record<string, string> = {
+  refrigerant: "Refrigerant log",
+  vehicle: "Fleet — mobile combustion",
+  purchase: "Purchase — goods & services",
+  capital: "Purchase — capital goods",
+  upstream_transport: "Purchase — inbound freight",
+  business_travel: "Business travel",
+  commute: "Employee commuting",
+};
+
+const CATEGORY_TAG = (c: string | null) => (c ? ` · ${c.replace("cat", "Cat ")}` : "");
+
+/**
+ * A Scope 1/3 activity row in the queue's shape. The value column shows what was
+ * captured and what it came to, because the tCO2e is the thing a checker is approving —
+ * a utility record's consumption speaks for itself, an activity's does not.
+ */
+export function toReviewRecordFromActivity(a: ActivityWithProperty, profiles: Map<string, Profile>): ReviewRecord {
+  const by = a.submitted_by ? profiles.get(a.submitted_by) : undefined;
+  const submittedAt = a.submitted_at ?? a.created_at;
+  const due = new Date(new Date(submittedAt).getTime() + SLA_DAYS * 86400000);
+  const open = a.status === "submitted" || a.status === "queried";
+  const overdueDays = open ? Math.max(0, Math.floor((Date.now() - due.getTime()) / 86400000)) : 0;
+  const p = a.source_payload as Record<string, unknown> | null;
+  const qty = `${Number(a.quantity).toLocaleString("en-US")} ${a.unit}`;
+  const tco2e = a.tco2e != null ? `${Number(a.tco2e).toFixed(2)} tCO₂e` : "not calculated";
+  return {
+    id: a.id,
+    property: a.property?.name ?? "—",
+    region: a.property?.region ?? "",
+    pillar: "carbon",
+    dataType: `${ACTIVITY_LABEL[a.activity_type] ?? a.activity_type}${CATEGORY_TAG(a.category)}`,
+    method: a.input_method === "bulk" ? "bulk" : a.input_method === "ocr" ? "ocr" : a.input_method === "api" ? "api" : "manual",
+    source: a.description ?? ACTIVITY_LABEL[a.activity_type] ?? "Activity",
+    period: periodLabel(a.period_start),
+    value: `${qty} → ${tco2e}`,
+    // A foreign invoice shows what was actually billed, not just the converted figure.
+    cost: a.amount_original != null && a.currency_original
+      ? `${a.currency_original} ${Number(a.amount_original).toLocaleString("en-US")}`
+      : undefined,
+    invoiceRef: a.invoice_ref ?? undefined,
+    submittedBy: by?.full_name ?? "Maker",
+    submittedByRole: (by?.role as Role) ?? "maker",
+    submittedAt: stamp(submittedAt),
+    status: toStatus(a.status),
+    dueAt: due.toISOString(),
+    overdueDays,
+    flags: Array.isArray(a.anomaly_flags) ? (a.anomaly_flags as ReviewRecord["flags"]) : [],
+    evidence: toEvidence(p?.evidence),
+    queryRounds: [],
+    comments: [],
+    audit: [],
+    locked: a.status === "approved",
+  };
+}
+
 function toComments(rows: DbComment[], profiles: Map<string, Profile>): Comment[] {
   return rows.map((c) => {
     const author = c.author ?? profiles.get(c.author_id);
@@ -152,6 +210,8 @@ function toAudit(rows: AuditRow[], profiles: Map<string, Profile>): AuditEntry[]
 export function useReviewRecords(enabled: boolean) {
   const [records, setRecords] = useState<ReviewRecord[]>([]);
   const [profiles, setProfiles] = useState<Map<string, Profile>>(new Map());
+  /** Which table each queued row came from, so a decision goes to the right place. */
+  const [kinds, setKinds] = useState<Map<string, QueueKind>>(new Map());
   const [loading, setLoading] = useState(enabled);
   const [error, setError] = useState<string | null>(null);
 
@@ -159,14 +219,24 @@ export function useReviewRecords(enabled: boolean) {
     if (!enabled) return;
     setLoading(true);
     try {
-      const [open, recent, people] = await Promise.all([
+      const [open, recent, openActivities, recentActivities, people] = await Promise.all([
         listRecords({ status: ["draft", "submitted", "queried", "rejected"], limit: 300, orderBy: "submitted_at" }),
         listRecords({ status: "approved", limit: 120, orderBy: "submitted_at" }),
+        listActivitiesForReview({ status: ["draft", "submitted", "queried", "rejected"], limit: 300 }),
+        listActivitiesForReview({ status: "approved", limit: 120 }),
         listProfiles(),
       ]);
       const map = new Map(people.map((p) => [p.id, p]));
       setProfiles(map);
-      setRecords([...open, ...recent].map((r) => toReviewRecord(r, map)));
+
+      const utility = [...open, ...recent].map((r) => toReviewRecord(r, map));
+      const activity = [...openActivities, ...recentActivities].map((a) => toReviewRecordFromActivity(a, map));
+      setKinds(new Map([
+        ...utility.map((r) => [r.id, "record"] as const),
+        ...activity.map((r) => [r.id, "activity"] as const),
+      ]));
+      // One queue, newest first — a checker works a list, not two.
+      setRecords([...utility, ...activity].sort((a, b) => b.submittedAt.localeCompare(a.submittedAt)));
       setError(null);
     } catch (e) {
       setError((e as Error).message);
@@ -193,16 +263,21 @@ export function useReviewRecords(enabled: boolean) {
   }, [enabled, profiles]);
 
   const decide = useCallback(async (id: string, next: "approved" | "queried" | "rejected", comment?: string) => {
-    await transitionRecord(id, next, comment);
+    if (kinds.get(id) === "activity") await transitionActivity(id, next, comment);
+    else await transitionRecord(id, next, comment);
     await refresh();
     await hydrate(id);
-  }, [refresh, hydrate]);
+  }, [kinds, refresh, hydrate]);
 
   const resubmit = useCallback(async (id: string, comment: string, patch?: { consumption?: number }) => {
-    await resubmitRecord(id, comment, patch);
+    if (kinds.get(id) === "activity") await resubmitActivity(id, comment, { quantity: patch?.consumption });
+    else await resubmitRecord(id, comment, patch);
     await refresh();
     await hydrate(id);
-  }, [refresh, hydrate]);
+  }, [kinds, refresh, hydrate]);
 
-  return useMemo(() => ({ records, loading, error, refresh, hydrate, decide, resubmit }), [records, loading, error, refresh, hydrate, decide, resubmit]);
+  return useMemo(
+    () => ({ records, loading, error, refresh, hydrate, decide, resubmit, kinds }),
+    [records, loading, error, refresh, hydrate, decide, resubmit, kinds],
+  );
 }
